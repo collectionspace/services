@@ -24,7 +24,9 @@
 package org.collectionspace.services.relation.nuxeo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.net.HttpURLConnection;
 
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -48,6 +50,7 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.collectionspace.services.relation.RelationsDocListItem;
+import org.collectionspace.services.relation.RelationshipType;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -83,13 +86,13 @@ public class RelationDocumentModelHandler
      * for ACTION.GET_ALL
      */
     private RelationsCommonList relationList;
-    
+
     private static final String ERROR_TERMS_IN_WORKFLOWSTATE = "Cannot modify a relationship if either end is in the workflow state: ";
 
     /*
      * Will return 'true' if either the subject's or object's current workflow state *contain* the passed in workflow
      * state.
-     * 
+     *
      * For example:
      * 	- will return 'true' if the subject's workflow state is "replicated_deleted" and the passed in workflow state is "replicated" or "deleted".
      *  - will return 'true' if the subject's or object's workflow state is "locked" and the passed in workflow state is "locked"
@@ -98,7 +101,7 @@ public class RelationDocumentModelHandler
     	boolean result = false;
     	DocumentModel relationDocModel = wrapDoc.getWrappedObject();
     	String errMsg = ERROR_TERMS_IN_WORKFLOWSTATE + workflowState;
-    			
+
     	CoreSessionInterface repoSession = this.getRepositorySession();
         try {
 			DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
@@ -112,15 +115,15 @@ public class RelationDocumentModelHandler
 				logger.info(errMsg, e);
 			}
 		}
-    	        
+
     	return result;
     }
-    
+
 	@Override
 	/*
 	 * Until we rework the RepositoryClient to handle the workflow transition (just like it does for 'create', 'get', 'update', and 'delete'), this method will only check to see
 	 * if the transition is allowed.  Until then, the WorkflowDocumentModelHandler class does the actual workflow transition.
-	 * 
+	 *
 	 * @see org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandlerImpl#handleWorkflowTransition(org.collectionspace.services.common.document.DocumentWrapper, org.collectionspace.services.lifecycle.TransitionDef)
 	 */
 	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc,
@@ -142,7 +145,7 @@ public class RelationDocumentModelHandler
 				doc.setProperty(RelationClient.SERVICE_COMMONPART_NAME, RelationJAXBSchema.RELATIONSHIP_ACTIVE, Boolean.FALSE);
 			}
 		}
-		
+
 	}
 
     @Override
@@ -150,30 +153,69 @@ public class RelationDocumentModelHandler
     	// Merge in the data from the payload
         super.handleCreate(wrapDoc);
 
-        // And take care of ensuring all the values for the relation info are correct 
+        // And take care of ensuring all the values for the relation info are correct
         populateSubjectAndObjectValues(wrapDoc);
-    	
+
         // We can't create a relationship record if either the subject or the object is in a locked workflow state
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == true) {
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot create a relationship if either end is in the workflow state: " + workflowState);
     	}
+
+        if (isCircularHierarchy(wrapDoc)) {
+            throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
+                    "Cannot create a circular hierarchy");
+        }
+    }
+
+    private boolean isCircularHierarchy(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
+        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+        String commonPartLabel = ctx.getCommonPartLabel();
+        DocumentModel relationDocModel = wrapDoc.getWrappedObject();
+
+        String type = (String) relationDocModel.getProperty(commonPartLabel,
+                RelationJAXBSchema.RELATIONSHIP_TYPE);
+
+        if (type.equals(RelationshipType.HAS_BROADER.value())) {
+            String subjectCsid = (String) relationDocModel.getProperty(commonPartLabel,
+                    RelationJAXBSchema.SUBJECT_CSID);
+
+            String objectCsid = (String) relationDocModel.getProperty(commonPartLabel,
+                    RelationJAXBSchema.OBJECT_CSID);
+
+            // Check if ascending the hierarchy tree from the object reaches the subject. If so,
+            // this creates a circular hierarchy.
+
+            HierarchyAscender objectHierarchyAscender = new HierarchyAscender(objectCsid);
+
+            try {
+                return objectHierarchyAscender.canReach(subjectCsid);
+            } catch (HierarchyAscender.CircularHierarchyException e) {
+                // We got caught in a loop while ascending the tree, but never got to the subject.
+                // So there isn't a path from object to subject, which is what this function is
+                // concerned about.
+
+                return false;
+            }
+        }
+
+        return false;
     }
 
     @Override
     public void handleUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	// Merge in the data from the payload
         super.handleUpdate(wrapDoc);
-        
-        // And take care of ensuring all the values for the relation info are correct 
+
+        // And take care of ensuring all the values for the relation info are correct
         populateSubjectAndObjectValues(wrapDoc);
     }
-    
+
     @Override
     public boolean handleDelete(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
     	boolean result = true;
-    	
+
     	String workflowState = WorkflowClient.WORKFLOWSTATE_LOCKED;
     	// Neither the subject nor the object can be locked
     	if (subjectOrObjectInWorkflowState(wrapDoc, workflowState) == false) {
@@ -182,18 +224,18 @@ public class RelationDocumentModelHandler
     		throw new ServiceException(HttpURLConnection.HTTP_FORBIDDEN,
                     "Cannot delete a relationship if either end is in the workflow state: " + workflowState);
     	}
-    	
+
     	return result;
     }
-    
+
     private void populateSubjectAndObjectValues(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         // Obtain document models for the subject and object of the relation, so that
-        // we ensure we have value docType, URI info. If the docModels support refNames, 
+        // we ensure we have value docType, URI info. If the docModels support refNames,
         // we will also set those.
-        // Note that this introduces another caching problem... 
+        // Note that this introduces another caching problem...
         DocumentModel relationDocModel = wrapDoc.getWrappedObject();
         CoreSessionInterface repoSession = this.getRepositorySession();
-        
+
         DocumentModel subjectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, SUBJ_DOC_MODEL);
         DocumentModel objectDocModel = getSubjectOrObjectDocModel(repoSession, relationDocModel, OBJ_DOC_MODEL);
 
@@ -279,46 +321,46 @@ public class RelationDocumentModelHandler
         String id = getCsid(docModel);
         relationListItem.setCsid(id);
 
-        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        relationListItem.setSubjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.SUBJECT_CSID));
 
-        String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String predicate = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.RELATIONSHIP_TYPE);
         relationListItem.setRelationshipType(predicate);
         relationListItem.setPredicate(predicate); //predicate is new name for relationshipType.
-        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        relationListItem.setPredicateDisplayName((String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.RELATIONSHIP_TYPE_DISPLAYNAME));
 
-        relationListItem.setRelationshipMetaType((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        relationListItem.setRelationshipMetaType((String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.RELATIONSHIP_META_TYPE));
-        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        relationListItem.setObjectCsid((String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.OBJECT_CSID));
 
         relationListItem.setUri(serviceContextPath + id);
 
         //Now fill in summary info for the related docs: subject and object.
         String subjectCsid = relationListItem.getSubjectCsid();
-        String subjectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String subjectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.SUBJECT_DOCTYPE);
         RelationsDocListItem subject = createRelationsDocListItem(ctx, sbt, subjectCsid, tReader, subjectDocumentType);
 
-        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String subjectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.SUBJECT_URI);
         subject.setUri(subjectUri);
-        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String subjectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.SUBJECT_REFNAME);
         subject.setRefName(subjectRefName);
         relationListItem.setSubject(subject);
 
         String objectCsid = relationListItem.getObjectCsid();
-        String objectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String objectDocumentType = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.OBJECT_DOCTYPE);
         RelationsDocListItem object = createRelationsDocListItem(ctx, sbt, objectCsid, tReader, objectDocumentType);
 
-        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String objectUri = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.OBJECT_URI);
         object.setUri(objectUri);
-        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(), 
+        String objectRefName = (String) docModel.getProperty(ctx.getCommonPartLabel(),
         												RelationJAXBSchema.OBJECT_REFNAME);
         object.setRefName(objectRefName);
         relationListItem.setObject(object);
@@ -388,13 +430,13 @@ public class RelationDocumentModelHandler
 
     private final boolean SUBJ_DOC_MODEL = true;
     private final boolean OBJ_DOC_MODEL = false;
-    
+
     private DocumentModel getSubjectOrObjectDocModel(
     		CoreSessionInterface repoSession,
     		DocumentModel relationDocModel,
     		boolean fSubject) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	
+
         // Get the document model for the object of the relation.
     	String commonPartLabel = ctx.getCommonPartLabel();
         String csid = "";
@@ -403,7 +445,7 @@ public class RelationDocumentModelHandler
         // FIXME: Currently assumes that the object CSID is valid if present
         // in the incoming payload.
         try {
-            csid = (String) relationDocModel.getProperty(commonPartLabel, 
+            csid = (String) relationDocModel.getProperty(commonPartLabel,
             		(fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID));
         } catch (PropertyException pe) {
             // Per CSPACE-4468, ignore any property exception here.
@@ -417,7 +459,7 @@ public class RelationDocumentModelHandler
             docModel = docWrapper.getWrappedObject();
         } else { //  if (Tools.isBlank(objectCsid)) {
             try {
-            	refName = (String) relationDocModel.getProperty(commonPartLabel, 
+            	refName = (String) relationDocModel.getProperty(commonPartLabel,
             			(fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME));
             	docModel = NuxeoBasedResource.getDocModelForRefName(ctx, refName, ctx.getResourceMap());
             } catch (Exception e) {
@@ -431,40 +473,40 @@ public class RelationDocumentModelHandler
         }
         return docModel;
     }
-    
+
     private void populateSubjectOrObjectValues(
-    		DocumentModel relationDocModel, 
+    		DocumentModel relationDocModel,
     		DocumentModel subjectOrObjectDocModel,
     		boolean fSubject ) {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	
+
         HashMap<String,Object> properties = new HashMap<String,Object>();
         try {
 	        String doctype = subjectOrObjectDocModel.getDocumentType().getName();
             doctype = ServiceBindingUtils.getUnqualifiedTenantDocType(doctype);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_DOCTYPE:RelationJAXBSchema.OBJECT_DOCTYPE),
 	        					doctype);
-	
+
 	        String csid = (String) subjectOrObjectDocModel.getName();
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_CSID:RelationJAXBSchema.OBJECT_CSID),
 	        					csid);
-	
+
 	        String uri = (String) subjectOrObjectDocModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 	        		CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
 	        properties.put((fSubject?RelationJAXBSchema.SUBJECT_URI:RelationJAXBSchema.OBJECT_URI),
 	        					uri);
-	        
+
 	    	/*
 	    	String common_schema = getCommonSchemaNameForDocType(doctype);
-	    	
+
 	    	if(common_schema!=null) {
-	    		String refname = (String)subjectOrObjectDocModel.getProperty(common_schema, 
+	    		String refname = (String)subjectOrObjectDocModel.getProperty(common_schema,
 	    														RefName.REFNAME );
 	            properties.put((fSubject?RelationJAXBSchema.SUBJECT_REFNAME:RelationJAXBSchema.OBJECT_REFNAME),
 	            		refname);
 	    	}
 	    	*/
-	        String refname = (String) 
+	        String refname = (String)
 	        		subjectOrObjectDocModel.getProperty(
 	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 	        				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
@@ -486,9 +528,54 @@ public class RelationDocumentModelHandler
                     "populateSubjectValues: Problem setting fields " + ce.getLocalizedMessage());
         }
     }
-    
+
     @Override
 	public boolean supportsWorkflowStates() {
 		return true;
 	}
+
+    private class HierarchyAscender {
+        private String originCsid = null;
+        private Set<String> visited = new HashSet<String>();
+
+        public HierarchyAscender(String originCsid) {
+            this.originCsid = originCsid;
+        }
+
+        public boolean canReach(String targetCsid) throws Exception {
+            this.visited.clear();
+
+            String subjectCsid = this.originCsid;
+
+            while (subjectCsid != null) {
+                RelationsCommonList results = RelationDocumentModelHandler.this.getRelations(
+                        subjectCsid, null, RelationshipType.HAS_BROADER.value());
+
+                if (results.getTotalItems() == 0) {
+                    break;
+                }
+
+                RelationListItem item = results.getRelationListItem().get(0);
+                String objectCsid = item.getObjectCsid();
+
+                if (objectCsid.equals(targetCsid)) {
+                    return true;
+                }
+
+                if (this.visited.contains(objectCsid)) {
+                    throw new CircularHierarchyException();
+                }
+
+                visited.add(objectCsid);
+
+                subjectCsid = objectCsid;
+            }
+
+            return false;
+        }
+
+        public class CircularHierarchyException extends IllegalStateException {
+
+        }
+    }
 }
