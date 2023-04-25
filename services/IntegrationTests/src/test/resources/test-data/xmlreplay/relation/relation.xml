@@ -4,8 +4,54 @@
         <!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
-   
+
     <testGroup ID="makeRelations" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
+         <test ID="oe1">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="oe2">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="oe3">
+             <method>POST</method>
+             <uri>/cspace-services/objectexit/</uri>
+             <filename>relation/oe1.xml</filename>
+         </test>
+         <test ID="relate1">
+             <method>POST</method>
+             <uri>/cspace-services/relations/</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="subjectCsid">${oe1.CSID}</var>
+                <var ID="objectCsid">${oe2.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
+                <var ID="relationshipType">hasBroader</var>
+             </vars>
+         </test>
+         <test ID="relate2">
+             <method>POST</method>
+             <uri>/cspace-services/relations/</uri>
+             <filename>relation/r-1.xml</filename>
+             <vars>
+                <var ID="subjectCsid">${oe2.CSID}</var>
+                <var ID="objectCsid">${oe3.CSID}</var>
+                <var ID="subjectDocumentType">objectexit</var>
+                <var ID="objectDocumentType">objectexit</var>
+                <var ID="relationshipType">hasBroader</var>
+             </vars>
+         </test>
+         <test ID="relationsGET">
+             <method>GET</method>
+             <uri>/cspace-services/relations/</uri>
+         </test>
+    </testGroup>
+
+    <testGroup ID="makeCircularHierarchyRelations" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
          <test ID="oe1">
              <method>POST</method>
              <uri>/cspace-services/objectexit/</uri>
@@ -33,27 +79,17 @@
              <uri>/cspace-services/relations/</uri>
              <filename>relation/r-1.xml</filename>
              <vars>
-                <!-- switched oe2 and oe1 on this -->
                 <var ID="subjectCsid">${oe2.CSID}</var>
                 <var ID="objectCsid">${oe1.CSID}</var>
                 <var ID="subjectDocumentType">objectexit</var>
                 <var ID="objectDocumentType">objectexit</var>
                 <var ID="relationshipType">hasBroader</var>
              </vars>
+             <!-- This would create a circular hierarchy, so expect it to fail. -->
+             <expectedCodes>400</expectedCodes>
          </test>
-         <test ID="relationsGET">
-             <method>GET</method>
-             <uri>/cspace-services/relations/</uri>
-         </test>
-         
-         <!--
-         <test>
-            <method>GET</method>
-            <uri>/cspace-services/personauthorities/${OrgAuth1.CSID}/items/${Org1.CSID}</uri>
-        </test>
-        -->
     </testGroup>
-    
+
     <testGroup ID="makeRelationsNested" autoDeletePOSTS="true" authForCleanup="admin@core.collectionspace.org">
          <test ID="oe1">
              <method>POST</method>
@@ -82,7 +118,7 @@
              <uri>/cspace-services/relations/</uri>
          </test>
     </testGroup>
-         
+
     <testGroup ID="r2only" autoDeletePOSTS="true">
          <test ID="relate">
              <method>POST</method>
@@ -101,9 +137,9 @@
              <uri>/cspace-services/relations/</uri>
          </test>
     </testGroup>
-    
+
     <!-- Test whether a relation is automatically soft deleted -->
-    <!-- when a subject of the relation is deleted --> 
+    <!-- when a subject of the relation is deleted -->
     <testGroup ID="cascadeDeleteRelationsOnSubjectDelete" autoDeletePOSTS="true">
          <test ID="createSubject">
              <method>POST</method>
@@ -203,7 +239,7 @@
              </response>
          </test>
     </testGroup>
-    
+
     <!-- Test whether multiple relations are automatically soft deleted -->
     <!-- when an object of the relation is soft deleted. -->
     <testGroup ID="cascadeDeleteMultipleRelationsOnObjectDelete" autoDeletePOSTS="true">
@@ -348,7 +384,7 @@
              </response>
          </test>
     </testGroup>
-         
+
 </xmlReplay>
-        
-        
+
+

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xmlReplayMaster>
     <protoHostPort>http://localhost:8180</protoHostPort>
-    
+
     <!-- legal values for dumpServiceResult=[minimal,detailed,full,auto] -->
     <dump payloads="false" dumpServiceResult="auto" />
-    
+
     <!-- Auth = Base64Encode("username:password") See https://www.base64encode.org/
                 For example:
                     Username = "grover"
@@ -15,20 +15,21 @@
     <auths default="admin@core.collectionspace.org">
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
-    
+
     <run controlFile="security/security-oauth.xml" />
     <run controlFile="security/security.xml" />
     <run controlFile="objectexit/object-exit.xml" testGroup="makeone" />
     <run controlFile="objectexit/object-exit.xml" testGroup="checkList" />
     <run controlFile="objectexit/object-exit-display.xml" testGroup="refNameDisplayNameOnly" />
- 
+
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchCommonSchema" />
     <run controlFile="collectionobject/collectionobject-adv-search.xml" testGroup="advSearchExtensionSchema" />
     <run controlFile="collectionobject/related/collectionobject-related.xml" />
-    
+
     <run controlFile="acquisitions/acquisitions.xml" testGroup="makeone" />
     <run controlFile="acquisitions/acquisitions.xml" testGroup="testList" />
     <run controlFile="relation/relation.xml" testGroup="makeRelations" />
+    <run controlFile="relation/relation.xml" testGroup="makeCircularHierarchyRelations" />
 
     <run controlFile="person/person.xml" testGroup="postPerson" />
     <run controlFile="person/person.xml" testGroup="updatePerson" />
@@ -36,7 +37,7 @@
 
     <run controlFile="location/location-hierarchy.xml" testGroup="HierarchicLocation" />
     <run controlFile="organization/organization-hierarchy.xml" testGroup="HierarchicOrganization" />
- 
+
     <run controlFile="report/report.xml" />
     <run controlFile="authrefs/authrefs.xml" testGroup="AuthRefs" />
     <run controlFile="vocabulary/vocabulary.xml" />
@@ -44,19 +45,19 @@
     <run controlFile="authrefs/authrefsComplex.xml" testGroup="AuthRefsComplex" />
     <run controlFile="authority/authority.xml" testGroup="TestAuthoritiesMultiVocabSearch" />
 	<run controlFile="authority/authority.xml" testGroup="TestAuthorityItemsWithContacts" />
-    
+
     <run controlFile="imports/imports.xml" testGroup="importsTestGroup" />
     <run controlFile="imports/imports.xml" testGroup="importsSeparateRepoTestGroup" />
 
     <run controlFile="collectionobject/collectionobject-hierarchy-csid.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-hierarchy-refname.xml" testGroup="CreateUpdateReadStructuredObjects" />
     <run controlFile="collectionobject/collectionobject-displayname-update.xml" testGroup="DisplayNameChangesReflectedInRefNames" />
-    
+
     <run controlFile="versioning/versioning.xml" testGroup="VersionedRecordFiltering" />
-    
+
     <run controlFile="batch/batch.xml" testGroup="testSingle"/>
     <run controlFile="batch/batch.xml" testGroup="testPermissionsAndRoles"/>
-    
+
     <!-- Uncomment the following when needed to test the UpdateObjectLocationBatchJob -->
     <!-- which updates the computed current location values in CollectionObject records. -->
     <!-- For these tests to be meaningful, you will also first need to disable the event listener -->
@@ -70,25 +71,25 @@
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeGroup" />
     <run controlFile="batch/batch-update-object-loc.xml" testGroup="invocationModeSingleInVersioningEnabledTenant" />
     -->
-    
+
     <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveEventListener" />
-    <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveInVersioningEnabledTenant"/>    
+    <run controlFile="listener/listener-update-object-loc.xml" testGroup="updateObjectLocationOnMoveInVersioningEnabledTenant"/>
 
     <!-- Broken tests -->
-    
+
     <!-- FIXME: the following tests were commented out without any annotation as to why this was done. -->
     <!-- We might check whether any of these tests should be re-enabled - ADR 2012-09-07 -->
-    
+
     <!-- run controlFile="objectexit/object-exit.xml" testGroup="CRUDL" / -->
     <!-- run controlFile="objectexit/object-exit.xml" testGroup="domwalk" / -->
     <!-- run controlFile="media/media.xml" testGroup="authrefs" / -->
     <!-- run controlFile="./organization.xml" testGroup="organization" / -->
 
     <!-- Comments on broken tests, below, are historic, were written by various authors, and lack JIRA issue context. - ADR 2012-09-07 -->
-    
+
     <!-- No - this test is broken -->
     <!-- run controlFile="relation/relation.xml" testGroup="r2only" / -->
-    
+
     <!-- This used to work, but for check-in, I'm commenting it out as it currently breaks if things are left around in DB. -->
     <!-- run controlFile="security/security.xml" testGroup="security" / -->
 
@@ -98,6 +99,6 @@
     When the DB is cleaned with [ant create_db import] it runs OK.
     -->
     <!-- run controlFile="security/security.xml" testGroup="securityRemovingRoleperms" / -->
-    
+
 </xmlReplayMaster>
 
