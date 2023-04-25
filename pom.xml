@@ -90,7 +90,7 @@
 		<!-- CSpace copy of nuxeo-vendor-releases repo. -->
 		<repository>
 			<id>cspace-nuxeo-vendor-releases</id>
-			<url>https://cspace-maven-repo.s3-us-west-2.amazonaws.com/vendor-releases</url>
+			<url>https://cspace-maven-repo.s3-us-west-2.amazonaws.com/nuxeo/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
