@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="tombwithbudget" pageWidth="1650" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="4c5bbac9-2c85-4313-8fa9-cec40abcec05">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["collection,owner,installationtype,worktype,material,creator,acquisitionfundingcurrency"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH artists AS (SELECT
+    artist_hier.parentid,
+    artist_hier.id,
+    artist.*
+  FROM vocabularies_common vocab
+  INNER JOIN hierarchy hier ON hier.id = vocab.id
+  INNER JOIN vocabularyitems_common item ON item.inauthority = hier.name
+  INNER JOIN publicartproductionpersongroup artist ON artist.publicartproductionpersonrole = item.refname
+  INNER JOIN hierarchy artist_hier ON artist_hier.id = artist.id
+  WHERE vocab.shortidentifier = 'prodpersonrole' AND item.shortidentifier IN ('artist')
+)
+SELECT
+  obj.objectnumber,
+  title.title,
+  creator.publicartproductionperson AS creator,
+  bd.item as briefdescription,
+  coll.item AS collection,
+  owner.item AS owner,
+  inventory.item AS installationtype,
+  namegroup.objectname AS worktype,
+  material.material,
+  dimension.dimension,
+  dimension.value AS dimensionvalue,
+  dimension.measurementunit AS dimensionunit,
+  sd.datedisplaydate AS artworkdate,
+  media.objectcsid AS mediacsid,
+  funding.acquisitionfundingcurrency,
+  funding.acquisitionfundingvalue
+FROM collectionobjects_common obj
+INNER JOIN hierarchy hier ON hier.id = obj.id
+INNER JOIN misc ON misc.id = hier.id AND misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON core.id = misc.id AND core.tenantid = $P{tenantid}
+LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
+LEFT JOIN titlegroup title ON title.id = title_hier.id
+LEFT JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj.id AND coll.pos = 0
+LEFT JOIN artists creator ON creator.parentid = obj.id
+LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
+LEFT JOIN collectionobjects_common_owners owner ON owner.id = obj.id AND owner.pos = 0
+LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id AND inventory.pos = 0
+LEFT JOIN hierarchy namegroup_hier ON namegroup_hier.parentid = obj.id AND namegroup_hier.primarytype = 'objectNameGroup' AND namegroup_hier.pos = 0
+LEFT JOIN objectnamegroup namegroup ON namegroup.id = namegroup_hier.id
+LEFT JOIN hierarchy material_hier ON material_hier.parentid = obj.id AND material_hier.primarytype = 'materialGroup' AND material_hier.pos = 0
+LEFT JOIN materialgroup material ON material.id = material_hier.id
+LEFT JOIN hierarchy measured_hier ON measured_hier.parentid = obj.id AND measured_hier.primarytype = 'measuredPartGroup' AND measured_hier.pos = 0
+LEFT JOIN hierarchy dimension_hier ON dimension_hier.parentid = measured_hier.id AND dimension_hier.primarytype = 'dimensionSubGroup' AND dimension_hier.pos = 0
+LEFT JOIN dimensionsubgroup dimension ON dimension.id = dimension_hier.id
+LEFT JOIN hierarchy pdg_hier ON pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' AND pdg_hier.pos = 0
+LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
+LEFT JOIN structureddategroup sd ON sd.id = sdg_hier.id
+LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
+LEFT JOIN relations_common acq_rels ON acq_rels.subjectcsid = hier.name AND acq_rels.objectdocumenttype = 'Acquisition'
+LEFT JOIN hierarchy acquisition_hier ON acquisition_hier.name = acq_rels.objectcsid
+LEFT JOIN hierarchy funding_hier ON funding_hier.parentid = acquisition_hier.id AND funding_hier.primarytype = 'acquisitionFunding' AND funding_hier.pos = 0
+LEFT JOIN acquisitionfunding funding ON funding.id = funding_hier.id
+$P!{whereclause}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="title"/>
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="titlegroup"/>
+	</field>
+	<field name="creator" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="creator"/>
+		<property name="com.jaspersoft.studio.field.label" value="creator"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="publicartproductionpersongroup"/>
+	</field>
+	<field name="briefdescription" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="briefdescription"/>
+		<property name="com.jaspersoft.studio.field.label" value="briefdescription"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_briefdescriptions"/>
+	</field>
+	<field name="collection" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="collection"/>
+		<property name="com.jaspersoft.studio.field.label" value="collection"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_publicart_publicartcollections"/>
+	</field>
+	<field name="owner" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="owner"/>
+		<property name="com.jaspersoft.studio.field.label" value="owner"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_owners"/>
+	</field>
+	<field name="installationtype" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="installationtype"/>
+		<property name="com.jaspersoft.studio.field.label" value="installationtype"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_inventorystatuslist"/>
+	</field>
+	<field name="worktype" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="worktype"/>
+		<property name="com.jaspersoft.studio.field.label" value="worktype"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="material" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="material"/>
+		<property name="com.jaspersoft.studio.field.label" value="material"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="materialgroup"/>
+	</field>
+	<field name="dimension" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="dimension"/>
+		<property name="com.jaspersoft.studio.field.label" value="dimension"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
+	</field>
+	<field name="dimensionvalue" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="dimensionvalue"/>
+		<property name="com.jaspersoft.studio.field.label" value="dimensionvalue"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
+	</field>
+	<field name="dimensionunit" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="dimensionunit"/>
+		<property name="com.jaspersoft.studio.field.label" value="dimensionunit"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
+	</field>
+	<field name="artworkdate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="artworkdate"/>
+		<property name="com.jaspersoft.studio.field.label" value="artworkdate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<field name="acquisitionfundingcurrency" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionfundingcurrency"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionfundingcurrency"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitionfunding"/>
+	</field>
+	<field name="acquisitionfundingvalue" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="acquisitionfundingvalue"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisitionfundingvalue"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitionfunding"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="51ff7df7-b142-4030-bcd7-0e8bbd94b29b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Artwork ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="15aa2856-acf6-40f6-8030-5274550ea6aa">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="b17ee427-1505-4bb9-ab57-083e5a86db58">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Creator(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="8e28b831-f831-4695-807d-2c4316180dfe">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="ac9e5655-f444-4b03-99f9-51d00919870f">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Collection]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="2584adbd-dfb9-4b7e-80b9-3fe00cfe3103">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Owner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="72a8c4c9-bedd-497d-b8fe-290cbe64cb4b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Installation type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="18e899c9-d546-4ea4-88ee-e274f21e0dc0">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Worktype]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="5c6abef3-a4d8-44b0-a971-ac75067a15c4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Material]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="ce5cc065-bfef-42a2-b501-b8af358ddba1">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Dimension]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="f2efe8ae-8e49-4d7f-ab2a-419c33161858">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Dimension Value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="17cc9dd4-c0ef-4231-b883-e8aa90e4ea94">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Dimension Unit]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="b98e1fe2-1f19-4553-9968-5b0a76252c2b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Artwork date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="5ef5ad52-af6b-40f2-86a9-2c627dc524c3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Funding value]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="1c7908f5-fbaa-4eea-9495-f6e760125d7d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Funding currency]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="b238a33c-354c-4642-8418-5c2ecf04f459">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Thumbnail]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="b2e5d1cf-fb6d-41df-9445-86da42726096">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="fb043df7-300f-40a1-9c25-9c4c5aa8020c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="f412c611-8b7d-457b-ae24-3f287afa7b20">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{creator}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="d6f44c66-ac62-4d17-9930-ee964bd30d6e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{briefdescription}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="d0f0dc9f-6558-4459-86cd-b0672875c9ca">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{collection}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="76124f26-72f7-4ea1-9535-0cf58feb1d4e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{owner}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="495d8de0-c693-45db-a4e1-29346b1614de">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{installationtype}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="4bddf1c6-a41b-4826-904f-2ad5fb404f3e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{worktype}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="c6e16da7-169d-4cca-a03c-079627298ff9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{material}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="c961a497-57f7-453d-b7b7-eb6e642730bb">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{dimension}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="90e06353-8e5a-4320-bff8-c0f51af49d2c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{dimensionvalue}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="92b62fb7-de65-4c41-add5-59c4e1ae5332">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{dimensionunit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="e67d1a01-bb33-4a25-8ebf-de7467387c5f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{artworkdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="c8b3c3a4-5941-4a6a-8c2d-e4a6b5de7aca">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionfundingvalue}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="6f2a0ddc-3505-463a-8ead-a02bc4772a51">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{acquisitionfundingcurrency}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="500" y="0" width="50" height="50" uuid="1ad42717-39a1-42dd-be1c-e4b125a5df3e"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
