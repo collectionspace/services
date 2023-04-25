@@ -62,17 +62,35 @@
 			</snapshots>
 		</repository>
 
-		<repository>
+		<!-- <repository>
 			<id>nuxeo-public-releases</id>
 			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
-		</repository>
+		</repository> -->
 
-		<repository>
+		<!-- <repository>
 			<id>nuxeo-vendor-releases</id>
 			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository> -->
+
+		<!-- CSpace copy of nuxeo-public-releases repo. -->
+		<repository>
+			<id>cspace-nuxeo-public-releases</id>
+			<url>https://cspace-maven-repo.s3-us-west-2.amazonaws.com/nuxeo/public-releases</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+
+		<!-- CSpace copy of nuxeo-vendor-releases repo. -->
+		<repository>
+			<id>cspace-nuxeo-vendor-releases</id>
+			<url>https://cspace-maven-repo.s3-us-west-2.amazonaws.com/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
