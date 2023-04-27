@@ -49,8 +49,8 @@ SELECT
   dimension.measurementunit AS dimensionunit,
   sd.datedisplaydate AS artworkdate,
   media.objectcsid AS mediacsid,
-  funding.acquisitionfundingcurrency,
-  funding.acquisitionfundingvalue
+  acquisition.acquisitionfundingcurrency,
+  acquisition.acquisitionfundingvalue
 FROM collectionobjects_common obj
 INNER JOIN hierarchy hier ON hier.id = obj.id
 INNER JOIN misc ON misc.id = hier.id AND misc.lifecyclestate != 'deleted'
