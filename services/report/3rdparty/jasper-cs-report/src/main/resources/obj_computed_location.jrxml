@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="objcomputedlocation" pageWidth="1000" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="0b89017b-1c64-4285-9d1a-33596b3f5bb3">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["computedcurrentlocation,finalname"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+  object.objectnumber,
+  title.title,
+  namegroup.objectname,
+  taxon.taxon,
+  CASE
+    WHEN (title IS NULL) AND (objectname IS NULL) THEN taxon
+    ELSE objectname
+  END AS finalname,
+  object.computedcurrentlocation,
+  COALESCE(loc_term.termname, org_term.termname) AS locationname,
+  bd.item AS description,
+  media.objectcsid AS mediacsid
+FROM collectionobjects_common object
+INNER JOIN misc ON misc.id = object.id AND misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+INNER JOIN hierarchy hier ON hier.id = object.id
+LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
+LEFT JOIN hierarchy title_hier ON title_hier.parentid = object.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
+LEFT JOIN titlegroup title ON title.id = title_hier.id
+LEFT JOIN hierarchy namegroup_hier ON namegroup_hier.parentid = object.id AND namegroup_hier.primarytype = 'objectNameGroup' AND namegroup_hier.pos = 0
+LEFT JOIN objectnamegroup namegroup ON namegroup.id = namegroup_hier.id
+LEFT JOIN hierarchy taxon_hier ON taxon_hier.parentid = object.id AND taxon_hier.primarytype = 'taxonomicIdentGroup' AND taxon_hier.pos = 0
+LEFT JOIN taxonomicidentgroup taxon ON taxon.id = taxon_hier.id
+-- location
+LEFT JOIN locations_common loc ON loc.refname = object.computedcurrentlocation
+LEFT JOIN hierarchy loc_hier ON loc_hier.parentid = loc.id AND loc_hier.primarytype = 'locTermGroup' AND loc_hier.pos = 0
+LEFT JOIN loctermgroup loc_term ON loc_term.id = loc_hier.id
+-- or storage if location dne
+LEFT JOIN organizations_common org ON org.refname = object.computedcurrentlocation
+LEFT JOIN hierarchy org_hier ON org_hier.parentid = org.id AND org_hier.primarytype = 'orgTermGroup' AND org_hier.pos = 0
+LEFT JOIN orgtermgroup org_term ON org_term.id = org_hier.id
+LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
+$P!{whereclause}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="title"/>
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="titlegroup"/>
+	</field>
+	<field name="objectname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="taxon" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="taxon"/>
+		<property name="com.jaspersoft.studio.field.label" value="taxon"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="taxonomicidentgroup"/>
+	</field>
+	<field name="finalname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="finalname"/>
+		<property name="com.jaspersoft.studio.field.label" value="finalname"/>
+	</field>
+	<field name="computedcurrentlocation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.label" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="locationname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="locationname"/>
+		<property name="com.jaspersoft.studio.field.label" value="locationname"/>
+	</field>
+	<field name="description" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="description"/>
+		<property name="com.jaspersoft.studio.field.label" value="description"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_briefdescriptions"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="04111d8b-a198-4d97-8b4c-fb0677bdbe86">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="ec8d107b-350d-4e76-93a3-490b76dee492">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="e665283e-ea90-4a6c-bcfa-bf930c083cbb">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="b45f56a8-e3d3-437f-a305-36d246b96f5c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Computed Current Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="4899e0c4-bc49-4b31-94b7-901f45dbc3c4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Location Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="7ac0ce8b-8975-4c6e-812e-b4560bce0920">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="5a2643f1-334a-4919-bbe0-55ca96029d24">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Thumbnail]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="7362be03-1a72-418e-a0da-1309cf959811">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="6e5c5cd7-f3a1-4794-8cb1-e65145ec11f4">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="3eb519fb-f717-4769-9582-7e7ebb07a511">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{finalname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="4d34814d-7e29-4ccc-9fd6-9b7fcbe93bbb">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="8f539dce-a584-4071-a43f-0e91aa3e568f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{locationname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="7aaa4bcf-472f-451e-b096-f17ef2ecfbbd">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement style="Detail" x="600" y="0" width="50" height="50" uuid="aae2de88-ac2f-4c87-933b-d6bc744f556d"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
