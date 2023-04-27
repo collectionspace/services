@@ -35,7 +35,7 @@
   object.computedcurrentlocation,
   COALESCE(loc_term.termname, org_term.termname) AS locationname,
   bd.item AS description,
-  media.objectcsid AS mediacsid
+  related_media.objectcsid AS mediacsid
 FROM collectionobjects_common object
 INNER JOIN misc ON misc.id = object.id AND misc.lifecyclestate != 'deleted'
 INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
@@ -55,7 +55,13 @@ LEFT JOIN loctermgroup loc_term ON loc_term.id = loc_hier.id
 LEFT JOIN organizations_common org ON org.refname = object.computedcurrentlocation
 LEFT JOIN hierarchy org_hier ON org_hier.parentid = org.id AND org_hier.primarytype = 'orgTermGroup' AND org_hier.pos = 0
 LEFT JOIN orgtermgroup org_term ON org_term.id = org_hier.id
-LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
+-- related media
+LEFT JOIN (
+  SELECT relation.*
+  FROM relations_common relation
+  INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+) related_media ON related_media.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String">
