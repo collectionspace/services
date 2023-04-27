@@ -397,7 +397,7 @@ $P!{whereclause}]]>
 				<textFieldExpression><![CDATA[$F{acquisitionfundingcurrency}]]></textFieldExpression>
 			</textField>
 			<image onErrorType="Blank">
-				<reportElement x="500" y="0" width="50" height="50" uuid="1ad42717-39a1-42dd-be1c-e4b125a5df3e"/>
+				<reportElement x="1500" y="0" width="50" height="50" uuid="1ad42717-39a1-42dd-be1c-e4b125a5df3e"/>
 				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
 			</image>
 		</band>
