@@ -73,7 +73,7 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
+
     <target name="clean" depends="clean-unix,clean-windows"
   description="Delete target directories" >
         <delete dir="${build}"/>
@@ -108,38 +108,38 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-    
-    <!-- 
+
+    <!--
          Preserve the legacy name for this target, while noting that
          legacy name is no longer descriptive of its purpose.
      -->
     <target name="deploy_jasper_samples" depends="deploy_report_files" />
 
     <target name="deploy_report_files"
-        description="Deploy report files">
+        description="Deploy report files and metadata files">
         <copy todir="${jee.server.cspace}/cspace/reports" overwrite="true">
             <fileset dir="${basedir}/jasper-cs-report/src/main/resources"
-                includes="*.jrxml"/>
+                includes="*.jrxml,*.xml"/>
         </copy>
     </target>
-    
+
     <target name="undeploy_report_files"
       depends="undeploy_source_report_files,undeploy_compiled_report_files"
       description="Undeploy report files">
     </target>
-    
+
 	<!-- Removes only the source reports that originated from the source directory.  Ones added
 		manually remain.
 	-->
     <target name="undeploy_source_report_files"
-      description="Undeploy source (.jrxml) report files">
+      description="Undeploy source (.jrxml) report files and metadata (.xml) files">
       <delete failonerror="false">
-        <fileset dir="${jee.server.cspace}/cspace/reports" includes="*.jrxml">
+        <fileset dir="${jee.server.cspace}/cspace/reports" includes="*.jrxml,*.xml">
 			<present targetdir="${basedir}/jasper-cs-report/src/main/resources" />
 		</fileset>
       </delete>
     </target>
-    
+
     <target name="undeploy_compiled_report_files"
       description="Undeploy compiled (.jasper) report files">
       <delete failonerror="false">
@@ -150,7 +150,7 @@
     <target name="deploy" depends="install,deploy_report_files"
       description="Deploy report-related artifacts">
       <!--
-        The following ant call is obsolete.  The Nuxeo artifacts are now created 
+        The following ant call is obsolete.  The Nuxeo artifacts are now created
         and deployed using the "csmake" tool.
         <ant antfile="nuxeo-platform-cs-report/build.xml" target="deploy" inheritall="false"/>
       -->

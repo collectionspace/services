@@ -71,6 +71,7 @@ import org.collectionspace.services.report.ResourceActionGroupList;
 import org.collectionspace.services.report.ReportsCommon.ForRoles;
 import org.collectionspace.services.report.MIMEType;
 import org.collectionspace.services.report.MIMETypeItemType;
+import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.report.ReportsCommon;
 import org.collectionspace.services.report.ReportsOuputMimeList;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -117,7 +118,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
 
 		private static final Pattern INVALID_CSID_PATTERN = Pattern.compile("[^\\w\\-]");
-    private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
 
     private static String REPORTS_STD_CSID_PARAM = "csid";
@@ -346,52 +346,51 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 	}
 
-    private InputStream buildReportResult(String reportCSID,
-    		HashMap<String, Object> params, String reportFileName, String outputMimeType, StringBuffer outReportFileName)
-    				throws Exception {
-		Connection conn = null;
-		InputStream result = null;
+    private InputStream buildReportResult(
+			String reportCSID,
+			HashMap<String, Object> params,
+			String reportFileName,
+			String outputMimeType,
+			StringBuffer outReportFileName
+		) throws Exception {
+
+			Connection conn = null;
+			InputStream result = null;
 
     	try {
-    		String fileNameBase = Tools.getFilenameBase(reportFileName);
-    		String compiledReportFilename = fileNameBase+ReportClient.COMPILED_REPORT_EXTENSION;
-    		String reportDescriptionFilename = fileNameBase+ReportClient.REPORT_DECSRIPTION_EXTENSION;
+				String reportName = Tools.getFilenameBase(reportFileName);
+				File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
 
-			String basePath = ServiceMain.getInstance().getServerRootDir() +
-								File.separator + JEEServerDeployment.CSPACE_DIR_NAME +
-								File.separator + REPORTS_FOLDER +
-								// File.separator + tenantName +
-								File.separator; // + reportFileName;
+				if (!reportCompiledFile.exists()) {
+					// Need to compile the file.
 
-			String compiledFilePath = basePath+compiledReportFilename;
-			File f = new File(compiledFilePath);
-			if(!f.exists()) { // Need to compile the file
-				// First verify that there is a source file.
-				String sourceFilePath = basePath+reportDescriptionFilename;
-				File f2 = new File(sourceFilePath);
-				if(!f2.exists()) { // Missing source file - error!
-					logger.error("Report for csid={} is missing the specified source file: {}",
-									reportCSID, sourceFilePath);
-					throw new RuntimeException("Report is missing the specified source file!");
+					File reportSourceFile = ReportResource.getReportSourceFile(reportName);
+
+					if(!reportSourceFile.exists()) {
+						logger.error("Report for csid={} is missing source file: {}",
+								reportCSID, reportSourceFile.getAbsolutePath());
+
+						throw new RuntimeException("Report is missing source file");
+					}
+
+					logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+							reportCSID, reportCompiledFile.getAbsolutePath());
+
+					JasperDesign design = JRXmlLoader.load(reportSourceFile.getAbsolutePath());
+
+					design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
+
+					JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
 				}
 
-				logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
-					reportCSID, compiledFilePath);
+				conn = getConnection();
 
-				JasperDesign design = JRXmlLoader.load(sourceFilePath);
+				if (logger.isTraceEnabled()) {
+					logger.trace("ReportResource for csid=" + reportCSID
+							+ " output as " + outputMimeType + " using report file: " + reportCompiledFile.getAbsolutePath());
+				}
 
-				design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
-
-				JasperCompileManager.compileReportToFile(design, compiledFilePath);
-			}
-
-			conn = getConnection();
-
-            if (logger.isTraceEnabled()) {
-            	logger.trace("ReportResource for csid=" + reportCSID
-            			+" output as "+outputMimeType+" using report file: "+compiledFilePath);
-            }
-			FileInputStream fileStream = new FileInputStream(compiledFilePath);
+			FileInputStream fileStream = new FileInputStream(reportCompiledFile);
 
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);

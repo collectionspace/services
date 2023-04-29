@@ -96,6 +96,7 @@ public class BatchResource extends NuxeoBasedResource {
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
+            String filename = queryParams.getFirst(IQueryManager.SEARCH_TYPE_FILENAME);
             List<String> modes = queryParams.get(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
@@ -104,6 +105,13 @@ public class BatchResource extends NuxeoBasedResource {
             if (docType != null && !docType.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByDocType(
                 		common_part, docType);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+
+            if (filename != null && !filename.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByFilename(
+                        common_part, filename);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }

@@ -35,17 +35,18 @@ public interface IQueryManager {
 	final static String SEARCH_TERM_SEPARATOR = " ";
 	final static String SEARCH_LIKE = " LIKE ";
 	final static String SEARCH_ILIKE = " ILIKE ";
-    final static String SEARCH_TYPE_KEYWORDS = "keywords";
-    final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
-    final static String SEARCH_TYPE_KEYWORDS_AS = "as";
-    final static String SEARCH_TYPE_PARTIALTERM = "pt";
-    final static String SEARCH_TYPE_DOCTYPE = "doctype";
-    final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
-    final static String SEARCH_TYPE_INVOCATION = "inv";
+	final static String SEARCH_TYPE_KEYWORDS = "keywords";
+	final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
+	final static String SEARCH_TYPE_KEYWORDS_AS = "as";
+	final static String SEARCH_TYPE_PARTIALTERM = "pt";
+	final static String SEARCH_TYPE_DOCTYPE = "doctype";
+	final static String SEARCH_TYPE_FILENAME = "filename";
+	final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
+	final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
 	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
-    final static String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
-    final static String CSID_QUERY_PARAM = "csid";
+	final static String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
+	final static String CSID_QUERY_PARAM = "csid";
 
 
 	//
@@ -160,6 +161,16 @@ public interface IQueryManager {
 	 * @return the string
 	 */
 	public String createWhereClauseForInvocableByDocType(String schema, String docType);
+
+
+	/**
+	 * Creates a filtering where clause from filename, for invocables.
+	 *
+	 * @param schema  the schema name for this invocable
+	 * @param docType the filename
+	 * @return        the where clause
+	 */
+	public String createWhereClauseForInvocableByFilename(String schema, String filename);
 
 	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
