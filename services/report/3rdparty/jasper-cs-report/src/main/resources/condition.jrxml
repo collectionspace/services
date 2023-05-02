@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="condition" pageWidth="2650" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="24d719d7-0b47-4997-84e3-90c2132540b5">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+  <parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["conditionchecker,computedcurrentlocation"]]></defaultValueExpression>
+  </parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH media AS (
+  SELECT
+    relation.subjectcsid,
+    relation.objectcsid AS mediacsid
+  FROM media_common media
+  INNER JOIN hierarchy hier ON hier.id = media.id
+  INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN relations_common relation ON relation.objectcsid = hier.name
+    AND (relation.subjectdocumenttype = 'Conditioncheck' OR relation.subjectdocumenttype = 'CollectionObject')
+)
+SELECT
+  obj.objectnumber,
+  title.title AS objecttitle,
+  obj.computedcurrentlocation,
+  condition.*,
+  media.mediacsid AS objmedia
+FROM collectionobjects_common obj
+INNER JOIN hierarchy hier ON hier.id = obj.id
+INNER JOIN misc ON misc.id = obj.id AND misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primaryType = 'titleGroup' AND title_hier.pos = 0
+LEFT JOIN titlegroup title ON title.id = title_hier.id
+LEFT JOIN media ON media.subjectcsid = hier.name
+LEFT JOIN (
+  SELECT
+    relation.subjectcsid,
+    condition.conditioncheckrefnumber,
+    condition.conditioncheckassessmentdate AS assessmentdate,
+    condition.conditioncheckmethod,
+    condition.conditionchecknote,
+    condition.conditioncheckreason,
+    condition.conditionchecker,
+    condition.objectauditcategory,
+    condition.conservationtreatmentpriority,
+    condition.nextconditioncheckdate,
+    cg.completeness,
+    tech.techassessment,
+    ccheck.condition,
+    env.envconditionnote,
+    condition.displayrecommendations,
+    condition.handlingrecommendations,
+    condition.envrecommendations,
+    condition.specialrequirements,
+    legal.legalreqsheld,
+    legal.legalreqsheldbegindate,
+    legal.legalreqsheldrenewdate,
+    legal.legalreqsheldenddate,
+    media.mediacsid AS conditionmedia
+  FROM conditionchecks_common condition
+  INNER JOIN hierarchy hier ON hier.id = condition.id
+  INNER JOIN misc on misc.id = condition.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN relations_common relation ON relation.objectcsid = hier.name
+    AND relation.subjectdocumenttype = 'CollectionObject'
+    AND relation.objectdocumenttype = 'Conditioncheck'
+  LEFT JOIN hierarchy comp_hier ON comp_hier.parentid = condition.id AND comp_hier.primaryType = 'completenessGroup' AND comp_hier.pos = 0
+  LEFT JOIN completenessgroup cg ON cg.id = comp_hier.id
+  LEFT JOIN hierarchy tech_hier ON tech_hier.parentid = condition.id AND tech_hier.primaryType = 'techAssessmentGroup' AND tech_hier.pos = 0
+  LEFT JOIN techassessmentgroup tech ON tech.id = tech_hier.id
+  LEFT JOIN hierarchy cond_hier ON cond_hier.parentid = condition.id AND cond_hier.primaryType = 'conditionCheckGroup' AND cond_hier.pos = 0
+  LEFT JOIN conditioncheckgroup ccheck ON ccheck.id = cond_hier.id
+  LEFT JOIN hierarchy env_hier ON env_hier.parentid = condition.id AND env_hier.primaryType = 'envConditionNoteGroup' AND env_hier.pos = 0
+  LEFT JOIN envconditionnotegroup env ON env.id = env_hier.id
+  LEFT JOIN hierarchy legal_hier ON legal_hier.parentid = condition.id AND legal_hier.primaryType = 'legalReqsHeldGroup' AND legal_hier.pos = 0
+  LEFT JOIN legalreqsheldgroup legal ON legal.id = legal_hier.id
+  LEFT JOIN media ON media.subjectcsid = hier.name
+) condition ON condition.subjectcsid = hier.name
+$P!{whereclause}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objecttitle" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objecttitle"/>
+		<property name="com.jaspersoft.studio.field.label" value="objecttitle"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="titlegroup"/>
+	</field>
+	<field name="computedcurrentlocation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.label" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="conditioncheckrefnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditioncheckrefnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditioncheckrefnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="assessmentdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="assessmentdate"/>
+		<property name="com.jaspersoft.studio.field.label" value="assessmentdate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="conditioncheckmethod" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditioncheckmethod"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditioncheckmethod"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="conditionchecknote" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditionchecknote"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditionchecknote"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="conditioncheckreason" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditioncheckreason"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditioncheckreason"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="conditionchecker" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditionchecker"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditionchecker"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="objectauditcategory" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectauditcategory"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectauditcategory"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="conservationtreatmentpriority" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conservationtreatmentpriority"/>
+		<property name="com.jaspersoft.studio.field.label" value="conservationtreatmentpriority"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="nextconditioncheckdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="nextconditioncheckdate"/>
+		<property name="com.jaspersoft.studio.field.label" value="nextconditioncheckdate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="completeness" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="completeness"/>
+		<property name="com.jaspersoft.studio.field.label" value="completeness"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="completenessgroup"/>
+	</field>
+	<field name="techassessment" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="techassessment"/>
+		<property name="com.jaspersoft.studio.field.label" value="techassessment"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="techassessmentgroup"/>
+	</field>
+	<field name="condition" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="condition"/>
+		<property name="com.jaspersoft.studio.field.label" value="condition"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditioncheckgroup"/>
+	</field>
+	<field name="envconditionnote" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="envconditionnote"/>
+		<property name="com.jaspersoft.studio.field.label" value="envconditionnote"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="envconditionnotegroup"/>
+	</field>
+	<field name="displayrecommendations" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="displayrecommendations"/>
+		<property name="com.jaspersoft.studio.field.label" value="displayrecommendations"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="handlingrecommendations" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="handlingrecommendations"/>
+		<property name="com.jaspersoft.studio.field.label" value="handlingrecommendations"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="envrecommendations" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="envrecommendations"/>
+		<property name="com.jaspersoft.studio.field.label" value="envrecommendations"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="specialrequirements" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="specialrequirements"/>
+		<property name="com.jaspersoft.studio.field.label" value="specialrequirements"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="conditionchecks_common"/>
+	</field>
+	<field name="legalreqsheld" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="legalreqsheld"/>
+		<property name="com.jaspersoft.studio.field.label" value="legalreqsheld"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="legalreqsheldgroup"/>
+	</field>
+	<field name="legalreqsheldbegindate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="legalreqsheldbegindate"/>
+		<property name="com.jaspersoft.studio.field.label" value="legalreqsheldbegindate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="legalreqsheldgroup"/>
+	</field>
+	<field name="legalreqsheldrenewdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="legalreqsheldrenewdate"/>
+		<property name="com.jaspersoft.studio.field.label" value="legalreqsheldrenewdate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="legalreqsheldgroup"/>
+	</field>
+	<field name="legalreqsheldenddate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="legalreqsheldenddate"/>
+		<property name="com.jaspersoft.studio.field.label" value="legalreqsheldenddate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="legalreqsheldgroup"/>
+	</field>
+	<field name="conditionmedia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="conditionmedia"/>
+		<property name="com.jaspersoft.studio.field.label" value="conditionmedia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<field name="objmedia" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objmedia"/>
+		<property name="com.jaspersoft.studio.field.label" value="objmedia"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="56101944-71d5-44ea-acc5-7ebf5bdec618">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="792d333e-d3f1-45f7-9847-8028664029c1">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="c09b118c-cadb-4986-be61-8b964a3fa438">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Computed Current Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="0b399729-6077-4052-af46-9720652a55f9">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Condition Check]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="7fe91acf-8593-4860-9453-b5bf8a252cdb">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Check/Assessment Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="1575dffc-8f12-402b-a61e-2606ddab5093">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Check Method]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="e2b7b6f6-9cfd-4179-9f05-6e9ad91281c3">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Check Note]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="d76b9c4e-79ad-4f46-962b-592794a8284e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Check Reason]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="6430f397-a65e-4095-814a-0f63e9a43814">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Assessor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="e89effb6-a3a2-4876-8dc1-cc7ad955531e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Audit Category]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="c7577f1b-1945-4b82-a08c-2eebcd44e906">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Conservation Treatment Priority]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="81e4f238-37b5-4a11-b241-94e76e25711d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Next Assessment Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="1720b75a-b20f-4aeb-8790-1158493d6f7e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Completeness Desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="7742aad8-04c0-4d4d-8e79-cafaf51b4f0a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Technical Assessment Desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="87bffc66-75f2-4e8b-9d97-1f0703f56914">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Condition Desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="67eb1147-93e4-4d03-8e07-4391fe27b6dd">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Environment Condition Desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="1da9cba8-8b9a-42cb-a0dc-8c4cf098caa6">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Display Recommendation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="9ab6eb94-7af7-4c78-aa2e-6880a3e63a18">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Handling Recommendation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="4427e33c-a220-49b2-aed2-ecbc18d0475c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Environment Recommendation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="901736ba-113a-4233-8d70-80d03250a1b9">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Special Requirements]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="65a2219b-1b3d-4cbc-9197-f668c04d02b4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[License/Legal Held Desc]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2100" y="0" width="100" height="44" uuid="1ef73356-82dd-428e-9c9b-95c141580c52">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[License/Legal Held Begin Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="73709ab7-393f-4a71-a503-7ea2eb09549a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[License/Legal Held Renew Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2300" y="0" width="100" height="44" uuid="6c666501-8085-4842-93a7-8cc89e1045d8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[License/Legal Held End Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2400" y="0" width="100" height="44" uuid="09671099-5a55-414f-be04-5cad8c1591f5">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Condition Check Thumbnail]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2500" y="0" width="100" height="44" uuid="550e5eab-4cdd-43a2-b1d3-d94cdf078a9d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Thumbnail]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="34739193-2dcb-4387-8284-fd24f4706904">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="529adab3-6a52-459d-96ec-cd38a4bd4c93">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objecttitle}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="2b48e622-5e32-446a-bf28-9774811125af">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="177d5084-83c1-4b52-8717-adf6231b2eb8">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conditioncheckrefnumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="0379bfa9-7b8b-4d13-a5fa-6d64d43ebf9d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{assessmentdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="b09479c8-6012-482f-a4bd-f0dc316f7755">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conditioncheckmethod}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="2266b3e3-a874-4269-bc46-8f8eb974dfa5">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conditionchecknote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="6bbb65c7-c336-4b3b-bd17-d248c54b29d3">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conditioncheckreason}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="9b914486-8ddb-4169-95d3-226e53b9e491">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conditionchecker}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="e4a1fe39-4c56-4236-aac4-bc95edef2084">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectauditcategory}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="6e19e025-7e56-47c9-bf12-726b32e87fa5">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{conservationtreatmentpriority}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="075bd94f-4bc9-4023-98ee-5fdce4386950">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{nextconditioncheckdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="925908e3-aba0-4e68-a4d6-a5a1545fc42b">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{completeness}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="0eb55128-c734-4b2c-8721-012033891d7a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{techassessment}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="7d9350d9-a343-4a16-b513-34761e8e7c78">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{condition}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="45f5fab1-9ebd-4898-916b-76cb5060b8fa">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{envconditionnote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="908bb4ca-411c-43c2-b96c-21d01012f2e6">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{displayrecommendations}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="dbdb7ee0-3f88-4920-94bd-85edcb5c79d8">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{handlingrecommendations}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="1ca18fc8-0f07-426d-ae4c-34148ad5f94a">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{envrecommendations}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="89957c32-74ab-4545-8481-70977d5e75cf">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{specialrequirements}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="2cbdf3fc-58d9-4a8a-a24c-16bf8baf99af">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{legalreqsheld}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="362785d3-2875-46fb-91d6-96f550e3d4da">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{legalreqsheldbegindate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="523caf3a-8e56-41dd-965a-15c7cbbaefaa">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{legalreqsheldrenewdate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="2300" y="0" width="100" height="30" uuid="7421a5d1-67af-4dc6-b090-34c8217f8113">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{legalreqsheldenddate}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement style="Detail" x="2400" y="0" width="50" height="50" uuid="0fedd541-b1ad-4f49-a93a-b77d40828cad"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{conditionmedia} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+			<image onErrorType="Blank">
+				<reportElement style="Detail" x="2500" y="0" width="50" height="50" uuid="0fedd541-b1ad-4f49-a93a-b77d40828cad"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{objmedia} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+		</band>
+	</summary>
+</jasperReport>
