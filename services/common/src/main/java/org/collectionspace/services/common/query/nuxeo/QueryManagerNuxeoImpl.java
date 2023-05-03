@@ -280,18 +280,44 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	 * @return the string
 	 */
 	@Override
-	public String createWhereClauseForInvocableByDocType(String schema,
-			String docType) {
-		String trimmed = (docType == null) ? "" : docType.trim();
+	public String createWhereClauseForInvocableByDocType(String schema, String docType) {
+		String trimmed = sanitizeNXQLString(docType);
+
 		if (trimmed.isEmpty()) {
 			throw new RuntimeException("No docType specified.");
 		}
+
 		if (schema == null || schema.isEmpty()) {
 			throw new RuntimeException("No match schema specified.");
 		}
-		String wClause = schema + ":" + InvocableJAXBSchema.FOR_DOC_TYPES
-				+ " = '" + trimmed + "'";
-		return wClause;
+
+		String whereClause = schema + ":" + InvocableJAXBSchema.FOR_DOC_TYPES + " = '" + trimmed + "'";
+
+		return whereClause;
+	}
+
+	/**
+	 * Creates a filtering where clause from filename, for invocables.
+	 *
+	 * @param schema  the schema name for this invocable
+	 * @param docType the filename
+	 * @return        the where clause
+	 */
+	@Override
+	public String createWhereClauseForInvocableByFilename(String schema, String filename) {
+		String trimmed = sanitizeNXQLString(filename);
+
+		if (trimmed.isEmpty()) {
+			throw new RuntimeException("No filename specified.");
+		}
+
+		if (schema == null || schema.isEmpty()) {
+			throw new RuntimeException("No match schema specified.");
+		}
+
+		String whereClause = schema + ":" + InvocableJAXBSchema.FILENAME + " = '" + trimmed + "'";
+
+		return whereClause;
 	}
 
 	/**
@@ -336,6 +362,13 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		}
 
 		return "";
+	}
+
+	private String sanitizeNXQLString(String input) {
+		String trimmed = (input == null) ? "" : input.trim();
+		String escaped = unescapedSingleQuote.matcher(trimmed).replaceAll("\\\\'");
+
+		return escaped;
 	}
 
 	/**
@@ -389,5 +422,4 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 
 		return NuxeoUtils.getByNameWhereClause(csid);
 	}
-
 }

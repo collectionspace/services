@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Object Valuation</name>
+    <notes>Returns latest valuation information for selected objects. Runs on selected objects, or all objects.</notes>
+    <forDocTypes>
+      <forDocType>CollectionObject</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>false</supportsSingleDoc>
+    <supportsDocList>true</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>true</supportsNoContext>
+    <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
+    <filename>object_valuation.jrxml</filename>
+  </ns2:reports_common>
+</document>

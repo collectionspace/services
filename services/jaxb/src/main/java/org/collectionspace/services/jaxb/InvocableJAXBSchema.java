@@ -1,9 +1,10 @@
 /**
- * 
+ *
  */
 package org.collectionspace.services.jaxb;
 
 public interface InvocableJAXBSchema {
+    final static String FILENAME = "filename";
     final static String FOR_DOC_TYPES = "forDocTypes";
     final static String SUPPORTS_SINGLE_DOC = "supportsSingleDoc";
     final static String SUPPORTS_DOC_LIST = "supportsDocList";

@@ -23,6 +23,7 @@
  */
 package org.collectionspace.services.report;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -37,7 +38,9 @@ import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -68,6 +71,8 @@ import javax.ws.rs.core.Response.Status;
 public class ReportResource extends NuxeoBasedResource {
     final Logger logger = LoggerFactory.getLogger(ReportResource.class);
 
+    private static String REPORTS_FOLDER = "reports";
+
     @Override
     protected String getVersionString() {
     	final String lastChangeRevision = "$LastChangedRevision: 1982 $";
@@ -94,6 +99,7 @@ public class ReportResource extends NuxeoBasedResource {
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
+            String filename = queryParams.getFirst(IQueryManager.SEARCH_TYPE_FILENAME);
             List<String> modes = queryParams.get(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
@@ -101,6 +107,12 @@ public class ReportResource extends NuxeoBasedResource {
             if (docType != null && !docType.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByDocType(
                 		common_part, docType);
+                documentFilter = handler.getDocumentFilter();
+                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+            }
+            if (filename != null && !filename.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByFilename(
+                        common_part, filename);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
@@ -329,4 +341,29 @@ public class ReportResource extends NuxeoBasedResource {
         return result;
     }
 
+    private static String getReportBasePath() {
+        return (
+            ServiceMain.getInstance().getServerRootDir() +
+            File.separator +
+            JEEServerDeployment.CSPACE_DIR_NAME +
+            File.separator +
+            REPORTS_FOLDER +
+            File.separator
+        );
+    }
+
+    public static File getReportSourceFile(String reportName) {
+        return new File(
+            getReportBasePath() + reportName + ReportClient.REPORT_DECSRIPTION_EXTENSION);
+    }
+
+    public static File getReportCompiledFile(String reportName) {
+        return new File(
+            getReportBasePath() + reportName + ReportClient.COMPILED_REPORT_EXTENSION);
+    }
+
+    public static File getReportMetadataFile(String reportName) {
+        return new File(
+            getReportBasePath() + reportName + ReportClient.REPORT_METADATA_EXTENSION);
+    }
 }
