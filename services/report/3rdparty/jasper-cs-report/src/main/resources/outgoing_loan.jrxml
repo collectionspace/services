@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="outgoingloan" pageWidth="2050" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="3cca5535-6d07-44da-9337-8b874cbc9f70">
+  <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+  <property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+  <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+  <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+  <property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+  <property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+  <style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+  <style name="Detail" fontName="SansSerif" fontSize="12"/>
+  <parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["borrower,borrowerscontact,objvaluecurrency,loanvaluecurrency,loangroup"]]></defaultValueExpression>
+  </parameter>
+  <parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+  </parameter>
+  <parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+  <parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
+  </parameter>
+  <queryString language="SQL">
+    <![CDATA[WITH valuations AS (
+  SELECT
+    relation.subjectcsid,
+    amount.valueamount,
+    amount.valuecurrency
+  FROM valuationcontrols_common valuation
+  INNER JOIN hierarchy hier ON hier.id = valuation.id
+  INNER JOIN misc ON misc.id = valuation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN relations_common relation ON relation.objectcsid = hier.name
+    AND (relation.subjectdocumenttype = 'Loanout' OR relation.subjectdocumenttype = 'CollectionObject')
+  LEFT JOIN hierarchy amount_hier ON amount_hier.parentid = valuation.id AND amount_hier.primarytype = 'valueAmounts' AND amount_hier.pos = 0
+  LEFT JOIN valueamounts amount ON amount.id = amount_hier.id
+)
+SELECT
+  loan.loanoutnumber,
+  loan.borrower,
+  loan.borrowerscontact,
+  COALESCE(person_addr.addressplace1, org_addr.addressplace1, '') AS addressplace1,
+  COALESCE(person_addr.addressplace2, org_addr.addressplace2, '') AS addressplace2,
+  COALESCE(person_addr.addresstype, org_addr.addresstype, '') AS addresstype,
+  COALESCE(person_addr.addresscountry, org_addr.addresscountry, '') AS addresscountry,
+  COALESCE(person_addr.addressmunicipality, org_addr.addressmunicipality, '') AS addressmunicipality,
+  COALESCE(person_addr.addresspostcode, org_addr.addresspostcode, '') AS addresspostcode,
+  COALESCE(person_addr.addressstateorprovince, org_addr.addressstateorprovince, '') AS addressstateorprovince,
+  loan.loanoutdate,
+  loan.loanrenewalapplicationdate,
+  object.objectnumber,
+  object.objectname,
+  loan_valuation.valueamount AS loanvalueamount,
+  loan_valuation.valuecurrency AS loanvaluecurrency,
+  obj_valuation.valueamount AS objvalueamount,
+  obj_valuation.valuecurrency AS objvaluecurrency,
+  status.loangroup,
+  status.loanstatusdate
+FROM loansout_common loan
+INNER JOIN hierarchy hier ON hier.id = loan.id
+INNER JOIN misc ON misc.id = loan.id AND misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+LEFT JOIN hierarchy status_hier ON status_hier.parentid = loan.id AND status_hier.primarytype = 'loanStatusGroup' AND status_hier.pos = 0
+LEFT JOIN loanstatusgroup status ON status.id = status_hier.id
+-- borrower person address
+LEFT JOIN persons_common pc ON pc.refname = loan.borrower
+LEFT JOIN hierarchy person_hier ON person_hier.id = pc.id
+LEFT JOIN contacts_common person_contact ON person_contact.initem = person_hier.name
+LEFT JOIN hierarchy p_addr_hier ON p_addr_hier.parentid = person_contact.id AND p_addr_hier.primarytype = 'addressGroup' AND p_addr_hier.pos = 0
+LEFT JOIN addressgroup person_addr ON person_addr.id = p_addr_hier.id
+-- borrower org address
+LEFT JOIN organizations_common oc ON oc.refname = loan.borrower
+LEFT JOIN hierarchy org_hier ON org_hier.id = oc.id
+LEFT JOIN contacts_common org_contact ON org_contact.initem = org_hier.name
+LEFT JOIN hierarchy org_addr_hier ON org_addr_hier.parentid = org_contact.id AND org_addr_hier.primarytype = 'addressGroup' AND org_addr_hier.pos = 0
+LEFT JOIN addressgroup org_addr ON org_addr.id = org_addr_hier.id
+-- relatedobjs
+LEFT JOIN (
+  SELECT
+    hier.name AS csid,
+    relation.subjectcsid,
+    obj.objectnumber,
+    ong.objectname
+  FROM collectionobjects_common obj
+  INNER JOIN hierarchy hier ON hier.id = obj.id
+  INNER JOIN misc on misc.id = obj.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN relations_common relation ON relation.objectcsid = hier.name
+    AND relation.subjectdocumenttype = 'Loanout'
+    AND relation.objectdocumenttype = 'CollectionObject'
+  LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
+  LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
+) object ON object.subjectcsid = hier.name
+-- valuations
+LEFT JOIN valuations loan_valuation ON loan_valuation.subjectcsid = hier.name
+LEFT JOIN valuations obj_valuation ON obj_valuation.subjectcsid = object.csid
+$P!{whereclause}
+]]>
+  </queryString>
+  <field name="loanoutnumber" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="loanoutnumber"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanoutnumber"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loansin_common"/>
+  </field>
+  <field name="borrower" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="borrower"/>
+    <property name="com.jaspersoft.studio.field.label" value="borrower"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="borrowergroup"/>
+  </field>
+  <field name="borrowerscontact" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="borrowerscontact"/>
+    <property name="com.jaspersoft.studio.field.label" value="borrowerscontact"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="borrowergroup"/>
+  </field>
+  <field name="addressplace1" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addressplace1"/>
+    <property name="com.jaspersoft.studio.field.label" value="addressplace1"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addressplace2" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addressplace2"/>
+    <property name="com.jaspersoft.studio.field.label" value="addressplace2"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addresstype" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addresstype"/>
+    <property name="com.jaspersoft.studio.field.label" value="addresstype"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addresscountry" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addresscountry"/>
+    <property name="com.jaspersoft.studio.field.label" value="addresscountry"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addressmunicipality" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addressmunicipality"/>
+    <property name="com.jaspersoft.studio.field.label" value="addressmunicipality"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addresspostcode" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addresspostcode"/>
+    <property name="com.jaspersoft.studio.field.label" value="addresspostcode"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="addressstateorprovince" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="addressstateorprovince"/>
+    <property name="com.jaspersoft.studio.field.label" value="addressstateorprovince"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+  </field>
+  <field name="loanoutdate" class="java.sql.Timestamp">
+    <property name="com.jaspersoft.studio.field.name" value="loanoutdate"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanoutdate"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loansin_common"/>
+  </field>
+  <field name="loanrenewalapplicationdate" class="java.sql.Timestamp">
+    <property name="com.jaspersoft.studio.field.name" value="loanrenewalapplicationdate"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanrenewalapplicationdate"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loansin_common"/>
+  </field>
+  <field name="objectnumber" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+    <property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+  </field>
+  <field name="objectname" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="objectname"/>
+    <property name="com.jaspersoft.studio.field.label" value="objectname"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+  </field>
+  <field name="loanvalueamount" class="java.lang.Double">
+    <property name="com.jaspersoft.studio.field.name" value="loanvalueamount"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanvalueamount"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="valueamounts"/>
+  </field>
+  <field name="loanvaluecurrency" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="loanvaluecurrency"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanvaluecurrency"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="valueamounts"/>
+  </field>
+  <field name="objvalueamount" class="java.lang.Double">
+    <property name="com.jaspersoft.studio.field.name" value="objvalueamount"/>
+    <property name="com.jaspersoft.studio.field.label" value="objvalueamount"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="valueamounts"/>
+  </field>
+  <field name="objvaluecurrency" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="objvaluecurrency"/>
+    <property name="com.jaspersoft.studio.field.label" value="objvaluecurrency"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="valueamounts"/>
+  </field>
+  <field name="loangroup" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="loangroup"/>
+    <property name="com.jaspersoft.studio.field.label" value="loangroup"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loanstatusgroup"/>
+  </field>
+  <field name="loanstatusdate" class="java.sql.Timestamp">
+    <property name="com.jaspersoft.studio.field.name" value="loanstatusdate"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanstatusdate"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loanstatusgroup"/>
+  </field>
+  <background>
+    <band splitType="Stretch"/>
+  </background>
+  <title>
+    <band>
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+    </band>
+  </title>
+  <pageHeader>
+    <band splitType="Stretch">
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+    </band>
+  </pageHeader>
+  <columnHeader>
+    <band height="44" splitType="Stretch">
+      <property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+      <staticText>
+        <reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="ca7d3b53-acef-4f92-8995-aff1abc2c36a">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loanout Number]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="3b214c05-4eb2-47be-b6d3-c7e9e3365313">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="e5ed784e-a7ae-4ce2-ab5a-382c9c7c69dc">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Contact]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="ef5fb147-f0eb-4e03-9301-28791f0b86d2">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Type]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="b0f76254-5cd6-40fb-b400-af815ef4cd6b">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Line 1]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="7c638e9d-4f44-42d5-980c-7297a351ce28">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Line 2]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="78ab11f9-ecb1-476b-81c3-2c12f5f5d6af">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Country]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="499b462d-7d68-42a2-a11c-cdfa94a5c785">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Municipality]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="341a9b63-9c71-47c4-b102-cc9252c4ef75">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr Post Code]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="29a9a220-7233-4e30-8237-50f92b05fed4">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Borrower Addr State/Province]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="49400e99-631a-427b-a302-c23c6b219e9c">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loanout Date]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="e22be89a-0c1b-4055-a7b5-1207db3e78d0">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Renewal Application Date]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="2f0f70fb-bbb1-4fab-9190-915de09971ef">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Related Obj Number]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="36750574-4d3d-4853-9286-bbcfae83f36c">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Related Obj Name]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="53bf3ed6-5117-4ad8-afd6-e86c76041f05">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Related Obj Value]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="ec96f4f4-03e3-4fd8-8e90-05085c930c64">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Related Obj Value Currency]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="66aa8482-9c5c-4aad-abf6-6a2cacf3f985">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loanout Value]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="0547579c-5810-4c20-ade2-1785e939db02">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loanout Value Currency]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="22491212-73f4-4469-90e5-8bb955178303">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loan status group]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="359f094b-630c-40eb-a759-79162e98d547">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loan status date]]></text>
+      </staticText>
+    </band>
+  </columnHeader>
+  <detail>
+    <band height="66" splitType="Stretch">
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+      <textField>
+        <reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="87fafe2a-7b2a-433c-8440-926f5a750b5f">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanoutnumber}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="bab80b3a-e8d5-4c25-924b-758c4670107c">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{borrower}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="fc9c6181-58b1-41e3-b3a8-83f827cf022e">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{borrowerscontact}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="624834c8-81d7-4412-b8dc-2a9b815989dd">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addresstype}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="c6ff1ca8-3214-4941-8a7e-9da39051b4da">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addressplace1}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="edcdd538-cb26-4440-803a-52d0c1369be3">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addressplace2}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="16b2267d-e844-48e3-b5e8-c8c2f7b4c081">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addresscountry}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="82c4bb0f-3bb8-4e17-8de5-2cf9bf389f2e">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addressmunicipality}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="eddcc588-8f60-452d-8dd2-be47a11aae3a">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addresspostcode}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="30082e40-1545-432b-836a-eb74b307d255">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{addressstateorprovince}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="8f89dca7-b1bf-4936-8c66-5a31bdcc1cf2">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanoutdate}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="c9ff25cc-2642-4642-a1ea-0ae142eaaf8b">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanrenewalapplicationdate}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="aa45e199-0803-47ce-b415-b7d1607ed5d5">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="0a8c6654-d5ee-4359-8899-873d77a757dc">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="9fbf094d-4093-455c-9c8a-3062a8c7ccfd">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{objvalueamount}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="0ea9afd4-9730-4983-bdd1-59418b57fbd0">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{objvaluecurrency}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="4b9a3472-b72c-49ab-8d35-80eeaa1e6c81">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanvalueamount}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="ffa7daf8-1b19-4189-bed5-89e0af96c483">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanvaluecurrency}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="50b791cd-4504-4c57-bd9a-b2e798edf5cc">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loangroup}]]></textFieldExpression>
+      </textField>
+      <textField>
+        <reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="0e3c00b0-462b-442f-8f91-0b1cf95422fe">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanstatusdate}]]></textFieldExpression>
+      </textField>
+    </band>
+  </detail>
+  <columnFooter>
+    <band splitType="Stretch">
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+    </band>
+  </columnFooter>
+  <pageFooter>
+    <band splitType="Stretch">
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+    </band>
+  </pageFooter>
+  <summary>
+    <band splitType="Stretch">
+      <property name="com.jaspersoft.studio.unit.height" value="px"/>
+    </band>
+  </summary>
+</jasperReport>
