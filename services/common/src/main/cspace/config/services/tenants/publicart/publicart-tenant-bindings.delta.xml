@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tenant:TenantBindingConfig
-        xmlns:merge="http://xmlmerge.el4j.elca.ch"
-        xmlns:tenant="http://collectionspace.org/services/config/tenant">
+		xmlns:merge="http://xmlmerge.el4j.elca.ch"
+		xmlns:tenant="http://collectionspace.org/services/config/tenant">
 
-    <!-- Add your changes, if any, within the following tag pair. -->
-    <!-- The value of the 'id' attribute, below, should match the corresponding -->
-    <!-- value in cspace/config/services/tenants/publicart-tenant-bindings-proto.xml -->
+	<!-- Add your changes, if any, within the following tag pair. -->
+	<!-- The value of the 'id' attribute, below, should match the corresponding -->
+	<!-- value in cspace/config/services/tenants/publicart-tenant-bindings-proto.xml -->
 
-    <tenant:tenantBinding id="5000">
-    </tenant:tenantBinding>
+	<tenant:tenantBinding id="5000">
+		<tenant:serviceBindings merge:matcher="id" id="Reports">
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>obj_current_place_details</types:value>
+				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>tombstone_with_budget</types:value>
+				</types:item>
+			</service:properties>
+		</tenant:serviceBindings>
+	</tenant:tenantBinding>
 
 </tenant:TenantBindingConfig>
