@@ -46,7 +46,7 @@
   LEFT JOIN objectexit_common_exitmethods exitmethod ON exitmethod.id = exit.id AND exitmethod.pos = 0
   LEFT JOIN hierarchy date_hier ON date_hier.parentid = exit.id AND date_hier.name = 'objectexit_common:exitDateGroup'
   LEFT JOIN structureddategroup sdg ON sdg.id = date_hier.id
-	$P!{whereclause}
+  $P!{whereclause}
 ), proposed_recipients AS (
   SELECT
     ag.*,
@@ -92,36 +92,49 @@
   INNER JOIN deacapprovalgroup approval on approval.id = hier.id
 ), related_objects AS (
   SELECT
+    hier.name AS csid,
     object.collection,
     object.objectnumber,
     object.objecthistorynote,
     ong.objectname,
     bd.item as briefdescription,
     sdg.datedisplaydate as productiondate,
-    media.objectcsid as mediacsid,
     exit.csid as exitcsid
   FROM objectexits exit
   INNER JOIN relations_common rels ON rels.subjectcsid = exit.csid AND rels.objectdocumenttype = 'CollectionObject'
+  INNER JOIN misc ON misc.id = rels.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = rels.objectcsid
   INNER JOIN collectionobjects_common object ON object.id = hier.id
-  LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
   LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
   LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = object.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
   LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
   LEFT JOIN hierarchy opdg_hier ON opdg_hier.parentid = object.id AND opdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND opdg_hier.pos = 0
   LEFT JOIN structureddategroup sdg ON sdg.id = opdg_hier.id
-), related_procedures AS (
+), related_object_media AS (
+  SELECT
+    object.csid AS objcsid,
+    media.objectcsid as mediacsid
+  FROM related_objects object
+  INNER JOIN relations_common media ON media.subjectcsid = object.csid AND media.objectdocumenttype = 'Media'
+  INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
+), related_acquisitions AS (
   SELECT
     acq.acquisitionreferencenumber AS acquisition,
+    exit.csid as exitcsid
+  FROM objectexits exit
+  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Acquisition'
+  INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN acquisitions_common acq ON acq.id = hier.id
+), related_intakes AS (
+  SELECT
     intake.entrynumber AS intake,
     exit.csid as exitcsid
   FROM objectexits exit
-  LEFT JOIN relations_common acq_rels ON acq_rels.subjectcsid = exit.csid AND acq_rels.objectdocumenttype = 'Acquisition'
-  LEFT JOIN hierarchy acq_hier ON acq_hier.name = acq_rels.objectcsid
-  LEFT JOIN acquisitions_common acq ON acq.id = acq_hier.id
-  LEFT JOIN relations_common intake_rels ON intake_rels.subjectcsid = exit.csid AND intake_rels.objectdocumenttype = 'Intake'
-  LEFT JOIN hierarchy intake_hier ON intake_hier.name = intake_rels.objectcsid
-  LEFT JOIN intakes_common intake ON intake.id = intake_hier.id
+  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Intake'
+  INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN intakes_common intake ON intake.id = hier.id
 )
 SELECT
   exit.exitnumber,
@@ -166,15 +179,17 @@ SELECT
   exit.disposaldate,
   exit.disposalmethod,
   exit.disposalvalue,
-  procedures.acquisition,
-  procedures.intake,
-  obj.mediacsid
+  acquisition.acquisition,
+  intake.intake,
+  media.mediacsid
 FROM objectexits exit
 LEFT JOIN approvals approval ON approval.exitcsid = exit.csid
 LEFT JOIN related_objects obj ON obj.exitcsid = exit.csid
+LEFT JOIN related_object_media media ON media.objcsid = obj.csid
 LEFT JOIN proposed_recipients proposed_recip ON proposed_recip.exitcsid = exit.csid
 LEFT JOIN recipients recip ON recip.exitcsid = exit.csid
-LEFT JOIN related_procedures procedures ON procedures.exitcsid = exit.csid]]>
+LEFT JOIN related_acquisitions acquisition ON acquisition.exitcsid = exit.csid
+LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 	</queryString>
 	<field name="exitnumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="exitnumber"/>

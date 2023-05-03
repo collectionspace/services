@@ -49,8 +49,8 @@ SELECT
   dimension.measurementunit AS dimensionunit,
   sd.datedisplaydate AS artworkdate,
   media.objectcsid AS mediacsid,
-  funding.acquisitionfundingcurrency,
-  funding.acquisitionfundingvalue
+  acquisition.acquisitionfundingcurrency,
+  acquisition.acquisitionfundingvalue
 FROM collectionobjects_common obj
 INNER JOIN hierarchy hier ON hier.id = obj.id
 INNER JOIN misc ON misc.id = hier.id AND misc.lifecyclestate != 'deleted'
@@ -72,11 +72,24 @@ LEFT JOIN dimensionsubgroup dimension ON dimension.id = dimension_hier.id
 LEFT JOIN hierarchy pdg_hier ON pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' AND pdg_hier.pos = 0
 LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
 LEFT JOIN structureddategroup sd ON sd.id = sdg_hier.id
-LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
-LEFT JOIN relations_common acq_rels ON acq_rels.subjectcsid = hier.name AND acq_rels.objectdocumenttype = 'Acquisition'
-LEFT JOIN hierarchy acquisition_hier ON acquisition_hier.name = acq_rels.objectcsid
-LEFT JOIN hierarchy funding_hier ON funding_hier.parentid = acquisition_hier.id AND funding_hier.primarytype = 'acquisitionFunding' AND funding_hier.pos = 0
-LEFT JOIN acquisitionfunding funding ON funding.id = funding_hier.id
+LEFT JOIN (
+  SELECT relation.*
+  FROM relations_common relation
+  INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+) media ON media.subjectcsid = hier.name
+LEFT JOIN (
+  SELECT
+    relation.subjectcsid,
+    funding.acquisitionfundingcurrency,
+    funding.acquisitionfundingvalue
+  FROM relations_common relation
+  INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  LEFT JOIN hierarchy funding_hier ON funding_hier.parentid = hier.id AND funding_hier.primarytype = 'acquisitionFunding' AND funding_hier.pos = 0
+  LEFT JOIN acquisitionfunding funding ON funding.id = funding_hier.id
+  WHERE relation.objectdocumenttype = 'Acquisition' AND relation.subjectdocumenttype = 'CollectionObject'
+) acquisition ON acquisition.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String">
@@ -384,7 +397,7 @@ $P!{whereclause}]]>
 				<textFieldExpression><![CDATA[$F{acquisitionfundingcurrency}]]></textFieldExpression>
 			</textField>
 			<image onErrorType="Blank">
-				<reportElement x="500" y="0" width="50" height="50" uuid="1ad42717-39a1-42dd-be1c-e4b125a5df3e"/>
+				<reportElement x="1500" y="0" width="50" height="50" uuid="1ad42717-39a1-42dd-be1c-e4b125a5df3e"/>
 				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
 			</image>
 		</band>

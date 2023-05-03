@@ -56,24 +56,31 @@
 	$P!{whereclause}
 ), related_objects AS (
   SELECT
+    hier.name AS csid,
     object.collection,
     object.objecthistorynote,
     object.objectnumber,
     ong.objectname,
     bd.item AS briefdescription,
     sdg.datedisplaydate AS objectproductiondate,
-    media.objectcsid AS mediacsid,
     acq.csid AS acquisitioncsid
   FROM acquisitions acq
   INNER JOIN relations_common rels ON rels.subjectcsid = acq.csid AND rels.objectdocumenttype = 'CollectionObject'
+  INNER JOIN misc on misc.id = rels.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
   INNER JOIN collectionobjects_common object ON object.id = hier.id
-  LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
   LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
   LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = object.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
   LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
   LEFT JOIN hierarchy opdg_hier ON opdg_hier.parentid = object.id AND opdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND opdg_hier.pos = 0
   LEFT JOIN structureddategroup sdg ON sdg.id = opdg_hier.id
+), related_media AS (
+  SELECT
+    object.csid AS objcsid,
+    media.objectcsid AS mediacsid
+  FROM related_objects object
+  INNER JOIN relations_common media ON media.subjectcsid = object.csid AND media.objectdocumenttype = 'Media'
+  INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
 )
 SELECT
   acq.acquisitionreferencenumber,
@@ -94,9 +101,10 @@ SELECT
   obj.collection,
   obj.briefdescription,
   obj.objecthistorynote,
-  obj.mediacsid
+  media.mediacsid
 FROM acquisitions acq
-LEFT JOIN related_objects obj ON obj.acquisitioncsid = acq.csid]]>
+LEFT JOIN related_objects obj ON obj.acquisitioncsid = acq.csid
+LEFT JOIN related_media media ON media.objcsid = obj.csid]]>
 	</queryString>
 	<field name="acquisitionreferencenumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="acquisitionreferencenumber"/>

@@ -56,19 +56,26 @@
   SELECT object.collection,
     ong.objectname,
     bd.item as briefdescription,
-    media.objectcsid as mediacsid,
     sdg.datedisplaydate as productiondate,
-    intake.csid as intakecsid
+    intake.csid as intakecsid,
+    hier.name as csid
   FROM intakes intake
   INNER JOIN relations_common rels ON rels.subjectcsid = intake.csid AND rels.objectdocumenttype = 'CollectionObject'
+  INNER JOIN misc on misc.id = rels.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
   INNER JOIN collectionobjects_common object ON object.id = hier.id
   LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
-  LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media'
   LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = object.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
   LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
   LEFT JOIN hierarchy opdg_hier ON opdg_hier.parentid = object.id AND opdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND opdg_hier.pos = 0
   LEFT JOIN structureddategroup sdg ON sdg.id = opdg_hier.id
+), related_object_media AS (
+  SELECT
+    object.csid AS objcsid,
+    media.objectcsid as mediacsid
+  FROM related_objects object
+  INNER JOIN relations_common media ON media.subjectcsid = object.csid AND media.objectdocumenttype = 'Media'
+  INNER JOIN misc on misc.id = media.id AND misc.lifecyclestate != 'deleted'
 )
 select owner.primarydisplayname as primarydisplayname,
   owner.secondarydisplayname as secondarydisplayname,
@@ -83,10 +90,11 @@ select owner.primarydisplayname as primarydisplayname,
   obj.objectname,
   obj.briefdescription,
   obj.productiondate,
-  obj.mediacsid
+  media.mediacsid
 from intakes intake
 left join person_owners as owner on intake.csid = owner.intakecsid
-left join related_objects obj on intake.csid = obj.intakecsid]]>
+left join related_objects obj on intake.csid = obj.intakecsid
+left join related_object_media media on media.objcsid = obj.csid]]>
 	</queryString>
 	<field name="primarydisplayname" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="primarydisplayname"/>
