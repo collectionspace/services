@@ -191,7 +191,11 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			if (list.getTotalItems() == 0) {
 				logger.info("Adding report " + reportName);
 
-				reportResource.create(resourceMap, null, payload);
+				try {
+					reportResource.create(resourceMap, null, payload);
+				} catch(Exception e) {
+					logger.error(e.getMessage(), e);
+				}
 			} else {
 				for (ListItem item : list.getListItem()) {
 					String csid = AbstractCommonListUtils.ListItemGetCSID(item);
@@ -215,7 +219,11 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 					) {
 						logger.info("Updating report {} with csid {}", reportName, csid);
 
-						reportResource.update(resourceMap, null, csid, payload);
+						try {
+							reportResource.update(resourceMap, null, csid, payload);
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}
 					} else {
 						logger.info(
 							"Not updating report {} with csid {} - it was not auto-created, or was updated or soft-deleted",
