@@ -589,7 +589,43 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
+					<types:value>acq_basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>Acq_List_Basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
 					<types:value>box_list</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>CC_List_Basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreAcquisition</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreGroupObject</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreIntake</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreLoanIn</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreLoanOut</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>coreObjectExit</types:value>
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
@@ -601,7 +637,23 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
+					<types:value>Exhibition_List_Basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>Group_List_Basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
 					<types:value>incoming_loan_letter</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>LoansIn_List_Basic</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>LoansOut_List_Basic</types:value>
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
@@ -609,7 +661,15 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
+					<types:value>object_valuation</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
 					<types:value>outgoing_loan_letter</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>systematicInventory</types:value>
 				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
