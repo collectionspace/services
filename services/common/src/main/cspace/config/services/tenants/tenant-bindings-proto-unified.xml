@@ -645,6 +645,10 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
+					<types:value>incoming_loan</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
 					<types:value>incoming_loan_letter</types:value>
 				</types:item>
 				<types:item>
@@ -666,6 +670,10 @@
 				<types:item>
 					<types:key>report</types:key>
 					<types:value>outgoing_loan_letter</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>referral</types:value>
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
