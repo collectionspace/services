@@ -679,6 +679,10 @@
 					<types:key>report</types:key>
 					<types:value>systematicInventory</types:value>
 				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>condition</types:value>
+				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">
