@@ -649,7 +649,7 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
-					<types:value>incoming_loan_letter</types:value>
+					<types:value>gncoming_loan_letter</types:value>
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
@@ -678,6 +678,10 @@
 				<types:item>
 					<types:key>report</types:key>
 					<types:value>systematicInventory</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>outgoing_loan</types:value>
 				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
