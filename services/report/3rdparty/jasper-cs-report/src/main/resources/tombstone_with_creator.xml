@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Tombstone with Creator</name>
+    <notes>Tombstone Report with Creator (Public Art Profile)</notes>
+    <forDocTypes>
+      <forDocType>CollectionObject</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>false</supportsSingleDoc>
+    <supportsDocList>true</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>true</supportsNoContext>
+    <filename>tombstone_with_creator.jrxml</filename>
+    <outputMIME>text/csv</outputMIME>
+  </ns2:reports_common>
+</document>
