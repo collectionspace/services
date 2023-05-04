@@ -18,6 +18,10 @@
 					<types:key>report</types:key>
 					<types:value>tombstone_with_budget</types:value>
 				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>tombstone_with_creator</types:value>
+				</types:item>
 			</service:properties>
 		</tenant:serviceBindings>
 	</tenant:tenantBinding>
