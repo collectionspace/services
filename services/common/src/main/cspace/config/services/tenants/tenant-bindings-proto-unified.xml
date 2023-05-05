@@ -681,6 +681,10 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
+					<types:value>condition</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
 					<types:value>outgoing_loan</types:value>
 				</types:item>
 			</service:properties>
