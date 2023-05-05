@@ -649,7 +649,7 @@
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
-					<types:value>gncoming_loan_letter</types:value>
+					<types:value>incoming_loan_letter</types:value>
 				</types:item>
 				<types:item>
 					<types:key>report</types:key>
