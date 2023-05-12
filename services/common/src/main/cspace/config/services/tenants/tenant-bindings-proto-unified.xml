@@ -305,6 +305,20 @@
 			</service:DocHandlerParams>
 			<service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service">org.collectionspace.services.batch.nuxeo.BatchValidatorHandler
 			</service:validatorHandler>
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
+				<types:item>
+					<types:key>batch</types:key>
+					<types:value>org.collectionspace.services.batch.nuxeo.MergeAuthorityItemsBatchJob</types:value>
+				</types:item>
+				<types:item>
+					<types:key>batch</types:key>
+					<types:value>org.collectionspace.services.batch.nuxeo.UpdateInventoryStatusBatchJob</types:value>
+				</types:item>
+				<types:item>
+					<types:key>batch</types:key>
+					<types:value>org.collectionspace.services.batch.nuxeo.UpdateObjectLocationBatchJob</types:value>
+				</types:item>
+			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Batch"
 				version="1.0">
 				<service:part id="0" control_group="Managed" versionable="true" auditable="false" label="batch-system"

@@ -1,0 +1,15 @@
+<document name="batch">
+  <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <name>Update Current Location</name>
+    <notes>Recompute the current location of Object records, based on the related Location/Movement/Inventory records. Runs on a single record or all records.</notes>
+    <forDocTypes>
+      <forDocType>CollectionObject</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>true</supportsNoContext>
+    <createsNewFocus>false</createsNewFocus>
+    <className>org.collectionspace.services.batch.nuxeo.UpdateObjectLocationBatchJob</className>
+  </ns2:batch_common>
+</document>

@@ -41,6 +41,7 @@ public interface IQueryManager {
 	final static String SEARCH_TYPE_PARTIALTERM = "pt";
 	final static String SEARCH_TYPE_DOCTYPE = "doctype";
 	final static String SEARCH_TYPE_FILENAME = "filename";
+	final static String SEARCH_TYPE_CLASS_NAME = "classname";
 	final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
 	final static String SEARCH_TYPE_INVOCATION = "inv";
 	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
@@ -171,6 +172,15 @@ public interface IQueryManager {
 	 * @return        the where clause
 	 */
 	public String createWhereClauseForInvocableByFilename(String schema, String filename);
+
+	/**
+	 * Creates a filtering where clause from class name, for invocables.
+	 *
+	 * @param schema  the schema name for this invocable
+	 * @param docType the class name
+	 * @return        the where clause
+	 */
+	public String createWhereClauseForInvocableByClassName(String schema, String className);
 
 	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.

@@ -1,0 +1,22 @@
+<document name="batch">
+  <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <name>Merge Authority Items</name>
+    <notes>Merge an authority item into a target, and update all referencing records. Runs on a single record only.</notes>
+    <forDocTypes>
+      <forDocType>Chronology</forDocType>
+      <forDocType>Workitem</forDocType>
+      <forDocType>Person</forDocType>
+      <forDocType>Conceptitem</forDocType>
+      <forDocType>Placeitem</forDocType>
+      <forDocType>Citation</forDocType>
+      <forDocType>Organization</forDocType>
+      <forDocType>Locationitem</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <createsNewFocus>false</createsNewFocus>
+    <className>org.collectionspace.services.batch.nuxeo.MergeAuthorityItemsBatchJob</className>
+  </ns2:batch_common>
+</document>
