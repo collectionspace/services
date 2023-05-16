@@ -321,6 +321,30 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	}
 
 	/**
+	 * Creates a filtering where clause from class name, for invocables.
+	 *
+	 * @param schema  the schema name for this invocable
+	 * @param docType the class name
+	 * @return        the where clause
+	 */
+	@Override
+	public String createWhereClauseForInvocableByClassName(String schema, String className) {
+		String trimmed = sanitizeNXQLString(className);
+
+		if (trimmed.isEmpty()) {
+			throw new RuntimeException("No class name specified.");
+		}
+
+		if (schema == null || schema.isEmpty()) {
+			throw new RuntimeException("No match schema specified.");
+		}
+
+		String whereClause = schema + ":" + InvocableJAXBSchema.CLASS_NAME + " = '" + trimmed + "'";
+
+		return whereClause;
+	}
+
+	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
 	 *
 	 * @param mode

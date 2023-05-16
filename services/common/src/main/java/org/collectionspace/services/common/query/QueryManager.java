@@ -121,6 +121,17 @@ public class QueryManager {
 	}
 
 	/**
+	 * Creates a filtering where clause from class name, for invocables.
+	 *
+	 * @param schema  the schema name for this invocable
+	 * @param docType the class name
+	 * @return        the where clause
+	 */
+	static public String createWhereClauseForInvocableByClassName(String schema, String className) {
+		return queryManager.createWhereClauseForInvocableByClassName(schema, className);
+	}
+
+	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
 	 *
 	 * @param schema the schema name for this invocable type

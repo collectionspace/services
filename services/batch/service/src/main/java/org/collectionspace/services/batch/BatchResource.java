@@ -48,6 +48,7 @@ import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.authorization.perms.ActionType;
 
+import java.io.InputStream;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -96,7 +97,7 @@ public class BatchResource extends NuxeoBasedResource {
             MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
             DocumentHandler handler = createDocumentHandler(ctx);
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
-            String filename = queryParams.getFirst(IQueryManager.SEARCH_TYPE_FILENAME);
+            String className = queryParams.getFirst(IQueryManager.SEARCH_TYPE_CLASS_NAME);
             List<String> modes = queryParams.get(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
             String whereClause = null;
             DocumentFilter documentFilter = null;
@@ -109,9 +110,9 @@ public class BatchResource extends NuxeoBasedResource {
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
 
-            if (filename != null && !filename.isEmpty()) {
-                whereClause = QueryManager.createWhereClauseForInvocableByFilename(
-                        common_part, filename);
+            if (className != null && !className.isEmpty()) {
+                whereClause = QueryManager.createWhereClauseForInvocableByClassName(
+                        common_part, className);
                 documentFilter = handler.getDocumentFilter();
                 documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
@@ -289,6 +290,19 @@ public class BatchResource extends NuxeoBasedResource {
         	String msg = String.format("%s Could not invoke batch job with CSID='%s'.",
         			ServiceMessages.POST_FAILED, csid);
             throw bigReThrow(e, msg);
+        }
+    }
+
+    public static InputStream getBatchMetadataInputStream(String batchName) {
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+        try {
+            Class<?> clazz = classLoader.loadClass(batchName);
+            String metadataFileName = clazz.getSimpleName() + ".xml";
+
+            return clazz.getResourceAsStream(metadataFileName);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

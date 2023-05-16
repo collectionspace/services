@@ -1,0 +1,15 @@
+<document name="batch">
+  <ns2:batch_common xmlns:ns2="http://collectionspace.org/services/batch" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <name>Update Inventory Status</name>
+    <notes>Set the inventory status of selected Object records. Runs on a record list only.</notes>
+    <forDocTypes>
+      <forDocType>CollectionObject</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>false</supportsSingleDoc>
+    <supportsDocList>true</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <createsNewFocus>false</createsNewFocus>
+    <className>org.collectionspace.services.batch.nuxeo.UpdateInventoryStatusBatchJob</className>
+  </ns2:batch_common>
+</document>

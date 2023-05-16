@@ -10,13 +10,16 @@ import javax.ws.rs.core.UriInfo;
 import org.jboss.resteasy.core.Dispatcher;
 import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
+import org.apache.commons.io.IOUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
 import org.collectionspace.services.account.Tenant;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.authorization.AuthZ;
+import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.AuthorityClient;
+import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -50,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -67,8 +71,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	private static final String RESET_AUTHORITIES_PROPERTY = "org.collectionspace.services.authorities.reset";
 	private static final String RESET_ELASTICSEARCH_INDEX_PROPERTY = "org.collectionspace.services.elasticsearch.reset";
 	private static final String RESET_REPORTS_PROPERTY = "org.collectionspace.services.reports.reset";
+	private static final String RESET_BATCH_JOBS_PROPERTY = "org.collectionspace.services.batch.reset";
 	private static final String QUICK_BOOT_PROPERTY = "org.collectionspace.services.quickboot";
 	private static final String REPORT_PROPERTY = "report";
+	private static final String BATCH_PROPERTY = "batch";
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
@@ -90,6 +96,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 				// The below properties can be set in the tomcat/bin/setenv.sh (or setenv.bat) file.
 				String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString());
 				String resetElasticsearchIndexString = System.getProperty(RESET_ELASTICSEARCH_INDEX_PROPERTY, Boolean.FALSE.toString());
+				String resetBatchJobsString = System.getProperty(RESET_BATCH_JOBS_PROPERTY, Boolean.TRUE.toString());
 				String resetReportsString = System.getProperty(RESET_REPORTS_PROPERTY, Boolean.TRUE.toString());
 
 				initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
@@ -100,6 +107,10 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 
 				if (Boolean.valueOf(resetReportsString) == true) {
 					resetReports();
+				}
+
+				if (Boolean.valueOf(resetBatchJobsString) == true) {
+					resetBatchJobs();
 				}
 			}
 
@@ -228,6 +239,122 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 						logger.info(
 							"Not updating report {} with csid {} - it was not auto-created, or was updated or soft-deleted",
 							reportName, csid);
+					}
+				}
+			}
+		}
+	}
+
+	public void resetBatchJobs() throws Exception {
+		logger.info("Resetting batch jobs");
+
+		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+		Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
+
+		for (TenantBindingType tenantBinding : tenantBindingsTable.values()) {
+			ServiceBindingType batchServiceBinding = null;
+
+			for (ServiceBindingType serviceBinding : tenantBinding.getServiceBindings()) {
+				if (serviceBinding.getName().toLowerCase().trim().equals(BatchClient.SERVICE_NAME)) {
+					batchServiceBinding = serviceBinding;
+
+					break;
+				}
+			}
+
+			Set<String> batchNames = new HashSet<String>();
+
+			if (batchServiceBinding != null) {
+				for (PropertyType property : batchServiceBinding.getProperties()) {
+					for (PropertyItemType item : property.getItem()) {
+						if (item.getKey().equals(BATCH_PROPERTY)) {
+							batchNames.add(item.getValue());
+						}
+					}
+				}
+			}
+
+			if (batchNames.size() > 0) {
+				CSpaceTenant tenant = new CSpaceTenant(tenantBinding.getId(), tenantBinding.getName());
+
+				resetTenantBatchJobs(tenant, batchNames);
+			}
+		}
+	}
+
+	private void resetTenantBatchJobs(CSpaceTenant tenant, Set<String> batchNames) throws Exception {
+		logger.info("Resetting batch jobs for tenant {}", tenant.getId());
+
+		AuthZ.get().login(tenant);
+
+		CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();
+		ResourceMap resourceMap = app.getResourceMap();
+		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
+
+		for (String batchName : batchNames) {
+			InputStream batchMetadataInputStream = BatchResource.getBatchMetadataInputStream(batchName);
+
+			if (batchMetadataInputStream == null) {
+				logger.warn(
+					"Metadata file not found for batch {}", batchName);
+
+				continue;
+			}
+
+			String payload = IOUtils.toString(batchMetadataInputStream, StandardCharsets.UTF_8);
+
+			batchMetadataInputStream.close();
+
+			UriInfo uriInfo = new UriInfoImpl(
+				new URI(""),
+				new URI(""),
+				"",
+				"pgSz=0&classname=" + URLEncoder.encode(batchName, StandardCharsets.UTF_8.toString()),
+				Arrays.asList((PathSegment) new PathSegmentImpl("", false))
+			);
+
+			AbstractCommonList list = batchResource.getList(uriInfo);
+
+			if (list.getTotalItems() == 0) {
+				logger.info("Adding batch job " + batchName);
+
+				try {
+					batchResource.create(resourceMap, null, payload);
+				} catch(Exception e) {
+					logger.error(e.getMessage(), e);
+				}
+			} else {
+				for (ListItem item : list.getListItem()) {
+					String csid = AbstractCommonListUtils.ListItemGetCSID(item);
+
+					// Update an existing batch job iff:
+					// - it was created autmatically (i.e., by the SPRING_ADMIN user)
+					// - it was last updated automatically (i.e., by the SPRING_ADMIN user)
+					// - it is not soft-deleted
+
+					PoxPayloadOut batchPayload = batchResource.getResourceFromCsid(null, null, csid);
+					PayloadOutputPart corePart = batchPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
+
+					String createdBy = corePart.asElement().selectSingleNode(CollectionSpaceClient.COLLECTIONSPACE_CORE_CREATED_BY).getText();
+					String updatedBy = corePart.asElement().selectSingleNode(CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_BY).getText();
+					String workflowState = corePart.asElement().selectSingleNode(CollectionSpaceClient.COLLECTIONSPACE_CORE_WORKFLOWSTATE).getText();
+
+					if (
+						createdBy.equals(AuthN.SPRING_ADMIN_USER)
+						&& updatedBy.equals(AuthN.SPRING_ADMIN_USER)
+						&& !workflowState.equals(WorkflowClient.WORKFLOWSTATE_DELETED)
+					) {
+						logger.info("Updating batch job {} with csid {}", batchName, csid);
+
+						try {
+							batchResource.update(resourceMap, null, csid, payload);
+						} catch (Exception e) {
+							logger.error(e.getMessage(), e);
+						}
+					} else {
+						logger.info(
+							"Not updating batch job {} with csid {} - it was not auto-created, or was updated or soft-deleted",
+							batchName, csid);
 					}
 				}
 			}
