@@ -145,55 +145,55 @@
 	<detail>
 		<band height="51" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.HorizontalRowLayout"/>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="51" uuid="020a8318-9170-4d22-a0ad-31192ed44b9a"/>
 				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="92" y="0" width="91" height="51" uuid="c7a74edc-c985-466f-9d1a-1a053b057c40"/>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="183" y="0" width="91" height="51" uuid="967aa94c-4d64-47fc-9234-4c4eccfd8de5"/>
 				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="274" y="0" width="91" height="51" uuid="955d1530-7a02-4fff-bcbf-a77fdf7106a2"/>
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="365" y="0" width="91" height="51" uuid="cd2614be-d303-42ec-b1ae-17986df423dd"/>
 				<textFieldExpression><![CDATA[$F{oporg}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="456" y="0" width="91" height="51" uuid="f9b9b475-9f9e-48a7-8016-330cbcfb0fae"/>
 				<textFieldExpression><![CDATA[$F{objectproductionorganizationrole}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="547" y="0" width="91" height="51" uuid="2c3a2c4b-9124-43c8-8be3-69c482f4e5ad"/>
 				<textFieldExpression><![CDATA[$F{opperson}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="638" y="0" width="91" height="51" uuid="baa2cb50-03d1-45e0-9e32-dac575891da9"/>
 				<textFieldExpression><![CDATA[$F{objectproductionpersonrole}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="729" y="0" width="91" height="51" uuid="00f2e1c6-6a9d-445a-9bb0-8792754d5f66"/>
 				<textFieldExpression><![CDATA[$F{objectproductionpeople}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="820" y="0" width="91" height="51" uuid="f28c35cd-bc86-49a7-95ff-cebf40b6434f"/>
 				<textFieldExpression><![CDATA[$F{datedisplaydate}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="911" y="0" width="91" height="51" uuid="274ac7cc-d075-46bd-9597-39892c40d201"/>
 				<textFieldExpression><![CDATA[$F{dimensionsummary}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1002" y="0" width="91" height="51" uuid="b9726228-b679-47da-b31d-456cd589b566"/>
 				<textFieldExpression><![CDATA[$F{numberofobjects}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" stretchType="RelativeToTallestObject" x="1093" y="0" width="91" height="51" uuid="569e8c92-bc33-49c8-bad7-a80b144d5406">
 					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
 				</reportElement>
