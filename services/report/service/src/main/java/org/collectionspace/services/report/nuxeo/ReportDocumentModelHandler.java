@@ -230,11 +230,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 				StringBuilder sb = new StringBuilder();
 				boolean first = true;
-				for(String csidItem : csids) {
-					if(first)
+				for (String csidItem : csids) {
+					if (first) {
 						first = false;
-					else
+					} else {
 						sb.append(CSID_LIST_SEPARATOR);
+					}
 	   				sb.append(assertValidCsid(csidItem));
 				}
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
@@ -394,13 +395,15 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
 			int idx = outputFilename.lastIndexOf(".");
-			if(idx>0)
+			if (idx > 0) {
 				outputFilename = outputFilename.substring(0, idx);
+			}
 			// Strip any sub-dir from report filename.
 			idx = outputFilename.lastIndexOf(File.separator);
-			if(idx>0)
-				outputFilename = outputFilename.substring(idx+1);
-			if(outputMimeType.equals(MediaType.APPLICATION_XML)) {
+			if (idx > 0) {
+				outputFilename = outputFilename.substring(idx + 1);
+			}
+			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRXmlExporter();
 				outputFilename = outputFilename+".xml";
