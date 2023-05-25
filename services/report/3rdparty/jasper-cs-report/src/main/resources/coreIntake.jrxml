@@ -7,6 +7,9 @@
 	<style name="SubTitle" forecolor="#666666" fontName="SansSerif" fontSize="18"/>
 	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["site,objectname,productionpeople"]]></defaultValueExpression>
+	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[15]]></defaultValueExpression>
 	</parameter>
@@ -21,19 +24,10 @@ inc.entryDate entryDate,
 inc.returnDate returnDate,
 h1.name AS "csid",
 co.objectnumber AS "objectnumber",
-case when (co.fieldcollectionplace  is not null and co.fieldcollectionplace  <> '') then
- regexp_replace(co.fieldcollectionplace , '^.*\)''(.*)''$', '\1')
- else ''
-end AS site,
+co.fieldcollectionplace AS site,
 ong.objectName AS "objectname",
-case when (bd.item is not null and bd.item <> '') then
- regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
- else ''
-end AS description,
-case when (oppp.objectproductionpeople is not null and oppp.objectproductionpeople <> '') then
- regexp_replace(oppp.objectproductionpeople, '^.*\)''(.*)''$', '\1')
- else ''
-end as productionpeople
+bd.item AS description,
+oppp.objectproductionpeople AS productionpeople
 FROM hierarchy  h1
 JOIN intakes_common inc ON (inc.id=h1.id)
 LEFT OUTER JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
