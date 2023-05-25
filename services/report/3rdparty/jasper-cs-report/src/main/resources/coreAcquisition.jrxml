@@ -24,7 +24,7 @@ co.objectnumber AS "objectnumber",
 ong.objectName AS "objectname",
 dg.datedisplaydate AS "acquisitiondate",
 case when (bd.item is not null and bd.item <> '') then
- regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
+ bd.item
  when co.objectnumber is null then 'No objects are related to this Acquisition.'
  else ''
 end AS description,

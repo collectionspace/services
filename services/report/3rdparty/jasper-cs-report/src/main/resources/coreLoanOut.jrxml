@@ -30,10 +30,7 @@ h1.name AS "csid",
 co.objectnumber AS "objectnumber",
 co.fieldcollectionplace AS site,
 ong.objectName AS "objectname",
-case when (bd.item is not null and bd.item <> '') then
- regexp_replace(bd.item, '^.*\)''(.*)''$', '\1')
- else ''
-end AS description,
+bd.item AS description,
 oppp.objectproductionpeople as productionpeople
 FROM hierarchy h1
 JOIN loansout_common loc ON (loc.id=h1.id)
