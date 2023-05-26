@@ -207,7 +207,7 @@
 	<noData>
 		<band height="50">
 			<staticText>
-				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="1300" y="22" width="375" height="28"/>
+				<reportElement uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" style="Column header" x="0" y="22" width="375" height="28"/>
 				<textElement>
 					<font size="14"/>
 				</textElement>
