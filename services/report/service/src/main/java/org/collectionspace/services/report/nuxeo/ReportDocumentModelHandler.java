@@ -35,9 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import javax.ws.rs.core.MediaType;
 import javax.naming.NamingException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import net.sf.jasperreports.engine.JRException;
@@ -48,16 +47,15 @@ import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.export.HtmlExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXmlExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.account.AccountResource;
@@ -66,20 +64,11 @@ import org.collectionspace.services.authorization.CSpaceResource;
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.authorization.perms.ActionType;
-import org.collectionspace.services.report.ResourceActionGroup;
-import org.collectionspace.services.report.ResourceActionGroupList;
-import org.collectionspace.services.report.ReportsCommon.ForRoles;
-import org.collectionspace.services.report.MIMEType;
-import org.collectionspace.services.report.MIMETypeItemType;
-import org.collectionspace.services.report.ReportResource;
-import org.collectionspace.services.report.ReportsCommon;
-import org.collectionspace.services.report.ReportsOuputMimeList;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.ActionGroup;
@@ -95,16 +84,21 @@ import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.jaxb.InvocableJAXBSchema;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-
+import org.collectionspace.services.report.MIMEType;
+import org.collectionspace.services.report.MIMETypeItemType;
+import org.collectionspace.services.report.ReportResource;
+import org.collectionspace.services.report.ReportsCommon;
+import org.collectionspace.services.report.ReportsCommon.ForRoles;
+import org.collectionspace.services.report.ReportsOuputMimeList;
+import org.collectionspace.services.report.ResourceActionGroup;
+import org.collectionspace.services.report.ResourceActionGroupList;
 import org.jfree.util.Log;
-
-import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.DocumentModel;
-
+import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -236,11 +230,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 				StringBuilder sb = new StringBuilder();
 				boolean first = true;
-				for(String csidItem : csids) {
-					if(first)
+				for (String csidItem : csids) {
+					if (first) {
 						first = false;
-					else
+					} else {
 						sb.append(CSID_LIST_SEPARATOR);
+					}
 	   				sb.append(assertValidCsid(csidItem));
 				}
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
@@ -400,18 +395,20 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
 			int idx = outputFilename.lastIndexOf(".");
-			if(idx>0)
+			if (idx > 0) {
 				outputFilename = outputFilename.substring(0, idx);
+			}
 			// Strip any sub-dir from report filename.
 			idx = outputFilename.lastIndexOf(File.separator);
-			if(idx>0)
-				outputFilename = outputFilename.substring(idx+1);
-			if(outputMimeType.equals(MediaType.APPLICATION_XML)) {
+			if (idx > 0) {
+				outputFilename = outputFilename.substring(idx + 1);
+			}
+			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRXmlExporter();
 				outputFilename = outputFilename+".xml";
 			} else if(outputMimeType.equals(MediaType.TEXT_HTML)) {
-				exporter = new JRHtmlExporter();
+				exporter = new HtmlExporter();
 				outputFilename = outputFilename+".html";
 			} else if(outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
 				exporter = new JRPdfExporter();
