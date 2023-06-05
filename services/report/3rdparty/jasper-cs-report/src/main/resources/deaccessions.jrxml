@@ -120,18 +120,18 @@
 ), related_acquisitions AS (
   SELECT
     acq.acquisitionreferencenumber AS acquisition,
-    exit.csid as exitcsid
-  FROM objectexits exit
-  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Acquisition'
+    obj.csid as objcsid
+  FROM related_objects obj
+  INNER JOIN relations_common relation ON relation.subjectcsid = obj.csid AND relation.objectdocumenttype = 'Acquisition'
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
   INNER JOIN acquisitions_common acq ON acq.id = hier.id
 ), related_intakes AS (
   SELECT
     intake.entrynumber AS intake,
-    exit.csid as exitcsid
-  FROM objectexits exit
-  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Intake'
+    obj.csid as objcsid
+  FROM related_objects obj
+  INNER JOIN relations_common relation ON relation.subjectcsid = obj.csid AND relation.objectdocumenttype = 'Intake'
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
   INNER JOIN intakes_common intake ON intake.id = hier.id
@@ -188,8 +188,8 @@ LEFT JOIN related_objects obj ON obj.exitcsid = exit.csid
 LEFT JOIN related_object_media media ON media.objcsid = obj.csid
 LEFT JOIN proposed_recipients proposed_recip ON proposed_recip.exitcsid = exit.csid
 LEFT JOIN recipients recip ON recip.exitcsid = exit.csid
-LEFT JOIN related_acquisitions acquisition ON acquisition.exitcsid = exit.csid
-LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
+LEFT JOIN related_acquisitions acquisition ON acquisition.objcsid = obj.csid
+LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 	</queryString>
 	<field name="exitnumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="exitnumber"/>
