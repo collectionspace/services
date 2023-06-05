@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="outgoingloan" pageWidth="2050" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="3cca5535-6d07-44da-9337-8b874cbc9f70">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="outgoingloan" pageWidth="2150" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="3cca5535-6d07-44da-9337-8b874cbc9f70">
   <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
   <property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
   <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -10,7 +10,7 @@
   <style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
   <style name="Detail" fontName="SansSerif" fontSize="12"/>
   <parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-    <defaultValueExpression><![CDATA["borrower,borrowerscontact,objvaluecurrency,loanvaluecurrency,loangroup"]]></defaultValueExpression>
+    <defaultValueExpression><![CDATA["borrower,borrowerscontact,objvaluecurrency,loanvaluecurrency,loangroup,loanstatus"]]></defaultValueExpression>
   </parameter>
   <parameter name="tenantid" class="java.lang.String" isForPrompting="false">
     <defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -53,7 +53,8 @@ SELECT
   obj_valuation.valueamount AS objvalueamount,
   obj_valuation.valuecurrency AS objvaluecurrency,
   status.loangroup,
-  status.loanstatusdate
+  status.loanstatusdate,
+  status.loanstatus
 FROM loansout_common loan
 INNER JOIN hierarchy hier ON hier.id = loan.id
 INNER JOIN misc ON misc.id = loan.id AND misc.lifecyclestate != 'deleted'
@@ -192,6 +193,11 @@ $P!{whereclause}
   <field name="loanstatusdate" class="java.sql.Timestamp">
     <property name="com.jaspersoft.studio.field.name" value="loanstatusdate"/>
     <property name="com.jaspersoft.studio.field.label" value="loanstatusdate"/>
+    <property name="com.jaspersoft.studio.field.tree.path" value="loanstatusgroup"/>
+  </field>
+  <field name="loanstatus" class="java.lang.String">
+    <property name="com.jaspersoft.studio.field.name" value="loanstatus"/>
+    <property name="com.jaspersoft.studio.field.label" value="loanstatus"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="loanstatusgroup"/>
   </field>
   <background>
@@ -351,6 +357,13 @@ $P!{whereclause}
         <textElement markup="styled"/>
         <text><![CDATA[Loan status date]]></text>
       </staticText>
+      <staticText>
+        <reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="ad3aa331-91d9-4af2-88d2-3083ae43ca15">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Loan status]]></text>
+      </staticText>
     </band>
   </columnHeader>
   <detail>
@@ -475,6 +488,12 @@ $P!{whereclause}
           <property name="com.jaspersoft.studio.unit.y" value="px"/>
         </reportElement>
         <textFieldExpression><![CDATA[$F{loanstatusdate}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="0e3c00b0-462b-442f-8f91-0b1cf95422fe">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{loanstatus}]]></textFieldExpression>
       </textField>
     </band>
   </detail>
