@@ -235,62 +235,62 @@ left outer join person_contacts pc on pc.loanid = loanin.csid]]>
 	<detail>
 		<band height="50">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="0" y="0" width="100" height="30" uuid="b7031da3-fa26-431d-91cd-a73b4709fc49">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_termdisplayname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="100" y="0" width="100" height="30" uuid="a45fa9bd-55e6-474a-8571-099c400f4791">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{contact_termdisplayname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="200" y="0" width="100" height="30" uuid="adbc8947-55c5-4b49-8b9f-20fdd90546cb">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addresstype}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="300" y="0" width="100" height="30" uuid="50526dbe-1701-4d76-90aa-41593ba7d184">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addressplace1}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="400" y="0" width="100" height="30" uuid="0e8e683e-37e9-4561-8ffa-48d85d1a32e8">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addressplace2}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="500" y="0" width="100" height="30" uuid="b2b512cd-f061-440f-b83c-4fb8c8d2cb03">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addresscountry}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="600" y="0" width="100" height="30" uuid="bcdc2de1-8562-41eb-9bdb-d9c24e35e462">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addressmunicipality}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="700" y="0" width="100" height="30" uuid="401ff189-6051-43ee-9ccc-a62fe2d954cb">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addresspostcode}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="800" y="0" width="100" height="30" uuid="b00311a6-076d-46ef-ab90-9405e8d954e0">
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{lender_addressstateorprovince}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="900" y="0" width="100" height="30" uuid="2ff6b56e-9731-441e-b9d9-b14f9268a313">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -298,7 +298,7 @@ left outer join person_contacts pc on pc.loanid = loanin.csid]]>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{loanindate}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement x="1000" y="0" width="100" height="30" uuid="0ea61055-9756-4e94-9549-dd95e009479a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
