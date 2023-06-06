@@ -39,7 +39,6 @@
 ), person_owners AS (
   SELECT ag.*,
     primaryterm.termdisplayname as primarydisplayname,
-    secondaryterm.termdisplayname as secondarydisplayname,
     intake.csid as intakecsid
   FROM intakes intake
   INNER JOIN intakes_common_currentowners co ON co.id = intake.id AND co.pos = 0
@@ -47,8 +46,6 @@
   INNER JOIN hierarchy hier ON hier.id = person.id
   INNER JOIN hierarchy term_hier ON term_hier.parentid = person.id AND term_hier.primarytype = 'personTermGroup' AND term_hier.pos = 0
   INNER JOIN persontermgroup primaryterm ON primaryterm.id = term_hier.id
-  LEFT JOIN hierarchy secterm_hier ON secterm_hier.parentid = person.id AND secterm_hier.primarytype = 'personTermGroup' AND secterm_hier.pos = 1
-  LEFT JOIN persontermgroup secondaryterm ON secondaryterm.id = secterm_hier.id
   LEFT JOIN contacts_common contact ON contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier ON addr_hier.parentid = contact.id AND addr_hier.primarytype = 'addressGroup' AND addr_hier.pos = 0
   LEFT JOIN addressgroup ag ON ag.id = addr_hier.id
@@ -78,7 +75,6 @@
   INNER JOIN misc on misc.id = media.id AND misc.lifecyclestate != 'deleted'
 )
 select owner.primarydisplayname as primarydisplayname,
-  owner.secondarydisplayname as secondarydisplayname,
   owner.addressplace1 as addressplace1,
   owner.addressplace2 as addressplace2,
   owner.addresstype as addresstype,
@@ -99,11 +95,6 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 	<field name="primarydisplayname" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="primarydisplayname"/>
 		<property name="com.jaspersoft.studio.field.label" value="primarydisplayname"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
-	</field>
-	<field name="secondarydisplayname" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="secondarydisplayname"/>
-		<property name="com.jaspersoft.studio.field.label" value="secondarydisplayname"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
 	<field name="addressplace1" class="java.lang.String">
@@ -189,15 +180,7 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Current Owner Name 1]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44"
-					uuid="53c6d776-23f5-4aba-984e-c7b19b57350f">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Current Owner Name 2]]></text>
+				<text><![CDATA[Current Owner]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="200" y="0" width="100" height="44"
@@ -307,14 +290,7 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{primarydisplayname}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="100" y="0" width="100" height="30"
-					uuid="c206b5d0-24e2-444f-98c0-ee82bb10c9b6">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{secondarydisplayname}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+			<textField>
 				<reportElement style="Detail" x="200" y="0" width="100" height="30"
 					uuid="656cd834-b03b-4bab-89b1-eb531c4671ad">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
