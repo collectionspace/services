@@ -26,7 +26,6 @@
     exit.id AS id,
     exit.exitnote,
     exit.exitnumber,
-    exit.exitquantity,
     exit.exitreason,
     exit.packingnote,
     exit.deaccessiondate,
@@ -51,15 +50,12 @@
   SELECT
     ag.*,
     ptg.termdisplayname AS primarydisplayname,
-    secondaryterm.termdisplayname AS secondarydisplayname,
     exit.csid AS exitcsid
   FROM objectexits exit
   INNER JOIN persons_common person on person.refname = exit.disposalproposedrecipient
   INNER JOIN hierarchy hier on hier.id = person.id
   INNER JOIN hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup' and ptg_hier.pos = 0
   INNER JOIN persontermgroup ptg on ptg.id = ptg_hier.id
-  LEFT JOIN hierarchy secterm_hier ON secterm_hier.parentid = person.id AND secterm_hier.primarytype = 'personTermGroup' AND secterm_hier.pos = 1
-  LEFT JOIN persontermgroup secondaryterm ON secondaryterm.id = secterm_hier.id
   LEFT JOIN contacts_common contact on contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
   LEFT JOIN addressgroup ag on ag.id = addr_hier.id
@@ -67,15 +63,12 @@
   SELECT
     ag.*,
     ptg.termdisplayname AS primarydisplayname,
-    secondaryterm.termdisplayname AS secondarydisplayname,
     exit.csid AS exitcsid
   FROM objectexits exit
   INNER JOIN persons_common person on person.refname = exit.disposalrecipient
   INNER JOIN hierarchy hier on hier.id = person.id
   INNER JOIN hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup' and ptg_hier.pos = 0
   INNER JOIN persontermgroup ptg on ptg.id = ptg_hier.id
-  LEFT JOIN hierarchy secterm_hier ON secterm_hier.parentid = person.id AND secterm_hier.primarytype = 'personTermGroup' AND secterm_hier.pos = 1
-  LEFT JOIN persontermgroup secondaryterm ON secondaryterm.id = secterm_hier.id
   LEFT JOIN contacts_common contact on contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
   LEFT JOIN addressgroup ag on ag.id = addr_hier.id
@@ -138,7 +131,6 @@
 )
 SELECT
   exit.exitnumber,
-  exit.exitquantity,
   exit.exitdate,
   exit.exitmethod,
   exit.exitreason,
@@ -156,7 +148,6 @@ SELECT
   obj.briefdescription,
   obj.objecthistorynote,
   proposed_recip.primarydisplayname AS proposed_primaryname,
-  proposed_recip.secondarydisplayname AS proposed_secondaryname,
   proposed_recip.addressplace1 AS proposed_addressplace1,
   proposed_recip.addressplace2 AS proposed_addressplace2,
   proposed_recip.addresstype AS proposed_addresstype,
@@ -165,7 +156,6 @@ SELECT
   proposed_recip.addresspostcode AS proposed_addresspostcode,
   proposed_recip.addressstateorprovince AS proposed_addressstateorprovince,
   recip.primarydisplayname AS recip_primaryname,
-  recip.secondarydisplayname AS recip_secondaryname,
   recip.addressplace1 AS recip_addressplace1,
   recip.addressplace2 AS recip_addressplace2,
   recip.addresstype AS recip_addresstype,
@@ -194,11 +184,6 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 	<field name="exitnumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="exitnumber"/>
 		<property name="com.jaspersoft.studio.field.label" value="exitnumber"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="objectexit_common"/>
-	</field>
-	<field name="exitquantity" class="java.lang.Long">
-		<property name="com.jaspersoft.studio.field.name" value="exitquantity"/>
-		<property name="com.jaspersoft.studio.field.label" value="exitquantity"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="objectexit_common"/>
 	</field>
 	<field name="exitdate" class="java.lang.String">
@@ -286,11 +271,6 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 		<property name="com.jaspersoft.studio.field.label" value="proposed_primaryname"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
-	<field name="proposed_secondaryname" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="proposed_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.label" value="proposed_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
-	</field>
 	<field name="proposed_addressplace1" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="proposed_addressplace1"/>
 		<property name="com.jaspersoft.studio.field.label" value="proposed_addressplace1"/>
@@ -329,11 +309,6 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 	<field name="recip_primaryname" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="recip_primaryname"/>
 		<property name="com.jaspersoft.studio.field.label" value="recip_primaryname"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
-	</field>
-	<field name="recip_secondaryname" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="recip_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.label" value="recip_secondaryname"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
 	<field name="recip_addressplace1" class="java.lang.String">
@@ -439,13 +414,6 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit number]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="df0dab5e-6620-4d94-a2e8-aa0e57ce83e2">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Exit quantity]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="d8c568a2-c8bf-4385-968b-ebd7e7b2b027">
@@ -564,14 +532,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Proposed Recipient Name 1]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="007384f1-6266-46d3-8cda-9984d957868d">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Proposed Recipient Name 2]]></text>
+				<text><![CDATA[Disposal Proposed Recipient]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="bfb9be47-d2d1-435a-832f-2f98bb7a8502">
@@ -627,14 +588,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Recipient Name 1]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="2800" y="0" width="100" height="44" uuid="dbbba120-1610-4189-a9a2-4c54228b26bb">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Recipient Name 2]]></text>
+				<text><![CDATA[Disposal Recipient]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="2900" y="0" width="100" height="44" uuid="25568da7-628b-4cb8-9bc5-82190ee44390">
@@ -759,13 +713,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{exitnumber}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="6c9fc572-62c9-4591-bf13-9b50a671addc">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{exitquantity}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+			<textField>
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="198b574c-8492-4ea4-ab68-17b18f412c3f">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
@@ -867,13 +815,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{proposed_primaryname}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="7c20f6cf-9100-4faf-b844-f0f2540a90fe">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{proposed_secondaryname}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+			<textField>
 				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="cbf4ed81-59bb-4446-a665-26a77da6b3c5">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
@@ -921,13 +863,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{recip_primaryname}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2800" y="0" width="100" height="30" uuid="a85ada24-3a62-4e93-93de-0b4cb8463137">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{recip_secondaryname}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+			<textField>
 				<reportElement style="Detail" x="2900" y="0" width="100" height="30" uuid="44e0bd3a-c6bd-48da-a78c-1f14a942d0d7">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
