@@ -145,34 +145,34 @@ LEFT OUTER JOIN thumbnails ON thumbnails.objectcsid = co.csid]]>
 	<detail>
 		<band height="66" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="00603df5-d974-4732-9ae8-299fa37b2987">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{movementreferencenumber}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="9de99e14-7bd6-47a9-b28e-903bb3f7bf6b">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{termdisplayname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="53e52de5-3610-4c50-b27d-0cfa6b66410e">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{termname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="9a48e9ea-699b-42b8-85f1-090a20cb0a38">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="de6e4b2e-cf86-4733-90b9-8bc416968623">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>

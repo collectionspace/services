@@ -425,145 +425,145 @@ $P!{whereclause}]]>
 	<detail>
 		<band height="66" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="34739193-2dcb-4387-8284-fd24f4706904">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="529adab3-6a52-459d-96ec-cd38a4bd4c93">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objecttitle}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="2b48e622-5e32-446a-bf28-9774811125af">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="177d5084-83c1-4b52-8717-adf6231b2eb8">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conditioncheckrefnumber}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="0379bfa9-7b8b-4d13-a5fa-6d64d43ebf9d">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{assessmentdate}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="b09479c8-6012-482f-a4bd-f0dc316f7755">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conditioncheckmethod}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="2266b3e3-a874-4269-bc46-8f8eb974dfa5">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conditionchecknote}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="6bbb65c7-c336-4b3b-bd17-d248c54b29d3">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conditioncheckreason}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="9b914486-8ddb-4169-95d3-226e53b9e491">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conditionchecker}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="e4a1fe39-4c56-4236-aac4-bc95edef2084">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectauditcategory}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="6e19e025-7e56-47c9-bf12-726b32e87fa5">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{conservationtreatmentpriority}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="075bd94f-4bc9-4023-98ee-5fdce4386950">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{nextconditioncheckdate}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="925908e3-aba0-4e68-a4d6-a5a1545fc42b">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{completeness}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="0eb55128-c734-4b2c-8721-012033891d7a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{techassessment}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="7d9350d9-a343-4a16-b513-34761e8e7c78">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{condition}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="45f5fab1-9ebd-4898-916b-76cb5060b8fa">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{envconditionnote}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="908bb4ca-411c-43c2-b96c-21d01012f2e6">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{displayrecommendations}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="dbdb7ee0-3f88-4920-94bd-85edcb5c79d8">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{handlingrecommendations}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="1ca18fc8-0f07-426d-ae4c-34148ad5f94a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{envrecommendations}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="89957c32-74ab-4545-8481-70977d5e75cf">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{specialrequirements}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="2cbdf3fc-58d9-4a8a-a24c-16bf8baf99af">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{legalreqsheld}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="362785d3-2875-46fb-91d6-96f550e3d4da">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{legalreqsheldbegindate}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="523caf3a-8e56-41dd-965a-15c7cbbaefaa">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{legalreqsheldrenewdate}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2300" y="0" width="100" height="30" uuid="7421a5d1-67af-4dc6-b090-34c8217f8113">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>

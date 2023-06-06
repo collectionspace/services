@@ -178,37 +178,37 @@ $P!{whereclause}]]>
 	<detail>
 		<band height="66" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="7362be03-1a72-418e-a0da-1309cf959811">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="6e5c5cd7-f3a1-4794-8cb1-e65145ec11f4">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="3eb519fb-f717-4769-9582-7e7ebb07a511">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{finalname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="4d34814d-7e29-4ccc-9fd6-9b7fcbe93bbb">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="8f539dce-a584-4071-a43f-0e91aa3e568f">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{locationname}]]></textFieldExpression>
 			</textField>
-			<textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="7aaa4bcf-472f-451e-b096-f17ef2ecfbbd">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
