@@ -26,7 +26,6 @@
     exit.id AS id,
     exit.exitnote,
     exit.exitnumber,
-    exit.exitquantity,
     exit.exitreason,
     exit.packingnote,
     exit.deaccessiondate,
@@ -51,15 +50,12 @@
   SELECT
     ag.*,
     ptg.termdisplayname AS primarydisplayname,
-    secondaryterm.termdisplayname AS secondarydisplayname,
     exit.csid AS exitcsid
   FROM objectexits exit
   INNER JOIN persons_common person on person.refname = exit.disposalproposedrecipient
   INNER JOIN hierarchy hier on hier.id = person.id
   INNER JOIN hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup' and ptg_hier.pos = 0
   INNER JOIN persontermgroup ptg on ptg.id = ptg_hier.id
-  LEFT JOIN hierarchy secterm_hier ON secterm_hier.parentid = person.id AND secterm_hier.primarytype = 'personTermGroup' AND secterm_hier.pos = 1
-  LEFT JOIN persontermgroup secondaryterm ON secondaryterm.id = secterm_hier.id
   LEFT JOIN contacts_common contact on contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
   LEFT JOIN addressgroup ag on ag.id = addr_hier.id
@@ -67,15 +63,12 @@
   SELECT
     ag.*,
     ptg.termdisplayname AS primarydisplayname,
-    secondaryterm.termdisplayname AS secondarydisplayname,
     exit.csid AS exitcsid
   FROM objectexits exit
   INNER JOIN persons_common person on person.refname = exit.disposalrecipient
   INNER JOIN hierarchy hier on hier.id = person.id
   INNER JOIN hierarchy ptg_hier on ptg_hier.parentid = person.id and ptg_hier.primarytype = 'personTermGroup' and ptg_hier.pos = 0
   INNER JOIN persontermgroup ptg on ptg.id = ptg_hier.id
-  LEFT JOIN hierarchy secterm_hier ON secterm_hier.parentid = person.id AND secterm_hier.primarytype = 'personTermGroup' AND secterm_hier.pos = 1
-  LEFT JOIN persontermgroup secondaryterm ON secondaryterm.id = secterm_hier.id
   LEFT JOIN contacts_common contact on contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier on addr_hier.parentid = contact.id and addr_hier.primarytype = 'addressGroup' and addr_hier.pos = 0
   LEFT JOIN addressgroup ag on ag.id = addr_hier.id
@@ -120,25 +113,24 @@
 ), related_acquisitions AS (
   SELECT
     acq.acquisitionreferencenumber AS acquisition,
-    exit.csid as exitcsid
-  FROM objectexits exit
-  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Acquisition'
+    obj.csid as objcsid
+  FROM related_objects obj
+  INNER JOIN relations_common relation ON relation.subjectcsid = obj.csid AND relation.objectdocumenttype = 'Acquisition'
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
   INNER JOIN acquisitions_common acq ON acq.id = hier.id
 ), related_intakes AS (
   SELECT
     intake.entrynumber AS intake,
-    exit.csid as exitcsid
-  FROM objectexits exit
-  INNER JOIN relations_common relation ON relation.subjectcsid = exit.csid AND relation.objectdocumenttype = 'Intake'
+    obj.csid as objcsid
+  FROM related_objects obj
+  INNER JOIN relations_common relation ON relation.subjectcsid = obj.csid AND relation.objectdocumenttype = 'Intake'
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
   INNER JOIN intakes_common intake ON intake.id = hier.id
 )
 SELECT
   exit.exitnumber,
-  exit.exitquantity,
   exit.exitdate,
   exit.exitmethod,
   exit.exitreason,
@@ -156,7 +148,6 @@ SELECT
   obj.briefdescription,
   obj.objecthistorynote,
   proposed_recip.primarydisplayname AS proposed_primaryname,
-  proposed_recip.secondarydisplayname AS proposed_secondaryname,
   proposed_recip.addressplace1 AS proposed_addressplace1,
   proposed_recip.addressplace2 AS proposed_addressplace2,
   proposed_recip.addresstype AS proposed_addresstype,
@@ -165,7 +156,6 @@ SELECT
   proposed_recip.addresspostcode AS proposed_addresspostcode,
   proposed_recip.addressstateorprovince AS proposed_addressstateorprovince,
   recip.primarydisplayname AS recip_primaryname,
-  recip.secondarydisplayname AS recip_secondaryname,
   recip.addressplace1 AS recip_addressplace1,
   recip.addressplace2 AS recip_addressplace2,
   recip.addresstype AS recip_addresstype,
@@ -188,17 +178,12 @@ LEFT JOIN related_objects obj ON obj.exitcsid = exit.csid
 LEFT JOIN related_object_media media ON media.objcsid = obj.csid
 LEFT JOIN proposed_recipients proposed_recip ON proposed_recip.exitcsid = exit.csid
 LEFT JOIN recipients recip ON recip.exitcsid = exit.csid
-LEFT JOIN related_acquisitions acquisition ON acquisition.exitcsid = exit.csid
-LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
+LEFT JOIN related_acquisitions acquisition ON acquisition.objcsid = obj.csid
+LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 	</queryString>
 	<field name="exitnumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="exitnumber"/>
 		<property name="com.jaspersoft.studio.field.label" value="exitnumber"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="objectexit_common"/>
-	</field>
-	<field name="exitquantity" class="java.lang.Long">
-		<property name="com.jaspersoft.studio.field.name" value="exitquantity"/>
-		<property name="com.jaspersoft.studio.field.label" value="exitquantity"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="objectexit_common"/>
 	</field>
 	<field name="exitdate" class="java.lang.String">
@@ -286,11 +271,6 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 		<property name="com.jaspersoft.studio.field.label" value="proposed_primaryname"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
-	<field name="proposed_secondaryname" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="proposed_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.label" value="proposed_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
-	</field>
 	<field name="proposed_addressplace1" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="proposed_addressplace1"/>
 		<property name="com.jaspersoft.studio.field.label" value="proposed_addressplace1"/>
@@ -329,11 +309,6 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 	<field name="recip_primaryname" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="recip_primaryname"/>
 		<property name="com.jaspersoft.studio.field.label" value="recip_primaryname"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
-	</field>
-	<field name="recip_secondaryname" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="recip_secondaryname"/>
-		<property name="com.jaspersoft.studio.field.label" value="recip_secondaryname"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
 	<field name="recip_addressplace1" class="java.lang.String">
@@ -430,319 +405,298 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="44" splitType="Stretch">
+		<band height="60" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="f809accd-fe24-4e42-904a-9c5ddb7d5170">
+				<reportElement style="Column header" x="0" y="0" width="100" height="60" uuid="f809accd-fe24-4e42-904a-9c5ddb7d5170">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="df0dab5e-6620-4d94-a2e8-aa0e57ce83e2">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Exit quantity]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="d8c568a2-c8bf-4385-968b-ebd7e7b2b027">
+				<reportElement style="Column header" x="200" y="0" width="100" height="60" uuid="d8c568a2-c8bf-4385-968b-ebd7e7b2b027">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="c9c7042a-5de0-4780-9475-4edc7aa99066">
+				<reportElement style="Column header" x="300" y="0" width="100" height="60" uuid="c9c7042a-5de0-4780-9475-4edc7aa99066">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit method]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="7f22ccd2-2633-4b12-9a69-a2ba3468d66e">
+				<reportElement style="Column header" x="400" y="0" width="100" height="60" uuid="7f22ccd2-2633-4b12-9a69-a2ba3468d66e">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit reason]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="7731969b-6e12-42dd-a4a7-8cd70670f394">
+				<reportElement style="Column header" x="500" y="0" width="100" height="60" uuid="7731969b-6e12-42dd-a4a7-8cd70670f394">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession group]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="2733a9de-4ff6-40b2-9a58-bc26e2344b70">
+				<reportElement style="Column header" x="600" y="0" width="100" height="60" uuid="2733a9de-4ff6-40b2-9a58-bc26e2344b70">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession individual]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="455b0b82-d5f9-4c0e-8e23-d9202e710166">
+				<reportElement style="Column header" x="700" y="0" width="100" height="60" uuid="455b0b82-d5f9-4c0e-8e23-d9202e710166">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="d4f0fe26-8760-441a-a6c7-6d187ad507fd">
+				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="d4f0fe26-8760-441a-a6c7-6d187ad507fd">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="6f6be086-9951-4ea1-a051-9c37ea68bd80">
+				<reportElement style="Column header" x="900" y="0" width="100" height="60" uuid="6f6be086-9951-4ea1-a051-9c37ea68bd80">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="7a865f30-03c8-4cca-9f4a-00c9cdb634c7">
+				<reportElement style="Column header" x="1000" y="0" width="100" height="60" uuid="7a865f30-03c8-4cca-9f4a-00c9cdb634c7">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Exit note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="a5e37502-996c-483e-bdb7-abe30cafb16b">
+				<reportElement style="Column header" x="1100" y="0" width="100" height="60" uuid="a5e37502-996c-483e-bdb7-abe30cafb16b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Packing note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="30549c2c-b81c-4508-96b2-1a882fda44b5">
+				<reportElement style="Column header" x="1200" y="0" width="100" height="60" uuid="30549c2c-b81c-4508-96b2-1a882fda44b5">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Object number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="f0e8795a-9621-4887-9390-8ca2fac97309">
+				<reportElement style="Column header" x="1300" y="0" width="100" height="60" uuid="f0e8795a-9621-4887-9390-8ca2fac97309">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Object name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="542800ab-8b92-4e91-ab38-96f07a21f11c">
+				<reportElement style="Column header" x="1400" y="0" width="100" height="60" uuid="542800ab-8b92-4e91-ab38-96f07a21f11c">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Object prod date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="230e1f74-dbdf-4426-8cfb-68c01ffe678b">
+				<reportElement style="Column header" x="1500" y="0" width="100" height="60" uuid="230e1f74-dbdf-4426-8cfb-68c01ffe678b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Obj collection]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="6f4daf54-06fc-43ea-9c2c-6f30cde79c20">
+				<reportElement style="Column header" x="1600" y="0" width="100" height="60" uuid="6f4daf54-06fc-43ea-9c2c-6f30cde79c20">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Obj brief desc]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="1dc8f32f-dc35-44cf-93da-945de643100f">
+				<reportElement style="Column header" x="1700" y="0" width="100" height="60" uuid="1dc8f32f-dc35-44cf-93da-945de643100f">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Obj history note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="b7723ca7-30de-4f07-b8d8-f992da5fa4a9">
+				<reportElement style="Column header" x="1800" y="0" width="100" height="60" uuid="b7723ca7-30de-4f07-b8d8-f992da5fa4a9">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Proposed Recipient Name 1]]></text>
+				<text><![CDATA[Disposal Proposed Recipient]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="007384f1-6266-46d3-8cda-9984d957868d">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Proposed Recipient Name 2]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="bfb9be47-d2d1-435a-832f-2f98bb7a8502">
+				<reportElement style="Column header" x="2000" y="0" width="100" height="60" uuid="bfb9be47-d2d1-435a-832f-2f98bb7a8502">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Addr Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2100" y="0" width="100" height="44" uuid="672caeb6-bf39-4238-98b6-a4feac38f918">
+				<reportElement style="Column header" x="2100" y="0" width="100" height="60" uuid="672caeb6-bf39-4238-98b6-a4feac38f918">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Addr Line 1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="42f07533-80a6-4117-b995-5bcf26f0debe">
+				<reportElement style="Column header" x="2200" y="0" width="100" height="60" uuid="42f07533-80a6-4117-b995-5bcf26f0debe">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Addr Line 2]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2300" y="0" width="100" height="44" uuid="dd2b4d65-3cc3-4319-b02e-9fec7c77b262">
+				<reportElement style="Column header" x="2300" y="0" width="100" height="60" uuid="dd2b4d65-3cc3-4319-b02e-9fec7c77b262">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Municipality]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2400" y="0" width="100" height="44" uuid="88c77fdb-83ff-4503-8d92-ae63828b59b6">
+				<reportElement style="Column header" x="2400" y="0" width="100" height="60" uuid="88c77fdb-83ff-4503-8d92-ae63828b59b6">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient State/Province]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2500" y="0" width="100" height="44" uuid="0eb2a4c3-4c35-4b5e-82ba-09db339fd2ad">
+				<reportElement style="Column header" x="2500" y="0" width="100" height="60" uuid="0eb2a4c3-4c35-4b5e-82ba-09db339fd2ad">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Postal Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2600" y="0" width="100" height="44" uuid="31e06d48-bf69-4916-a800-354ea33c2a3f">
+				<reportElement style="Column header" x="2600" y="0" width="100" height="60" uuid="31e06d48-bf69-4916-a800-354ea33c2a3f">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Proposed Recipient Country]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2700" y="0" width="100" height="44" uuid="90a78145-071d-45f1-98b4-1d0ab8b05d26">
+				<reportElement style="Column header" x="2700" y="0" width="100" height="60" uuid="90a78145-071d-45f1-98b4-1d0ab8b05d26">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Recipient Name 1]]></text>
+				<text><![CDATA[Disposal Recipient]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2800" y="0" width="100" height="44" uuid="dbbba120-1610-4189-a9a2-4c54228b26bb">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Disposal Recipient Name 2]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="2900" y="0" width="100" height="44" uuid="25568da7-628b-4cb8-9bc5-82190ee44390">
+				<reportElement style="Column header" x="2900" y="0" width="100" height="60" uuid="25568da7-628b-4cb8-9bc5-82190ee44390">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Addr Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3000" y="0" width="100" height="44" uuid="b46a51ec-e390-4b25-8043-06e2b3cd0024">
+				<reportElement style="Column header" x="3000" y="0" width="100" height="60" uuid="b46a51ec-e390-4b25-8043-06e2b3cd0024">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Addr Line 1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3100" y="0" width="100" height="44" uuid="90632fe1-ea17-4142-9f3e-d457b16e670d">
+				<reportElement style="Column header" x="3100" y="0" width="100" height="60" uuid="90632fe1-ea17-4142-9f3e-d457b16e670d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Addr Line 2]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3200" y="0" width="100" height="44" uuid="bc0ed9d3-883a-482c-b04a-2305aad732a3">
+				<reportElement style="Column header" x="3200" y="0" width="100" height="60" uuid="bc0ed9d3-883a-482c-b04a-2305aad732a3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Municipality]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3300" y="0" width="100" height="44" uuid="38792d6e-225e-48cc-b38d-485edf5d8dc5">
+				<reportElement style="Column header" x="3300" y="0" width="100" height="60" uuid="38792d6e-225e-48cc-b38d-485edf5d8dc5">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient State/Province]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3400" y="0" width="100" height="44" uuid="fcfef552-f9c3-4542-bd61-9b8bf2883a27">
+				<reportElement style="Column header" x="3400" y="0" width="100" height="60" uuid="fcfef552-f9c3-4542-bd61-9b8bf2883a27">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Postal Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3500" y="0" width="100" height="44" uuid="b45aee43-0cab-4b0e-95e9-edfdc7641992">
+				<reportElement style="Column header" x="3500" y="0" width="100" height="60" uuid="b45aee43-0cab-4b0e-95e9-edfdc7641992">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal Recipient Country]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3600" y="0" width="100" height="44" uuid="a4f8f6c4-0bf6-4d83-ade1-5dc289ce8e03">
+				<reportElement style="Column header" x="3600" y="0" width="100" height="60" uuid="a4f8f6c4-0bf6-4d83-ade1-5dc289ce8e03">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal provisos]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3700" y="0" width="100" height="44" uuid="1a6cb6e4-71f5-4cf1-a40b-e2948706f2f3">
+				<reportElement style="Column header" x="3700" y="0" width="100" height="60" uuid="1a6cb6e4-71f5-4cf1-a40b-e2948706f2f3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3800" y="0" width="100" height="44" uuid="4bf915f7-efed-4a43-89c1-6b058dae0bf7">
+				<reportElement style="Column header" x="3800" y="0" width="100" height="60" uuid="4bf915f7-efed-4a43-89c1-6b058dae0bf7">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Deaccession date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3900" y="0" width="100" height="44" uuid="1fc9d0c3-3081-42ed-8097-e68d323765d1">
+				<reportElement style="Column header" x="3900" y="0" width="100" height="60" uuid="1fc9d0c3-3081-42ed-8097-e68d323765d1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="4000" y="0" width="100" height="44" uuid="9951fbb5-a174-4c45-9341-9424315fea7e">
+				<reportElement style="Column header" x="4000" y="0" width="100" height="60" uuid="9951fbb5-a174-4c45-9341-9424315fea7e">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal method]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="4100" y="0" width="100" height="44" uuid="a32a0b13-e56d-4ada-a8aa-dde01dae48ae">
+				<reportElement style="Column header" x="4100" y="0" width="100" height="60" uuid="a32a0b13-e56d-4ada-a8aa-dde01dae48ae">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Disposal value]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="4200" y="0" width="100" height="44" uuid="2d33ea33-de5d-4e94-8e63-a5dd71e3ab24">
+				<reportElement style="Column header" x="4200" y="0" width="100" height="60" uuid="2d33ea33-de5d-4e94-8e63-a5dd71e3ab24">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Accesssion number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="4300" y="0" width="100" height="44" uuid="ff6b0674-b07f-4429-afbb-24b2c1a5fada">
+				<reportElement style="Column header" x="4300" y="0" width="100" height="60" uuid="ff6b0674-b07f-4429-afbb-24b2c1a5fada">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Intake number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="4400" y="0" width="100" height="44" uuid="35da18f4-135b-4a59-8f36-d90375c1f1f1">
+				<reportElement style="Column header" x="4400" y="0" width="100" height="60" uuid="35da18f4-135b-4a59-8f36-d90375c1f1f1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
@@ -758,12 +712,6 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{exitnumber}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="6c9fc572-62c9-4591-bf13-9b50a671addc">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{exitquantity}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="198b574c-8492-4ea4-ab68-17b18f412c3f">
@@ -868,12 +816,6 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 				<textFieldExpression><![CDATA[$F{proposed_primaryname}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="7c20f6cf-9100-4faf-b844-f0f2540a90fe">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{proposed_secondaryname}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="cbf4ed81-59bb-4446-a665-26a77da6b3c5">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
@@ -920,12 +862,6 @@ LEFT JOIN related_intakes intake ON intake.exitcsid = exit.csid]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{recip_primaryname}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2800" y="0" width="100" height="30" uuid="a85ada24-3a62-4e93-93de-0b4cb8463137">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{recip_secondaryname}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2900" y="0" width="100" height="30" uuid="44e0bd3a-c6bd-48da-a78c-1f14a942d0d7">

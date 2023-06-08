@@ -33,7 +33,7 @@
     ELSE objectname
   END AS finalname,
   object.computedcurrentlocation,
-  COALESCE(loc_term.termname, org_term.termname) AS locationname,
+  COALESCE(loc_term.termname, place_term.termname) AS locationname,
   bd.item AS description,
   related_media.objectcsid AS mediacsid
 FROM collectionobjects_common object
@@ -47,14 +47,14 @@ LEFT JOIN hierarchy namegroup_hier ON namegroup_hier.parentid = object.id AND na
 LEFT JOIN objectnamegroup namegroup ON namegroup.id = namegroup_hier.id
 LEFT JOIN hierarchy taxon_hier ON taxon_hier.parentid = object.id AND taxon_hier.primarytype = 'taxonomicIdentGroup' AND taxon_hier.pos = 0
 LEFT JOIN taxonomicidentgroup taxon ON taxon.id = taxon_hier.id
--- location
+-- storage location
 LEFT JOIN locations_common loc ON loc.refname = object.computedcurrentlocation
 LEFT JOIN hierarchy loc_hier ON loc_hier.parentid = loc.id AND loc_hier.primarytype = 'locTermGroup' AND loc_hier.pos = 0
 LEFT JOIN loctermgroup loc_term ON loc_term.id = loc_hier.id
--- or storage if location dne
-LEFT JOIN organizations_common org ON org.refname = object.computedcurrentlocation
-LEFT JOIN hierarchy org_hier ON org_hier.parentid = org.id AND org_hier.primarytype = 'orgTermGroup' AND org_hier.pos = 0
-LEFT JOIN orgtermgroup org_term ON org_term.id = org_hier.id
+-- or place if storage is null
+LEFT JOIN places_common place ON place.refname = object.computedcurrentlocation
+LEFT JOIN hierarchy place_hier ON place_hier.parentid = place.id AND place_hier.primarytype = 'placeTermGroup' AND place_hier.pos = 0
+LEFT JOIN placetermgroup place_term ON place_term.id = place_hier.id
 -- related media
 LEFT JOIN (
   SELECT relation.*
