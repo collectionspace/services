@@ -30,6 +30,9 @@ import java.util.List;
 
 public interface IQueryManager {
 
+	final static String SEARCH_COMBINE_QUERY_PARAM = "combine";
+	final static String SEARCH_COMBINE_AND = "and";
+	final static String SEARCH_COMBINE_OR = "or";
 	final static String SEARCH_GROUP_OPEN = "(";
 	final static String SEARCH_GROUP_CLOSE = ")";
 	final static String SEARCH_TERM_SEPARATOR = " ";

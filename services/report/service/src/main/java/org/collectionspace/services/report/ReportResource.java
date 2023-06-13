@@ -101,6 +101,12 @@ public class ReportResource extends NuxeoBasedResource {
             String docType = queryParams.getFirst(IQueryManager.SEARCH_TYPE_DOCTYPE);
             String filename = queryParams.getFirst(IQueryManager.SEARCH_TYPE_FILENAME);
             List<String> modes = queryParams.get(IQueryManager.SEARCH_TYPE_INVOCATION_MODE);
+            String combine = queryParams.getFirst(IQueryManager.SEARCH_COMBINE_QUERY_PARAM);
+
+            String qualifier = (combine != null && combine.equals(IQueryManager.SEARCH_COMBINE_OR))
+                ? IQueryManager.SEARCH_QUALIFIER_OR
+                : IQueryManager.SEARCH_QUALIFIER_AND;
+
             String whereClause = null;
             DocumentFilter documentFilter = null;
             String common_part =ctx.getCommonPartLabel();
@@ -108,19 +114,19 @@ public class ReportResource extends NuxeoBasedResource {
                 whereClause = QueryManager.createWhereClauseForInvocableByDocType(
                 		common_part, docType);
                 documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                documentFilter.appendWhereClause(whereClause, qualifier);
             }
             if (filename != null && !filename.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByFilename(
                         common_part, filename);
                 documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                documentFilter.appendWhereClause(whereClause, qualifier);
             }
             if (modes != null && !modes.isEmpty()) {
                 whereClause = QueryManager.createWhereClauseForInvocableByMode(
                 		common_part, modes);
                 documentFilter = handler.getDocumentFilter();
-                documentFilter.appendWhereClause(whereClause, IQueryManager.SEARCH_QUALIFIER_AND);
+                documentFilter.appendWhereClause(whereClause, qualifier);
             }
             if (whereClause !=null && logger.isDebugEnabled()) {
                 logger.debug("The WHERE clause is: " + documentFilter.getWhereClause());
