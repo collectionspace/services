@@ -250,14 +250,25 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			//
 			// Ensure the batch job supports the requested invocation context's document type
 			if (!Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationCtx.getMode())) {
+				String invDocType = invocationCtx.getDocType();
 				ForDocTypes forDocTypes = batchCommon.getForDocTypes();
-				if (forDocTypes != null) {
-					List<String> forDocTypeList = toLowerCase(forDocTypes.getForDocType()); // convert all strings to lowercase.
-					if (forDocTypeList == null || !forDocTypeList.contains(invocationCtx.getDocType().toLowerCase())) {
-						String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation document type '%s'.",
-								batchCommon.getName(), csid, invocationCtx.getDocType());
-						throw new BadRequestException(msg);
-					}
+
+				List<String> forDocTypeList = (forDocTypes == null)
+					? new ArrayList<String>()
+					: toLowerCase(forDocTypes.getForDocType()); // convert all strings to lowercase.
+
+				if (Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationCtx.getMode())) {
+					// In group mode, allow the context doc type to be Group or null, even if the report wasn't registered
+					// with those types.
+
+					forDocTypeList.add("group");
+					forDocTypeList.add(null);
+				}
+
+				if (!forDocTypeList.contains(invDocType.toLowerCase())) {
+					String msg = String.format("BatchResource: The batch job '%s' CSID='%s' does not support the invocation document type '%s'.",
+							batchCommon.getName(), csid, invDocType);
+					throw new BadRequestException(msg);
 				}
 			}
 

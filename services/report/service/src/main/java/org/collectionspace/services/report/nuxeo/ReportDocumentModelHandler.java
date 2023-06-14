@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -272,15 +273,28 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 						"ReportResource: This Report does not support Invocation Mode: "
 	        			+invocationMode);
 			}
-	    	if (checkDocType) {
-	    		List<String> forDocTypeList =
-	    			(List<String>) NuxeoUtils.getProperyValue(docModel, InvocableJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
-	    		if (forDocTypeList==null || !forDocTypeList.contains(invContext.getDocType())) {
-	        		throw new BadRequestException(
-	        				"ReportResource: Invoked with unsupported document type: "
-	        				+invContext.getDocType());
-	        	}
-	    	}
+			if (checkDocType) {
+				String invDocType = invContext.getDocType();
+				List<String> forDocTypeList = (List<String>) NuxeoUtils.getProperyValue(docModel, InvocableJAXBSchema.FOR_DOC_TYPES);
+
+				if (forDocTypeList == null) {
+					forDocTypeList = new ArrayList<String>();
+				}
+
+				if (Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
+					// In group mode, allow the context doc type to be Group or null, even if the report wasn't registered
+					// with those types.
+
+					forDocTypeList.add("Group");
+					forDocTypeList.add(null);
+				}
+
+				if (!forDocTypeList.contains(invDocType)) {
+					throw new BadRequestException(
+						"ReportResource: Invoked with unsupported document type: "
+						+invDocType);
+				}
+			}
 	    	reportFileNameProperty = (String) NuxeoUtils.getProperyValue(docModel, ReportJAXBSchema.FILENAME); //docModel.getPropertyValue(ReportJAXBSchema.FILENAME)); // Set the outgoing param with the report file name
 			//
 	    	// If the invocation context contains a MIME type then use it.  Otherwise, look in the report resource.  If no MIME type in the report resource,
