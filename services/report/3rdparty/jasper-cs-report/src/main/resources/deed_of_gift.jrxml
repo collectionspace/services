@@ -38,17 +38,18 @@
 	$P!{whereclause}
 ), person_owners AS (
   SELECT ag.*,
-    primaryterm.termdisplayname as primarydisplayname,
+    string_agg(primaryterm.termdisplayname, '|') as primarydisplayname,
     intake.csid as intakecsid
   FROM intakes intake
   INNER JOIN intakes_common_currentowners co ON co.id = intake.id AND co.pos = 0
   INNER JOIN persons_common person ON person.refname = co.item
   INNER JOIN hierarchy hier ON hier.id = person.id
-  INNER JOIN hierarchy term_hier ON term_hier.parentid = person.id AND term_hier.primarytype = 'personTermGroup' AND term_hier.pos = 0
+  INNER JOIN hierarchy term_hier ON term_hier.parentid = person.id AND term_hier.primarytype = 'personTermGroup' AND (term_hier.pos = 0 OR term_hier.pos = 1)
   INNER JOIN persontermgroup primaryterm ON primaryterm.id = term_hier.id
   LEFT JOIN contacts_common contact ON contact.initem = hier.name
   LEFT JOIN hierarchy addr_hier ON addr_hier.parentid = contact.id AND addr_hier.primarytype = 'addressGroup' AND addr_hier.pos = 0
   LEFT JOIN addressgroup ag ON ag.id = addr_hier.id
+  GROUP BY intake.csid, ag.addressplace1, ag.addressplace2, ag.id, ag.addresscountry, ag.addressmunicipality, ag.addresspostcode, ag.addressstateorprovince, ag.addresstype
 ), related_objects AS (
   SELECT object.collection,
     ong.objectname,
