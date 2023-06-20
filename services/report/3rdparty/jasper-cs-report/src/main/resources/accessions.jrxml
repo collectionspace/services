@@ -19,7 +19,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["approvalgroup,approvalindividual,acquisitionsource,approvalstatus"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["acquisitionsource"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -39,7 +39,6 @@
     acq.creditline,
     acq.acquisitionprovisos,
     source.item AS acquisitionsource,
-    appgroup.approvalgroup, appgroup.approvalindividual, appgroup.approvalstatus, appgroup.approvaldate,
     acd_sdg.datedisplaydate AS accessiondate,
     acdl_sdg.datedisplaydate AS acquisitiondate
   FROM acquisitions_common acq
@@ -47,13 +46,22 @@
   INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
   INNER JOIN hierarchy hier ON acq.id = hier.id
   LEFT JOIN acquisitions_common_acquisitionsources source ON source.id = acq.id AND source.pos = 0
-  LEFT JOIN hierarchy app_hier ON app_hier.parentid = acq.id AND app_hier.primarytype = 'approvalGroup' AND app_hier.pos = 0
-  LEFT JOIN approvalgroup appgroup ON appgroup.id = app_hier.id
   LEFT JOIN hierarchy acd_hier ON acd_hier.parentid = acq.id AND acd_hier.name = 'acquisitions_common:accessionDateGroup'
   LEFT JOIN structureddategroup acd_sdg ON acd_sdg.id = acd_hier.id
   LEFT JOIN hierarchy adgl_hier ON adgl_hier.parentid = acq.id AND adgl_hier.name = 'acquisitions_common:acquisitionDateGroupList' AND adgl_hier.pos = 0
   LEFT JOIN structureddategroup acdl_sdg ON acdl_sdg.id = adgl_hier.id
 	$P!{whereclause}
+), approvals AS (
+  SELECT
+    acq.csid AS acquisitioncsid,
+    string_agg(regexp_replace(approval.approvalgroup, '^.*\)''(.*)''$', '\1'), '|') AS approvalgroup,
+    string_agg(regexp_replace(approval.approvalindividual, '^.*\)''(.*)''$', '\1'), '|') AS approvalindividual,
+    string_agg(regexp_replace(approval.approvalstatus, '^.*\)''(.*)''$', '\1'), '|') AS approvalstatus,
+    string_agg(to_char(approval.approvaldate, 'YYYY-MM-DD'), '|') AS approvaldate
+  FROM acquisitions acq
+  INNER JOIN hierarchy app_hier ON app_hier.parentid = acq.id AND app_hier.primarytype = 'approvalGroup'
+  INNER JOIN approvalgroup approval ON approval.id = app_hier.id
+  GROUP BY acq.csid
 ), related_objects AS (
   SELECT
     hier.name AS csid,
@@ -88,10 +96,10 @@ SELECT
   acq.acquisitiondate,
   acq.acquisitionmethod,
   acq.acquisitionsource,
-  acq.approvalgroup,
-  acq.approvalindividual,
-  acq.approvalstatus,
-  acq.approvaldate,
+  approval.approvalgroup,
+  approval.approvalindividual,
+  approval.approvalstatus,
+  approval.approvaldate,
   acq.acquisitionnote,
   acq.acquisitionprovisos,
   acq.creditline,
@@ -103,6 +111,7 @@ SELECT
   obj.objecthistorynote,
   media.mediacsid
 FROM acquisitions acq
+LEFT JOIN approvals approval ON approval.acquisitioncsid = acq.csid
 LEFT JOIN related_objects obj ON obj.acquisitioncsid = acq.csid
 LEFT JOIN related_media media ON media.objcsid = obj.csid]]>
 	</queryString>
@@ -146,7 +155,7 @@ LEFT JOIN related_media media ON media.objcsid = obj.csid]]>
 		<property name="com.jaspersoft.studio.field.label" value="approvalstatus"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
 	</field>
-	<field name="approvaldate" class="java.sql.Timestamp">
+	<field name="approvaldate" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="approvaldate"/>
 		<property name="com.jaspersoft.studio.field.label" value="approvaldate"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
