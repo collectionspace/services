@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["deaccessionapprovalgroup,deaccessionapprovalindividual,deaccessionapprovalstatus,disposalmethod"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["disposalmethod"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -75,14 +75,15 @@
 ), approvals AS (
   SELECT
     exit.csid as exitcsid,
-    approval.deaccessionapprovalgroup,
-    approval.deaccessionapprovalindividual,
-    approval.deaccessionapprovalstatus,
-    approval.deaccessionapprovaldate,
-    approval.deaccessionapprovalnote
+    string_agg(regexp_replace(approval.deaccessionapprovalgroup, '^.*\)''(.*)''$', '\1'), '|') AS deaccessionapprovalgroup,
+    string_agg(regexp_replace(approval.deaccessionapprovalindividual, '^.*\)''(.*)''$', '\1'), '|') AS deaccessionapprovalindividual,
+    string_agg(regexp_replace(approval.deaccessionapprovalstatus, '^.*\)''(.*)''$', '\1'), '|') AS deaccessionapprovalstatus,
+    string_agg(to_char(approval.deaccessionapprovaldate, 'YYYY-MM-DD'), '|') AS deaccessionapprovaldate,
+    string_agg(approval.deaccessionapprovalnote, '|') AS deaccessionapprovalnote
   FROM objectexits exit
   INNER JOIN hierarchy hier on hier.parentid = exit.id AND hier.primarytype = 'deacApprovalGroup'
   INNER JOIN deacapprovalgroup approval on approval.id = hier.id
+  GROUP BY exit.csid
 ), related_objects AS (
   SELECT
     hier.name AS csid,
@@ -216,7 +217,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 		<property name="com.jaspersoft.studio.field.label" value="deaccessionapprovalstatus"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="deacapprovalgroup"/>
 	</field>
-	<field name="deaccessionapprovaldate" class="java.sql.Timestamp">
+	<field name="deaccessionapprovaldate" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="deaccessionapprovaldate"/>
 		<property name="com.jaspersoft.studio.field.label" value="deaccessionapprovaldate"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="deacapprovalgroup"/>
@@ -759,7 +760,7 @@ LEFT JOIN related_intakes intake ON intake.objcsid = obj.csid]]>
 				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="7f3c6b34-7d67-40a9-941d-9ab1bac2c0e6">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{deaccessionapprovaldate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{deaccessionapprovalnote}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="427c6ba1-a7b7-4053-91f8-a968e2578786">
