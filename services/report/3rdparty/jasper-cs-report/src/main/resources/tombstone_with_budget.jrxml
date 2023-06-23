@@ -9,9 +9,6 @@
 	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
-	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["collection,owner,installationtype,worktype,material,creator,acquisitionfundingcurrency"]]></defaultValueExpression>
-	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
 	</parameter>
@@ -23,7 +20,8 @@
 		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[WITH artists AS (SELECT
+		<![CDATA[WITH artists AS (
+  SELECT
     artist_hier.parentid,
     artist_hier.id,
     artist.*
@@ -33,64 +31,144 @@
   INNER JOIN publicartproductionpersongroup artist ON artist.publicartproductionpersonrole = item.refname
   INNER JOIN hierarchy artist_hier ON artist_hier.id = artist.id
   WHERE vocab.shortidentifier = 'prodpersonrole' AND item.shortidentifier IN ('artist')
+), objects AS (
+  SELECT
+    obj.id,
+    obj.objectnumber,
+    hier.name AS objcsid
+  FROM collectionobjects_common obj
+  INNER JOIN hierarchy hier on hier.id = obj.id
+  INNER JOIN misc on misc.id = hier.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core on core.id = misc.id AND core.tenantid = $P{tenantid}
+	$P!{whereclause}
+), titles AS (
+ SELECT
+  obj.objcsid,
+  string_agg(title.title, '|') AS title
+  FROM objects obj
+  LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup'
+  LEFT JOIN titlegroup title ON title.id = title_hier.id
+  GROUP BY obj.objcsid
+), descriptions AS (
+ SELECT
+  obj.objcsid,
+  string_agg(bd.item, '|') AS briefdescription
+  FROM objects obj
+  LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id
+  GROUP BY obj.objcsid
+), creators AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(creator.publicartproductionperson, '^.*\)''(.*)''$', '\1'), '|') AS creator
+  FROM objects obj
+  INNER JOIN hierarchy creator_hier ON creator_hier.parentid = obj.id AND creator_hier.primarytype = 'publicartProductionPersonGroup'
+  INNER JOIN publicartproductionpersongroup creator ON creator.id = creator_hier.id
+  GROUP BY obj.objcsid
+), collections AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(coll.item, '^.*\)''(.*)''$', '\1'), '|') AS collection
+  FROM objects obj
+  INNER JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj.id
+  GROUP BY obj.objcsid
+), owners AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(owner.item, '^.*\)''(.*)''$', '\1'), '|') AS owner
+  FROM objects obj
+  INNER JOIN collectionobjects_common_owners owner ON owner.id = obj.id
+  GROUP BY obj.objcsid
+), installations AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(inventory.item, '^.*\)''(.*)''$', '\1'), '|') AS installationtype
+  FROM objects obj
+  INNER JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id
+  GROUP BY obj.objcsid
+), worktypes AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(namegroup.objectname, '^.*\)''(.*)''$', '\1'), '|') AS worktype
+  FROM objects obj
+  INNER JOIN hierarchy namegroup_hier on namegroup_hier.parentid = obj.id and namegroup_hier.primarytype = 'objectNameGroup'
+  INNER JOIN objectnamegroup namegroup on namegroup.id = namegroup_hier.id
+  GROUP BY obj.objcsid
+), materials AS (
+ SELECT
+  obj.objcsid,
+  string_agg(regexp_replace(material.material, '^.*\)''(.*)''$', '\1'), '|') AS material
+  FROM objects obj
+  INNER JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup'
+  INNER JOIN materialgroup material on material.id = material_hier.id
+  GROUP BY obj.objcsid
+), dimensions AS (
+ SELECT
+  obj.objcsid,
+  string_agg(dimension.dimension, '|') AS dimension,
+  string_agg(dimension.value::text, '|') AS dimensionvalue,
+  string_agg(dimension.measurementunit, '|') AS dimensionunit
+  FROM objects obj
+  INNER JOIN hierarchy measured_hier on measured_hier.parentid = obj.id and measured_hier.primarytype = 'measuredPartGroup'
+  INNER JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup'
+  LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
+  GROUP BY obj.objcsid
+), dates AS (
+ SELECT
+  obj.objcsid,
+  string_agg(sd.datedisplaydate, '|') AS artworkdate
+  FROM objects obj
+  INNER JOIN hierarchy pdg_hier on pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup'
+  INNER JOIN hierarchy sdg_hier on sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
+  INNER JOIN structureddategroup sd on sd.id = sdg_hier.id
+  GROUP BY obj.objcsid
 )
 SELECT
   obj.objectnumber,
   title.title,
-  creator.publicartproductionperson AS creator,
-  bd.item as briefdescription,
-  coll.item AS collection,
-  owner.item AS owner,
-  inventory.item AS installationtype,
-  namegroup.objectname AS worktype,
+  bd.briefdescription,
+  creator.creator,
+  collection.collection,
+  owner.owner,
+  installation.installationtype,
+  worktype.worktype,
   material.material,
   dimension.dimension,
-  dimension.value AS dimensionvalue,
-  dimension.measurementunit AS dimensionunit,
-  sd.datedisplaydate AS artworkdate,
+  dimension.dimensionvalue,
+  dimension.dimensionunit,
+  date.artworkdate,
   media.objectcsid AS mediacsid,
   acquisition.acquisitionfundingcurrency,
   acquisition.acquisitionfundingvalue
-FROM collectionobjects_common obj
-INNER JOIN hierarchy hier ON hier.id = obj.id
-INNER JOIN misc ON misc.id = hier.id AND misc.lifecyclestate != 'deleted'
-INNER JOIN collectionspace_core core ON core.id = misc.id AND core.tenantid = $P{tenantid}
-LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
-LEFT JOIN titlegroup title ON title.id = title_hier.id
-LEFT JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj.id AND coll.pos = 0
-LEFT JOIN artists creator ON creator.parentid = obj.id
-LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
-LEFT JOIN collectionobjects_common_owners owner ON owner.id = obj.id AND owner.pos = 0
-LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id AND inventory.pos = 0
-LEFT JOIN hierarchy namegroup_hier ON namegroup_hier.parentid = obj.id AND namegroup_hier.primarytype = 'objectNameGroup' AND namegroup_hier.pos = 0
-LEFT JOIN objectnamegroup namegroup ON namegroup.id = namegroup_hier.id
-LEFT JOIN hierarchy material_hier ON material_hier.parentid = obj.id AND material_hier.primarytype = 'materialGroup' AND material_hier.pos = 0
-LEFT JOIN materialgroup material ON material.id = material_hier.id
-LEFT JOIN hierarchy measured_hier ON measured_hier.parentid = obj.id AND measured_hier.primarytype = 'measuredPartGroup' AND measured_hier.pos = 0
-LEFT JOIN hierarchy dimension_hier ON dimension_hier.parentid = measured_hier.id AND dimension_hier.primarytype = 'dimensionSubGroup' AND dimension_hier.pos = 0
-LEFT JOIN dimensionsubgroup dimension ON dimension.id = dimension_hier.id
-LEFT JOIN hierarchy pdg_hier ON pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' AND pdg_hier.pos = 0
-LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
-LEFT JOIN structureddategroup sd ON sd.id = sdg_hier.id
+FROM objects obj
+LEFT JOIN titles title on title.objcsid = obj.objcsid
+LEFT JOIN descriptions bd on bd.objcsid = obj.objcsid
+LEFT JOIN creators creator on creator.objcsid = obj.objcsid
+LEFT JOIN collections collection on collection.objcsid = obj.objcsid
+LEFT JOIN owners owner on owner.objcsid = obj.objcsid
+LEFT JOIN installations installation on installation.objcsid = obj.objcsid
+LEFT JOIN worktypes worktype on worktype.objcsid = obj.objcsid
+LEFT JOIN materials material on material.objcsid = obj.objcsid
+LEFT JOIN dimensions dimension on dimension.objcsid = obj.objcsid
+LEFT JOIN dates date on date.objcsid = obj.objcsid
 LEFT JOIN (
   SELECT relation.*
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
-) media ON media.subjectcsid = hier.name
+) media ON media.subjectcsid = obj.objcsid
 LEFT JOIN (
   SELECT
     relation.subjectcsid,
-    funding.acquisitionfundingcurrency,
-    funding.acquisitionfundingvalue
+    string_agg(regexp_replace(funding.acquisitionfundingcurrency, '^.*\)''(.*)''$', '\1'), '|') AS acquisitionfundingcurrency,
+    string_agg(funding.acquisitionfundingvalue::text, '|') AS acquisitionfundingvalue
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
-  LEFT JOIN hierarchy funding_hier ON funding_hier.parentid = hier.id AND funding_hier.primarytype = 'acquisitionFunding' AND funding_hier.pos = 0
+  LEFT JOIN hierarchy funding_hier ON funding_hier.parentid = hier.id AND funding_hier.primarytype = 'acquisitionFunding'
   LEFT JOIN acquisitionfunding funding ON funding.id = funding_hier.id
   WHERE relation.objectdocumenttype = 'Acquisition' AND relation.subjectdocumenttype = 'CollectionObject'
-) acquisition ON acquisition.subjectcsid = hier.name
-$P!{whereclause}]]>
+  GROUP BY relation.subjectcsid
+) acquisition ON acquisition.subjectcsid = obj.objcsid]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
@@ -142,7 +220,7 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="dimension"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
 	</field>
-	<field name="dimensionvalue" class="java.lang.Double">
+	<field name="dimensionvalue" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="dimensionvalue"/>
 		<property name="com.jaspersoft.studio.field.label" value="dimensionvalue"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
@@ -167,7 +245,7 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="acquisitionfundingcurrency"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitionfunding"/>
 	</field>
-	<field name="acquisitionfundingvalue" class="java.lang.Double">
+	<field name="acquisitionfundingvalue" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="acquisitionfundingvalue"/>
 		<property name="com.jaspersoft.studio.field.label" value="acquisitionfundingvalue"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="acquisitionfunding"/>

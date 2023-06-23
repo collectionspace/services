@@ -10,7 +10,7 @@
   <style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
   <style name="Detail" fontName="SansSerif" fontSize="12"/>
   <parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-    <defaultValueExpression><![CDATA["entrymethod,approvalgroup,approvalindividual,approvalstatus,currentlocation"]]></defaultValueExpression>
+    <defaultValueExpression><![CDATA["entrymethod,currentlocation"]]></defaultValueExpression>
   </parameter>
   <parameter name="tenantid" class="java.lang.String" isForPrompting="false">
     <defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -29,8 +29,8 @@
   approval.approvalgroup,
   approval.approvalindividual,
   approval.approvalstatus,
-  approval.approvaldate AS approvaldate,
-  approval.approvalnote AS approvalnote,
+  approval.approvaldate,
+  approval.approvalnote,
   currentloc.currentlocation,
   person_term.termdisplayname,
   address.addresstype,
@@ -52,8 +52,6 @@ INNER JOIN hierarchy hier on hier.id = intake.id
 INNER JOIN misc on misc.id = hier.id AND misc.lifecyclestate != 'deleted'
 INNER JOIN collectionspace_core core on core.id = misc.id AND core.tenantid = $P{tenantid}
 LEFT JOIN intakes_common_entrymethods entrymethod ON entrymethod.id = intake.id AND entrymethod.pos = 0
-LEFT JOIN hierarchy approval_hier ON approval_hier.parentid = intake.id AND approval_hier.primarytype = 'approvalGroup' AND approval_hier.pos = 0
-LEFT JOIN approvalgroup approval ON approval.id = approval_hier.id
 LEFT JOIN hierarchy location_hier ON location_hier.parentid = intake.id AND location_hier.primarytype = 'currentLocationGroup' AND location_hier.pos = 0
 LEFT JOIN currentlocationgroup currentloc ON currentloc.id = location_hier.id
 -- owner display name and address
@@ -65,6 +63,20 @@ LEFT JOIN hierarchy addr_hier ON addr_hier.parentid = contact.id AND addr_hier.p
 LEFT JOIN addressgroup address ON address.id = addr_hier.id
 LEFT JOIN hierarchy term_hier ON term_hier.parentid = person.id AND term_hier.primarytype = 'personTermGroup' AND term_hier.pos = 0
 LEFT JOIN persontermgroup person_term ON person_term.id = term_hier.id
+-- approval, aggregated
+LEFT JOIN (
+  SELECT
+    approval_hier.parentid,
+    string_agg(regexp_replace(approval.approvalgroup, '^.*\)''(.*)''$', '\1'), '|') AS approvalgroup,
+    string_agg(regexp_replace(approval.approvalindividual, '^.*\)''(.*)''$', '\1'), '|') AS approvalindividual,
+    string_agg(regexp_replace(approval.approvalstatus, '^.*\)''(.*)''$', '\1'), '|') AS approvalstatus,
+    string_agg(to_char(approval.approvaldate, 'YYYY-MM-DD'), '|') AS approvaldate,
+    string_agg(approval.approvalnote, '|') AS approvalnote
+  FROM hierarchy approval_hier
+  INNER JOIN approvalgroup approval ON approval.id = approval_hier.id
+  WHERE approval_hier.primarytype = 'approvalGroup'
+  GROUP BY approval_hier.parentid
+) approval ON approval.parentid = intake.id
 -- related obj
 LEFT JOIN (
   SELECT
@@ -95,7 +107,8 @@ LEFT JOIN (
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
 ) media ON media.subjectcsid = objects.csid
-$P!{whereclause}]]>
+$P!{whereclause}
+]]>
   </queryString>
   <field name="entrynumber" class="java.lang.String">
     <property name="com.jaspersoft.studio.field.name" value="entrynumber"/>
@@ -137,7 +150,7 @@ $P!{whereclause}]]>
     <property name="com.jaspersoft.studio.field.label" value="approvalstatus"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>
   </field>
-  <field name="approvaldate" class="java.sql.Timestamp">
+  <field name="approvaldate" class="java.lang.String">
     <property name="com.jaspersoft.studio.field.name" value="approvaldate"/>
     <property name="com.jaspersoft.studio.field.label" value="approvaldate"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="approvalgroup"/>

@@ -10,7 +10,7 @@
   <style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
   <style name="Detail" fontName="SansSerif" fontSize="12"/>
   <parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-    <defaultValueExpression><![CDATA["creator,creatorrole,collection,owner,installationtype,worktype,material"]]></defaultValueExpression>
+    <defaultValueExpression><![CDATA["collection,owner,installationtype"]]></defaultValueExpression>
   </parameter>
   <parameter name="tenantid" class="java.lang.String" isForPrompting="false">
     <defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -26,13 +26,12 @@
     <![CDATA[SELECT
   obj.objectnumber,
   title.title,
-  creator.publicartproductionperson AS creator,
-  creator.publicartproductionpersonrole AS creatorrole,
+  creator.creator,
   bd.item as briefdescription,
   coll.item AS collection,
   owner.item AS owner,
   inventory.item AS installationtype,
-  namegroup.objectname AS worktype,
+  namegroup.worktype,
   material.material,
   dimension.dimension,
   dimension.value AS dimensionvalue,
@@ -46,21 +45,45 @@ INNER JOIN collectionspace_core core on core.id = misc.id AND core.tenantid = $P
 LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
 LEFT JOIN titlegroup title ON title.id = title_hier.id
 LEFT JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj.id AND coll.pos = 0
-LEFT JOIN hierarchy creator_hier ON creator_hier.parentid = obj.id AND creator_hier.primarytype = 'publicartProductionPersonGroup'
-LEFT JOIN publicartproductionpersongroup creator ON creator.id = creator_hier.id
 LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
 LEFT JOIN collectionobjects_common_owners owner ON owner.id = obj.id AND owner.pos = 0
 LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id AND inventory.pos = 0
-LEFT JOIN hierarchy namegroup_hier on namegroup_hier.parentid = obj.id and namegroup_hier.primarytype = 'objectNameGroup' and namegroup_hier.pos = 0
-LEFT JOIN objectnamegroup namegroup on namegroup.id = namegroup_hier.id
-LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup' and material_hier.pos = 0
-LEFT JOIN materialgroup material on material.id = material_hier.id
 LEFT JOIN hierarchy measured_hier on measured_hier.parentid = obj.id and measured_hier.primarytype = 'measuredPartGroup' and measured_hier.pos = 0
 LEFT JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup' and dimension_hier.pos = 0
 LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
 LEFT JOIN hierarchy pdg_hier on pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' and pdg_hier.pos = 0
 LEFT JOIN hierarchy sdg_hier on sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
 LEFT JOIN structureddategroup sd on sd.id = sdg_hier.id
+LEFT JOIN (
+  SELECT
+    creator_hier.parentid,
+    string_agg(
+      regexp_replace(creator.publicartproductionperson, '^.*\)''(.*)''$', '\1') || ';' ||
+      regexp_replace(creator.publicartproductionpersonrole, '^.*\)''(.*)''$', '\1'),  '|'
+    ) AS creator
+  FROM hierarchy creator_hier
+  INNER JOIN publicartproductionpersongroup creator ON creator.id = creator_hier.id
+  WHERE creator_hier.primarytype = 'publicartProductionPersonGroup'
+  GROUP BY creator_hier.parentid
+) creator ON creator.parentid = obj.id
+LEFT JOIN (
+  SELECT
+    namegroup_hier.parentid,
+    string_agg(regexp_replace(namegroup.objectname, '^.*\)''(.*)''$', '\1'), '|') AS worktype
+  FROM hierarchy namegroup_hier
+  INNER JOIN objectnamegroup namegroup on namegroup.id = namegroup_hier.id
+  WHERE namegroup_hier.primarytype = 'objectNameGroup'
+  GROUP BY namegroup_hier.parentid
+) namegroup ON namegroup.parentid = obj.id
+LEFT JOIN (
+  SELECT
+    material_hier.parentid,
+    string_agg(regexp_replace(material.material, '^.*\)''(.*)''$', '\1'), '|') AS material
+  FROM hierarchy material_hier
+  INNER JOIN materialgroup material on material.id = material_hier.id
+  WHERE material_hier.primarytype = 'materialGroup'
+  GROUP BY material_hier.parentid
+) material ON material.parentid = obj.id
 LEFT JOIN (
   SELECT relation.subjectcsid, relation.objectcsid
   FROM relations_common relation
@@ -82,11 +105,6 @@ $P!{whereclause}]]>
   <field name="creator" class="java.lang.String">
     <property name="com.jaspersoft.studio.field.name" value="creator"/>
     <property name="com.jaspersoft.studio.field.label" value="creator"/>
-    <property name="com.jaspersoft.studio.field.tree.path" value="publicartproductionpersongroup"/>
-  </field>
-  <field name="creatorrole" class="java.lang.String">
-    <property name="com.jaspersoft.studio.field.name" value="creatorrole"/>
-    <property name="com.jaspersoft.studio.field.label" value="creatorrole"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="publicartproductionpersongroup"/>
   </field>
   <field name="briefdescription" class="java.lang.String">
@@ -180,14 +198,7 @@ $P!{whereclause}]]>
           <property name="com.jaspersoft.studio.unit.width" value="px"/>
         </reportElement>
         <textElement markup="styled"/>
-        <text><![CDATA[Creator]]></text>
-      </staticText>
-      <staticText>
-        <reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="5c7f491d-2585-47ef-9d79-bd02e6bc1079">
-          <property name="com.jaspersoft.studio.unit.width" value="px"/>
-        </reportElement>
-        <textElement markup="styled"/>
-        <text><![CDATA[Creator Role]]></text>
+        <text><![CDATA[Creator and role]]></text>
       </staticText>
       <staticText>
         <reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="6e5e825c-de22-47e1-89c5-af83b8822ac7">
@@ -288,12 +299,6 @@ $P!{whereclause}]]>
           <property name="com.jaspersoft.studio.unit.y" value="px"/>
         </reportElement>
         <textFieldExpression><![CDATA[$F{creator}]]></textFieldExpression>
-      </textField>
-      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
-        <reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="62fbe3a1-a1bf-4106-85bc-9350fe383626">
-          <property name="com.jaspersoft.studio.unit.y" value="px"/>
-        </reportElement>
-        <textFieldExpression><![CDATA[$F{creatorrole}]]></textFieldExpression>
       </textField>
       <textField textAdjust="StretchHeight" isBlankWhenNull="true">
         <reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="a5df8077-4ddb-44ed-a65b-942c4cbdb294">
