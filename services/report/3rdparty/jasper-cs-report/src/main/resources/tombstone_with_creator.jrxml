@@ -34,8 +34,8 @@
   namegroup.worktype,
   material.material,
   dimension.dimension,
-  dimension.value AS dimensionvalue,
-  dimension.measurementunit AS dimensionunit,
+  dimension.dimensionvalue,
+  dimension.dimensionunit,
   sd.datedisplaydate AS artworkdate,
   media.objectcsid AS mediacsid
 FROM collectionobjects_common obj
@@ -48,12 +48,21 @@ LEFT JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj
 LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
 LEFT JOIN collectionobjects_common_owners owner ON owner.id = obj.id AND owner.pos = 0
 LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id AND inventory.pos = 0
-LEFT JOIN hierarchy measured_hier on measured_hier.parentid = obj.id and measured_hier.primarytype = 'measuredPartGroup' and measured_hier.pos = 0
-LEFT JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup' and dimension_hier.pos = 0
-LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
 LEFT JOIN hierarchy pdg_hier on pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' and pdg_hier.pos = 0
 LEFT JOIN hierarchy sdg_hier on sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
 LEFT JOIN structureddategroup sd on sd.id = sdg_hier.id
+LEFT JOIN (
+ SELECT
+  measured_hier.parentid,
+  string_agg(dimension.dimension, '|') AS dimension,
+  string_agg(dimension.value::text, '|') AS dimensionvalue,
+  string_agg(dimension.measurementunit, '|') AS dimensionunit
+  FROM hierarchy measured_hier
+  INNER JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup'
+  LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
+  WHERE measured_hier.primarytype = 'measuredPartGroup'
+  GROUP BY measured_hier.parentid
+) dimension on dimension.parentid = obj.id
 LEFT JOIN (
   SELECT
     creator_hier.parentid,
@@ -142,7 +151,7 @@ $P!{whereclause}]]>
     <property name="com.jaspersoft.studio.field.label" value="dimension"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
   </field>
-  <field name="dimensionvalue" class="java.lang.Double">
+  <field name="dimensionvalue" class="java.lang.String">
     <property name="com.jaspersoft.studio.field.name" value="dimensionvalue"/>
     <property name="com.jaspersoft.studio.field.label" value="dimensionvalue"/>
     <property name="com.jaspersoft.studio.field.tree.path" value="dimensionsubgroup"/>
