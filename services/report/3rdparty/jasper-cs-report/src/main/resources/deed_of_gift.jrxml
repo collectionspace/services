@@ -38,7 +38,7 @@
 	$P!{whereclause}
 ), person_owners AS (
   SELECT ag.*,
-    string_agg(primaryterm.termdisplayname, '|') as primarydisplayname,
+    string_agg(primaryterm.termdisplayname, '|' ORDER BY term_hier.pos) as primarydisplayname,
     intake.csid as intakecsid
   FROM intakes intake
   INNER JOIN intakes_common_currentowners co ON co.id = intake.id AND co.pos = 0
