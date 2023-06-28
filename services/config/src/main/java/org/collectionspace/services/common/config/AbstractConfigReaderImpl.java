@@ -64,6 +64,9 @@ public abstract class AbstractConfigReaderImpl<T> implements ConfigReader<T> {
 	abstract public void read(String configFile, boolean useAppGeneratedBindings) throws Exception;
 
 	@Override
+	abstract public void read(List<String> configFiles, boolean useAppGeneratedBindings) throws Exception;
+
+	@Override
 	abstract public T getConfiguration();
 
 	/**

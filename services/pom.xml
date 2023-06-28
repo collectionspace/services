@@ -100,6 +100,8 @@
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>
+		<module>login</module>
+		<module>logout</module>
 		<module>JaxRsServiceProvider</module>
 	</modules>
 

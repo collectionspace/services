@@ -346,7 +346,9 @@
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/config" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/scripts" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/db/jdbc_drivers" />
-		<delete failonerror="false" dir="${jee.server.cspace}/cspace/config/services" />
+		<delete failonerror="false">
+			<fileset dir="${jee.server.cspace}/cspace/config/services" excludes="local/**" />
+		</delete>
 
 		<!-- Delete mysql-ds.xml to clean up pre-1.8 bundles -->
 		<delete failonerror="false" file="${jee.deploy.cspace}/mysql-ds.xml" />

@@ -12,40 +12,37 @@ import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
 import org.postgresql.util.PSQLState;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 
 public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<AuthenticationSuccessEvent> {
-	
-	final private static String UPDATE_USER_SQL =
+
+	private static final String UPDATE_USER_SQL =
 			"UPDATE users SET lastlogin = now() WHERE username = ?";
 
 	@Override
 	public void onApplicationEvent(AuthenticationSuccessEvent event) {
-		// TODO Auto-generated method stub
-		System.out.println(); //org.springframework.security.authentication.UsernamePasswordAuthenticationToken@8a633e91: Principal: org.collectionspace.authentication.CSpaceUser@b122ec20: Username: admin@core.collectionspace.org; Password: [PROTECTED]; Enabled: true; AccountNonExpired: true; credentialsNonExpired: true; AccountNonLocked: true; Granted Authorities: ROLE_1_TENANT_ADMINISTRATOR,ROLE_SPRING_ADMIN; Credentials: [PROTECTED]; Authenticated: true; Details: {grant_type=password, username=admin@core.collectionspace.org}; Granted Authorities: ROLE_1_TENANT_ADMINISTRATOR, ROLE_SPRING_ADMIN
-		String username = null;
-		CSpaceDbRealm cspaceDbRealm = new CSpaceDbRealm();
-		
-		if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
-			UsernamePasswordAuthenticationToken eventSource = (UsernamePasswordAuthenticationToken)event.getSource();
+		if (event.getSource() instanceof Authentication) {
+			Authentication eventSource = (Authentication) event.getSource();
+
 			if (eventSource.getPrincipal() instanceof CSpaceUser) {
+				CSpaceDbRealm cspaceDbRealm = new CSpaceDbRealm();
 				CSpaceUser cspaceUser = (CSpaceUser) eventSource.getPrincipal();
-				username = cspaceUser.getUsername();
+				String username = cspaceUser.getUsername();
+
 				try {
 					setLastLogin(cspaceDbRealm, username);
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		}
 	}
-	
+
 	private void setLastLogin(CSpaceDbRealm cspaceDbRealm, String username) throws AccountException {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
-        
+
         try {
             conn = cspaceDbRealm.getConnection();
             ps = conn.prepareStatement(UPDATE_USER_SQL);

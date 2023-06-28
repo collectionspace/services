@@ -182,6 +182,11 @@ public class TenantBindingConfigReaderImpl extends AbstractConfigReaderImpl<List
 	}
 
 	@Override
+	public void read(List<String> configFiles, boolean useAppGeneratedBindings) throws Exception {
+		throw new UnsupportedOperationException("Not implemented");
+	}
+
+	@Override
 	public void read(String tenantRootDirPath, boolean useAppGeneratedBindings) throws Exception {
 		File tenantsRootDir = new File(tenantRootDirPath);
 		if (tenantsRootDir.exists() == false) {

@@ -69,6 +69,8 @@ import org.collectionspace.services.osteology.OsteologyResource;
 import org.collectionspace.services.conditioncheck.ConditioncheckResource;
 import org.collectionspace.services.conservation.ConservationResource;
 import org.collectionspace.services.authorization.PermissionResource;
+import org.collectionspace.services.login.LoginResource;
+import org.collectionspace.services.logout.LogoutResource;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.Application;
@@ -120,6 +122,8 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
         singletons.add(new IndexResource());
+        singletons.add(new LoginResource());
+        singletons.add(new LogoutResource());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());

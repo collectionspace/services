@@ -82,14 +82,14 @@ public class UserStorageClient {
             logger.error(msg);
             throw new DocumentNotFoundException(msg);
         }
-        
+
         return userFound;
     }
-    
+
     @SuppressWarnings("rawtypes")
 	public User get(ServiceContext ctx, String userId) throws DocumentNotFoundException, TransactionException {
     	User userFound = null;
-    	
+
     	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
     	try {
 	        userFound = (User) jpaConnectionContext.find(User.class, userId);
@@ -101,9 +101,9 @@ public class UserStorageClient {
     	} finally {
     		ctx.closeConnection();
     	}
-        
+
         return userFound;
-    }    
+    }
 
     /**
      * updateUser for given userId
@@ -158,8 +158,7 @@ public class UserStorageClient {
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
-        String secEncPasswd = SecurityUtils.createPasswordHash(
-                userId, new String(password), salt);
+        String secEncPasswd = SecurityUtils.createPasswordHash(new String(password));
         return secEncPasswd;
     }
 }

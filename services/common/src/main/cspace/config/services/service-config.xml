@@ -19,7 +19,7 @@
 	<db-nuxeo-name>@DB_NUXEO_NAME@</db-nuxeo-name>
 	<db-cspace-name>@DB_CSPACE_NAME@</db-cspace-name>
 	<use-app-generated-tenant-bindings>true</use-app-generated-tenant-bindings>
-    
+
     <!-- name of the repository client is referred in each service binding -->
     <repository-client name="nuxeo-java" default="true">
         <!-- ip of network interface to which Nuxeo server is listening on -->

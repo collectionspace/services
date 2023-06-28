@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class AccountValidatorHandler implements ValidatorHandler {
 
@@ -105,7 +105,7 @@ public class AccountValidatorHandler implements ValidatorHandler {
                 if (account.getPassword() == null || account.getPassword().length == 0) {
                     invalid = true;
                     msgBldr.append("\npassword : missing");
-                }                
+                }
                 if (account.getEmail() == null || account.getEmail().isEmpty()) {
                     invalid = true;
                     msgBldr.append("\nemail : missing");

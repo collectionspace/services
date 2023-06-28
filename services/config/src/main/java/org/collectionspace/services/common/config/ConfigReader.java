@@ -24,6 +24,8 @@
 package org.collectionspace.services.common.config;
 
 import java.io.File;
+import java.util.List;
+
 import org.collectionspace.services.common.api.JEEServerDeployment;
 
 /**
@@ -53,6 +55,13 @@ public interface ConfigReader<T> {
      * @throws Exception
      */
     public void read(String configFile, boolean useAppGeneratedBindings) throws Exception;
+
+    /**
+     * Merge the given configuration files, and parse the result.
+     * @param configFiles fully qualified file names
+     * @throws Exception
+     */
+    public void read(List<String> configFiles, boolean useAppGeneratedBindings) throws Exception;
 
     /**
      * getConfig get configuration binding

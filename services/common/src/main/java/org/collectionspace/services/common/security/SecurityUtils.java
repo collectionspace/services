@@ -38,6 +38,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.authentication.spring.CSpacePasswordEncoderFactory;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
@@ -45,39 +46,11 @@ import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.security.authentication.encoding.BasePasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.jboss.crypto.digest.DigestCallback;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
 import org.jboss.security.Base64Utils;
-
-/**
- * Extends Spring Security's base class for encoding passwords.  We use only the
- * mergePasswordAndSalt() method.
- * @author remillet
- *
- */
-class CSpacePasswordEncoder extends BasePasswordEncoder {
-	public CSpacePasswordEncoder() {
-		//Do nothing
-	}
-
-	String mergePasswordAndSalt(String password, String salt) {
-		return this.mergePasswordAndSalt(password, salt, false);
-	}
-
-	@Override
-	public String encodePassword(String rawPass, Object salt) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-}
 
 /**
  *
@@ -99,18 +72,13 @@ public class SecurityUtils {
     /**
      * createPasswordHash creates password has using configured digest algorithm
      * and encoding
-     * @param user
      * @param password in cleartext
      * @return hashed password
      */
-    public static String createPasswordHash(String username, String password, String salt) {
-        //TODO: externalize digest algo and encoding
-        return createPasswordHash("SHA-256", //digest algo
-                "base64", //encoding
-                null, //charset
-                username,
-                password,
-                salt);
+    public static String createPasswordHash(String password) {
+        PasswordEncoder encoder = CSpacePasswordEncoderFactory.createDefaultPasswordEncoder();
+
+        return encoder.encode(password);
     }
 
     /**
@@ -351,118 +319,4 @@ public class SecurityUtils {
 
         return result;
     }
-
-    public static String createPasswordHash(String hashAlgorithm, String hashEncoding, String hashCharset,
-    		String username, String password, String salt)
-    {
-        return createPasswordHash(hashAlgorithm, hashEncoding, hashCharset, username, password, salt, null);
-    }
-
-    public static String createPasswordHash(String hashAlgorithm, String hashEncoding, String hashCharset,
-    		String username, String password, String salt, DigestCallback callback)
-    {
-    	CSpacePasswordEncoder passwordEncoder = new CSpacePasswordEncoder();
-    	String saltedPassword = passwordEncoder.mergePasswordAndSalt(password, salt); //
-
-        String passwordHash = null;
-        byte passBytes[];
-        try
-        {
-            if(hashCharset == null)
-                passBytes = saltedPassword.getBytes();
-            else
-                passBytes = saltedPassword.getBytes(hashCharset);
-        }
-        catch(UnsupportedEncodingException uee)
-        {
-            logger.error((new StringBuilder()).append("charset ").append(hashCharset).append(" not found. Using platform default.").toString(), uee);
-            passBytes = saltedPassword.getBytes();
-        }
-        try
-        {
-            MessageDigest md = MessageDigest.getInstance(hashAlgorithm);
-            if(callback != null)
-                callback.preDigest(md);
-            md.update(passBytes);
-            if(callback != null)
-                callback.postDigest(md);
-            byte hash[] = md.digest();
-            if(hashEncoding.equalsIgnoreCase("BASE64"))
-                passwordHash = encodeBase64(hash);
-            else
-            if(hashEncoding.equalsIgnoreCase("HEX"))
-                passwordHash = encodeBase16(hash);
-            else
-            if(hashEncoding.equalsIgnoreCase("RFC2617"))
-                passwordHash = encodeRFC2617(hash);
-            else
-                logger.error((new StringBuilder()).append("Unsupported hash encoding format ").append(hashEncoding).toString());
-        }
-        catch(Exception e)
-        {
-            logger.error("Password hash calculation failed ", e);
-        }
-        return passwordHash;
-    }
-
-    public static String encodeRFC2617(byte data[])
-    {
-        char hash[] = new char[32];
-        for(int i = 0; i < 16; i++)
-        {
-            int j = data[i] >> 4 & 0xf;
-            hash[i * 2] = MD5_HEX[j];
-            j = data[i] & 0xf;
-            hash[i * 2 + 1] = MD5_HEX[j];
-        }
-
-        return new String(hash);
-    }
-
-    public static String encodeBase16(byte bytes[])
-    {
-        StringBuffer sb = new StringBuffer(bytes.length * 2);
-        for(int i = 0; i < bytes.length; i++)
-        {
-            byte b = bytes[i];
-            char c = (char)(b >> 4 & 0xf);
-            if(c > '\t')
-                c = (char)((c - 10) + 97);
-            else
-                c += '0';
-            sb.append(c);
-            c = (char)(b & 0xf);
-            if(c > '\t')
-                c = (char)((c - 10) + 97);
-            else
-                c += '0';
-            sb.append(c);
-        }
-
-        return sb.toString();
-    }
-
-    public static String encodeBase64(byte bytes[])
-    {
-        String base64 = null;
-        try
-        {
-            base64 = Base64Encoder.encode(bytes);
-        }
-        catch(Exception e) { }
-        return base64;
-    }
-
-    public static String tob64(byte buffer[])
-    {
-        return Base64Utils.tob64(buffer);
-    }
-
-    public static byte[] fromb64(String str)
-        throws NumberFormatException
-    {
-        return Base64Utils.fromb64(str);
-    }
-
-
 }
