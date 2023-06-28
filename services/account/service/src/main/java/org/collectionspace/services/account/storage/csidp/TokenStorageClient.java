@@ -60,9 +60,9 @@ public class TokenStorageClient {
      * @return user
      */
     static public Token create(String accountCsid, String tenantId, BigInteger expireSeconds) {
-        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();        
+        EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
 	    Token token = new Token();
-	    
+
         try {
             EntityManager em = emf.createEntityManager();
 
@@ -72,7 +72,7 @@ public class TokenStorageClient {
     		token.setExpireSeconds(expireSeconds);
     		token.setEnabled(true);
     		token.setCreatedAtItem(new Date());
-            
+
             em.getTransaction().begin();
     		em.persist(token);
             em.getTransaction().commit();
@@ -82,7 +82,7 @@ public class TokenStorageClient {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
-        
+
         return token;
 	}
 
@@ -90,11 +90,11 @@ public class TokenStorageClient {
      * Update a token for given an id
      * @param id
      * @param enabledFlag
-     * @throws TransactionException 
+     * @throws TransactionException
      */
     static public void update(TransactionContext transactionContext, String id, boolean enabledFlag) throws DocumentNotFoundException, TransactionException {
         Token tokenFound = null;
-        
+
         tokenFound = get((JPATransactionContext)transactionContext, id);
         if (tokenFound != null) {
             tokenFound.setEnabled(enabledFlag);
@@ -112,11 +112,11 @@ public class TokenStorageClient {
      * Get token for given ID
      * @param em EntityManager
      * @param id
-     */    
+     */
     public static Token get(JPATransactionContext jpaTransactionContext, String id) throws DocumentNotFoundException, TransactionException {
         Token tokenFound = null;
-        
-        tokenFound = (Token) jpaTransactionContext.find(Token.class, id);        
+
+        tokenFound = (Token) jpaTransactionContext.find(Token.class, id);
         if (tokenFound == null) {
             String msg = "Could not find token with ID=" + id;
             logger.error(msg);
@@ -125,14 +125,14 @@ public class TokenStorageClient {
 
         return tokenFound;
     }
-    
+
     static public Token get(String id) throws DocumentNotFoundException {
         Token tokenFound = null;
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
 
         try {
             EntityManager em = emf.createEntityManager();
-            tokenFound = (Token) em.find(Token.class, id);        
+            tokenFound = (Token) em.find(Token.class, id);
             if (tokenFound == null) {
                 String msg = "Could not find token with ID=" + id;
                 logger.error(msg);
@@ -143,9 +143,9 @@ public class TokenStorageClient {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
         }
-        
+
         return tokenFound;
-    }    
+    }
 
 	/**
      * Deletes the token with given id
@@ -157,11 +157,11 @@ public class TokenStorageClient {
 
         try {
             EntityManager em = emf.createEntityManager();
-            
+
             StringBuilder tokenDelStr = new StringBuilder("DELETE FROM ");
 	        tokenDelStr.append(Token.class.getCanonicalName());
 	        tokenDelStr.append(" WHERE id = :id");
-	
+
 	        Query tokenDel = em.createQuery(tokenDelStr.toString());
 	        tokenDel.setParameter("id", id);
 	        int tokenDelCount = tokenDel.executeUpdate();
@@ -174,7 +174,7 @@ public class TokenStorageClient {
             if (emf != null) {
                 JpaStorageUtils.releaseEntityManagerFactory(emf);
             }
-        }	        
+        }
     }
 
     private String getEncPassword(String userId, byte[] password) throws BadRequestException {
@@ -185,8 +185,7 @@ public class TokenStorageClient {
         } catch (Exception e) {
             throw new BadRequestException(e.getMessage());
         }
-        String secEncPasswd = SecurityUtils.createPasswordHash(
-                userId, new String(password), null);
+        String secEncPasswd = SecurityUtils.createPasswordHash(new String(password));
         return secEncPasswd;
     }
 }

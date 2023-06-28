@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema 
+<xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     jaxb:version="2.1" elementFormDefault="unqualified"
@@ -19,7 +19,7 @@
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 	-->
-	
+
     <!-- This is the base class for paginated lists -->
     <xs:complexType name="abstractCommonList">
         <xs:annotation>
@@ -42,41 +42,42 @@
                 </xs:appinfo>
             </xs:annotation>
             <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-		            <xs:sequence>
-		                <xs:element name="account-list-item" maxOccurs="unbounded">
-		                    <xs:complexType>
-		                        <xs:annotation>
-		                            <xs:appinfo>
-		                                <hj:ignored/>
-		                            </xs:appinfo>
-		                        </xs:annotation>
-		                        <xs:sequence>
-		                            <xs:element name="screenName" type="xs:string" minOccurs="1"/>
-		                            <xs:element name="userid" type="xs:string" minOccurs="1" />
-		                            <xs:element name="tenantid" type="xs:string" minOccurs="1" />
-		                            <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
-				                    <xs:annotation>
-				                        <xs:documentation>
-				                            tenant association is usually not required to be provided by the
-				                            service consumer. only in cases where a user in CollectionSpace
-				                            has access to the spaces of multiple tenants, this is used
-				                            to associate that user with more than one tenants
-				                        </xs:documentation>
-				                    </xs:annotation>
-                					</xs:element>		                            
-		                            <xs:element name="personRefName" type="xs:string" minOccurs="1" />
-		                            <xs:element name="email" type="xs:string" minOccurs="1" />
-		                            <xs:element name="status" type="status" minOccurs="1" />
-		                            <!-- uri to retrive collection object details -->
-		                            <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
-		                            <xs:element name="csid" type="xs:string" minOccurs="1" />
-		                        </xs:sequence>
-		                    </xs:complexType>
-		                </xs:element>
-		            </xs:sequence>
+                <xs:extension base="abstractCommonList">
+                    <xs:sequence>
+                        <xs:element name="account-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:annotation>
+                                    <xs:appinfo>
+                                        <hj:ignored/>
+                                    </xs:appinfo>
+                                </xs:annotation>
+                                <xs:sequence>
+                                    <xs:element name="screenName" type="xs:string" minOccurs="1"/>
+                                    <xs:element name="userid" type="xs:string" minOccurs="1" />
+                                    <xs:element name="tenantid" type="xs:string" minOccurs="1" />
+                                    <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation>
+                                            tenant association is usually not required to be provided by the
+                                            service consumer. only in cases where a user in CollectionSpace
+                                            has access to the spaces of multiple tenants, this is used
+                                            to associate that user with more than one tenants
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                    </xs:element>
+                                    <xs:element name="personRefName" type="xs:string" minOccurs="1" />
+                                    <xs:element name="email" type="xs:string" minOccurs="1" />
+                                    <xs:element name="requireSSO" type="xs:boolean" minOccurs="0" />
+                                    <xs:element name="status" type="status" minOccurs="1" />
+                                    <!-- uri to retrive collection object details -->
+                                    <xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                                    <xs:element name="csid" type="xs:string" minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
                 </xs:extension>
-            </xs:complexContent>        
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
 
@@ -93,7 +94,7 @@
                 </xs:appinfo>
             </xs:annotation>
             <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
+                <xs:extension base="abstractCommonList">
 		            <xs:sequence>
 		                <xs:element name="tenant-list-item" maxOccurs="unbounded">
 		                    <xs:complexType>
@@ -111,8 +112,7 @@
 		                </xs:element>
 		            </xs:sequence>
                 </xs:extension>
-            </xs:complexContent>        
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
 </xs:schema>
-

@@ -37,23 +37,23 @@ public class SpringAuthNContext implements AuthNContext {
 
     /**
      * Returns the username of the authenticated user.
-     * 
+     *
      * @return the username
      */
     @Override
 	public String getUserId() {
         Authentication authToken = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (authToken == null) {
             return AuthN.ANONYMOUS_USER;
         }
-        
+
         return authToken.getName();
     }
 
     /**
      * Returns the authenticated CSpaceUser user.
-     * 
+     *
      * @return the user
      */
     @Override
@@ -67,38 +67,38 @@ public class SpringAuthNContext implements AuthNContext {
             if (principal instanceof CSpaceUser ) {
             	result = (CSpaceUser) principal;
             }
-        }        
-        
+        }
+
         return result;
     }
 
     /**
      * Returns the id of the primary tenant associated with the authenticated user.
-     * 
+     *
      * @return the tenant id
      */
     @Override
 	public String getCurrentTenantId() {
     	String result = null;
-    	
+
     	CSpaceUser cspaceUser = getUser();
     	if (cspaceUser != null) {
             result = getCurrentTenant().getId();
     	} else {
-	        String username = getUserId();        
+	        String username = getUserId();
 	        if (username.equals(AuthN.ANONYMOUS_USER)) {
 	            result = AuthN.ANONYMOUS_TENANT_ID;
 	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
 	            result = AuthN.ADMIN_TENANT_ID;
 	        }
     	}
-    	
+
     	return result;
     }
 
     /**
      * Returns the name of the primary tenant associated with the authenticated user.
-     * 
+     *
      * @return the tenant name
      */
     @Override
@@ -112,13 +112,13 @@ public class SpringAuthNContext implements AuthNContext {
 
     /**
      * Returns the primary tenant associated with the authenticated user.
-     * 
+     *
      * @return the tenant
      */
     @Override
 	public CSpaceTenant getCurrentTenant() {
     	CSpaceTenant result = null;
-    	
+
     	CSpaceUser cspaceUser = getUser();
     	if (cspaceUser != null) {
     		result = getUser().getPrimaryTenant();
@@ -128,9 +128,9 @@ public class SpringAuthNContext implements AuthNContext {
 	            result = new CSpaceTenant(AuthN.ANONYMOUS_TENANT_ID, AuthN.ANONYMOUS_TENANT_NAME);
 	        } else if (username.equals(AuthN.SPRING_ADMIN_USER)) {
 	            result = new CSpaceTenant(AuthN.ADMIN_TENANT_ID, AuthN.ADMIN_TENANT_NAME);
-	        } 
+	        }
     	}
-    	
+
     	return result;
     }
 }

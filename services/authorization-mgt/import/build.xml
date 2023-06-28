@@ -117,6 +117,7 @@
             <arg value="${basedir}/pom.xml" />
             <arg value="-N" />
             <arg value="${mvn.opts}" />
+            <arg value="-X" />
         </exec>
     </target>
     <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
@@ -149,7 +150,7 @@
         <copy tofile="${dest.appContext.cfg}" file="${src.appContext.cfg}" filtering="true"/>
     </target>
 
-    
+
     <target name="deploy" depends="install"
             description="deploy authorization-mgt import in ${jee.server.cspace}">
     </target>

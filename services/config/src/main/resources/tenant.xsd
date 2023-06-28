@@ -51,6 +51,7 @@
 			<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="uiConfig" type="UIConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchDocumentWriter" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="serviceBindings" type="service:ServiceBindingType" minOccurs="0" maxOccurs="unbounded"/>
@@ -67,6 +68,8 @@
 		<!-- domain name including subdomain but not TLD -->
 		<!-- e.g. hearstmuseum.berkeley or movingimage.us -->
 		<xs:attribute name="name" type="xs:string" use="required"/>
+		<!-- Short name (not a domain), e.g. mmi, pahma -->
+		<xs:attribute name="shortName" type="xs:string" use="required"/>
 		<!-- display name as Museum of Moving Images -->
 		<xs:attribute name="displayName" type="xs:string" use="required"/>
 		<xs:attribute name="version" type="types:VersionType" use="required"/>
@@ -121,6 +124,55 @@
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="UIConfig">
+		<xs:annotation>
+			<xs:documentation>Configuration of the CollectionSpace UI.</xs:documentation>
+		</xs:annotation>
+
+		<xs:sequence>
+			<xs:element name="baseUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The base URL of the UI. Other configured URLs are appended this URL.
+						This should end with a slash. Example: http://core.dev.collectionspace.org/cspace/core/
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="loginSuccessUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The URL in the UI that should be opened after a login to the tenant succeeds,
+						relative to the baseUrl (see above).
+						See LoginResource.rootRedirect.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="authorizationSuccessUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The URL in the UI that can be opened after an OAuth authorization succeeds,
+						relative to the baseUrl (see above).
+						This is not used directly by the services; it is only added to the list of
+						URIs to which clients are permitted to ask for a redirect.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+
+			<xs:element name="logoutSuccessUrl" type="xs:string" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						The URL in the UI that can be opened after a logout succeeds, relative to
+						the baseUrl (see above).
+						This is not used directly by the services; it is only added to the list of
+						URIs to which clients are permitted to ask for a redirect.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="ElasticSearchIndexConfig">
 		<xs:annotation>
 			<xs:documentation>Configuration of a tenant's Elasticsearch index</xs:documentation>
@@ -161,7 +213,6 @@
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="tokenExpirationSeconds" type="xs:integer" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="loginpage" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="subject" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="message" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>

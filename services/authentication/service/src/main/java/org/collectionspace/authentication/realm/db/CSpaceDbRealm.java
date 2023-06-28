@@ -84,6 +84,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private String datasourceName;
     private String principalsQuery;
     private String saltQuery;
+    private String requireSSOQuery;
     private String rolesQuery;
     private String tenantsQueryNoDisabled;
     private String tenantsQueryWithDisabled;
@@ -151,6 +152,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
         tmp = options.get("saltQuery");
         if (tmp != null) {
         	saltQuery = tmp.toString();
+        }
+        tmp = options.get("requireSSOQuery");
+        if (tmp != null) {
+        	requireSSOQuery = tmp.toString();
         }
         tmp = options.get("rolesQuery");
         if (tmp != null) {
@@ -716,5 +721,77 @@ public class CSpaceDbRealm implements CSpaceRealm {
         
         return salt;
     }
-    
+
+    @Override
+    public boolean isRequireSSO(String username) throws AccountException {
+        Boolean requireSSO = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + requireSSOQuery + ", with username: " + username);
+            }
+
+            ps = conn.prepareStatement(requireSSOQuery);
+
+            ps.setString(1, username);
+
+            rs = ps.executeQuery();
+
+            if (rs.next() == false) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(requireSSOQuery + " returned no matches from db");
+                }
+
+                throw new AccountNotFoundException("No matching username found");
+            }
+
+            requireSSO = rs.getBoolean(1);
+        } catch (SQLException ex) {
+            if (logger.isTraceEnabled() == true) {
+                logger.error("Could not open database to read AuthN tables.", ex);
+            }
+
+            AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
+
+            ae.initCause(ex);
+            
+            throw ae;
+        } catch (AccountNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            AccountException ae = new AccountException("Unknown Exception");
+
+            ae.initCause(ex);
+            
+            throw ae;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+
+        return requireSSO;
+    }
 }

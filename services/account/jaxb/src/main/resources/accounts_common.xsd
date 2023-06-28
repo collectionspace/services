@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<xs:schema 
+<xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     jaxb:version="2.1" elementFormDefault="unqualified"
@@ -25,7 +25,7 @@
 			</jaxb:globalBindings>
 		</xs:appinfo>
 	</xs:annotation>
-		
+
     <!-- accounts-common -->
     <!-- convention: <servicename>-common  -->
     <xs:element name="accounts_common">
@@ -120,6 +120,18 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="requireSSO" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            If true, login through an SSO identity provider is required.
+                        </xs:documentation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="require_sso" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
                     <xs:annotation>
                         <xs:documentation>
@@ -188,7 +200,7 @@
             </xs:attribute>
         </xs:complexType>
     </xs:element>
-    
+
     <xs:complexType name="roleList">
         <xs:annotation>
             <xs:documentation>
@@ -201,7 +213,7 @@
         <xs:sequence>
             <xs:element name="role" type="role_value" minOccurs="1" maxOccurs="unbounded"/>
         </xs:sequence>
-    </xs:complexType>    
+    </xs:complexType>
 
     <xs:complexType name="role_value" >
         <xs:annotation>
@@ -257,7 +269,7 @@
             </xs:element>
         </xs:sequence>
     </xs:complexType>
-	
+
     <!-- FIXME tenant definition could be in a separate schema -->
 	<xs:element name="tenant">
 		<xs:complexType>
@@ -298,7 +310,7 @@
 							</hj:basic>
 						</xs:appinfo>
 					</xs:annotation>
-				</xs:element>				
+				</xs:element>
 				<xs:element name="authoritiesInitialized" type="xs:boolean">
 					<xs:annotation>
 						<xs:appinfo>
@@ -339,4 +351,3 @@
 		</xs:complexType>
 	</xs:element>
 </xs:schema>
-

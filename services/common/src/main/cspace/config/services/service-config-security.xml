@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svc:service-config
+    xmlns:svc='http://collectionspace.org/services/config'
+    xmlns:merge='http://xmlmerge.el4j.elca.ch'
+>
+    <security merge:action="insert">
+        <cors>
+            <max-age>P1D</max-age>
+        </cors>
+
+        <oauth>
+            <default-access-token-time-to-live>PT1H</default-access-token-time-to-live>
+
+            <client-registrations>
+                <client id="cspace-ui">
+                    <client-id>cspace-ui</client-id>
+                    <client-name>CollectionSpace UI</client-name>
+                    <!--
+                        cspace-ui is a public client that cannot keep a secret, so it does not use
+                        client authentication.
+                    -->
+                    <client-authentication-method>none</client-authentication-method>
+                    <!--
+                        Spring does not allow refresh token grants for public clients (those with
+		                ClientAuthenticationMethod.NONE), so the cspace-ui client only supports
+                        AuthorizationGrantType.AUTHORIZATION_CODE.
+                    -->
+                    <authorization-grant-type>authorization_code</authorization-grant-type>
+                    <!-- <authorization-grant-type>refresh</authorization-grant-type> -->
+                    <scope>cspace.full</scope>
+                    <!--
+                        For the cspace-ui client, the allowed redirect URIs are now automatically
+                        populated from tenant config. The lines below serve as examples for other
+                        clients.
+                    -->
+                    <!--
+                    <redirect-uri>http://localhost:8180/cspace/core/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/anthro/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/bonsai/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/botgarden/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/fcart/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/lhmc/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/materials/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/publicart/authorized</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/core/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/anthro/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/bonsai/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/botgarden/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/fcart/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/lhmc/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/materials/logout?success</redirect-uri>
+                    <redirect-uri>http://localhost:8180/cspace/publicart/logout?success</redirect-uri>
+                    -->
+                    <client-settings>
+                        <require-authorization-consent>false</require-authorization-consent>
+                    </client-settings>
+                    <token-settings>
+                        <access-token-time-to-live>PT12H</access-token-time-to-live>
+                    </token-settings>
+                </client>
+            </client-registrations>
+        </oauth>
+
+        <!--
+            Example SSO config.
+        -->
+        <!--
+        <sso>
+            <saml>
+                <single-logout />
+
+                <relying-party-registrations>
+                    <relying-party id="mocksaml">
+                        <name>Mock SAML</name>
+                        <icon location="https://mocksaml.com/favicon.ico" />
+                        <metadata location="https://mocksaml.com/api/saml/metadata" />
+
+                        <signing-x509-credentials>
+                            <x509-credential>
+                                <private-key location="file:///home/collectionspace/tomcat/cspace/services/credentials/private.key" />
+                                <x509-certificate location="file:///home/collectionspace/tomcat/cspace/services/credentials/certificate.crt" />
+                            </x509-credential>
+                        </signing-x509-credentials>
+                    </relying-party>
+                </relying-party-registrations>
+            </saml>
+        </sso>
+        -->
+    </security>
+</svc:service-config>

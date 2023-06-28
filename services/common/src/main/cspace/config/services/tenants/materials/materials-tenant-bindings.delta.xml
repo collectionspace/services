@@ -8,7 +8,7 @@
     <!-- value in cspace/config/services/tenants/materials-tenant-bindings-proto.xml -->
 
     <tenant:tenantBinding id="2000">
-        <tenant:elasticSearchDocumentWriter merge:action="replace">
+      <tenant:elasticSearchDocumentWriter merge:action="replace">
           org.collectionspace.services.nuxeo.elasticsearch.materials.MaterialsESDocumentWriter
         </tenant:elasticSearchDocumentWriter>
 

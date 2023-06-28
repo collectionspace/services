@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.nio.file.Path;
@@ -66,6 +67,9 @@ import org.dom4j.tree.DefaultElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import freemarker.template.Configuration;
+import freemarker.template.TemplateExceptionHandler;
+
 /**
  * Main class for Services layer. It reads configuration and performs service
  * level initialization. It is a singleton.
@@ -88,29 +92,30 @@ public class ServiceMain {
     	ServiceMain.logger.info(str);
     }
 
-    /**
-     * volatile is used here to assume about ordering (post JDK 1.5)
-     */
-    private static volatile ServiceMain instance = null;
-    private static volatile boolean initFailed = false;
+		/**
+		 * volatile is used here to assume about ordering (post JDK 1.5)
+		 */
+		private static volatile ServiceMain instance = null;
+		private static volatile boolean initFailed = false;
 
-    private static final String SERVER_HOME_PROPERTY = "catalina.base";
-	private static final boolean USE_APP_GENERATED_CONFIG = true;
+		private static final String SERVER_HOME_PROPERTY = "catalina.base";
+		private static final boolean USE_APP_GENERATED_CONFIG = true;
 
-	private static ServletContext servletContext = null;
+		private static ServletContext servletContext = null;
 
-	private NuxeoConnectorEmbedded nuxeoConnector;
-    private String serverRootDir = null;
-    private ServicesConfigReaderImpl servicesConfigReader;
-    private TenantBindingConfigReaderImpl tenantBindingConfigReader;
-    private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
+		private NuxeoConnectorEmbedded nuxeoConnector;
+		private String serverRootDir = null;
+		private ServicesConfigReaderImpl servicesConfigReader;
+		private TenantBindingConfigReaderImpl tenantBindingConfigReader;
+		private UriTemplateRegistry uriTemplateRegistry = new UriTemplateRegistry();
+		private Configuration freeMarkerConfig = null;
 
-    private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
-    private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
-    private static final String DROP_USER_SQL_CMD = "DROP USER";
-    private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
-    private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
-	private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
+		private static final String DROP_DATABASE_SQL_CMD = "DROP DATABASE";
+		private static final String DROP_DATABASE_IF_EXISTS_SQL_CMD = DROP_DATABASE_SQL_CMD + " IF EXISTS %s;";
+		private static final String DROP_USER_SQL_CMD = "DROP USER";
+		private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
+		private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
+		private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
 
     private ServiceMain() {
     	// Intentionally blank
@@ -229,6 +234,7 @@ public class ServiceMain {
         //
         //
         initializeEventListeners();
+				initializeFreeMarker();
 
         //
         // Mark if a tenant's bindings have changed since the last time we started, by comparing the MD5 hash of each tenant's bindings with that of
@@ -297,6 +303,18 @@ public class ServiceMain {
 
     	return result;
     }
+
+		private void initializeFreeMarker() throws IOException {
+			Configuration config = new Configuration(Configuration.VERSION_2_3_32);
+			TenantBindingConfigReaderImpl tenantBindingConfigReader = this.getTenantBindingConfigReader();
+			String templateDir = tenantBindingConfigReader.getResourcesDir() + File.separator + "templates";
+
+			config.setDirectoryForTemplateLoading(new File(templateDir));
+			config.setDefaultEncoding("UTF-8");
+			config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+
+			this.freeMarkerConfig = config;
+		}
 
     /**
      * Initialize the event listeners.  We're essentially registering listeners with tenants.  This ensures that listeners ignore events
@@ -895,6 +913,10 @@ public class ServiceMain {
     	}
 
     	return result;
+	}
+
+	public Configuration getFreeMarkerConfig() {
+		return this.freeMarkerConfig;
 	}
 
 	/*

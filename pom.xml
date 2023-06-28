@@ -14,14 +14,15 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>${revision}</cspace.services.version>
 		<cspace.services.client.version>${revision}</cspace.services.client.version>
+		<jackson.version>2.14.3</jackson.version>
 		<nuxeo.general.release>9.10-HF30</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
 		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
-		<spring.version>4.3.16.RELEASE</spring.version>
-		<spring.security.version>4.1.1.RELEASE</spring.security.version>
-		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
+		<spring.version>5.3.28</spring.version>
+		<spring.security.version>5.8.4</spring.security.version>
+		<spring.security.authorization.server.version>0.4.3</spring.security.authorization.server.version>
 		<aspectj.version>1.7.4</aspectj.version>
 		<log4j.version>2.17.1</log4j.version>
 	</properties>
@@ -752,6 +753,32 @@
 				<scope>provided</scope>
 			</dependency>
 
+			<!-- Jackson -->
+
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-core</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-databind</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.core</groupId>
+				<artifactId>jackson-annotations</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.datatype</groupId>
+				<artifactId>jackson-datatype-jsr310</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

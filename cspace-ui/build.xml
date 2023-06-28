@@ -47,7 +47,7 @@
 	<target name="install_nvm" if="${cspace.ui.build}">
 		<exec executable="bash" failonerror="true">
 			<arg value="-c" />
-			<arg line='"curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash"' />
+			<arg line='"curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash"' />
 		</exec>
 	</target>
 
@@ -61,13 +61,19 @@
 	<target name="build_cspace_ui_js" depends="ensure_staging_dir,ensure_source_dir,install_node" if="${cspace.ui.build}">
 		<exec executable="bash" failonerror="true">
 			<arg value="-c" />
-			<arg value="./build_js.sh ${cspace.ui.package.name} ${cspace.ui.build.branch} ${source.dir} ${staging.dir} ${cspace.ui.library.name}"/>
+			<arg value="./build_js.sh ${cspace.ui.package.name} ${cspace.ui.build.branch} ${source.dir} ${staging.dir} ${cspace.ui.library.name} ${service.ui.library.name}"/>
 		</exec>
 	</target>
 
 	<target name="download_cspace_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
 		<exec executable="curl" failonerror="true">
 			<arg line="-o ${staging.dir}/${cspace.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
+		</exec>
+	</target>
+
+	<target name="download_service_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
+		<exec executable="curl" failonerror="true">
+			<arg line="-o ${staging.dir}/${service.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/cspace-ui@${cspace.ui.version}/dist/${service.ui.library.name}.min.js"/>
 		</exec>
 	</target>
 
@@ -81,6 +87,18 @@
 		</pathconvert>
 
 		<copy file="${staging.dir}/${cspace.ui.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
+	</target>
+
+	<target name="deploy_service_ui_js" depends="build_cspace_ui_js,download_service_ui_js">
+		<pathconvert property="service.ui.install.filename" targetos="unix">
+			<first>
+				<fileset dir="${staging.dir}" includes="${service.ui.library.name}@*.min.js" />
+			</first>
+
+			<mapper type="flatten" />
+		</pathconvert>
+
+		<copy file="${staging.dir}/${service.ui.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
 	<target name="deploy_tenants" depends="deploy_cspace_ui_js">
@@ -194,6 +212,16 @@
 		</copy>
 	</target>
 
+	<target name="deploy_service_ui_template" depends="deploy_service_ui_js">
+		<filter token="SERVICE_UI_FILENAME" value="${service.ui.install.filename}" />
+
+		<copy file="service-ui.ftlh" todir="${jee.server.cspace}/cspace/config/services/resources/templates" filtering="true" overwrite="true" />
+	</target>
+
+	<target name="undeploy_service_ui_template">
+		<delete file="${jee.server.cspace}/cspace/config/services/resources/templates/service-ui.ftlh" />
+	</target>
+
 	<target name="undeploy_tenants">
 		<subant target="undeploy_tenant" genericantfile="${ant.file}" inheritall="true">
 			<dirset dir="." includes="*" />
@@ -216,7 +244,7 @@
 		<delete dir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
-	<target name="deploy" depends="clean,deploy_tenants" description="deploy cspace ui to ${jee.server.cspace}" />
+	<target name="deploy" depends="clean,deploy_service_ui_js,deploy_service_ui_template,deploy_tenants" description="deploy cspace ui to ${jee.server.cspace}" />
 
-	<target name="undeploy" depends="undeploy_tenants,undeploy_js" description="undeploy collectionspace ui components from ${jee.server.cspace}" />
+	<target name="undeploy" depends="undeploy_service_ui_template,undeploy_tenants,undeploy_js" description="undeploy collectionspace ui components from ${jee.server.cspace}" />
 </project>

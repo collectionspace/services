@@ -85,4 +85,12 @@ public interface CSpaceRealm {
      */
     public Set<CSpaceTenant> getTenants(String username, boolean includeDisabledTenants) throws AccountException;
 
+    /**
+     * Determines if the user is required to login using single sign-on.
+     * 
+     * @param username
+     * @return true if SSO is required, false otherwise
+     * @throws AccountException
+     */
+    public boolean isRequireSSO(String username) throws AccountException;
 }

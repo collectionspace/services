@@ -75,12 +75,14 @@ public class CSpaceUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String password = null;
         String salt = null;
+        Boolean requireSSO = null;
         Set<CSpaceTenant> tenants = null;
         Set<GrantedAuthority> grantedAuthorities = null;
         
         try {
             password = realm.getPassword(username);
             salt = realm.getSalt(username);
+            requireSSO = realm.isRequireSSO(username);
             tenants = getTenants(username);
             grantedAuthorities = getAuthorities(username);
         }
@@ -96,6 +98,7 @@ public class CSpaceUserDetailsService implements UserDetailsService {
                 username,
                 password,
                 salt,
+                requireSSO,
                 tenants,
                 grantedAuthorities);
                 

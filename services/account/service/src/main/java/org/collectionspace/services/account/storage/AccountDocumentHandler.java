@@ -31,17 +31,15 @@ import java.util.UUID;
 import org.collectionspace.services.account.AccountTenant;
 import org.collectionspace.services.account.AccountsCommon;
 import org.collectionspace.services.account.AccountsCommonList;
+import org.apache.commons.text.RandomStringGenerator;
 import org.collectionspace.services.account.AccountListItem;
 import org.collectionspace.services.account.AccountRoleSubResource;
 import org.collectionspace.services.account.Status;
 import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.PermissionRole;
-import org.collectionspace.services.authorization.PermissionRoleSubResource;
 import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.account.RoleValue;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.AccountRoleFactory;
-import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaDocumentHandler;
 import org.collectionspace.services.common.api.Tools;
@@ -56,7 +54,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author 
+ * @author
  */
 public class AccountDocumentHandler
         extends JpaDocumentHandler<AccountsCommon, AccountsCommonList, AccountsCommon, List<AccountsCommon>> {
@@ -69,9 +67,29 @@ public class AccountDocumentHandler
     public void handleCreate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         String id = UUID.randomUUID().toString();
         AccountsCommon account = wrapDoc.getWrappedObject();
+
         account.setCsid(id);
+
         setTenant(account);
-        account.setStatus(Status.ACTIVE);
+
+        if (account.getPassword() == null) {
+            // The password is allowed to be null when the user is created with requireSSO == true.
+            // Generate a random password to ensure that it won't be blank if the requireSSO flag
+            // is changed.
+
+            RandomStringGenerator generator = new RandomStringGenerator.Builder()
+                .withinRange(34, 126)
+                .build();
+
+            String randomPassword = generator.generate(24);
+
+            account.setPassword(randomPassword.getBytes());
+        }
+
+        if (account.getStatus() == null) {
+            account.setStatus(Status.ACTIVE);
+        }
+
         // We do not allow creation of locked accounts through the services.
         account.setMetadataProtection(null);
         account.setRolesProtection(null);
@@ -92,8 +110,8 @@ public class AccountDocumentHandler
             //
             // First, delete the existing accountroles
             //
-            AccountRoleSubResource subResource = 
-                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);           
+            AccountRoleSubResource subResource =
+                    new AccountRoleSubResource(AccountRoleSubResource.ACCOUNT_ACCOUNTROLE_SERVICE);
             subResource.deleteAccountRole(getServiceContext(), accountFound.getCsid(), SubjectType.ROLE);
             //
             // Check to see if the payload has new roles to relate to the account
@@ -103,7 +121,7 @@ public class AccountDocumentHandler
                 //
                 // Next, create the new accountroles
                 //
-                AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountFound, 
+                AccountRole accountRole = AccountRoleFactory.createAccountRoleInstance(accountFound,
                         roleValueList, true, true);
                 String accountRoleCsid = subResource.createAccountRole(getServiceContext(), accountRole, SubjectType.ROLE);
                 //
@@ -143,6 +161,10 @@ public class AccountDocumentHandler
         if (from.getPersonRefName() != null) {
             to.setPersonRefName(from.getPersonRefName());
         }
+        if (from.isRequireSSO() != null) {
+            to.setRequireSSO(from.isRequireSSO());
+        }
+
         // Note that we do not allow update of locks
         //fixme update for tenant association
 
@@ -173,11 +195,11 @@ public class AccountDocumentHandler
             subResource.createAccountRole(this.getServiceContext(), accountRole, SubjectType.ROLE);
         }
     }
-    
+
     @Override
     public void completeUpdate(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon upAcc = wrapDoc.getWrappedObject();
-        getServiceContext().setOutput(upAcc);        
+        getServiceContext().setOutput(upAcc);
     }
 
     @Override
@@ -198,7 +220,7 @@ public class AccountDocumentHandler
     @Override
     public AccountsCommon extractCommonPart(DocumentWrapper<AccountsCommon> wrapDoc) throws Exception {
         AccountsCommon account = wrapDoc.getWrappedObject();
-        
+
         String includeRolesQueryParamValue = (String) getServiceContext().getQueryParams().getFirst(AccountClient.INCLUDE_ROLES_QP);
         boolean includeRoles = Tools.isTrue(includeRolesQueryParamValue);
         if (includeRoles) {
@@ -208,7 +230,7 @@ public class AccountDocumentHandler
                     SubjectType.ROLE);
             account.setRoleList(AccountRoleFactory.convert(accountRole.getRole()));
         }
-        
+
         return wrapDoc.getWrappedObject();
     }
 
@@ -249,6 +271,7 @@ public class AccountDocumentHandler
 
             accListItem.setTenants(account.getTenants());
             accListItem.setEmail(account.getEmail());
+            accListItem.setRequireSSO(account.isRequireSSO());
             accListItem.setStatus(account.getStatus());
             String id = account.getCsid();
             accListItem.setUri(getServiceContextPath() + id);
@@ -313,13 +336,13 @@ public class AccountDocumentHandler
         AccountsCommon account = wrapDoc.getWrappedObject();
         sanitize(account);
     }
-    
+
     private void sanitize(AccountsCommon account) {
         account.setPassword(null);
         if (!SecurityUtils.isCSpaceAdmin()) {
             account.setTenants(new ArrayList<AccountTenant>(0));
         }
-    }    
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.common.document.DocumentHandler#initializeDocumentFilter(org.collectionspace.services.common.context.ServiceContext)

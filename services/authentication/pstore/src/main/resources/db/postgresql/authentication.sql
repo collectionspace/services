@@ -8,8 +8,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Upgrade older users tables to 6.0
+
 ALTER TABLE users ADD COLUMN IF NOT EXISTS lastlogin TIMESTAMP;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS salt VARCHAR(128);
+
+-- Upgrade older users tables to 8.0
+
+UPDATE users SET passwd = concat('{SHA-256}', '{', salt, '}', passwd)  WHERE left(passwd, 1) <> '{';
 
 CREATE TABLE IF NOT EXISTS tokens (
   id VARCHAR(128) NOT NULL PRIMARY KEY,
