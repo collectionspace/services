@@ -44,5 +44,13 @@
             </service:initHandler>
         </tenant:serviceBindings>
 
+        <tenant:serviceBindings merge:matcher="id" id="Reports">
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
+                <types:item merge:matcher="skip" merge:action="insert">
+                    <types:key>report</types:key>
+                    <types:value>duplicateobjectnumber</types:value>
+                </types:item>
+            </service:properties>
+        </tenant:serviceBindings>
     </tenant:tenantBinding>
 </tenant:TenantBindingConfig>
