@@ -587,10 +587,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(dayOfMonth);
 
 		if (dayOfMonth > 31 || dayOfMonth <= 0) {
-			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
+			throw new StructuredDateFormatException("unexpected day of month '" + dayOfMonth + "'");
 		}
 		if (year == 0) {
-			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
+			throw new StructuredDateFormatException("unexpected year '" + year + "'");
 		}
 	}
 
