@@ -382,11 +382,7 @@ public class NuxeoBlobUtils {
      */
     static private Map<String, Object> getMetadata(Blob nuxeoBlob) throws Exception {
         BinaryMetadataService binaryMetadataService = Framework.getService(BinaryMetadataService.class);
-        Map<String, Object> blobProperties = binaryMetadataService.readMetadata(nuxeoBlob, false);
-
-        ImagingService service = Framework.getService(ImagingService.class);
-        Map<String, Object> metadataMap = service.getImageMetadata(nuxeoBlob); // use org.nuxeo.binary.metadata.api.BinaryMetadataService#readMetadata(org.nuxeo.ecm.core.api.Blob)
-        return metadataMap;
+        return binaryMetadataService.readMetadata(nuxeoBlob, false);
     }
 
 	static private MeasuredPartGroupList getDimensions(
