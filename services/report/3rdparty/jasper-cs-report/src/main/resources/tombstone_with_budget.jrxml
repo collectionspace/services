@@ -151,10 +151,14 @@ LEFT JOIN materials material on material.objcsid = obj.objcsid
 LEFT JOIN dimensions dimension on dimension.objcsid = obj.objcsid
 LEFT JOIN dates date on date.objcsid = obj.objcsid
 LEFT JOIN (
-  SELECT relation.*
+  SELECT relation.subjectcsid, relation.objectcsid
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY core.updatedat DESC
+  LIMIT 1
 ) media ON media.subjectcsid = obj.objcsid
 LEFT JOIN (
   SELECT
