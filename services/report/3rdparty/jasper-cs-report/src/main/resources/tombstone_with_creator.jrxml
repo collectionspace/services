@@ -104,7 +104,11 @@ LEFT JOIN (
   SELECT relation.subjectcsid, relation.objectcsid
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY core.updatedat DESC
+  LIMIT 1
 ) media ON media.subjectcsid = hier.name
 $P!{whereclause}]]>
   </queryString>
