@@ -36,7 +36,7 @@
   dimension.dimension,
   dimension.dimensionvalue,
   dimension.dimensionunit,
-  sd.datedisplaydate AS artworkdate,
+  sd.artworkdate,
   media.objectcsid AS mediacsid
 FROM collectionobjects_common obj
 INNER JOIN hierarchy hier on hier.id = obj.id
@@ -48,9 +48,16 @@ LEFT JOIN collectionobjects_publicart_publicartcollections coll ON coll.id = obj
 LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
 LEFT JOIN collectionobjects_common_owners owner ON owner.id = obj.id AND owner.pos = 0
 LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id = obj.id AND inventory.pos = 0
-LEFT JOIN hierarchy pdg_hier on pdg_hier.parentid = obj.id AND pdg_hier.primarytype = 'publicartProductionDateGroup' and pdg_hier.pos = 0
-LEFT JOIN hierarchy sdg_hier on sdg_hier.parentid = pdg_hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
-LEFT JOIN structureddategroup sd on sd.id = sdg_hier.id
+LEFT JOIN (
+  SELECT
+    hier.parentid,
+    string_agg(sd.datedisplaydate, '|') as artworkdate
+  FROM hierarchy hier
+  LEFT JOIN hierarchy sdg_hier on sdg_hier.parentid = hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
+  LEFT JOIN structureddategroup sd on sd.id = sdg_hier.id
+  WHERE hier.primarytype = 'publicartProductionDateGroup'
+  GROUP BY hier.parentid
+) sd ON sd.parentid = obj.id
 LEFT JOIN (
  SELECT
   measured_hier.parentid,
@@ -97,7 +104,11 @@ LEFT JOIN (
   SELECT relation.subjectcsid, relation.objectcsid
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY core.updatedat DESC
+  LIMIT 1
 ) media ON media.subjectcsid = hier.name
 $P!{whereclause}]]>
   </queryString>
