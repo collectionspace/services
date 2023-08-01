@@ -181,7 +181,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
-		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
+		if (earliestDate.getYear() != null) {
 			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
 			if (compareResult == 1) {
 				Date temp;
