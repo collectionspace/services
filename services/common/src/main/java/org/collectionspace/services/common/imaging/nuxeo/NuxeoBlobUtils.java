@@ -121,20 +121,19 @@ class CSpaceFileBlob extends FileBlob {
 public class NuxeoBlobUtils {
 
 	/** The Constant logger. */
-	private static final Logger logger = LoggerFactory
-			.getLogger(NuxeoBlobUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(NuxeoBlobUtils.class);
 
     private static final String VIEWS_PROPERTY = "picture:views";
     private static final String TITLE_PROPERTY = "title";
     private static final String FILENAME_PROPERTY = "filename";
 
-	//
-	// A maximum byte size for the byte array used to hold an image.  Images larger than this will
-	// be returned as FileInputStreams rather than ByteArrayInputStreams
-	//
-	private static final int MAX_IMAGE_BUFFER = 256 * 1024; // REM: 11/26/2013 - This should be set in a config/property file.
-
-
+	/**
+	 * A maximum byte size for the byte array used to hold an image.  Images larger than this will
+	 * be returned as FileInputStreams rather than ByteArrayInputStreams
+	 * <p>
+	 * REM: 11/26/2013 - This should be set in a config/property file.
+	 */
+	private static final int MAX_IMAGE_BUFFER = 256 * 1024;
 
 	//
 	// File name constants
@@ -175,8 +174,7 @@ public class NuxeoBlobUtils {
 	 * hard coded.
 	 */
 	public static final String DERIVATIVE_ORIGINAL = "Original";
-	public static final String DERIVATIVE_ORIGINAL_TAG = DERIVATIVE_ORIGINAL
-			+ "_";
+	public static final String DERIVATIVE_ORIGINAL_TAG = DERIVATIVE_ORIGINAL + "_";
 
 	public static final String DERIVATIVE_ORIGINAL_JPEG = "OriginalJpeg";
 	public static final String DERIVATIVE_ORIGINAL_JPEG_TAG = DERIVATIVE_ORIGINAL_JPEG + "_";
@@ -294,7 +292,7 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-	static private void handleGenericBlobs(DocumentBlobHolder docBlobHolder, CommonList commonList, String uri) {
+	private static void handleGenericBlobs(DocumentBlobHolder docBlobHolder, CommonList commonList, String uri) {
 		int total = 0;
 		List<Blob> docBlobs = docBlobHolder.getBlobs();
 		// List<BlobListItem> blobListItems = result.getBlobListItem();
@@ -313,7 +311,7 @@ public class NuxeoBlobUtils {
 		commonList.setItemsInPage(total);
 	}
 
-	static private void handlePictureViewBlobs(PictureBlobHolder pictureBlobHolder,
+	private static void handlePictureViewBlobs(PictureBlobHolder pictureBlobHolder,
 			CoreSessionInterface repoSession,
 			String repositoryId,
 			CommonList commonList,
@@ -380,7 +378,7 @@ public class NuxeoBlobUtils {
     /*
      * [dublincore, uid, picture, iptc, common, image_metadata]
      */
-    static private Map<String, Object> getMetadata(Blob nuxeoBlob) throws Exception {
+    private static Map<String, Object> getMetadata(Blob nuxeoBlob) throws Exception {
         BinaryMetadataService binaryMetadataService = Framework.getService(BinaryMetadataService.class);
         return binaryMetadataService.readMetadata(nuxeoBlob, false);
     }
@@ -402,8 +400,8 @@ public class NuxeoBlobUtils {
 					String valueDate = GregorianCalendarDateTimeUtils.timestampUTC();
 
 					result = new MeasuredPartGroupList();
-					List<MeasuredPartGroup> measuredPartGroupList =
-						(result).getMeasuredPartGroup();
+					List<MeasuredPartGroup> measuredPartGroupList = (result).getMeasuredPartGroup();
+
 					//
 					// Create a new measured part for the "image"
 					//
@@ -411,8 +409,8 @@ public class NuxeoBlobUtils {
 					mpGroup.setMeasuredPart(PART_IMAGE);
 					mpGroup.setDimensionSummary(PART_SUMMARY);
 					mpGroup.setDimensionSubGroupList(new DimensionSubGroupList());
-					List<DimensionSubGroup> dimensionSubGroupList = mpGroup.getDimensionSubGroupList()
-																		   .getDimensionSubGroup();
+					List<DimensionSubGroup> dimensionSubGroupList =
+						mpGroup.getDimensionSubGroupList().getDimensionSubGroup();
 
 					//
 					// Set the width
