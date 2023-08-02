@@ -82,19 +82,19 @@ order by co.objectnumber, determination]]>
   </columnHeader>
   <detail>
     <band height="16" splitType="Prevent">
-      <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
         <reportElement stretchType="RelativeToBandHeight" x="59" y="0" width="249" height="15"
           isPrintWhenDetailOverflows="true" />
         <textElement />
         <textFieldExpression class="java.lang.String"><![CDATA[$F{determination}]]></textFieldExpression>
       </textField>
-      <textField isStretchWithOverflow="true" isBlankWhenNull="true">
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
         <reportElement stretchType="RelativeToBandHeight" x="319" y="0" width="221" height="15"
           isPrintWhenDetailOverflows="true" />
         <textElement />
         <textFieldExpression class="java.lang.String"><![CDATA[$F{collector}]]></textFieldExpression>
       </textField>
-      <textField isStretchWithOverflow="true">
+      <textField textAdjust="StretchHeight">
         <reportElement stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0"
           width="59" height="15" isPrintWhenDetailOverflows="true" />
         <textElement verticalAlignment="Middle">
