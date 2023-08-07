@@ -1040,14 +1040,9 @@ public class ServiceMain {
 	 */
 	private void createDatabaseWithRights(DatabaseProductType dbType, String dbName, String ownerName,
 			String ownerPW, String readerName) throws Exception {
-		Connection conn = null;
-		Statement stmt = null;
-
 		String sql = null;
-		try {
-			DataSource csadminDataSource = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
-			conn = csadminDataSource.getConnection();
-			stmt = conn.createStatement();
+		try (Connection conn = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME).getConnection();
+			 Statement stmt = conn.createStatement()) {
 			if (dbType == DatabaseProductType.POSTGRESQL) {
 				// PostgreSQL does not need passwords in grant statements.
 				sql = "CREATE DATABASE " + dbName + " ENCODING 'UTF8' OWNER " + ownerName;
@@ -1056,7 +1051,7 @@ public class ServiceMain {
 				if (readerName != null) {
 					sql = "GRANT CONNECT ON DATABASE " + dbName + " TO " + readerName;
 					stmt.executeUpdate(sql);
-                    logger.debug("Granted connect rights on: '{}' to reader: '{}'", dbName, readerName);
+					logger.debug("Granted connect rights on: '{}' to reader: '{}'", dbName, readerName);
 				}
 				// Note that select rights for reader must be granted after
 				// Nuxeo startup.
@@ -1065,20 +1060,9 @@ public class ServiceMain {
 			}
 		} catch (Exception e) {
 			logger.error("createDatabaseWithRights failed on exception:", e);
-            logger.error("The following SQL statement failed using credentials from datasource '{}': {}",
-                         JDBCTools.CSADMIN_DATASOURCE_NAME, sql);
+			logger.error("The following SQL statement failed using credentials from datasource '{}': {}",
+						 JDBCTools.CSADMIN_DATASOURCE_NAME, sql);
 			throw e;
-		} finally { // close resources
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-                logger.error("Error closing connection", se);
-			}
 		}
 	}
 
@@ -1087,13 +1071,10 @@ public class ServiceMain {
      */
     private void createUtilsSchemaWithRights(DatabaseProductType dbType, String ownerName,
                                              String repositoryName, String cspaceInstanceId) throws Exception {
-        Connection conn = null;
-        Statement stmt = null;
-
         String sql = null;
-        try {
-            conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId);
-            stmt = conn.createStatement();
+        try (Connection conn = JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME,
+                                                       repositoryName, cspaceInstanceId);
+             Statement stmt = conn.createStatement()) {
             if (dbType == DatabaseProductType.POSTGRESQL) {
                 sql = "CREATE SCHEMA IF NOT EXISTS " + CSPACE_UTILS_SCHEMANAME + " AUTHORIZATION " + ownerName;
                 stmt.executeUpdate(sql);
@@ -1105,18 +1086,7 @@ public class ServiceMain {
             logger.error("createUtilsSchemaWithRights() failed with exception:", e);
             logger.error("The following SQL statement failed using credentials from datasource '{}': {}",
                          JDBCTools.NUXEO_DATASOURCE_NAME, sql);
-            throw e; // propagate
-        } finally { // close resources
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException se) {
-                se.printStackTrace();
-            }
+            throw e;
         }
     }
 
