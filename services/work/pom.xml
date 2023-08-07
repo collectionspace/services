@@ -27,15 +27,6 @@
         <module>3rdparty</module>
         <module>client</module>
     </modules>
-    
-    <profiles>
-        <profile>
-            <id>samples</id>
-        <modules>
-            <!-- <module>sample</module> -->
-        </modules>
-        </profile>
-    </profiles>
-    
+
 </project>
 
