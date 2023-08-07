@@ -88,26 +88,22 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
             }
             scriptContents = getSqlScriptContents(scriptPath);
             if (Tools.isBlank(scriptContents)) {
-            	//
-            	// Since we couldn't find the script in the tenant qualified location, let's look in the shared/common (non-tenant qualified) location
-            	//
-            	String commonPath = getSqlScriptCommonPath(dataSourceName, repositoryName, scriptName);
+                // Since we couldn't find the script in the tenant qualified location, let's look in the shared/common
+                // (non-tenant qualified) location
+                String commonPath = getSqlScriptCommonPath(dataSourceName, repositoryName, scriptName);
                 scriptContents = getSqlScriptContents(commonPath);
-                logger.warn(String.format("Could not get contents of SQL script from resource '%s'.  Looking here instead: '%s'",
-                		scriptPath, commonPath));
+                logger.warn("Could not get contents of SQL script from resource '{}'.  Looking here instead: '{}'",
+                            scriptPath, commonPath);
                 if (Tools.isBlank(scriptContents)) {
-                    logger.warn("Could not get contents of SQL script from resource " + commonPath);
+                    logger.warn("Could not get contents of SQL script from resource {}", commonPath);
                     logger.warn(CANNOT_PERFORM_TASKS_MESSAGE);
                     continue;
                 }
             }
 
-            if (logger.isInfoEnabled()) {
-            	String msg = String.format("Running SQL script from Java class path '%s'", scriptPath);
-            	logger.info(msg);
-            	logger.trace(scriptContents);
-            }
-            
+            logger.info("Running SQL script from Java class path '{}'", scriptPath);
+            logger.trace(scriptContents);
+
             runScript(dataSourceName, repositoryName, cspaceInstanceId, scriptContents, "resource path " + scriptPath);
         }
 
@@ -151,8 +147,10 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
         }
         return scriptNames;
     }
-    
-    private String getSqlScriptCommonPath(String dataSourceName, String repositoryName, String scriptName) throws Exception {
+
+    private String getSqlScriptCommonPath(String dataSourceName,
+                                          String repositoryName,
+                                          String scriptName) throws Exception {
         String scriptPath =
                 DATABASE_RESOURCE_DIRECTORY_NAME
                 + RESOURCE_PATH_SEPARATOR
@@ -162,7 +160,10 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
         return scriptPath;
     }
 
-    private String getSqlScriptPath(String dataSourceName, String repositoryName, String tenantShortName, String scriptName) throws Exception {
+    private String getSqlScriptPath(String dataSourceName,
+                                    String repositoryName,
+                                    String tenantShortName,
+                                    String scriptName) throws Exception {
         String scriptPath =
                 DATABASE_RESOURCE_DIRECTORY_NAME
                 + RESOURCE_PATH_SEPARATOR
@@ -176,7 +177,9 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
         return scriptPath;
     }
 
-    private String getSqlScriptDirectoryPath(String dataSourceName, String repositoryName, String tenantShortName) throws Exception {
+    private String getSqlScriptDirectoryPath(String dataSourceName,
+                                             String repositoryName,
+                                             String tenantShortName) throws Exception {
         String scriptDirectoryPath =
                 getServerResourcesDirectoryPath()
                 + DATABASE_RESOURCE_DIRECTORY_NAME
@@ -185,8 +188,8 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
                 + File.separator
                 + "tenants"
                 + File.separator
-        		+ tenantShortName
-        		+ File.separator;
+                + tenantShortName
+                + File.separator;
         return scriptDirectoryPath;
     }
 
@@ -197,7 +200,9 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
         return serverResourcesPath;
     }
 
-    private List<File> getSqlScriptFiles(String dataSourceName, String repositoryName, String tenantShortName) throws Exception {
+    private List<File> getSqlScriptFiles(String dataSourceName,
+                                         String repositoryName,
+                                         String tenantShortName) throws Exception {
         List<File> sqlScriptFiles = new ArrayList<>();
         File folder = new File(getSqlScriptDirectoryPath(dataSourceName, repositoryName, tenantShortName));
         if (!folder.isDirectory() || !folder.canRead()) {
@@ -278,7 +283,6 @@ public class RunSqlScripts extends InitHandler implements IInitHandler {
             rows = JDBCTools.executeUpdate(dataSourceName, repositoryName, cspaceInstanceId, scriptContents);
         } catch (Throwable e) {
             logger.warn("Running SQL script from " + scriptPath + " resulted in error: ", e.getMessage());
-            e.printStackTrace(System.err);
             rows = -1;
         }
         // FIXME: Verify which row values represent failure; should there always
