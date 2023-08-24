@@ -116,7 +116,7 @@ public class UpdateHybridNameBatchJob extends AbstractBatchJob {
         taxon = taxon.equals("") ? "" : RefNameUtils.getDisplayName(taxon);
 
 
-        if (hybridFlagNode.getText() != "true") {
+        if (!hybridFlagNode.getText().equals("true")) {
             if (affinityTaxon == null) {
                 taxonomicIdentHybridName = taxon;
             } if (affinityTaxon != null) {
