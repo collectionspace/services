@@ -41,10 +41,8 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
             ArrayList<String> csids = new ArrayList<String>();
 
             if (mode.equalsIgnoreCase(INVOCATION_MODE_SINGLE)) {
-
                 String csid = ctx.getSingleCSID();
                 csids.add(csid);
-
             } else if (mode.equalsIgnoreCase(INVOCATION_MODE_LIST)) {
                 csids.addAll(ctx.getListCSIDs().getCsid());
             } else {
@@ -59,9 +57,6 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
 
             setResults(updateRecords(csids, fieldsToValues));
             setCompletionStatus(STATUS_COMPLETE);
-
-
-
         } catch (Exception e) {
             setCompletionStatus(STATUS_ERROR);
             setErrorInfo(new InvocationError(INT_ERROR_STATUS, e.getMessage()));
@@ -71,7 +66,6 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
     public InvocationResults updateRecords(List<String> csids, HashMap<String, String> values) {
         InvocationResults results = new InvocationResults();
         int numAffected = 0;
-
 
         try {
             for (String csid : csids) {
@@ -84,7 +78,6 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
 
         String userNote = "";
 
-
         results.setNumAffected(numAffected);
         results.setUserNote(userNote);
 
@@ -92,14 +85,16 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
     }
 
     public void updateRecord(String csid, HashMap<String, String> values) throws URISyntaxException {
-        String valuesToUpdate = "";
+        StringBuilder valuesToUpdate = new StringBuilder();
         String sex = "";
 
         for (String key : values.keySet()) {
             if (key.equals("sex")) {
                 sex = "<sex>" + values.get(key) + "</sex>";
             } else {
-                valuesToUpdate += "<" + key + ">" + values.get(key) + "</" + key + ">";
+                valuesToUpdate.append("<").append(key).append(">")
+                              .append(values.get(key))
+                              .append("</").append(key).append(">");
             }
         }
 
@@ -130,7 +125,7 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
         for (Param param : this.getParams()) {
             if (param.getKey() != null) {
                 String value = param.getValue();
-                if (value != null && !value.equals("")) {
+                if (value != null && !value.isEmpty()) {
                     results.put(param.getKey(), param.getValue());
                 }
             }
