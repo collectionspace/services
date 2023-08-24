@@ -121,9 +121,8 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
         NuxeoBasedResource collectionObjectResource = (NuxeoBasedResource) resource.get(CollectionObjectClient.SERVICE_NAME);
         byte[] responseBytes = collectionObjectResource.update(getServiceContext(), resource, createUriInfo(), csid, payload);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Batch resource: Resonse from collectionobject (cataloging record) update: %s", new String(responseBytes)));
-        }
+        logger.debug("Batch resource: Response from CollectionObject (cataloging record) update: {}",
+                     new String(responseBytes));
     }
 
     public HashMap<String, String> getValues() {
