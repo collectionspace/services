@@ -392,10 +392,10 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 		//
 		// Test to see if we should run SAS-related tests
 		//
-		String testSASProperyValue = System.getProperty(CollectionSpaceClient.TEST_SAS_PROPERTY);
-		if (testSASProperyValue != null) {
-			Boolean shouldTestSAS = Boolean.valueOf(testSASProperyValue);
-			if (shouldTestSAS.booleanValue() == false) {
+		String testSASPropertyValue = System.getProperty(CollectionSpaceClient.TEST_SAS_PROPERTY);
+		if (testSASPropertyValue != null) {
+			boolean shouldTestSAS = Boolean.parseBoolean(testSASPropertyValue);
+			if (!shouldTestSAS) {
 				throw new SkipException(String.format("Skipped the test system property '%s' has a value of false.",
 						shouldTestSAS));
 			}
