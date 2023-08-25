@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.common.api;
 
-import org.collectionspace.services.common.api.RefNameUtils.AuthorityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
