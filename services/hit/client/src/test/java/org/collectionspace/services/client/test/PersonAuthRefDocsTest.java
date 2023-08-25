@@ -272,7 +272,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         List<AuthorityRefDocList.AuthorityRefDocItem> items = list.getAuthorityRefDocItem();
         Assert.assertNotNull(items);
-        Assert.assertTrue(items.size() > 0);
+        Assert.assertFalse(items.isEmpty());
 
         // output additional data about list members for debugging.
         boolean fFoundHit = false;
@@ -305,7 +305,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         items = list.getAuthorityRefDocItem();
         Assert.assertNotNull(items);
-        Assert.assertTrue(items.size() > 0);
+        Assert.assertFalse(items.isEmpty());
         Assert.assertNotNull(items.get(0));
 
         // Optionally output additional data about list members for debugging.
@@ -351,7 +351,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         List<AuthorityRefDocList.AuthorityRefDocItem> items = list.getAuthorityRefDocItem();
         Assert.assertNotNull(items);
-        Assert.assertTrue(items.size() > 0);
+        Assert.assertFalse(items.isEmpty());
         Assert.assertNotNull(items.get(0));
 
         // Optionally output additional data about list members for debugging.
