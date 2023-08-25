@@ -388,7 +388,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.parseBoolean(noTest)) {
             logger.debug("Skipping Cleanup phase ...");
             return;
         }

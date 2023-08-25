@@ -292,7 +292,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.parseBoolean(noTest)) {
             logger.debug("Skipping Cleanup phase ...");
             return;
         }
