@@ -397,7 +397,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
 			boolean shouldTestSAS = Boolean.parseBoolean(testSASPropertyValue);
 			if (!shouldTestSAS) {
 				throw new SkipException(String.format("Skipped the test system property '%s' has a value of false.",
-						shouldTestSAS));
+						CollectionSpaceClient.TEST_SAS_PROPERTY));
 			}
 		}
 
