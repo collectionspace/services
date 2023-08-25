@@ -4,22 +4,22 @@
         intake nuxeo document type
     </description>
     <!-- set global properties for this build -->
-    <property name="services.trunk" value="../../../.."/>
+    <property name="services.trunk" value="../../../.." />
     <!-- environment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
     <property name="mvn.opts" value="-V" />
-    <property name="src" location="src"/>
+    <property name="src" location="src" />
     <!-- JAR files used by CollectionSpace 4.0 and later -->
     <property name="nuxeo.intake.doctype.jars.all"
-        value="collectionspace.intake.doctype.*.jar"/>
+        value="collectionspace.intake.doctype.*.jar" />
     <property name="nuxeo.intake.schema.jars.all"
-        value="collectionspace.intake.schema.*.jar"/>
+        value="collectionspace.intake.schema.*.jar" />
     <!-- Legacy JAR files used by CollectionSpace 3.3 and earlier -->
     <property name="nuxeo.intake.legacy.jars.all"
-        value="org.collectionspace.services.intake.3rdparty.nuxeo-*.jar"/>
+        value="org.collectionspace.services.intake.3rdparty.nuxeo-*.jar" />
     <property name="nuxeo.intake.legacy.jar"
-        value="org.collectionspace.services.intake.3rdparty.nuxeo-${cspace.release}.jar"/>
+        value="org.collectionspace.services.intake.3rdparty.nuxeo-${cspace.release}.jar" />
 
     <condition property="osfamily-unix">
         <os family="unix" />
@@ -28,9 +28,9 @@
         <os family="windows" />
     </condition>
 
-    <target name="init" >
+    <target name="init">
         <!-- Create the time stamp -->
-        <tstamp/>
+        <tstamp />
     </target>
 
     <target name="package" depends="package-unix,package-windows"
@@ -84,8 +84,8 @@
     </target>
 
     <target name="clean" depends="clean-unix,clean-windows"
-        description="Delete target directories" >
-        <delete dir="${build}"/>
+        description="Delete target directories">
+        <delete dir="${build}" />
     </target>
     <target name="clean-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
@@ -120,10 +120,11 @@
 
     <target name="deploy" depends="install"
         description="deploy intake doctype in ${jee.server.nuxeo}">
-        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
+        <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the
+        "csmake" tool
         leaving this only for backwards compatibility reasons. -->
         <copy file="${basedir}/target/${nuxeo.intake.legacy.jar}"
-            todir="${jee.deploy.nuxeo.plugins}"/>
+            todir="${jee.deploy.nuxeo.plugins}" />
     </target>
 
     <target name="undeploy"
@@ -131,20 +132,20 @@
         <delete>
             <!-- Undeploy doctype and schema artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.intake.doctype.jars.all}"/>
+                <include name="${nuxeo.intake.doctype.jars.all}" />
             </fileset>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.intake.schema.jars.all}"/>
+                <include name="${nuxeo.intake.schema.jars.all}" />
             </fileset>
             <!-- Undeploy legacy artifacts -->
             <fileset dir="${jee.deploy.nuxeo.plugins}">
-                <include name="${nuxeo.intake.legacy.jars.all}"/>
+                <include name="${nuxeo.intake.legacy.jars.all}" />
             </fileset>
         </delete>
         <!-- Undeploy legacy artifacts from old deployment location through release 0.6 -->
         <delete quiet="true">
             <fileset dir="${jee.deploy.nuxeo.system}">
-                <include name="${nuxeo.intake.legacy.jars.all}"/>
+                <include name="${nuxeo.intake.legacy.jars.all}" />
             </fileset>
         </delete>
     </target>
@@ -152,7 +153,7 @@
     <target name="dist"
         description="generate distribution for intake doctype" depends="package">
         <copy todir="${services.trunk}/${dist.deploy.nuxeo.plugins}">
-            <fileset file="${basedir}/target/${nuxeo.intake.legacy.jar}"/>
+            <fileset file="${basedir}/target/${nuxeo.intake.legacy.jar}" />
         </copy>
     </target>
 

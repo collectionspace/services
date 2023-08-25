@@ -13,7 +13,7 @@
     <name>services.hit.client</name>
 
     <dependencies>
-<!-- CollectionSpace dependencies -->
+        <!-- CollectionSpace dependencies -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
@@ -50,7 +50,7 @@
             <artifactId>org.collectionspace.services.organization.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!-- External dependencies -->
+        <!-- External dependencies -->
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
