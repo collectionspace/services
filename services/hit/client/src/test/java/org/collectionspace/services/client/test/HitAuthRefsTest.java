@@ -26,35 +26,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.HitClient;
 import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
+import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.hit.CorrespondenceGroup;
-import org.collectionspace.services.hit.CorrespondenceGroupList;
-import org.collectionspace.services.hit.ExternalApprovalGroup;
-import org.collectionspace.services.hit.ExternalApprovalGroupList;
-import org.collectionspace.services.hit.HitDepositorGroup;
-import org.collectionspace.services.hit.HitDepositorGroupList;
 import org.collectionspace.services.hit.HitsCommon;
-import org.collectionspace.services.hit.InternalApprovalGroup;
-import org.collectionspace.services.hit.InternalApprovalGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * HitAuthRefsTest, carries out tests against a
@@ -65,54 +56,54 @@ import org.slf4j.LoggerFactory;
  */
 public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
-    private final String CLASS_NAME = HitAuthRefsTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-
+    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = HitClient.SERVICE_PATH_COMPONENT;//"hits";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
-//    private String knownResourceId = null;
-    private List<String> hitIdsCreated = new ArrayList<String>();
-    private List<String> personIdsCreated = new ArrayList<String>();
+    private final String CLASS_NAME = HitAuthRefsTest.class.getName();
+    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+
+    private final List<String> hitIdsCreated = new ArrayList<String>();
+    private final List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
     private String conditionCheckerOrAssessorRefName = null;
     private String insurerRefName = null;
     private String valuerRefName = null;
-    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
-	@Override
-	protected String getServiceName() {
-		throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
-	}
+    @Override
+    protected String getServiceName() {
+        throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+    }
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
     protected CollectionSpaceClient getClientInstance() {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
-	@Override
-	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
-	}
+    @Override
+    protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    }
 
     /* (non-Javadoc)
-     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client.ClientResponse)
+     * @see org.collectionspace.services.client.test.BaseServiceTest#getAbstractCommonList(org.jboss.resteasy.client
+     * .ClientResponse)
      */
     @Override
-	protected AbstractCommonList getCommonList(Response response) {
-    	throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
+    protected AbstractCommonList getCommonList(Response response) {
+        throw new UnsupportedOperationException(); //method not supported (or needed) in this test class
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class)
     public void createWithAuthRefs(String testName) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
@@ -125,38 +116,38 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // Submit the request to the service and store the response.
         HitClient hitClient = new HitClient();
         PoxPayloadOut multipart = createHitInstance(
-                "entryNumber-" + identifier,
-                CURRENT_DATE_UTC,
-                currentOwnerRefName,
-                depositorRefName,
-                conditionCheckerOrAssessorRefName,
-                insurerRefName,
-                valuerRefName );
+            "entryNumber-" + identifier,
+            CURRENT_DATE_UTC,
+            currentOwnerRefName,
+            depositorRefName,
+            conditionCheckerOrAssessorRefName,
+            insurerRefName,
+            valuerRefName);
 
         String newId = null;
         Response res = hitClient.create(multipart);
         try {
-	        int statusCode = res.getStatus();
-	        // Check the status code of the response: does it match
-	        // the expected response(s)?
-	        //
-	        // Specifically:
-	        // Does it fall within the set of valid status codes?
-	        // Does it exactly match the expected status code?
-	        if(logger.isDebugEnabled()){
-	            logger.debug(testName + ": status = " + statusCode);
-	        }
-	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(testRequestType, statusCode));
-	        Assert.assertEquals(statusCode, testExpectedStatusCode);
-	        newId = extractId(res);
+            int statusCode = res.getStatus();
+            // Check the status code of the response: does it match
+            // the expected response(s)?
+            //
+            // Specifically:
+            // Does it fall within the set of valid status codes?
+            // Does it exactly match the expected status code?
+            if (logger.isDebugEnabled()) {
+                logger.debug(testName + ": status = " + statusCode);
+            }
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                              invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, testExpectedStatusCode);
+            newId = extractId(res);
         } finally {
-        	res.close();
+            res.close();
         }
 
         // Store the ID returned from the first resource created
         // for additional tests below.
-        if (knownResourceId == null){
+        if (knownResourceId == null) {
             knownResourceId = newId;
             if (logger.isDebugEnabled()) {
                 logger.debug(testName + ": knownResourceId=" + knownResourceId);
@@ -169,21 +160,21 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     }
 
     protected void createPersonRefs() throws Exception {
-    	//
-    	// First, create a new person authority
-    	//
+        //
+        // First, create a new person authority
+        //
         PersonClient personAuthClient = new PersonClient();
-    	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
-    			PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
+        PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
+            PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
         try {
-	        int statusCode = res.getStatus();
-	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(testRequestType, statusCode));
-	        Assert.assertEquals(statusCode, STATUS_CREATED);
-	        personAuthCSID = extractId(res);
+            int statusCode = res.getStatus();
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                              invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            personAuthCSID = extractId(res);
         } finally {
-        	res.close();
+            res.close();
         }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
@@ -208,11 +199,12 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         personIdsCreated.add(csid);
     }
 
-    protected String createPerson(String firstName, String surName, String shortId, String authRefName ) throws Exception {
-    	String result = null;
+    protected String createPerson(String firstName, String surName, String shortId, String authRefName)
+        throws Exception {
+        String result = null;
 
         PersonClient personAuthClient = new PersonClient();
-        Map<String, String> personInfo = new HashMap<String,String>();
+        Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
         personInfo.put(PersonJAXBSchema.SUR_NAME, surName);
         personInfo.put(PersonJAXBSchema.SHORT_IDENTIFIER, shortId);
@@ -223,25 +215,26 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         term.setTermName(termName);
         personTerms.add(term);
         PoxPayloadOut multipart =
-    		PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
-    				authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
+            PersonAuthorityClientUtils.createPersonInstance(personAuthCSID,
+                                                            authRefName, personInfo, personTerms,
+                                                            personAuthClient.getItemCommonPartName());
 
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
         try {
-        	int statusCode = res.getStatus();
-	        Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
-	                invalidStatusCodeMessage(testRequestType, statusCode));
-	        Assert.assertEquals(statusCode, STATUS_CREATED);
-	        result = extractId(res);
+            int statusCode = res.getStatus();
+            Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
+                              invalidStatusCodeMessage(testRequestType, statusCode));
+            Assert.assertEquals(statusCode, STATUS_CREATED);
+            result = extractId(res);
         } finally {
-        	res.close();
+            res.close();
         }
 
-    	return result;
+        return result;
     }
 
     // Success outcomes
-    @Test(dataProvider="testName", dependsOnMethods = {"createWithAuthRefs"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"createWithAuthRefs"})
     public void readAndCheckAuthRefs(String testName) throws Exception {
         // Perform setup.
         testSetup(STATUS_OK, ServiceRequestType.READ);
@@ -250,13 +243,13 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         HitClient hitClient = new HitClient();
         Response res = hitClient.read(knownResourceId);
         try {
-	        assertStatusCode(res, testName);
-	        PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-	        HitsCommon hit = (HitsCommon) extractPart(input, hitClient.getCommonPartName(), HitsCommon.class);
-	        Assert.assertNotNull(hit);
-	        // Check a couple of fields
+            assertStatusCode(res, testName);
+            PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
+            HitsCommon hit = (HitsCommon) extractPart(input, hitClient.getCommonPartName(), HitsCommon.class);
+            Assert.assertNotNull(hit);
+            // Check a couple of fields
         } finally {
-        	if (res != null) {
+            if (res != null) {
                 res.close();
             }
         }
@@ -265,11 +258,11 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         res = hitClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list = null;
         try {
-	        assertStatusCode(res, testName);
-	        list = res.readEntity(AuthorityRefList.class);
+            assertStatusCode(res, testName);
+            list = res.readEntity(AuthorityRefList.class);
         } finally {
-        	if (res != null) {
-        		res.close();
+            if (res != null) {
+                res.close();
             }
         }
 
@@ -283,11 +276,11 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
-            for(AuthorityRefList.AuthorityRefItem item : items){
+            for (AuthorityRefList.AuthorityRefItem item : items) {
                 logger.debug(testName + ": list-item[" + i + "] Field:" +
-                		item.getSourceField() + "= " +
-                        item.getAuthDisplayName() +
-                        item.getItemDisplayName());
+                             item.getSourceField() + "= " +
+                             item.getAuthDisplayName() +
+                             item.getItemDisplayName());
                 logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
                 logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
                 i++;
@@ -296,7 +289,8 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         //
         // Ensure we got the correct number of authRefs
         Assert.assertEquals(numAuthRefsFound, personIdsCreated.size(),
-        		"Did not find all expected authority references! " + "Expected " + personIdsCreated.size() + ", found " + numAuthRefsFound);
+                            "Did not find all expected authority references! " + "Expected " + personIdsCreated.size() +
+                            ", found " + numAuthRefsFound);
     }
 
 
@@ -311,24 +305,25 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     *
      * @throws Exception
      */
-    @AfterClass(alwaysRun=true)
+    @AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
-    	if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
+        if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Skipping Cleanup phase ...");
             }
             return;
-    	}
+        }
         if (logger.isDebugEnabled()) {
             logger.debug("Cleaning up temporary resources created for testing ...");
         }
         HitClient hitClient = new HitClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : hitIdsCreated) {
-        	hitClient.delete(resourceId).close();
+            hitClient.delete(resourceId).close();
         }
         //
         // Delete all the person records then the parent resource
@@ -347,21 +342,22 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         return SERVICE_PATH_COMPONENT;
     }
 
-	private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
-			String conditionCheckerAssessor, String insurer, String Valuer) throws Exception {
+    private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
+                                            String conditionCheckerAssessor, String insurer, String Valuer)
+        throws Exception {
 
-		HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
-				conditionCheckerAssessor, insurer);
-		hit.setHitNumber(entryNumber);
+        HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
+                                                             conditionCheckerAssessor, insurer);
+        hit.setHitNumber(entryNumber);
 
-		PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-		PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
+        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+        PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("to be created, hit common");
-			logger.debug(objectAsXmlString(hit, HitsCommon.class));
-		}
+        if (logger.isDebugEnabled()) {
+            logger.debug("to be created, hit common");
+            logger.debug(objectAsXmlString(hit, HitsCommon.class));
+        }
 
-		return multipart;
-	}
+        return multipart;
+    }
 }

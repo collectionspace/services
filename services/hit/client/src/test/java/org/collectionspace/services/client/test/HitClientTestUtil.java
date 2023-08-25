@@ -2,9 +2,6 @@ package org.collectionspace.services.client.test;
 
 import java.util.List;
 
-import org.collectionspace.services.client.HitClient;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.hit.CorrespondenceGroup;
 import org.collectionspace.services.hit.CorrespondenceGroupList;
 import org.collectionspace.services.hit.ExternalApprovalGroup;
@@ -17,19 +14,19 @@ import org.collectionspace.services.hit.InternalApprovalGroupList;
 
 public class HitClientTestUtil {
 
-   protected static HitsCommon createHitInstance(
-		    String entryNumber,
-            String currentOwner,
-            String depositor,
-            String conditionCheckerAssessor,
-            String insurer) throws Exception {
+    protected static HitsCommon createHitInstance(
+        String entryNumber,
+        String currentOwner,
+        String depositor,
+        String conditionCheckerAssessor,
+        String insurer) throws Exception {
         HitsCommon hit = new HitsCommon();
 
         hit.setHitNumber(entryNumber);
 
         HitDepositorGroupList tempHDGL = hit.getHitDepositorGroupList();
         if (tempHDGL == null) {
-        	tempHDGL = new HitDepositorGroupList();
+            tempHDGL = new HitDepositorGroupList();
         }
         List<HitDepositorGroup> hitDepositorGroupList = tempHDGL.getHitDepositorGroup();
         HitDepositorGroup hitDepositorGroup = new HitDepositorGroup();
@@ -40,7 +37,7 @@ public class HitClientTestUtil {
 
         InternalApprovalGroupList tempIAGL = hit.getInternalApprovalGroupList();
         if (tempIAGL == null) {
-        	tempIAGL = new InternalApprovalGroupList();
+            tempIAGL = new InternalApprovalGroupList();
         }
         List<InternalApprovalGroup> internalApprovalGroupList = tempIAGL.getInternalApprovalGroup();
         InternalApprovalGroup internalApprovalGroup = new InternalApprovalGroup();
@@ -50,7 +47,7 @@ public class HitClientTestUtil {
 
         ExternalApprovalGroupList tempEAGL = hit.getExternalApprovalGroupList();
         if (tempEAGL == null) {
-        	tempEAGL = new ExternalApprovalGroupList();
+            tempEAGL = new ExternalApprovalGroupList();
         }
         List<ExternalApprovalGroup> externalApprovalGroupList = tempEAGL.getExternalApprovalGroup();
         ExternalApprovalGroup externalApprovalGroup = new ExternalApprovalGroup();
@@ -60,12 +57,12 @@ public class HitClientTestUtil {
 
         CorrespondenceGroupList tempCGL = hit.getCorrespondenceGroupList();
         if (tempCGL == null) {
-        	tempCGL = new CorrespondenceGroupList();
+            tempCGL = new CorrespondenceGroupList();
         }
         List<CorrespondenceGroup> correspondanceGroupList = tempCGL.getCorrespondenceGroup();
-        CorrespondenceGroup correspondanceGroup = new CorrespondenceGroup();
-        correspondanceGroup.setCorrespondenceSender(insurer);
-        correspondanceGroupList.add(correspondanceGroup);
+        CorrespondenceGroup correspondenceGroup = new CorrespondenceGroup();
+        correspondenceGroup.setCorrespondenceSender(insurer);
+        correspondanceGroupList.add(correspondenceGroup);
         hit.setCorrespondenceGroupList(tempCGL);
 
         return hit;

@@ -25,11 +25,11 @@ package org.collectionspace.services.hit.nuxeo;
 
 /**
  * HitConstants processes CollectionObject document
- *
  */
 public class HitConstants {
 
     public final static String NUXEO_DOCTYPE = "Hit";
     public final static String NUXEO_SCHEMA_NAME = "hit";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-Hit";
+
 }

@@ -39,14 +39,14 @@ public class HitClient extends AbstractCommonListPoxServiceClientImpl<HitProxy, 
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
     public HitClient() throws Exception {
-		super();
-	}
+        super();
+    }
 
     public HitClient(String clientPropertiesFilename) throws Exception {
-		super(clientPropertiesFilename);
-	}
+        super(clientPropertiesFilename);
+    }
 
-	@Override
+    @Override
     public String getServiceName() {
         return SERVICE_NAME;
     }

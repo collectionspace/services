@@ -36,5 +36,5 @@ import javax.ws.rs.Produces;
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
 public interface HitProxy extends CollectionSpaceCommonListPoxProxy {
-	// Intentionally left blank
+    // Intentionally left blank
 }

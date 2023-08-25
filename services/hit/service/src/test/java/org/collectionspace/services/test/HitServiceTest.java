@@ -6,5 +6,5 @@ package org.collectionspace.services.test;
  * @version $Revision:$
  */
 public class HitServiceTest {
-	//empty
+    //empty
 }
