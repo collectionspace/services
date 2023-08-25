@@ -134,9 +134,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
             // Specifically:
             // Does it fall within the set of valid status codes?
             // Does it exactly match the expected status code?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
+            logger.debug("{}: status = {}", testName, statusCode);
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                               invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
@@ -147,9 +145,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
             // for additional tests below.
             if (knownHitId == null) {
                 knownHitId = newHitId;
-                if (logger.isDebugEnabled()) {
-                    logger.debug(testName + ": knownHitId=" + knownHitId);
-                }
+                logger.debug("{}: knownHitId={}", testName, knownHitId);
             }
 
             // Store the IDs from every resource created by tests,
@@ -268,14 +264,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         if (iterateThroughList && logger.isDebugEnabled()) {
             List<AuthorityRefDocList.AuthorityRefDocItem> items = list.getAuthorityRefDocItem();
             int i = 0;
-            logger.debug(testName + ": Docs that use: " + currentOwnerRefName);
+            logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
             for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] " +
-                             item.getDocType() + "(" +
-                             item.getDocId() + ") Name:[" +
-                             item.getDocName() + "] Number:[" +
-                             item.getDocNumber() + "] in field:[" +
-                             item.getSourceField() + "]");
+                logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
+                             item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
+                             item.getSourceField());
                 if (knownHitId.equalsIgnoreCase(item.getDocId())) {
                     nHitsFound++;
                 }
@@ -305,14 +298,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
+            logger.debug("Skipping Cleanup phase ...");
             return;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
+
+        logger.debug("Cleaning up temporary resources created for testing ...");
         HitClient hitClient = new HitClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : hitIdsCreated) {
@@ -345,10 +335,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, hit common");
-            logger.debug(objectAsXmlString(hit, HitsCommon.class));
-        }
+        logger.debug("to be created, hit common");
+        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
 
         return multipart;
     }

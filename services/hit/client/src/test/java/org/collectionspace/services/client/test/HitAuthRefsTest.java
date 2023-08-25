@@ -134,9 +134,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             // Specifically:
             // Does it fall within the set of valid status codes?
             // Does it exactly match the expected status code?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
+            logger.debug("{}: status = {}", testName, statusCode);
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                               invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
@@ -149,9 +147,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         // for additional tests below.
         if (knownResourceId == null) {
             knownResourceId = newId;
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": knownResourceId=" + knownResourceId);
-            }
+            logger.debug("{}: knownResourceId={}", testName, knownResourceId);
         }
 
         // Store the IDs from every resource created by tests,
@@ -268,21 +264,17 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
         int numAuthRefsFound = items.size();
-        if (logger.isDebugEnabled()) {
-            logger.debug("Expected " + personIdsCreated.size() + " authority references, found " + numAuthRefsFound);
-        }
+        logger.debug("Expected {} authority references, found {}", personIdsCreated.size(), numAuthRefsFound);
 
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         if (iterateThroughList && logger.isDebugEnabled()) {
             int i = 0;
             for (AuthorityRefList.AuthorityRefItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] Field:" +
-                             item.getSourceField() + "= " +
-                             item.getAuthDisplayName() +
-                             item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
+                logger.debug("{}: list-item[{}] Field:{}={}{}", testName, i, item.getSourceField(),
+                             item.getAuthDisplayName(), item.getItemDisplayName());
+                logger.debug("{}: list-item[{}] refName={}", testName, i, item.getRefName());
+                logger.debug("{}: list-item[{}] URI={}", testName, i, item.getUri());
                 i++;
             }
         }
@@ -312,14 +304,11 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
         if (Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping Cleanup phase ...");
-            }
+            logger.debug("Skipping Cleanup phase ...");
             return;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("Cleaning up temporary resources created for testing ...");
-        }
+
+        logger.debug("Cleaning up temporary resources created for testing ...");
         HitClient hitClient = new HitClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : hitIdsCreated) {
@@ -353,10 +342,8 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, hit common");
-            logger.debug(objectAsXmlString(hit, HitsCommon.class));
-        }
+        logger.debug("to be created, hit common");
+        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
 
         return multipart;
     }

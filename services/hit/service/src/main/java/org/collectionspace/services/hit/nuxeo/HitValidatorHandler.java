@@ -31,9 +31,7 @@ public class HitValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxP
             HitsCommon hitsCommon = (HitsCommon) getCommonPart();
             assert (hitsCommon != null);
         } catch (AssertionError e) {
-            if (logger.isErrorEnabled()) {
-                logger.error(e.getMessage(), e);
-            }
+            logger.error(e.getMessage(), e);
             throw new InvalidDocumentException(VALIDATION_ERROR, e);
         }
     }

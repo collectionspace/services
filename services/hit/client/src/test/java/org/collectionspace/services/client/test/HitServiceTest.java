@@ -119,9 +119,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         PoxPayloadIn input = null;
         Response res = client.read(knownResourceId);
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": read status = " + res.getStatus());
-            }
+            logger.debug("{}: read status = {}", testName, res.getStatus());
             Assert.assertEquals(res.getStatus(), testExpectedStatusCode);
 
             input = new PoxPayloadIn(res.readEntity(String.class));
@@ -135,10 +133,8 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
             coreAsElement = payloadInputPart.getElementBody();
         }
         Assert.assertNotNull(coreAsElement);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Core part before update:");
-            logger.debug(coreAsElement.asXML());
-        }
+        logger.debug("Core part before update:");
+        logger.debug("{}", coreAsElement.asXML());
 
         // Update the read-only elements
         Element tenantId = coreAsElement.element(COLLECTIONSPACE_CORE_TENANTID);
@@ -150,7 +146,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         Element createdAt = coreAsElement.element(COLLECTIONSPACE_CORE_CREATED_AT);
         String originalCreatedAt = createdAt.getText();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
-        if (originalCreatedAt.equalsIgnoreCase(now) && logger.isWarnEnabled()) {
+        if (originalCreatedAt.equalsIgnoreCase(now)) {
             logger.warn("Cannot check createdAt read-only; too fast!");
         }
         createdAt.setText(now);
@@ -158,10 +154,8 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         String originalCreatedBy = createdBy.getText();
         createdBy.setText("foo");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Core part to be updated:");
-            logger.debug(coreAsElement.asXML());
-        }
+        logger.debug("Core part to be updated:");
+        logger.debug("{}", coreAsElement.asXML());
 
         // Create an output payload to send to the service, and add the common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
@@ -172,9 +166,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         try {
             int statusCode = res.getStatus();
             // Check the status code of the response: does it match the expected response(s)?
-            if (logger.isDebugEnabled()) {
-                logger.debug(testName + ": status = " + statusCode);
-            }
+            logger.debug("{}: status = {}", testName, statusCode);
             Assert.assertTrue(testRequestType.isValidStatusCode(statusCode),
                               invalidStatusCodeMessage(testRequestType, statusCode));
             Assert.assertEquals(statusCode, testExpectedStatusCode);
@@ -248,10 +240,8 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         PayloadOutputPart commonPart = multipart.addPart(hit, MediaType.APPLICATION_XML_TYPE);
         commonPart.setLabel(new HitClient().getCommonPartName());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, HitsCommon instance");
-            logger.debug(objectAsXmlString(hit, HitsCommon.class));
-        }
+        logger.debug("to be created, HitsCommon instance");
+        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
 
         return multipart;
     }
