@@ -29,15 +29,11 @@ import javax.ws.rs.Produces;
 
 import org.collectionspace.services.client.HitClient;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Path(HitClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class HitResource extends NuxeoBasedResource {
-
-    final Logger logger = LoggerFactory.getLogger(HitResource.class);
 
     @Override
     protected String getVersionString() {
