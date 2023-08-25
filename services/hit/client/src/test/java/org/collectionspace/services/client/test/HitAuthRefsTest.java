@@ -266,18 +266,16 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         int numAuthRefsFound = items.size();
         logger.debug("Expected {} authority references, found {}", personIdsCreated.size(), numAuthRefsFound);
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            for (AuthorityRefList.AuthorityRefItem item : items) {
-                logger.debug("{}: list-item[{}] Field:{}={}{}", testName, i, item.getSourceField(),
-                             item.getAuthDisplayName(), item.getItemDisplayName());
-                logger.debug("{}: list-item[{}] refName={}", testName, i, item.getRefName());
-                logger.debug("{}: list-item[{}] URI={}", testName, i, item.getUri());
-                i++;
-            }
+        // output additional data about list members for debugging.
+        int i = 0;
+        for (AuthorityRefList.AuthorityRefItem item : items) {
+            logger.debug("{}: list-item[{}] Field:{}={}{}", testName, i, item.getSourceField(),
+                         item.getAuthDisplayName(), item.getItemDisplayName());
+            logger.debug("{}: list-item[{}] refName={}", testName, i, item.getRefName());
+            logger.debug("{}: list-item[{}] URI={}", testName, i, item.getUri());
+            i++;
         }
+
         //
         // Ensure we got the correct number of authRefs
         Assert.assertEquals(numAuthRefsFound, personIdsCreated.size(),

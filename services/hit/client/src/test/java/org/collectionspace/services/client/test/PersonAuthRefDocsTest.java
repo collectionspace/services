@@ -274,23 +274,21 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertNotNull(items);
         Assert.assertTrue(items.size() > 0);
 
-        // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
+        // output additional data about list members for debugging.
         boolean fFoundHit = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
-            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-                logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
-                             item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
-                             item.getSourceField());
-                if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
-                    fFoundHit = true;
-                }
-                i++;
+        int i = 0;
+        logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
+        for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+            logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
+                         item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
+                         item.getSourceField());
+            if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
+                fFoundHit = true;
             }
-            Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
+            i++;
         }
+        Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
+
         //
         // Get the referencing objects
         //
@@ -311,22 +309,19 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertNotNull(items.get(0));
 
         // Optionally output additional data about list members for debugging.
-        iterateThroughList = true;
         fFoundHit = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            logger.debug("{}: Docs that use: {}", testName, depositorRefName);
-            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-                logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
-                             item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
-                             item.getSourceField());
-                if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
-                    fFoundHit = true;
-                }
-                i++;
+        logger.debug("{}: Docs that use: {}", testName, depositorRefName);
+        i = 0;
+        for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+            logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
+                         item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
+                         item.getSourceField());
+            if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
+                fFoundHit = true;
             }
-            Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
+            i++;
         }
+        Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
     }
 
     /*
@@ -360,22 +355,19 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertNotNull(items.get(0));
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
         boolean fFoundHit = false;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            int i = 0;
-            logger.debug("{}: Docs that use: {}", testName, insurerRefName);
-            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-                logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
-                             item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
-                             item.getSourceField());
-                if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
-                    fFoundHit = true;
-                }
-                i++;
+        int i = 0;
+        logger.debug("{}: Docs that use: {}", testName, insurerRefName);
+        for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
+            logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
+                         item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
+                         item.getSourceField());
+            if (!fFoundHit && knownHitId.equalsIgnoreCase(item.getDocId())) {
+                fFoundHit = true;
             }
-            Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
+            i++;
         }
+        Assert.assertTrue(fFoundHit, "Did not find Hit with authref!");
     }
 
 

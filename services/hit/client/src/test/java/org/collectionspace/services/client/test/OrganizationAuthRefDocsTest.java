@@ -258,25 +258,20 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         }
 
         // Optionally output additional data about list members for debugging.
-        boolean iterateThroughList = true;
         int nHitsFound = 0;
         final int EXPECTED_HITS = 3;
-        if (iterateThroughList && logger.isDebugEnabled()) {
-            List<AuthorityRefDocList.AuthorityRefDocItem> items = list.getAuthorityRefDocItem();
-            int i = 0;
-            logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
-            for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
-                logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
-                             item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
-                             item.getSourceField());
-                if (knownHitId.equalsIgnoreCase(item.getDocId())) {
-                    nHitsFound++;
-                }
-                i++;
+        int i = 0;
+        logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
+        for (AuthorityRefDocList.AuthorityRefDocItem item : list.getAuthorityRefDocItem()) {
+            logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
+                         item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
+                         item.getSourceField());
+            if (knownHitId.equalsIgnoreCase(item.getDocId())) {
+                nHitsFound++;
             }
-            //
-            Assert.assertTrue((nHitsFound == EXPECTED_HITS), "Did not find Hit (twice more) with authref!");
+            i++;
         }
+        Assert.assertTrue((nHitsFound == EXPECTED_HITS), "Did not find Hit (twice more) with authref!");
     }
 
 
