@@ -31,12 +31,10 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.HitClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.hit.HitsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -56,7 +54,6 @@ import org.testng.annotations.Test;
  */
 public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
-    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = HitClient.SERVICE_PATH_COMPONENT;//"hits";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
@@ -117,12 +114,10 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         HitClient hitClient = new HitClient();
         PoxPayloadOut multipart = createHitInstance(
             "entryNumber-" + identifier,
-            CURRENT_DATE_UTC,
             currentOwnerRefName,
             depositorRefName,
             conditionCheckerOrAssessorRefName,
-            insurerRefName,
-            valuerRefName);
+            insurerRefName);
 
         String newId = null;
         Response res = hitClient.create(multipart);
@@ -329,10 +324,8 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
-                                            String conditionCheckerAssessor, String insurer, String Valuer)
-        throws Exception {
-
+    private PoxPayloadOut createHitInstance(String entryNumber, String currentOwner, String depositor,
+                                            String conditionCheckerAssessor, String insurer) throws Exception {
         HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
                                                              conditionCheckerAssessor, insurer);
         hit.setHitNumber(entryNumber);

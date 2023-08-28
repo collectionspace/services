@@ -33,9 +33,7 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.HitClient;
 import org.collectionspace.services.client.OrgAuthorityClientUtils;
 import org.collectionspace.services.client.OrganizationClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.hit.HitsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -55,7 +53,7 @@ import org.testng.annotations.Test;
  */
 public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
-    private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
+    private static final Logger logger = LoggerFactory.getLogger(OrganizationAuthRefDocsTest.class);
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "hits";
     final String ORGANIZATION_AUTHORITY_NAME = "TestOrganizationAuth";
@@ -118,13 +116,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         HitClient hitClient = new HitClient();
         PoxPayloadOut hitPayload = createHitInstance(
             "entryNumber-" + identifier,
-            CURRENT_DATE_UTC,
             currentOwnerRefName,
             // Use currentOwnerRefName twice to test fix for CSPACE-2863
             currentOwnerRefName,
             conditionCheckerAssessorRefName,
-            insurerRefName,
-            valuerRefName);
+            insurerRefName);
 
         Response res = hitClient.create(hitPayload);
         try {
@@ -217,7 +213,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         term.setMainBodyName(longName);
         orgTerms.add(term);
         PoxPayloadOut multipart =
-            OrgAuthorityClientUtils.createOrganizationInstance(null, //orgAuthRefName
+            OrgAuthorityClientUtils.createOrganizationInstance(null,
                                                                orgInfo, orgTerms,
                                                                orgAuthClient.getItemCommonPartName());
 
@@ -321,9 +317,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
-                                            String conditionCheckerAssessor, String insurer, String Valuer)
-        throws Exception {
+    private PoxPayloadOut createHitInstance(String entryNumber, String currentOwner, String depositor,
+                                            String conditionCheckerAssessor, String insurer) throws Exception {
         HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
                                                              conditionCheckerAssessor, insurer);
 

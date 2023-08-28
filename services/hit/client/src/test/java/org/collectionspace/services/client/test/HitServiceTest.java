@@ -218,21 +218,17 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
      */
     @Override
     protected PoxPayloadOut createInstance(String identifier) throws Exception {
-        return createHitInstance("entryNumber-" + identifier, CURRENT_DATE_UTC, "depositor-" + identifier);
+        return createHitInstance("entryNumber-" + identifier);
     }
 
     /**
      * Creates the hit instance.
      *
      * @param entryNumber the entry number
-     * @param entryDate   the entry date
-     * @param depositor   the depositor
      * @return the multipart output
      * @throws Exception
      */
-    private PoxPayloadOut createHitInstance(String entryNumber,
-                                            String entryDate,
-                                            String depositor) throws Exception {
+    private PoxPayloadOut createHitInstance(String entryNumber) throws Exception {
         HitsCommon hit = new HitsCommon();
         hit.setHitNumber(entryNumber);
 
