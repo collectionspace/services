@@ -37,22 +37,22 @@ public class HitValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxP
     }
 
     @Override
-    protected void handleGet() throws InvalidDocumentException {
+    protected void handleGet() {
         // TODO Auto-generated method stub
     }
 
     @Override
-    protected void handleGetAll() throws InvalidDocumentException {
+    protected void handleGetAll() {
         // TODO Auto-generated method stub
     }
 
     @Override
-    protected void handleUpdate() throws InvalidDocumentException {
+    protected void handleUpdate() {
         // TODO Auto-generated method stub
     }
 
     @Override
-    protected void handleDelete() throws InvalidDocumentException {
+    protected void handleDelete() {
         // TODO Auto-generated method stub
     }
 

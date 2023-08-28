@@ -77,12 +77,12 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     @Override
-    protected void compareReadInstances(HitsCommon original, HitsCommon fromRead) throws Exception {
+    protected void compareReadInstances(HitsCommon original, HitsCommon fromRead) {
         // Add test here
     }
 
     @Override
-    public void delete(String testName) throws Exception {
+    public void delete(String testName) {
         // Do nothing because this test is not ready to delete the "knownResourceId".
         // Instead, the method localDelete() will get called later in the dependency chain. The
         // method localDelete() has a dependency on the test "verifyReadOnlyCoreFields".  Once the
@@ -258,7 +258,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
 
     @Override
     protected void compareUpdatedInstances(HitsCommon original,
-                                           HitsCommon updated) throws Exception {
+                                           HitsCommon updated) {
         // put test here
     }
 

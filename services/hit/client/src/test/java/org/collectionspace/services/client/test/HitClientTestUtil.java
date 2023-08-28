@@ -19,7 +19,7 @@ public class HitClientTestUtil {
         String currentOwner,
         String depositor,
         String conditionCheckerAssessor,
-        String insurer) throws Exception {
+        String insurer) {
         HitsCommon hit = new HitsCommon();
 
         hit.setHitNumber(entryNumber);
