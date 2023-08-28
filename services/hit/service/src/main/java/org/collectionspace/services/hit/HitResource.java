@@ -37,8 +37,7 @@ public class HitResource extends NuxeoBasedResource {
 
     @Override
     protected String getVersionString() {
-        final String lastChangeRevision = "$LastChangedRevision$";
-        return lastChangeRevision;
+        return "$LastChangedRevision$";
     }
 
     @Override
