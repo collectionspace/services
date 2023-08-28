@@ -53,7 +53,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
     private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /**
-     * The logger.
+     * The logger
      */
     private final Logger logger = LoggerFactory.getLogger(HitServiceTest.class);
 
@@ -92,7 +92,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
 
     @Test(dataProvider = "testName", dependsOnMethods = {"CRUDTests", "verifyReadOnlyCoreFields"})
     public void localDelete(String testName) throws Exception {
-        // Because of issues with TestNG not allowing @Test annotations on on override methods,
+        // Because of issues with TestNG not allowing @Test annotations on override methods,
         // and because we want the "updateWrongUser" to run before the "delete" test, we need
         // this method.  This method will call super.delete() after all the dependencies have been
         // met.

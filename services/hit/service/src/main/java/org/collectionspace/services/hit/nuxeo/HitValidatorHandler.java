@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 public class HitValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
     /**
-     * Error Messages
-     **/
+     * Error Message
+     */
     private static final String VALIDATION_ERROR = "The hit record payload was invalid. See log file for more details.";
 
     /**
