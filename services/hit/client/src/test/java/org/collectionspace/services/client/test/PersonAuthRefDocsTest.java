@@ -58,12 +58,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
     private final String CLASS_NAME = PersonAuthRefDocsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
     private String knownHitId = null;
     private final List<String> hitIdsCreated = new ArrayList<String>();
     private final List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private final String personShortId = PERSON_AUTHORITY_NAME;
     private String currentOwnerPersonCSID = null;
     private String depositorPersonCSID = null;
     private String insurerPersonCSID = null;

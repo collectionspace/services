@@ -55,7 +55,6 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
     /**
      * The logger.
      */
-    private final String CLASS_NAME = HitServiceTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(HitServiceTest.class);
 
     @Override
@@ -107,9 +106,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         final String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
         final String COLLECTIONSPACE_CORE_URI = "uri";
         final String COLLECTIONSPACE_CORE_CREATED_AT = "createdAt";
-        final String COLLECTIONSPACE_CORE_UPDATED_AT = "updatedAt";
         final String COLLECTIONSPACE_CORE_CREATED_BY = "createdBy";
-        final String COLLECTIONSPACE_CORE_UPDATED_BY = "updatedBy";
 
         // Perform setup.
         setupUpdate();

@@ -57,14 +57,10 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = "hits";
     final String ORGANIZATION_AUTHORITY_NAME = "TestOrganizationAuth";
-    private final String CLASS_NAME = OrganizationAuthRefDocsTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
-    private final int NUM_AUTH_REF_DOCS_EXPECTED = 1;
     private String knownHitId = null;
     private final List<String> hitIdsCreated = new ArrayList<String>();
     private final List<String> orgIdsCreated = new ArrayList<String>();
     private String orgAuthCSID = null;
-    //private String orgAuthRefName = null;
     private String currentOwnerOrgCSID = null;
     private String currentOwnerRefName = null;
     private String depositorRefName = null;
