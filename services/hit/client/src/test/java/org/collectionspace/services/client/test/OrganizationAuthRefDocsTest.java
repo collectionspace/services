@@ -200,7 +200,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     }
 
     protected String createOrganization(String shortId, String shortName, String longName) throws Exception {
-        String result = null;
+        String result;
 
         OrganizationClient orgAuthClient = new OrganizationClient();
         Map<String, String> orgInfo = new HashMap<String, String>();
@@ -242,7 +242,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         // Get the auth ref docs and check them
         OrganizationClient orgAuthClient = new OrganizationClient();
         Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
-        AuthorityRefDocList list = null;
+        AuthorityRefDocList list;
         try {
             assertStatusCode(refDocListResp, testName);
             list = refDocListResp.readEntity(AuthorityRefDocList.class);
@@ -323,7 +323,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                                                              conditionCheckerAssessor, insurer);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
+        multipart.addPart(new HitClient().getCommonPartName(), hit);
 
         logger.debug("to be created, hit common");
         logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));

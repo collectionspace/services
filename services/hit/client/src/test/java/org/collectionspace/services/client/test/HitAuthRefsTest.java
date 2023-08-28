@@ -119,7 +119,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             conditionCheckerOrAssessorRefName,
             insurerRefName);
 
-        String newId = null;
+        String newId;
         Response res = hitClient.create(multipart);
         try {
             int statusCode = res.getStatus();
@@ -192,7 +192,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName)
         throws Exception {
-        String result = null;
+        String result;
 
         PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
@@ -247,7 +247,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
         // Get the auth refs and check them
         res = hitClient.getAuthorityRefs(knownResourceId);
-        AuthorityRefList list = null;
+        AuthorityRefList list;
         try {
             assertStatusCode(res, testName);
             list = res.readEntity(AuthorityRefList.class);
@@ -331,7 +331,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         hit.setHitNumber(entryNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
+        multipart.addPart(new HitClient().getCommonPartName(), hit);
 
         logger.debug("to be created, hit common");
         logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));

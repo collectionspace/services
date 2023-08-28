@@ -116,7 +116,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
 
         // Retrieve the contents of a resource to update.
         HitClient client = new HitClient();
-        PoxPayloadIn input = null;
+        PoxPayloadIn input;
         Response res = client.read(knownResourceId);
         try {
             logger.debug("{}: read status = {}", testName, res.getStatus());
@@ -159,7 +159,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
 
         // Create an output payload to send to the service, and add the common part
         PoxPayloadOut output = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart corePart = output.addPart(COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
+        output.addPart(COLLECTIONSPACE_CORE_SCHEMA, coreAsElement);
 
         // Submit the request to the service and store the response.
         res = client.update(knownResourceId, output);
