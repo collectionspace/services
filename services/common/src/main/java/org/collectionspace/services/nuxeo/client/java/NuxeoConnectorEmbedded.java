@@ -49,7 +49,7 @@ public class NuxeoConnectorEmbedded {
 	private volatile boolean initialized = false; // use volatile for lazy
 													// initialization in
 													// singleton
-	ClassLoader classLoader;
+	private ClassLoader classLoader;
 	public NuxeoFrameworkBootstrap fb;
 	private ServletContext servletContext;
 	private RepositoryClientConfigType repositoryClientConfig;
