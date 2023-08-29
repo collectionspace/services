@@ -51,7 +51,7 @@ public class NuxeoFrameworkBootstrap extends FrameworkBootstrap {
         try {
             start.invoke(null);
         } catch (BlobNotFoundException e) {
-            System.err.println(String.format("WARN %s", e.getLocalizedMessage()));
+            System.err.printf("WARN %s%n", e.getLocalizedMessage());
         }
         printStartedMessage();
     }
