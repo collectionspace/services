@@ -625,7 +625,8 @@ public class JDBCTools {
         } catch (Exception e) {
             logger.error("createNewDatabaseUser failed on exception: " + e.getLocalizedMessage());
             if (sql != null) {
-                logger.error(String.format("The following SQL statement failed using credentials from datasource named '%s': '%s'", dataSourceName, sql));
+                logger.error("The following SQL statement failed using credentials from datasource named '{}': '{}'",
+                             dataSourceName, sql);
             }
             throw e;
         } finally {

@@ -164,9 +164,9 @@ public class NuxeoConnectorEmbedded {
 				Driver driver = drivers.nextElement();
 				try {
 					DriverManager.deregisterDriver(driver);
-					logger.info(String.format("Deregister JDBC driver: %s", driver));
+					logger.info("Deregister JDBC driver: {}", driver);
 				} catch (SQLException e) {
-					logger.error(String.format("Error deregistering JDBC driver %s", driver), e);
+					logger.error("Error deregistering JDBC driver {}", driver, e);
 				}
 			}
 		} catch (IllegalArgumentException | ReflectiveOperationException | JMException e) {
