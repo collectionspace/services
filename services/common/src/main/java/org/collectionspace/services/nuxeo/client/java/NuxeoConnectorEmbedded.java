@@ -169,16 +169,11 @@ public class NuxeoConnectorEmbedded {
 					logger.error(String.format("Error deregistering JDBC driver %s", driver), e);
 				}
 			}
-
-		} catch (IllegalArgumentException e) {
-			success = false;
-		} catch (ReflectiveOperationException e) {
-			success = false;
-		} catch (JMException e) {
+		} catch (IllegalArgumentException | ReflectiveOperationException | JMException e) {
 			success = false;
 		}
 
-		if (!success) {
+        if (!success) {
 			logger.error("CollectionSpace was unable to shutdown Nuxeo cleanly.");
 		}
 	}
