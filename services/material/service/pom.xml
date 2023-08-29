@@ -108,7 +108,5 @@
 
     <build>
         <finalName>collectionspace-services-material</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>

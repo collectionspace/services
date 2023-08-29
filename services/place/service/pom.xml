@@ -108,7 +108,5 @@
 
     <build>
         <finalName>collectionspace-services-place</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>

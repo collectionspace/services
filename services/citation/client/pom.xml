@@ -66,7 +66,5 @@
 
     <build>
         <finalName>collectionspace-services-citation-client</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>
