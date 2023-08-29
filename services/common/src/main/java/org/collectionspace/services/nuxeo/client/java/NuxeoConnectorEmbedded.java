@@ -186,22 +186,22 @@ public class NuxeoConnectorEmbedded {
 			}
 		}
 	}
-	
+
 	private void stopNuxeoEP() {
 		boolean success = true;
-		
+
 		try {
 			fb.stop(new MutableClassLoaderDelegate(classLoader));
-	        Enumeration<Driver> drivers = DriverManager.getDrivers();
-	        while (drivers.hasMoreElements()) {
-	            Driver driver = drivers.nextElement();
-	            try {
-	                DriverManager.deregisterDriver(driver);
-	                logger.info(String.format("Deregister JDBC driver: %s", driver));
-	            } catch (SQLException e) {
-	            	logger.error(String.format("Error deregistering JDBC driver %s", driver), e);
-	            }
-	        }
+			Enumeration<Driver> drivers = DriverManager.getDrivers();
+			while (drivers.hasMoreElements()) {
+				Driver driver = drivers.nextElement();
+				try {
+					DriverManager.deregisterDriver(driver);
+					logger.info(String.format("Deregister JDBC driver: %s", driver));
+				} catch (SQLException e) {
+					logger.error(String.format("Error deregistering JDBC driver %s", driver), e);
+				}
+			}
 
 		} catch (IllegalArgumentException e) {
 			success = false;
@@ -210,7 +210,7 @@ public class NuxeoConnectorEmbedded {
 		} catch (JMException e) {
 			success = false;
 		}
-		
+
 		if (!success) {
 			logger.error("CollectionSpace was unable to shutdown Nuxeo cleanly.");
 		}

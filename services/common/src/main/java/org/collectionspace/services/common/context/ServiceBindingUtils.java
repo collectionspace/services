@@ -116,14 +116,14 @@ public class ServiceBindingUtils {
     		String propName, boolean qualify) {
     	List<String> values = new ArrayList<String>();
         ServiceObjectType objectType = serviceBinding.getObject();
-        if (objectType != null) {
-	        List<ObjectPartType> objectPartTypes = objectType.getPart();
-	        for (ObjectPartType objectPartType : objectPartTypes) {
-	        	List<PropertyType> propNodeList = objectPartType.getProperties();
-	        	PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList,
-	        			propName, (qualify?(objectPartType.getLabel()+":"):null), values);
-	        }
-        }
+		if (objectType != null) {
+			List<ObjectPartType> objectPartTypes = objectType.getPart();
+			for (ObjectPartType objectPartType : objectPartTypes) {
+				List<PropertyType> propNodeList = objectPartType.getProperties();
+				PropertyItemUtils.getPropertyValuesByNameInNodeList(propNodeList, propName,
+					(qualify ? objectPartType.getLabel() + ":" : null), values);
+			}
+		}
     	return values;
     }
 
