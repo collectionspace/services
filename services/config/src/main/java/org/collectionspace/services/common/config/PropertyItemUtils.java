@@ -97,7 +97,6 @@ public class PropertyItemUtils {
     }
 
 	/**
-	 * @param propNodeList the Item list to search for the named property
 	 * @param propName the name of the property of interest
 	 * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
 	 * @param values and existing list to append values to. If null, a new one will be created.
