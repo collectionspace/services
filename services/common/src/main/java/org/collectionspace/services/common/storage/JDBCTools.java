@@ -601,46 +601,27 @@ public class JDBCTools {
      */
     public static void createNewDatabaseUser(String dataSourceName, String repositoryName,
              String cspaceInstanceId, DatabaseProductType dbType, String username, String userPW) throws Exception {
-        Statement stmt = null;
-        Connection conn = null;
         if (dbType != DatabaseProductType.POSTGRESQL) {
             throw new UnsupportedOperationException("createNewDatabaseUser only supports PostgreSQL");
         }
 
         String sql = null;
-        try {
+        try (Connection conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
+             Statement stmt = conn.createStatement()) {
             if (hasDatabaseUser(dataSourceName, repositoryName, cspaceInstanceId, dbType, username)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("User: " + username + " already exists.");
-                }
+                logger.debug("User: {} already exists.", username);
             } else {
-                conn = getConnection(dataSourceName, repositoryName, cspaceInstanceId);
-                stmt = conn.createStatement();
                 sql = "CREATE ROLE " + username + " WITH PASSWORD '" + userPW + "' LOGIN";
                 stmt.executeUpdate(sql);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Created User: " + username);
-                }
+                logger.debug("Created User: {}", username);
             }
         } catch (Exception e) {
-            logger.error("createNewDatabaseUser failed on exception: " + e.getLocalizedMessage());
+            logger.error("createNewDatabaseUser failed with exception:", e);
             if (sql != null) {
                 logger.error("The following SQL statement failed using credentials from datasource named '{}': '{}'",
                              dataSourceName, sql);
             }
             throw e;
-        } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException sqle) {
-                // nothing we can do here except log
-                logger.warn("SQL Exception when closing statement/connection: " + sqle.getLocalizedMessage());
-            }
         }
     }
 
