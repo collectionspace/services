@@ -115,84 +115,116 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
     }
 
     public String preparePayload(HashMap<String, String> fieldsToUpdate) {
-        String commonValues = "";
-        String natHistValues = "";
+        StringBuilder commonValues = new StringBuilder();
+        StringBuilder natHistValues = new StringBuilder();
 
-        String otherNumber = "<otherNumberList><otherNumber>";
+        StringBuilder otherNumber = new StringBuilder("<otherNumberList><otherNumber>");
         boolean otherNumFlag = false;
 
         for (String key : fieldsToUpdate.keySet()) {
             String value = fieldsToUpdate.get(key);
 
             if (key.equals("material")) {
-                commonValues += "<materialGroupList><materialGroup>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</materialGroup></materialGroupList>";
+                commonValues.append("<materialGroupList><materialGroup>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</materialGroup></materialGroupList>");
             } else if (key.equals("responsibleDepartment")) {
-                commonValues += "<responsibleDepartments>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</responsibleDepartments>";
+                commonValues.append("<responsibleDepartments>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</responsibleDepartments>");
             } else if (key.equals("assocPeople")) {
-                commonValues += "<assocPeopleGroupList><assocPeopleGroup>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</assocPeopleGroup></assocPeopleGroupList>";
+                commonValues.append("<assocPeopleGroupList><assocPeopleGroup>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</assocPeopleGroup></assocPeopleGroupList>");
             } else if (key.equals("objectProductionPerson")) {
-                commonValues += "<objectProductionPersonGroupList><objectProductionPersonGroup>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</objectProductionPersonGroup></objectProductionPersonGroupList>";
+                commonValues.append("<objectProductionPersonGroupList><objectProductionPersonGroup>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</objectProductionPersonGroup></objectProductionPersonGroupList>");
             } else if (key.equals("objectProductionPlace")) {
-                commonValues += "<objectProductionPlaceGroupList><objectProductionPlaceGroup>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</objectProductionPlaceGroup></objectProductionPlaceGroupList>";
+                commonValues.append("<objectProductionPlaceGroupList><objectProductionPlaceGroup>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</objectProductionPlaceGroup></objectProductionPlaceGroupList>");
             } else if (key.equals("fieldCollector")) {
-                commonValues += "<fieldCollectors>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</fieldCollectors>";
+                commonValues.append("<fieldCollectors>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</fieldCollectors>");
             } else if (key.equals("objectStatus")) {
-                commonValues += "<objectStatusList>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</objectStatusList>";
+                commonValues.append("<objectStatusList>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</objectStatusList>");
             } else if (key.equals("contentPlace")) {
-                commonValues += "<contentPlaces>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</contentPlaces>";
+                commonValues.append("<contentPlaces>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</contentPlaces>");
             } else if (key.equals("objectName")) {
-                commonValues += "<objectNameList><objectNameGroup>" +
-                                "<" + key + ">" + value + "</" + key + ">" +
-                                "</objectNameGroup></objectNameList>";
+                commonValues.append("<objectNameList><objectNameGroup>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</objectNameGroup></objectNameList>");
             } else if (key.equals("briefDescription")) {
-                commonValues += "<briefDescriptions><" + key + ">" + value + "</" + key + "></briefDescriptions>";
+                commonValues.append("<briefDescriptions>")
+                            .append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">")
+                            .append("</briefDescriptions>");
             } else if (key.equals("numberValue") || key.equals("numberType")) {
-                otherNumber += "<" + key + ">" + value + "</" + key + ">";
+                otherNumber.append("<").append(key).append(">")
+                           .append(value)
+                           .append("</").append(key).append(">");
                 otherNumFlag = true;
             } else if (key.equals("objectProductionDate")) {
-                commonValues += "<objectProductionDateGroupList><objectProductionDateGroup>" +
-                                "<dateDisplayDate>" + value + "</dateDisplayDate>" +
-                                "</objectProductionDateGroup></objectProductionDateGroupList>";
+                commonValues.append("<objectProductionDateGroupList><objectProductionDateGroup>")
+                            .append("<dateDisplayDate>").append(value).append("</dateDisplayDate>")
+                            .append("</objectProductionDateGroup></objectProductionDateGroupList>");
             } else if (key.equals("contentDate")) {
-                commonValues += "<contentDateGroup><dateDisplayDate>" + value + "</dateDisplayDate></contentDateGroup>";
+                commonValues.append("<contentDateGroup>")
+                            .append("<dateDisplayDate>").append(value).append("</dateDisplayDate>")
+                            .append("</contentDateGroup>");
             } else if (key.equals("fieldCollectionDateGroup")) {
-                commonValues += "<fieldCollectionDateGroup>" +
-                                "<dateDisplayDate>" + value + "</dateDisplayDate>" +
-                                "</fieldCollectionDateGroup>";
+                commonValues.append("<fieldCollectionDateGroup>")
+                            .append("<dateDisplayDate>").append(value).append("</dateDisplayDate>")
+                            .append("</fieldCollectionDateGroup>");
             } else if (key.equals("taxon")) {
-                natHistValues += "<taxonomicIdentGroupList><taxonomicIdentGroup>" +
-                                 "<" + key + ">" + value + "</" + key + ">" +
-                                 "</taxonomicIdentGroup></taxonomicIdentGroupList>";
+                natHistValues.append("<taxonomicIdentGroupList><taxonomicIdentGroup>")
+                             .append("<").append(key).append(">")
+                             .append(value)
+                             .append("</").append(key).append(">")
+                             .append("</taxonomicIdentGroup></taxonomicIdentGroupList>");
             } else if (key.equals("provenanceType")) {
-                natHistValues += "<" + key + ">" + value + "</" + key + ">";
+                natHistValues.append("<").append(key).append(">")
+                             .append(value)
+                             .append("</").append(key).append(">");
             } else {
-                commonValues += "<" + key + ">" + value + "</" + key + ">";
+                commonValues.append("<").append(key).append(">")
+                            .append(value)
+                            .append("</").append(key).append(">");
             }
         }
 
         if (otherNumFlag) {
-            otherNumber += "</otherNumber></otherNumberList>";
-            commonValues += otherNumber;
+            otherNumber.append("</otherNumber></otherNumberList>");
+            commonValues.append(otherNumber);
         }
 
         String natHistPayload = "";
-        if (!natHistValues.isEmpty()) {
+        if (natHistValues.length() > 0) {
             natHistPayload =
                 "<ns2:collectionobjects_naturalhistory " +
                 "xmlns:ns2=\"http://collectionspace.org/services/collectionobject/domain/naturalhistory\" " +
@@ -202,7 +234,7 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
 
         String commonPayload = "";
 
-        if (!commonValues.isEmpty()) {
+        if (commonValues.length() > 0) {
             commonPayload =
                 "<ns2:collectionobjects_common " +
                 "xmlns:ns2=\"http://collectionspace.org/services/collectionobject\" " +
