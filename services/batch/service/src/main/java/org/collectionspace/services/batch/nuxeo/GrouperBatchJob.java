@@ -72,8 +72,8 @@ public class GrouperBatchJob extends AbstractBatchJob {
 
         } catch (Exception e) {
             completionStatus = STATUS_ERROR;
-            errorInfo = new InvocationError(INT_ERROR_STATUS,
-                                            "Grouper batch job had  a  problem creating relations: " + e.getLocalizedMessage());
+            errorInfo = new InvocationError(INT_ERROR_STATUS, "Grouper batch job had a problem creating relations: " +
+                                            e.getLocalizedMessage());
             results.setUserNote(errorInfo.getMessage());
         }
     }
