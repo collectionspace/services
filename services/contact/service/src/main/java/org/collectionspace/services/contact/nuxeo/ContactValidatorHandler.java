@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 public class ContactValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
-    final Logger logger = LoggerFactory.getLogger(ContactValidatorHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(ContactValidatorHandler.class);
 
     // Error strings
     private static final String VALIDATION_ERROR =
@@ -42,9 +42,7 @@ public class ContactValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, 
         try {
             ContactsCommon contactsCommon = (ContactsCommon) getCommonPart();
         } catch (AssertionError e) {
-            if (logger.isErrorEnabled()) {
-                logger.error(e.getMessage(), e);
-            }
+            logger.error("Exception validating ContactsCommon", e);
             throw new InvalidDocumentException(VALIDATION_ERROR, e);
         }
     }
