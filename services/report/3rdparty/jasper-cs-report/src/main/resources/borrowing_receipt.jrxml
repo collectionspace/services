@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="borrowing_receipt" pageWidth="1000" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="69c8cb28-5625-4a2b-a2ca-34fb3800a6d8">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["borrower,objectproductionperson,computedcurrentlocation"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	loan.loanoutnumber,
+	loan.borrower,
+	object.objectnumber,
+	object.objectname,
+	object.title,
+	object.objectproductionperson,
+	object.objectproductiondate,
+	object.computedcurrentlocation,
+	object.mediacsid
+FROM loansout_common loan
+INNER JOIN hierarchy hier ON hier.id = loan.id
+INNER JOIN misc ON misc.id = loan.id AND misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+-- related objects
+LEFT JOIN (
+	SELECT
+		hier.name AS csid,
+		relation.subjectcsid,
+		obj.objectnumber,
+		obj.computedcurrentlocation,
+		ong.objectname,
+		tg.title,
+		person.objectproductionperson,
+		sdg.datedisplaydate AS objectproductiondate,
+		media.objectcsid AS mediacsid
+	FROM collectionobjects_common obj
+	INNER JOIN hierarchy hier ON hier.id = obj.id
+	INNER JOIN misc on misc.id = obj.id AND misc.lifecyclestate != 'deleted'
+	INNER JOIN relations_common relation ON relation.objectcsid = hier.name
+		AND relation.subjectdocumenttype = 'Loanout'
+		AND relation.objectdocumenttype = 'CollectionObject'
+	LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
+	LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
+	LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
+	LEFT JOIN titlegroup tg ON tg.id = title_hier.id
+	LEFT JOIN hierarchy person_hier ON person_hier.parentid = obj.id AND person_hier.primarytype = 'objectProductionPersonGroup' AND person_hier.pos = 0
+	LEFT JOIN objectproductionpersongroup person ON person.id = person_hier.id
+	LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = obj.id AND sdg_hier.primarytype = 'structuredDateGroup' AND sdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND sdg_hier.pos = 0
+	LEFT JOIN structureddategroup sdg ON sdg.id = sdg_hier.id
+	LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media' AND media.subjectdocumenttype = 'CollectionObject'
+) object ON object.subjectcsid = hier.name
+$P!{whereclause}]]>
+	</queryString>
+	<field name="loanoutnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="loanoutnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="loanoutnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loansout_common"/>
+	</field>
+	<field name="borrower" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="borrower"/>
+		<property name="com.jaspersoft.studio.field.label" value="borrower"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="loansout_common"/>
+	</field>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="title"/>
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectproductionperson" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectproductionperson"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectproductionperson"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectproductiondate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectproductiondate"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectproductiondate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="computedcurrentlocation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.label" value="computedcurrentlocation"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="c4532d84-99ec-4168-93e8-73d986ed72af">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[LoanOut Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="4e891d6f-4ff0-4b2f-9af0-7336d90acd22">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Borrower]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="cb4ccc79-dbbe-47ce-9b71-7c9746016278">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="3cad2341-164c-41cc-860f-e888e366958e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="a8ef0763-9326-4005-9400-d79dcce96245">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="dc6b337c-ce38-430b-8b82-beccc4c3e5e1">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Production Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="8edfffc1-e100-4af0-bae4-f582573ede1e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Production Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="86f1f4b9-0dc8-49af-a3d7-30a8da89114c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Current Location]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="e50a7d74-c6f3-4070-b7b0-466f485aeadf">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Related Media]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="cbab2f64-4b56-44ec-bfc8-a87b1180e6f1">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{loanoutnumber}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="062d0cd8-6943-4570-82c3-54dededf6943">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{borrower}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="22b386e5-f43d-4dcc-abc6-fbc5387d10d7">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="75357bf9-2789-41e5-9d31-4ff8ddaf544f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="17ee49b8-7c2d-4ebb-a61b-93945a51a90c">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="2604982b-936d-4bb8-a615-7ebf5edd3e39">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectproductionperson}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="d735f6df-c949-4bbd-bc2b-d7df2bf2cdd9">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectproductiondate}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="1be89a70-b461-4907-b2d2-a43440f61723">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="800" y="0" width="50" height="50" uuid="a7c10fcc-0020-478b-bcfe-cb191daa365f"/>
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>
