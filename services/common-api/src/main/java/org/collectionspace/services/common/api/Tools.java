@@ -37,9 +37,9 @@ import java.util.regex.Matcher;
  *   @author Laramie Crocker
  * v.1.4
  */
-public class Tools {    
+public class Tools {
     private static final String PROPERTY_VAR_REGEX = "\\$\\{([A-Za-z0-9_\\.]+)\\}";
-    
+
     /** @return first glued to second with the separator string, at most one time - useful for appending paths.
      */
     public static String glue(String first, String separator, String second){
@@ -101,15 +101,15 @@ public class Tools {
     public static boolean isTrue(String test) {
         return notEmpty(test) && (new Boolean(test)).booleanValue();
     }
-    
+
     /** Handles null value with 'true' result.  */
     public static boolean isFalse(String test) {
         if (test == null) {
             return true;
         }
-        
+
         return (new Boolean(test)).booleanValue() == false;
-    }    
+    }
 
     public static String searchAndReplace(String source, String find, String replace){
         Pattern pattern = Pattern.compile(find);
@@ -117,7 +117,7 @@ public class Tools {
         String output = matcher.replaceAll(replace);
         return output;
     }
-    
+
     public static String searchAndReplaceWithQuoteReplacement(String source, String find, String replace){
         Pattern pattern = Pattern.compile(find);
         Matcher matcher = pattern.matcher(source);
@@ -127,7 +127,7 @@ public class Tools {
 
     static boolean m_fileSystemIsDOS = "\\".equals(File.separator);
     static boolean m_fileSystemIsMac = ":".equals(File.separator);
-    
+
     public final static String FILE_EXTENSION_SEPARATOR = ".";
     public final static String OPTIONAL_VALUE_SUFFIX = "_OPT";
 
@@ -160,7 +160,7 @@ public class Tools {
         }
         return dir + file;
     }
-    
+
     public static String getFilenameExtension(String filename) {
         int dot = filename.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         return (dot>=0)?filename.substring(dot + 1):null;
@@ -177,7 +177,7 @@ public class Tools {
     public static String getStackTrace(Throwable e){
         return getStackTrace(e, -1);
     }
-    
+
     public static String implode(String strings[], String sep) {
         String implodedString;
         if (strings.length == 0) {
@@ -195,7 +195,7 @@ public class Tools {
         }
         return implodedString;
     }
-        
+
 
 
 
@@ -262,7 +262,7 @@ public class Tools {
 
     /**
      * Return a set of properties from a properties file.
-     * 
+     *
      * @param clientPropertiesFilename
      * @return
      */
@@ -288,32 +288,32 @@ public class Tools {
 
         return inProperties;
     }
-    
+
     static public Properties loadProperties(String clientPropertiesFilename, boolean filterPasswords) throws Exception {
         Properties result = loadProperties(clientPropertiesFilename);
 
         if (filterPasswords) {
             result = filterPropertiesWithEnvVars(result);
         }
-        
+
         return result;
     }
-    
+
     /**
      * Looks for property values if the form ${foo} and tries to find environment property "foo" value to replace with.
-     * 
+     *
      * For example, a property value of "${foo}" would be replaced with the value of the environment variable "foo" if a
      * value for "foo" exists in the current environment.
-     * 
+     *
      * @param inProperties
      * @return
      * @throws Exception
      */
     static public Properties filterPropertiesWithEnvVars(Properties inProperties) throws Exception {
         final String filteredFlag = "fe915b1b-7411-4aaa-887f";
-        final String filteredKey = filteredFlag;        
+        final String filteredKey = filteredFlag;
         Properties result = inProperties;
-        
+
         if (inProperties.containsKey(filteredKey) == false) {
             // Only process the properties once
             if (inProperties != null && inProperties.size() > 0) {
@@ -327,28 +327,28 @@ public class Tools {
                 inProperties.setProperty(filteredKey, filteredFlag); // set to indicated we've already process these properties
             }
         }
-        
+
         return result;
     }
-        
+
     static public boolean isOptional(String properyValue) {
         boolean result = false;
-        
+
         result = properyValue.endsWith(OPTIONAL_VALUE_SUFFIX);
-        
+
         return result;
     }
-    
+
     /**
      * Try to find the value of a property variable in the system or JVM environment.  This code substitutes only property values formed
      * like ${cspace.password.mysecret} or ${cspace_password_mysecret_secret}.  The corresponding environment variables would
      * be "cspace.password.mysecret" and "cspace.password.mysecret.secret".
-     * 
+     *
      * Returns null if the passed in property value is not a property variable -i.e., not something of the form {$cspace.password.foo}
-     * 
+     *
      * Throws an exception if the passed in property value has a valid variable form but the corresponding environment variable is not
      * set.
-     * 
+     *
      * @param propertyValue
      * @return
      * @throws Exception
@@ -361,7 +361,7 @@ public class Tools {
         //
         Pattern pattern = Pattern.compile(PROPERTY_VAR_REGEX);      // For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
         Matcher matcher = pattern.matcher(propertyValue);
-        String key = null;    
+        String key = null;
         if (matcher.find()) {
             key = matcher.group(1);  // Gets the string inside the ${} enclosure.  For example, gets "cspace.password.mysecret" from "${cspace.password.mysecret}"
             result = System.getenv(key);
@@ -371,7 +371,7 @@ public class Tools {
             }
 
             if (result == null || result.isEmpty()) {
-                String errMsg = String.format("Could find neither an environment variable nor a systen variable named '%s'", key);
+                String errMsg = String.format("Could find neither an environment variable nor a system variable named '%s'", key);
                 if (isOptional(key) == true) {
                     System.err.println(errMsg);
                 } else {
@@ -379,10 +379,10 @@ public class Tools {
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     /**
      * Test to see if 'propertyValue' is actually a property variable
      * @param propertyValue
@@ -390,7 +390,7 @@ public class Tools {
      */
     static public boolean isValuePropretyVar(String propertyValue) {
         boolean result = false;
-        
+
         if (propertyValue != null) {
             Pattern pattern = Pattern.compile(PROPERTY_VAR_REGEX);      // For example, "${cspace.password.mysecret}" or "${password_strong_longpassword}"
             Matcher matcher = pattern.matcher(propertyValue);
@@ -398,7 +398,7 @@ public class Tools {
                 result = true;
             }
         }
-        
+
         return result;
     }
 
@@ -409,16 +409,16 @@ public class Tools {
             return true;
         }
     }
-    
+
     static public boolean listContainsIgnoreCase(List<String> theList, String searchStr) {
     	boolean result = false;
-    	
+
     	for (String listItem : theList) {
     		if (StringUtils.containsIgnoreCase(listItem, searchStr)) {
     			return true;
     		}
     	}
-    	
+
     	return result;
     }
 }

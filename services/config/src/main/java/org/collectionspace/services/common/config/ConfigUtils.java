@@ -1,16 +1,25 @@
 package org.collectionspace.services.common.config;
 
+import java.net.MalformedURLException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.collectionspace.services.config.CORSType;
+import org.collectionspace.services.config.OAuthClientRegistrationsType;
+import org.collectionspace.services.config.OAuthClientType;
+import org.collectionspace.services.config.OAuthType;
+import org.collectionspace.services.config.SecurityType;
+import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.config.tenant.UIConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ConfigUtils {
     final static Logger logger = LoggerFactory.getLogger(ConfigUtils.class);
-    
+
     public static final String EXTENSION_XPATH = "/extension[@point='%s']";
     public static final String COMPONENT_EXTENSION_XPATH = "/component" + EXTENSION_XPATH;
     public static final String DATASOURCE_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "datasources");
@@ -19,21 +28,21 @@ public class ConfigUtils {
     public static final String CONFIGURATION_EXTENSION_POINT_XPATH = String.format(COMPONENT_EXTENSION_XPATH, "configuration");
     public static final String ELASTICSEARCH_INDEX_EXTENSION_XPATH = String.format(EXTENSION_XPATH, "elasticSearchIndex");
     public static final String ELASTICSEARCH_EXTENSIONS_EXPANDER_STR = "%elasticSearchIndex_extensions%";
-    
-    
+
+
     // Default database names
-    
+
     // public static String DEFAULT_CSPACE_DATABASE_NAME = "cspace";
     public static String DEFAULT_NUXEO_REPOSITORY_NAME = "default";
     public static String DEFAULT_NUXEO_DATABASE_NAME = "nuxeo";
     public static String DEFAULT_ELASTICSEARCH_INDEX_NAME = "nuxeo";
-    
+
     /*
      * Returns the list of repository/DB names defined by a tenant bindings file
      */
     public static List<String> getRepositoryNameList(TenantBindingType tenantBindingType) {
     	List<String> result = null;
-    	
+
 		List<RepositoryDomainType> repoDomainList = tenantBindingType.getRepositoryDomain();
 		if (repoDomainList != null && repoDomainList.isEmpty() == false) {
 			result = new ArrayList<String>();
@@ -41,10 +50,10 @@ public class ConfigUtils {
 					result.add(repoDomain.getRepositoryName());
 			}
 		}
-		
+
     	return result;
     }
-    
+
     /*
      * Returns 'true' if the tenant declares the default repository.
      */
@@ -59,13 +68,13 @@ public class ConfigUtils {
 				}
 			}
 		}
-   
+
     	return result;
     }
-        
+
     public static String getRepositoryName(TenantBindingType tenantBindingType, String domainName) {
 		String result = null;
-		
+
 		if (domainName != null && domainName.trim().isEmpty() == false) {
 			List<RepositoryDomainType> repoDomainList = tenantBindingType.getRepositoryDomain();
 			if (repoDomainList != null && repoDomainList.isEmpty() == false) {
@@ -84,8 +93,103 @@ public class ConfigUtils {
 			logger.trace(String.format("Could not find the repository name for tenent name='%s' and domain='%s'",
 					tenantBindingType.getName(), domainName));
 		}
-		
+
 		return result;
 	}
-    
+
+	public static CORSType getCors(ServiceConfig serviceConfig) {
+		SecurityType security = serviceConfig.getSecurity();
+
+		if (security != null) {
+			CORSType cors = security.getCors();
+
+			return cors;
+		}
+
+		return null;
+	}
+
+	public static List<String> getCorsAllowedOrigins(ServiceConfig serviceConfig) {
+		CORSType cors = getCors(serviceConfig);
+
+		if (cors != null) {
+			List<String> allowedOrigin = cors.getAllowedOrigin();
+
+			if (allowedOrigin != null) {
+				return allowedOrigin;
+			}
+		}
+
+		return new ArrayList<String>();
+	}
+
+	public static Duration getCorsMaxAge(ServiceConfig serviceConfig) {
+		CORSType cors = getCors(serviceConfig);
+
+		if (cors != null) {
+			String maxAge = cors.getMaxAge();
+
+			if (maxAge != null) {
+				return Duration.parse(maxAge);
+			}
+		}
+
+		return null;
+	}
+
+	public static OAuthType getOAuth(ServiceConfig serviceConfig) {
+		SecurityType security = serviceConfig.getSecurity();
+
+		if (security != null) {
+			OAuthType oauth = security.getOauth();
+
+			return oauth;
+		}
+
+		return null;
+	}
+
+	public static List<OAuthClientType> getOAuthClientRegistrations(ServiceConfig serviceConfig) {
+		OAuthType oauth = getOAuth(serviceConfig);
+
+		if (oauth != null) {
+			OAuthClientRegistrationsType registrations = oauth.getClientRegistrations();
+
+			if (registrations != null) {
+				return registrations.getClient();
+			}
+		}
+
+		return null;
+	}
+
+	public static String getUILoginSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {
+		UIConfig uiConfig = tenantBinding.getUiConfig();
+
+		if (uiConfig != null) {
+			return uiConfig.getBaseUrl() + uiConfig.getLoginSuccessUrl();
+		}
+
+		return null;
+	}
+
+	public static String getUIAuthorizationSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {
+		UIConfig uiConfig = tenantBinding.getUiConfig();
+
+		if (uiConfig != null) {
+			return uiConfig.getBaseUrl() + uiConfig.getAuthorizationSuccessUrl();
+		}
+
+		return null;
+	}
+
+	public static String getUILogoutSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {
+		UIConfig uiConfig = tenantBinding.getUiConfig();
+
+		if (uiConfig != null) {
+			return uiConfig.getBaseUrl() + uiConfig.getLogoutSuccessUrl();
+		}
+
+		return null;
+	}
 }

@@ -23,6 +23,8 @@
  */
 package org.collectionspace.services.account;
 
+import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
@@ -43,6 +45,8 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -52,21 +56,40 @@ import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.storage.StorageClient;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.tenant.EmailConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.web.csrf.CsrfToken;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -77,6 +100,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
@@ -93,8 +117,6 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
 	final Logger logger = LoggerFactory.getLogger(AccountResource.class);
     final StorageClient storageClient = new AccountStorageClient();
-    private static final String PASSWORD_RESET_PATH = "/requestpasswordreset";
-	private static final String PROCESS_PASSWORD_RESET_PATH = "/processpasswordreset";
 
     @Override
     protected String getVersionString() {
@@ -226,12 +248,69 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     public AccountsCommon updateAccount(@Context UriInfo ui, @PathParam("csid") String csid, AccountsCommon theUpdate) {
         return (AccountsCommon)update(ui, csid, theUpdate, AccountsCommon.class);
     }
-    
+
     /*
      * Use this when you have an existing and active ServiceContext. //FIXME: Use this only for password reset
      */
     private AccountsCommon updateAccountPassword(ServiceContext<AccountsCommon, AccountsCommon> parentContext, UriInfo ui, String csid, AccountsCommon theUpdate) {
         return (AccountsCommon)update(parentContext, ui, csid, theUpdate, AccountsCommon.class, false);
+    }
+
+    @GET
+    @Path(AccountClient.PROCESS_PASSWORD_RESET_PATH_COMPONENT)
+    @Produces(MediaType.TEXT_HTML)
+    public String processPasswordResetForm(@Context HttpServletRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+        String tokenId = request.getParameter(AccountClient.PASSWORD_RESET_TOKEN_QP);
+        Token token = null;
+
+        try {
+            token = TokenStorageClient.get(tokenId);
+        } catch (DocumentNotFoundException e) {
+        }
+
+        if (token == null || !token.isEnabled()) {
+            return String.format("<html><body>The token %s is not valid.</body></html>", tokenId);
+        }
+
+        Map<String, Object> uiConfig = new HashMap<>();
+
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+
+        if (csrfToken != null) {
+            Map<String, Object> csrfConfig = new HashMap<>();
+
+            csrfConfig.put("parameterName", csrfToken.getParameterName());
+            csrfConfig.put("token", csrfToken.getToken());
+
+            uiConfig.put("csrf", csrfConfig);
+        }
+
+        uiConfig.put("token", tokenId);
+        uiConfig.put("tenantId", token.getTenantId());
+
+        String uiConfigJS;
+
+        try {
+            uiConfigJS = new ObjectMapper().writeValueAsString(uiConfig);
+        } catch (JsonProcessingException e) {
+            logger.error("Error generating login page UI configuration", e);
+
+            uiConfigJS = "";
+        }
+
+        Map<String, String> dataModel = new HashMap<>();
+
+        dataModel.put("uiConfig", uiConfigJS);
+
+        Configuration freeMarkerConfig = ServiceMain.getInstance().getFreeMarkerConfig();
+        Template template = freeMarkerConfig.getTemplate("service-ui.ftlh");
+        Writer out = new StringWriter();
+
+        template.process(dataModel, out);
+
+        out.close();
+
+        return out.toString();
     }
 
     /**
@@ -248,7 +327,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
      * @throws IOException
      */
     @POST
-    @Path(PROCESS_PASSWORD_RESET_PATH)
+    @Path(AccountClient.PROCESS_PASSWORD_RESET_PATH_COMPONENT)
     synchronized public Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) {
     	Response response = null;
 
@@ -344,7 +423,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 			        }
 				} catch (Throwable t) {
 					transactionCtx.markForRollback();
-					transactionCtx.close(); // https://jira.ets.berkeley.edu/jira/browse/CC-241					
+					transactionCtx.close(); // https://jira.ets.berkeley.edu/jira/browse/CC-241
 					String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
 							t.getMessage(), token.getId());
 		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
@@ -365,53 +444,131 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     	return response;
     }
 
-    @POST
-    @Path(PASSWORD_RESET_PATH)
-    public Response requestPasswordReset(@Context UriInfo ui) {
-        Response response = null;
+    @GET
+    @Path(AccountClient.PASSWORD_RESET_PATH_COMPONENT)
+    @Produces(MediaType.TEXT_HTML)
+    public String requestPasswordResetForm(@Context HttpServletRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+        Map<String, Object> uiConfig = new HashMap<>();
 
+        CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
+
+        if (csrfToken != null) {
+            Map<String, Object> csrfConfig = new HashMap<>();
+
+            csrfConfig.put("parameterName", csrfToken.getParameterName());
+            csrfConfig.put("token", csrfToken.getToken());
+
+            uiConfig.put("csrf", csrfConfig);
+        }
+
+        String tenantId = request.getParameter(AuthN.TENANT_ID_QUERY_PARAM);
+
+        if (tenantId != null) {
+            uiConfig.put("tenantId", tenantId);
+        }
+
+        String uiConfigJS;
+
+        try {
+            uiConfigJS = new ObjectMapper().writeValueAsString(uiConfig);
+        } catch (JsonProcessingException e) {
+            logger.error("Error generating login page UI configuration", e);
+
+            uiConfigJS = "";
+        }
+
+        Map<String, String> dataModel = new HashMap<>();
+
+        dataModel.put("uiConfig", uiConfigJS);
+
+        Configuration freeMarkerConfig = ServiceMain.getInstance().getFreeMarkerConfig();
+        Template template = freeMarkerConfig.getTemplate("service-ui.ftlh");
+        Writer out = new StringWriter();
+
+        template.process(dataModel, out);
+
+        out.close();
+
+        return out.toString();
+    }
+
+    @POST
+    @Path(AccountClient.PASSWORD_RESET_PATH_COMPONENT)
+    public Response requestPasswordReset(@Context UriInfo ui) {
         MultivaluedMap<String,String> queryParams = ui.getQueryParameters();
         String email = queryParams.getFirst(AccountClient.EMAIL_QUERY_PARAM);
-        if (email == null || email.isEmpty()) {
-        	response = Response.status(Response.Status.BAD_REQUEST).entity("You must specify an 'email' query paramater.").type("text/plain").build();
-        	return response;
+
+        if (StringUtils.isEmpty(email)) {
+        	return Response.status(Response.Status.BAD_REQUEST).entity("You must specify an 'email' query paramater.").type("text/plain").build();
         }
 
-        String tenantId = queryParams.getFirst(AuthN.TENANT_ID_QUERY_PARAM);
-        if (tenantId == null || tenantId.isEmpty()) {
-        	response = Response.status(Response.Status.BAD_REQUEST).entity("You must specify an 'tid' (tenant ID) query paramater.").type("text/plain").build();
-        	return response;
+        final String tenantId = queryParams.getFirst(AuthN.TENANT_ID_QUERY_PARAM);
+
+        ui = new UriInfoWrapper(ui);
+
+        if (StringUtils.isEmpty(tenantId)) {
+            // If no tenant ID was supplied, pick an arbitrary one for purposes of account search.
+            // It doesn't matter which, because all accounts will be returned regardless of the
+            // tenant ID used to list the accounts.
+
+            TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+            String effectiveTenantId = tenantBindingConfigReader.getTenantIds().get(0);
+
+            ui.getQueryParameters().putSingle(AuthN.TENANT_ID_QUERY_PARAM, effectiveTenantId);
         }
+
         //
-        // Search for an account with the provided email and tenant ID
+        // Search for an account with the provided email and (optional) tenant ID.
         //
-		boolean found = false;
 		AccountListItem accountListItem = null;
     	AccountsCommonList accountList = getAccountList(ui);
+
     	if (accountList != null || accountList.getTotalItems() > 0) {
-			List<AccountListItem> itemsList = accountList.getAccountListItem();
-			for (AccountListItem item : itemsList) {
-				if (item != null && item.getTenantid() != null && item.getTenantid().equalsIgnoreCase(tenantId)) {
-					accountListItem = item;
-					found = true;
-					break;
-				}
-			}
-    	}
+            accountListItem = accountList.getAccountListItem().stream()
+                .filter(new Predicate<AccountListItem>() {
+                    @Override
+                    public boolean test(AccountListItem item) {
+                        if (item == null) {
+                            return false;
+                        }
 
-    	if (found == true) {
-			try {
-				response = requestPasswordReset(ui, tenantId, accountListItem);
-			} catch (Exception e) {
-	        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();
-			}
-    	} else {
-    		String msg = String.format("Could not locate an account associated with the email '%s' and tenant ID '%s'",
-    				email , tenantId);
-        	response = Response.status(Response.Status.NOT_FOUND).entity(msg).type("text/plain").build();
-    	}
+                        if (StringUtils.isEmpty(tenantId)) {
+                            return true;
+                        }
 
-        return response;
+                        String itemTenantId = item.getTenantid();
+
+                        return (itemTenantId != null && itemTenantId.equalsIgnoreCase(tenantId));
+                    }
+                })
+                .findFirst()
+                .orElse(null);
+        }
+
+        if (accountListItem == null) {
+            String msg = String.format(
+                StringUtils.isEmpty(tenantId)
+                    ? "Could not locate an account associated with the email %s"
+                    : "Could not locate an account associated with the email %s and tenant ID '%s'",
+                email, tenantId
+            );
+
+            return Response.status(Response.Status.NOT_FOUND).entity(msg).type("text/plain").build();
+        }
+
+        // If no tenant ID was supplied, use the account's first associated tenant ID for purposes
+        // of password reset. This is the same way that a tenant is selected for the account when
+        // logging in. In practice, accounts are only associated with one tenant anyway.
+
+        String targetTenantId = StringUtils.isEmpty(tenantId)
+            ? accountListItem.getTenants().get(0).getTenantId()
+            : tenantId;
+
+        try {
+            return requestPasswordReset(ui, targetTenantId, accountListItem);
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).type("text/plain").build();
+        }
     }
 
     private boolean contains(String targetTenantID, List<AccountTenant> accountTenantList) {
@@ -447,7 +604,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         	String deprecatedConfigBaseUrl = emailConfig.getBaseurl();
 
         	Object[] emptyValues = new String[0];
-        	String baseUrl = baseUrlBuilder.replacePath(null).build(emptyValues).toString();
+        	String baseUrl = baseUrlBuilder.build(emptyValues).toString();
+
         	emailConfig.setBaseurl(baseUrl);
         	//
         	// Configuring (via config files) the base URL is not supported as of CSpace v5.0.  Log a warning if we find config for it.
@@ -465,15 +623,15 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     		String message = AuthorizationCommon.generatePasswordResetEmailMessage(emailConfig, accountListItem, token);
     		String status = EmailUtil.sendMessage(emailConfig, accountListItem.getEmail(), message);
     		if (status != null) {
-    			String errMsg = String.format("Could not send a password request email to user ID='%s'.  Error: '%s'",
+    			String errMsg = String.format("Could not send email to %s: %s",
     					accountListItem.email, status);
             	result = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
     		} else {
-    			String okMsg = String.format("Password reset email sent to '%s'.", accountListItem.getEmail());
+    			String okMsg = accountListItem.getEmail();
     			result = Response.status(Response.Status.OK).entity(okMsg).type("text/plain").build();
     		}
     	} else {
-    		String errMsg = String.format("The email configuration for tenant ID='%s' is missing.  Please ask your CollectionSpace administrator to check the configuration.",
+    		String errMsg = String.format("The email configuration for tenant %s is missing. Please ask your CollectionSpace administrator to check the configuration.",
     				targetTenantID);
         	result = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
     	}

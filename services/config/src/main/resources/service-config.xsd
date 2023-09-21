@@ -10,7 +10,7 @@
         Schema for service layer configuration
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns="http://collectionspace.org/services/config"
   xmlns:types="http://collectionspace.org/services/config/types"
@@ -23,31 +23,32 @@
     <xs:element name="service-config">
         <xs:complexType>
             <xs:sequence>
-            	<xs:element name="use-app-generated-tenant-bindings" type="xs:boolean" minOccurs="0"  maxOccurs="1"/>
+            	<xs:element name="use-app-generated-tenant-bindings" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
             	<xs:element name="cspace-instance-id" type="xs:string" default="" minOccurs="0"  maxOccurs="1"/>
             	<xs:element name="db-csadmin-name" type="xs:string" minOccurs="1"  maxOccurs="1"/>
             	<xs:element name="db-cspace-name" type="xs:string" minOccurs="1"  maxOccurs="1"/>
             	<xs:element name="db-nuxeo-name" type="xs:string" minOccurs="1"  maxOccurs="1"/>
                 <!-- assumption: there is only one type of repository client used  -->
-                <xs:element name="repository-client" type="RepositoryClientConfigType" minOccurs="1"  maxOccurs="1"/>
-                <xs:element name="repository-workspace" type="RepositoryWorkspaceType" minOccurs="0"  maxOccurs="1" />
+                <xs:element name="repository-client" type="RepositoryClientConfigType" minOccurs="1" maxOccurs="1"/>
+                <xs:element name="repository-workspace" type="RepositoryWorkspaceType" minOccurs="0" maxOccurs="1" />
+                <xs:element name="security" type="SecurityType" minOccurs="0" maxOccurs="1" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
     <xs:complexType name="RepositoryClientConfigType">
         <xs:sequence>
-            <xs:element name="host" type="xs:string" minOccurs="1"  maxOccurs="1" />
-            <xs:element name="port" type="xs:int" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="host" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="port" type="xs:int" minOccurs="1" maxOccurs="1" />
             <!-- protocol (http/https) is only applicable for rest client -->
-            <xs:element name="protocol" type="xs:string" minOccurs="0"  maxOccurs="1" />
-            <xs:element name="user" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="protocol" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="user" type="xs:string" minOccurs="1" maxOccurs="1" />
             <!-- password should not be in cleartext -->
-            <xs:element name="password" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1" />
             <!-- default client is java -->
-            <xs:element name="client-type" type="ClientType" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="client-type" type="ClientType" minOccurs="1" maxOccurs="1" />
             <!-- default client is org.collectionspace.services.nuxeo.client.java.RepositoryJavaClient -->
-            <xs:element name="client-class" type="xs:string" minOccurs="1"  maxOccurs="1" />
+            <xs:element name="client-class" type="xs:string" minOccurs="1" maxOccurs="1" />
 						<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <!-- name of the client -->
@@ -60,17 +61,17 @@
             <xs:element name="workspace" maxOccurs="unbounded" >
                 <xs:complexType>
                     <xs:sequence>
-                        <xs:element name="service-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                        <xs:element name="service-name" type="xs:string" minOccurs="1" maxOccurs="1" />
                         <!-- workspace name is required for Repository Java client -->
-                        <xs:element name="workspace-name" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                        <xs:element name="workspace-name" type="xs:string" minOccurs="1" maxOccurs="1" />
                         <!-- workspace ids are required only for Repository REST client -->
-                        <xs:element name="workspace-id" type="xs:string" minOccurs="1"  maxOccurs="1" />
+                        <xs:element name="workspace-id" type="xs:string" minOccurs="1" maxOccurs="1" />
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
         </xs:sequence>
     </xs:complexType>
-    
+
     <!-- enumeration defining the type repository client -->
     <xs:simpleType name="ClientType">
         <xs:restriction base="xs:string">
@@ -79,6 +80,101 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:complexType name="SecurityType">
+        <xs:annotation>
+            <xs:documentation>Configures security.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="cors" type="CORSType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="oauth" type="OAuthType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
 
+    <xs:complexType name="CORSType">
+        <xs:sequence>
+            <!-- An origin for which cross-origin requests are allowed. -->
+            <xs:element name="allowed-origin" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+
+            <!-- How long, as a duration, the response from a pre-flight request can be cached by clients. -->
+            <!-- Specified in ISO-8601 duration format: PnDTnHnMn.nS -->
+            <xs:element name="max-age" type="xs:string" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OAuthType">
+        <xs:sequence>
+            <xs:element name="default-access-token-time-to-live" type="xs:string" minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The default TTL for access tokens, if not specified in the token settings of
+                        the client registration.
+
+                        Specified in ISO-8601 duration format: PnDTnHnMn.nS
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="client-registrations" type="OAuthClientRegistrationsType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OAuthClientRegistrationsType">
+        <xs:sequence>
+            <xs:element name="client" type="OAuthClientType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OAuthClientType">
+        <xs:sequence>
+            <xs:element name="client-id" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="client-name" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="client-authentication-method" type="OAuthClientAuthenticationMethodEnum" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="authorization-grant-type" type="OAuthAuthorizationGrantTypeEnum" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="scope" type="OAuthScopeEnum" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="redirect-uri" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="client-settings" type="OAuthClientSettingsType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="token-settings" type="OAuthTokenSettingsType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+
+        <xs:attribute name="id" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <xs:simpleType name="OAuthClientAuthenticationMethodEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="basic"/>
+            <xs:enumeration value="client_secret_basic"/>
+            <xs:enumeration value="post"/>
+            <xs:enumeration value="client_secret_post"/>
+            <xs:enumeration value="client_secret_jwt"/>
+            <xs:enumeration value="private_key_jwt"/>
+            <xs:enumeration value="none"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OAuthAuthorizationGrantTypeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="authorization_code"/>
+            <xs:enumeration value="implicit"/>
+            <xs:enumeration value="refresh_token"/>
+            <xs:enumeration value="client_credentials"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OAuthScopeEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="cspace.full"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="OAuthClientSettingsType">
+        <xs:sequence>
+            <xs:element name="require-authorization-consent" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OAuthTokenSettingsType">
+        <xs:sequence>
+            <xs:element name="access-token-time-to-live" type="xs:string" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
 </xs:schema>
-

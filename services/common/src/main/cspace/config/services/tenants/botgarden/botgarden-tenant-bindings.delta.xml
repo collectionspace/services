@@ -24,11 +24,11 @@
                 <types:value>425</types:value>
             </types:item>
         </tenant:properties>
-        
+
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
             <service:validatorHandler xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">org.collectionspace.services.collectionobject.nuxeo.BotGardenCollectionObjectValidatorHandler</service:validatorHandler>
         </tenant:serviceBindings>
- 
+
         <tenant:serviceBindings merge:matcher="id" id="idgenerators">
             <service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
                 <service:params>
@@ -43,6 +43,6 @@
                 </service:params>
             </service:initHandler>
         </tenant:serviceBindings>
-        
+
     </tenant:tenantBinding>
 </tenant:TenantBindingConfig>

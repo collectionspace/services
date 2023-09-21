@@ -27,15 +27,12 @@
  */
 package org.collectionspace.services.common.security;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Set;
 
-
-
-
-//import org.jboss.resteasy.core.ResourceMethod;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.interception.PostProcessInterceptor;
@@ -63,8 +60,9 @@ import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.collectionspace.services.login.LoginClient;
+import org.collectionspace.services.logout.LogoutClient;
 import org.collectionspace.services.systeminfo.SystemInfoClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,6 +83,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	/** The Constant logger. */
 	private static final Logger logger = LoggerFactory.getLogger(SecurityInterceptor.class);
 
+	private static final String LOGIN = LoginClient.SERVICE_NAME;
+	private static final String LOGOUT = LogoutClient.SERVICE_NAME;
 	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String NUXEO_ADMIN = null;
     //
@@ -105,7 +105,10 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 		switch (resName) {
 			case AuthZ.PASSWORD_RESET:
 			case AuthZ.PROCESS_PASSWORD_RESET:
+			case LOGIN:
+			case LOGOUT:
 			case SYSTEM_INFO:
+			case "":
 				return true;
 		}
 
@@ -155,6 +158,7 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 	@Override
 	public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker)
 			throws Failure, CSWebApplicationException {
+
 		ServerResponse result = null; // A null value essentially means success for this method
 		Method resourceMethod = resourceMethodInvoker.getMethod();
 
@@ -329,8 +333,8 @@ public class SecurityInterceptor implements PreProcessInterceptor, PostProcessIn
 					throw new CSWebApplicationException(response);
 				}
 			}
-
-		} catch (Exception e) {
+		}
+		catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			String msg = "User's account is in invalid state, userId=" + userId;
 			Response response = Response.status(
 					Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();

@@ -53,17 +53,19 @@
   			<version>6.6.1</version>
   		</dependency>
 
-        <!-- CollectionSpace dependencies -->
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.authorization.service</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
+		<!-- CollectionSpace dependencies -->
+
+		<dependency>
 			<groupId>org.collectionspace.services</groupId>
-        	<artifactId>org.collectionspace.services.authentication.service</artifactId>
-        	<version>${project.version}</version>
-        	<exclusions>
+			<artifactId>org.collectionspace.services.authorization.service</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.collectionspace.services</groupId>
+			<artifactId>org.collectionspace.services.authentication.service</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+			<exclusions>
 				<exclusion>
 					<artifactId>servlet-api-2.5</artifactId>
 					<groupId>org.mortbay.jetty</groupId>
@@ -156,7 +158,7 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.account.service</artifactId>
             <version>${project.version}</version>
-        </dependency>
+        </dependency>   
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authorization-mgt.service</artifactId>
@@ -206,6 +208,16 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.loanout.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.login.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.logout.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -489,19 +501,19 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
-            <version>${spring.security.oauth2.version}</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-oauth2-authorization-server</artifactId>
+            <version>${spring.security.authorization.server.version}</version>
             <scope>provided</scope>
             <exclusions>
-            	<exclusion>
-            		<artifactId>spring-core</artifactId>
-            		<groupId>org.springframework</groupId>
-            	</exclusion>
-            	<exclusion>
-            		<artifactId>spring-beans</artifactId>
-            		<groupId>org.springframework</groupId>
-            	</exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-beans</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>

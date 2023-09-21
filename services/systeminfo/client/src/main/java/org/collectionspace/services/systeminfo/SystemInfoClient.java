@@ -1,7 +1,7 @@
 package org.collectionspace.services.systeminfo;
 
 /**
- * Client class for Structureddate service.
+ * Client class for system info service.
  * @author remillet
  *
  */

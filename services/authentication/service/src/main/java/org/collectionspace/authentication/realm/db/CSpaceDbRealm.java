@@ -74,13 +74,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  * CSpaceDbRealm provides access to user, password, role, tenant database
- * @author 
+ * @author
  */
 public class CSpaceDbRealm implements CSpaceRealm {
 	public static String DEFAULT_DATASOURCE_NAME = "CspaceDS";
-	
+
     private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
-    
+
     private String datasourceName;
     private String principalsQuery;
     private String saltQuery;
@@ -96,7 +96,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
 	private long delayBetweenAttemptsMillis = DELAY_BETWEEN_ATTEMPTS_MILLISECONDS;
     private static final String DELAY_BETWEEN_ATTEMPTS_MILLISECONDS_STR = "delayBetweenAttemptsMillis";
 	private static final long DELAY_BETWEEN_ATTEMPTS_MILLISECONDS = 200;
-	
+
 	protected void setMaxRetrySeconds(Map<String, ?> options) {
 		Object optionsObj = options.get(MAX_RETRY_SECONDS_STR);
 		if (optionsObj != null) {
@@ -109,11 +109,11 @@ public class CSpaceDbRealm implements CSpaceRealm {
 			}
 		}
 	}
-	
+
 	protected long getMaxRetrySeconds() {
 		return this.maxRetrySeconds;
 	}
-	
+
 	protected void setDelayBetweenAttemptsMillis(Map<String, ?> options) {
 		Object optionsObj = options.get(DELAY_BETWEEN_ATTEMPTS_MILLISECONDS_STR);
 		if (optionsObj != null) {
@@ -126,15 +126,15 @@ public class CSpaceDbRealm implements CSpaceRealm {
 			}
 		}
 	}
-	
+
 	protected long getDelayBetweenAttemptsMillis() {
 		return this.delayBetweenAttemptsMillis;
 	}
-	
+
 	public CSpaceDbRealm() {
         datasourceName = DEFAULT_DATASOURCE_NAME;
 	}
-    
+
     /**
      * CSpace Database Realm
      * @param datasourceName datasource name
@@ -168,10 +168,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
         if (tmp != null) {
             suspendResume = Boolean.valueOf(tmp.toString()).booleanValue();
         }
-        
+
         this.setMaxRetrySeconds(options);
         this.setDelayBetweenAttemptsMillis(options);
-        
+
         if (logger.isTraceEnabled()) {
             logger.trace("DatabaseServerLoginModule, dsJndiName=" + datasourceName);
             logger.trace("principalsQuery=" + principalsQuery);
@@ -270,14 +270,14 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 if (logger.isDebugEnabled()) {
                     logger.debug("No roles found");
                 }
-                
+
                 return roles;
             }
 
             do {
                 String roleName = rs.getString(1);
                 roles.add(roleName);
-                
+
             } while (rs.next());
         } catch (SQLException ex) {
             AccountException ae = new AccountException("Query failed");
@@ -316,7 +316,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     public Set<CSpaceTenant> getTenants(String username) throws AccountException {
         return getTenants(username, false);
     }
-    
+
     private boolean userIsTenantManager(Connection conn, String username) {
         String acctQuery = "SELECT csid FROM accounts_common WHERE userid=?";
         PreparedStatement ps = null;
@@ -356,7 +356,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
         }
         return accountIsTenantManager;
     }
-    
+
     /**
      * Execute the tenantsQuery against the datasourceName to obtain the tenants for
      * the authenticated user.
@@ -366,13 +366,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
     public Set<CSpaceTenant> getTenants(String username, boolean includeDisabledTenants) throws AccountException {
 
     	String tenantsQuery = getTenantQuery(includeDisabledTenants);
-    	
+
         if (logger.isDebugEnabled()) {
             logger.debug("getTenants using tenantsQuery: " + tenantsQuery + ", username: " + username);
         }
 
         Set<CSpaceTenant> tenants = new LinkedHashSet<CSpaceTenant>();
-        
+
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -393,7 +393,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
                     if (logger.isDebugEnabled()) {
                         logger.debug("GetTenants called with tenantManager - synthesizing the pseudo-tenant");
                     }
-                    
+
                     tenants.add(new CSpaceTenant(AuthN.TENANT_MANAGER_ACCT_ID, "PseudoTenant"));
                 } else {
                     if (logger.isDebugEnabled()) {
@@ -403,7 +403,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
                     // empty Tenants set.
                     // FIXME  should this be allowed?
                 }
-                
+
                 return tenants;
             }
 
@@ -461,7 +461,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
 			if (requestAttempts > 0) {
 				Thread.sleep(getDelayBetweenAttemptsMillis()); // Wait a little time between reattempts.
 			}
-			
+
 			try {
 				// proceed to the original request by calling doFilter()
 				result = this.getConnection(getDataSourceName());
@@ -482,7 +482,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
 				requestAttempts++; // keep track of how many times we've tried the request
 			}
 		} while (System.currentTimeMillis() < quittingTime);  // keep trying until we run out of time
-		
+
 		//
 		// Add a warning to the logs if we encountered *any* failures on our re-attempts.  Only add the warning
 		// if we were eventually successful.
@@ -498,10 +498,10 @@ public class CSpaceDbRealm implements CSpaceRealm {
 			// If we get here, it means all of our attempts to get a successful call to chain.doFilter() have failed.
 			throw lastException;
 		}
-		
+
 		return result;
 	}
-    
+
 	/*
 	 * Don't call this method directly.  Instead, use the getConnection() method that take no arguments.
 	 */
@@ -509,52 +509,52 @@ public class CSpaceDbRealm implements CSpaceRealm {
         InitialContext ctx = null;
         Connection conn = null;
         DataSource ds = null;
-        
+
         try {
             ctx = new InitialContext();
             try {
             	ds = (DataSource) ctx.lookup(dataSourceName);
             } catch (Exception e) {}
-            
+
 	        try {
 	        	Context envCtx = (Context) ctx.lookup("java:comp/env");
 	        	ds = (DataSource) envCtx.lookup(dataSourceName);
 	        } catch (Exception e) {}
-	        
+
 	        try {
 	        	Context envCtx = (Context) ctx.lookup("java:comp");
 	        	ds = (DataSource) envCtx.lookup(dataSourceName);
 	        } catch (Exception e) {}
-	        
+
 	        try {
 	        	Context envCtx = (Context) ctx.lookup("java:");
 	        	ds = (DataSource) envCtx.lookup(dataSourceName);
 	        } catch (Exception e) {}
-	        
+
 	        try {
 	        	Context envCtx = (Context) ctx.lookup("java");
 	        	ds = (DataSource) envCtx.lookup(dataSourceName);
 	        } catch (Exception e) {}
-	        
+
 	        try {
 	        	ds = (DataSource) ctx.lookup("java:/" + dataSourceName);
-	        } catch (Exception e) {}  
+	        } catch (Exception e) {}
 
 	        if (ds == null) {
             	ds = AuthN.getDataSource();
 	        }
-	        
+
             if (ds == null) {
                 throw new IllegalArgumentException("datasource not found: " + dataSourceName);
             }
-            
+
             conn = ds.getConnection();
             if (conn == null) {
             	conn = AuthN.getDataSource().getConnection();  //FIXME:REM - This is the result of some type of JNDI mess.  Should try to solve this problem and clean up this code.
             }
-            
+
             return conn;
-            
+
         } catch (NamingException ex) {
             AccountException ae = new AccountException("Error looking up DataSource from: " + dataSourceName);
             ae.initCause(ex);
@@ -619,7 +619,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
         this.tenantsQueryNoDisabled = tenantQuery;
     }
      */
-    
+
     /*
      * This method crawls the exception chain looking for network related exceptions and
      * returns 'true' if it finds one.
@@ -633,13 +633,13 @@ public class CSpaceDbRealm implements CSpaceRealm {
 				result = true;
 				break;
 			}
-			
+
 			cause = cause.getCause();
 		}
 
 		return result;
 	}
-	
+
 	/*
 	 * Return 'true' if the exception is in the "java.net" package.
 	 */
@@ -713,8 +713,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
                 }
             }
         }
-        
+
         return salt;
     }
-    
 }

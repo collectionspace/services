@@ -7,11 +7,11 @@
     Description:
         service layer web application
 -->
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">    
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
     <display-name>CollectionSpace Services</display-name>
-    	
+
 	<env-entry>
-        <description>Sets the logging context for the Tiger web-app</description>
+        <description>Sets the logging context for the web-app</description>
         <env-entry-name>cspace-logging-context</env-entry-name>
         <env-entry-type>java.lang.String</env-entry-type>
         <env-entry-value>CSpaceLoggingContext</env-entry-value>
@@ -58,7 +58,7 @@
 	-		delayBetweenAttemptsMillis - How long to wait between retries.
 	-
 	-->
-	<!-- 
+	<!--
 	<filter>
 		<filter-name>networkErrorRetryFilter</filter-name>
 		<filter-class>org.collectionspace.services.common.NetworkErrorRetryFilter</filter-class>
@@ -71,13 +71,13 @@
       		<param-value>200</param-value>
    		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>networkErrorRetryFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
      -->
-     
+
 	<!--
 		A filter that logs profiling information.
 	 -->
@@ -85,7 +85,7 @@
 		<filter-name>CSpaceFilter</filter-name>
         <filter-class>org.collectionspace.services.common.profile.CSpaceFilter</filter-class>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>CSpaceFilter</filter-name>
 		<url-pattern>/*</url-pattern>
@@ -98,12 +98,12 @@
         <filter-name>JsonToXmlFilter</filter-name>
         <filter-class>org.collectionspace.services.common.xmljson.JsonToXmlFilter</filter-class>
     </filter>
-    
+
     <filter-mapping>
         <filter-name>JsonToXmlFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    
+
     <!--
         A filter that converts XML responses to JSON if needed.
     -->
@@ -111,7 +111,7 @@
         <filter-name>XmlToJsonFilter</filter-name>
         <filter-class>org.collectionspace.services.common.xmljson.XmlToJsonFilter</filter-class>
     </filter>
-    
+
     <filter-mapping>
         <filter-name>XmlToJsonFilter</filter-name>
         <url-pattern>/*</url-pattern>
@@ -150,29 +150,19 @@
             org.collectionspace.services.common.CollectionSpaceServiceContextListener
         </listener-class>
     </listener>
-    
+
 	<!-- The CollectionSpace listener that starts up the RESTEasy/JAX-RS service framework. -->
     <listener>
         <listener-class>
             org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
         </listener-class>
     </listener>
-
+    
     <servlet>
-        <servlet-name>oauth</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>oauth</servlet-name>
-        <url-pattern>/oauth/token/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-            <servlet-name>Resteasy</servlet-name>
-            <servlet-class>
-                org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
-            </servlet-class>
+        <servlet-name>Resteasy</servlet-name>
+        <servlet-class>
+            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
+        </servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Resteasy</servlet-name>
