@@ -24,6 +24,7 @@ import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.config.SAMLRelyingPartyType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.slf4j.Logger;
@@ -63,8 +64,36 @@ public class LoginResource {
     @Produces(MediaType.TEXT_HTML)
     public String getHtml(@Context HttpServletRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
         ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
+        List<SAMLRelyingPartyType> samlRegistrations = ConfigUtils.getSAMLRelyingPartyRegistrations(serviceConfig);
 
         Map<String, Object> uiConfig = new HashMap<>();
+        Map<String, Object> ssoConfig = new HashMap<>();
+
+        if (samlRegistrations != null) {
+            for (SAMLRelyingPartyType samlRegistration : samlRegistrations) {
+                Map<String, String> registrationConfig = new HashMap<>();
+                String name = samlRegistration.getName();
+
+                if (name == null || name.length() == 0) {
+                    name = samlRegistration.getId();
+                }
+
+                registrationConfig.put("name", name);
+
+                if (samlRegistration.getIcon() != null) {
+                    registrationConfig.put("icon", samlRegistration.getIcon().getLocation());
+                }
+
+                String url = "/cspace-services/saml2/authenticate/" + samlRegistration.getId();
+
+                ssoConfig.put(url, registrationConfig);
+            }
+        }
+
+        if (!ssoConfig.isEmpty()) {
+            uiConfig.put("sso", ssoConfig);
+        }
+
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
 
         if (csrfToken != null) {

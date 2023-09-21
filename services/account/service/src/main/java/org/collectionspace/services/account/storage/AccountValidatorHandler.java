@@ -102,7 +102,10 @@ public class AccountValidatorHandler implements ValidatorHandler {
                     invalid = true;
                     msgBldr.append("\nuserId : missing");
                 }
-                if (account.getPassword() == null || account.getPassword().length == 0) {
+                if (
+                    (account.isRequireSSO() == null || !account.isRequireSSO())
+                    && (account.getPassword() == null || account.getPassword().length == 0)
+                ) {
                     invalid = true;
                     msgBldr.append("\npassword : missing");
                 }

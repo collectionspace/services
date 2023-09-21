@@ -120,6 +120,18 @@
                         </xs:appinfo>
                     </xs:annotation>
                 </xs:element>
+                <xs:element name="requireSSO" type="xs:boolean" minOccurs="0" maxOccurs="1">
+                    <xs:annotation>
+                        <xs:documentation>
+                            If true, login through an SSO identity provider is required.
+                        </xs:documentation>
+                        <xs:appinfo>
+                            <hj:basic>
+                                <orm:column name="require_sso" />
+                            </hj:basic>
+                        </xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
                 <xs:element name="tenants" type="account_tenant" minOccurs="1" maxOccurs="unbounded">
                     <xs:annotation>
                         <xs:documentation>

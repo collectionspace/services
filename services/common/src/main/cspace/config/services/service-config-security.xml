@@ -61,5 +61,31 @@
                 </client>
             </client-registrations>
         </oauth>
+
+        <!--
+            Example SSO config.
+        -->
+        <!--
+        <sso>
+            <saml>
+                <single-logout />
+
+                <relying-party-registrations>
+                    <relying-party id="mocksaml">
+                        <name>Mock SAML</name>
+                        <icon location="https://mocksaml.com/favicon.ico" />
+                        <metadata location="https://mocksaml.com/api/saml/metadata" />
+
+                        <signing-x509-credentials>
+                            <x509-credential>
+                                <private-key location="file:///home/collectionspace/tomcat/cspace/services/credentials/private.key" />
+                                <x509-certificate location="file:///home/collectionspace/tomcat/cspace/services/credentials/certificate.crt" />
+                            </x509-credential>
+                        </signing-x509-credentials>
+                    </relying-party>
+                </relying-party-registrations>
+            </saml>
+        </sso>
+        -->
     </security>
 </svc:service-config>

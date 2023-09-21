@@ -556,6 +556,12 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             return Response.status(Response.Status.NOT_FOUND).entity(msg).type("text/plain").build();
         }
 
+        ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
+
+        if (ConfigUtils.isSsoAvailable(serviceConfig) && accountListItem.isRequireSSO() != null && accountListItem.isRequireSSO()) {
+        	return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("The account requires single sign-on.").type("text/plain").build();
+        }
+
         // If no tenant ID was supplied, use the account's first associated tenant ID for purposes
         // of password reset. This is the same way that a tenant is selected for the account when
         // logging in. In practice, accounts are only associated with one tenant anyway.
