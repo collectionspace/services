@@ -87,5 +87,17 @@
             </saml>
         </sso>
         -->
+
+        <sso>
+            <saml>
+                <relying-party-registrations>
+                    <relying-party id="auth0">
+                        <name>Auth0</name>
+                        <icon location="https://cdn.auth0.com/manhattan/versions/1.4478.0/assets/badge.png" />
+                        <metadata location="https://dev-vynkcnqhac3c0s10.us.auth0.com/samlp/metadata/aiXoltFSsQymeHorBxWM5pGLxnslocpe" />
+                    </relying-party>
+                </relying-party-registrations>
+            </saml>
+        </sso>
     </security>
 </svc:service-config>
