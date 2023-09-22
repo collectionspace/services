@@ -32,7 +32,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
 import org.collectionspace.authentication.CSpaceUser;
-import org.collectionspace.authentication.spring.CSpaceCorsConfiguration;
 import org.collectionspace.authentication.spring.CSpaceDaoAuthenticationProvider;
 import org.collectionspace.authentication.spring.CSpaceJwtAuthenticationToken;
 import org.collectionspace.authentication.spring.CSpaceLogoutSuccessHandler;
@@ -169,7 +168,7 @@ public class SecurityConfig {
 	}
 
 	private CorsConfiguration defaultCorsConfiguration(List<String> allowedOrigins, Duration maxAge) {
-		CorsConfiguration configuration = new CSpaceCorsConfiguration();
+		CorsConfiguration configuration = new CorsConfiguration();
 
 		configuration.setAllowedOrigins(allowedOrigins);
 
@@ -199,7 +198,7 @@ public class SecurityConfig {
 	}
 
 	private CorsConfiguration oauthServerCorsConfiguration(List<String> allowedOrigins, Duration maxAge) {
-		CorsConfiguration configuration = new CSpaceCorsConfiguration();
+		CorsConfiguration configuration = new CorsConfiguration();
 
 		configuration.setAllowedOrigins(allowedOrigins);
 
@@ -251,14 +250,6 @@ public class SecurityConfig {
 						@Override
 						@Nullable
 						public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-							String scheme = request.getScheme();
-							String host = request.getServerName();
-							int port = request.getServerPort();
-
-							System.out.println("scheme=[" + scheme + "]");
-							System.out.println("host=[" + host + "]");
-							System.out.println("port=[" + port + "]");
-
 							return SecurityConfig.this.oauthServerCorsConfiguration;
 						}
 					});
@@ -404,14 +395,6 @@ public class SecurityConfig {
 						@Override
 						@Nullable
 						public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-							String scheme = request.getScheme();
-							String host = request.getServerName();
-							int port = request.getServerPort();
-
-							System.out.println("scheme=[" + scheme + "]");
-							System.out.println("host=[" + host + "]");
-							System.out.println("port=[" + port + "]");
-
 							return SecurityConfig.this.defaultCorsConfiguration;
 						}
 					});
