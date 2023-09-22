@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS accounts_common (
 	mobile VARCHAR(255),
 	person_ref_name VARCHAR(255),
 	phone VARCHAR(255),
+	require_sso BOOLEAN,
 	screen_name VARCHAR(128) NOT NULL,
 	status VARCHAR(15) NOT NULL,
 	updated_at TIMESTAMP,
@@ -12,6 +13,10 @@ CREATE TABLE IF NOT EXISTS accounts_common (
 	metadata_protection VARCHAR(255),
 	roles_protection VARCHAR(255)
 );
+
+-- Upgrade older accounts_common tables to 8.0
+
+ALTER TABLE accounts_common ADD COLUMN IF NOT EXISTS require_sso BOOLEAN;
 
 CREATE TABLE IF NOT EXISTS accounts_tenants (
 	hjid INT8 NOT NULL PRIMARY KEY,

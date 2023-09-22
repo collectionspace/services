@@ -9,6 +9,10 @@ import org.collectionspace.services.config.CORSType;
 import org.collectionspace.services.config.OAuthClientRegistrationsType;
 import org.collectionspace.services.config.OAuthClientType;
 import org.collectionspace.services.config.OAuthType;
+import org.collectionspace.services.config.SAMLRelyingPartyRegistrationsType;
+import org.collectionspace.services.config.SAMLRelyingPartyType;
+import org.collectionspace.services.config.SAMLType;
+import org.collectionspace.services.config.SSOType;
 import org.collectionspace.services.config.SecurityType;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
@@ -161,6 +165,46 @@ public class ConfigUtils {
 		}
 
 		return null;
+	}
+
+	public static SSOType getSSO(ServiceConfig serviceConfig) {
+		SecurityType security = serviceConfig.getSecurity();
+
+		if (security != null) {
+			return security.getSso();
+		}
+
+		return null;
+	}
+
+	public static SAMLType getSAML(ServiceConfig serviceConfig) {
+		SSOType sso = getSSO(serviceConfig);
+
+		if (sso != null) {
+			return sso.getSaml();
+		}
+
+		return null;
+	}
+
+	public static List<SAMLRelyingPartyType> getSAMLRelyingPartyRegistrations(ServiceConfig serviceConfig) {
+		SAMLType saml = getSAML(serviceConfig);
+
+		if (saml != null) {
+			SAMLRelyingPartyRegistrationsType registrations = saml.getRelyingPartyRegistrations();
+
+			if (registrations != null) {
+				return registrations.getRelyingParty();
+			}
+		}
+
+		return null;
+	}
+
+	public static boolean isSsoAvailable(ServiceConfig serviceConfig) {
+		List<SAMLRelyingPartyType> samlRegistrations = getSAMLRelyingPartyRegistrations(serviceConfig);
+
+		return (samlRegistrations != null && samlRegistrations.size() > 0);
 	}
 
 	public static String getUILoginSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {

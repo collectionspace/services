@@ -148,8 +148,8 @@ public class AuthorizationCommon {
 			"INSERT INTO users (username,passwd,created_at) VALUES (?,?,now())";
 	final private static String INSERT_ACCOUNT_SQL =
 			"INSERT INTO accounts_common "
-					+ "(csid, email, userid, status, screen_name, metadata_protection, roles_protection, created_at) "
-					+ "VALUES (?,?,?,'ACTIVE',?, 'immutable', 'immutable', now())";
+					+ "(csid, email, userid, require_sso, status, screen_name, metadata_protection, roles_protection, created_at) "
+					+ "VALUES (?,?,?,false,'ACTIVE',?, 'immutable', 'immutable', now())";
 
 	// TENANT MANAGER specific SQL
 	final private static String QUERY_TENANT_MGR_USER_SQL =

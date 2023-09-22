@@ -34,6 +34,7 @@ public class CSpaceUser extends User {
 
     private Set<CSpaceTenant> tenants;
     private CSpaceTenant primaryTenant;
+    private boolean requireSSO;
     private String salt;
 
     /**
@@ -46,6 +47,7 @@ public class CSpaceUser extends User {
      * @param authorities the authorities that have been granted to the user
      */
     public CSpaceUser(String username, String password, String salt,
+            boolean requireSSO,
             Set<CSpaceTenant> tenants,
             Set<? extends GrantedAuthority> authorities) {
 
@@ -57,6 +59,7 @@ public class CSpaceUser extends User {
                 authorities);
 
         this.tenants = tenants;
+        this.requireSSO = requireSSO;
         this.salt = salt;
 
         if (!tenants.isEmpty()) {
@@ -88,5 +91,13 @@ public class CSpaceUser extends User {
      */
     public String getSalt() {
     	return salt != null ? salt : "";
+    }
+
+    /**
+     * Determines if the user is required to log in using single sign-on.
+     * @return true if SSO is required, false otherwise
+     */
+    public boolean isRequireSSO() {
+        return requireSSO;
     }
 }

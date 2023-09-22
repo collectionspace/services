@@ -67,6 +67,7 @@
                                     </xs:element>
                                     <xs:element name="personRefName" type="xs:string" minOccurs="1" />
                                     <xs:element name="email" type="xs:string" minOccurs="1" />
+                                    <xs:element name="requireSSO" type="xs:boolean" minOccurs="0" />
                                     <xs:element name="status" type="status" minOccurs="1" />
                                     <!-- uri to retrive collection object details -->
                                     <xs:element name="uri" type="xs:anyURI" minOccurs="1" />

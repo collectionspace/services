@@ -87,6 +87,7 @@
         <xs:sequence>
             <xs:element name="cors" type="CORSType" minOccurs="0" maxOccurs="1" />
             <xs:element name="oauth" type="OAuthType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="sso" type="SSOType" minOccurs="0" maxOccurs="1" />
         </xs:sequence>
     </xs:complexType>
 
@@ -175,6 +176,194 @@
     <xs:complexType name="OAuthTokenSettingsType">
         <xs:sequence>
             <xs:element name="access-token-time-to-live" type="xs:string" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SSOType">
+        <xs:annotation>
+            <xs:documentation>Configures single sign-on.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="saml" type="SAMLType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SAMLType">
+        <xs:annotation>
+            <xs:documentation>Configures SAML single sign-on.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="single-logout" type="SAMLSingleLogoutType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="relying-party-registrations" type="SAMLRelyingPartyRegistrationsType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SAMLSingleLogoutType">
+        <xs:annotation>
+            <xs:documentation>Configures SAML single logout. Single logout is enabled if this element is present.</xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
+
+    <xs:complexType name="SAMLRelyingPartyRegistrationsType">
+        <xs:annotation>
+            <xs:documentation>Configures connections to SAML identity providers.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="relying-party" type="SAMLRelyingPartyType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SAMLRelyingPartyType">
+        <xs:annotation>
+            <xs:documentation>Configures a connection to a SAML identity provider.</xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:element name="name" type="xs:string" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        A user-facing name for the IdP. This appears in the login UI, so it should
+                        be human-readable, using the terminology/branding that users of the IdP
+                        recognize. If no name is supplied, the registration ID is used in the user
+                        interface.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:element name="icon" type="IconType" minOccurs="0" maxOccurs="1" >
+                <xs:annotation>
+                    <xs:documentation>
+                        An icon for the IdP, used in the login UI. If no icon is supplied, a
+                        default icon is used.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
+            <xs:choice minOccurs="1" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        Configures the details of the IdP. Provide either metadata for automatic
+                        configuration, or asserting-party-details to manually specify the settings.
+                    </xs:documentation>
+                </xs:annotation>
+
+                <xs:element name="metadata" type="SAMLMetadataType" />
+                <xs:element name="asserting-party-details" type="AssertingPartyDetailsType" />
+            </xs:choice>
+
+            <xs:element name="signing-x509-credentials" type="X509CredentialsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The credentials used to sign requests to the IdP. Required if the IdP
+                        wants login requests to be signed (some do, some don't), or if single
+                        logout is enabled (since logout requests must always be signed).
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+
+        <xs:attribute name="id" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    A registration ID that must be unique among all SAML IdPs. This ID appears in
+                    URLs, so it's preferable to use only URL-friendly characters.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="IconType">
+        <xs:annotation>
+            <xs:documentation>
+                Configures an icon.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:attribute name="location" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The URL from which to retrieve the icon. This may be a file:// URL if the icon
+                    is stored in a local file.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="SAMLMetadataType">
+        <xs:annotation>
+            <xs:documentation>
+                Configures metadata retrieval for a SAML relying party.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:attribute name="location" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The URL from which to retrieve the metadata. This may be a file:// URL if the
+                    metadata is stored in a local file.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="X509CredentialsType">
+        <xs:sequence>
+            <xs:element name="x509-credential" type="X509CredentialType" minOccurs="1" maxOccurs="unbounded" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="X509CredentialType">
+        <xs:sequence>
+            <xs:element name="private-key" type="PrivateKeyType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="x509-certificate" type="X509CertificateType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PrivateKeyType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="location" type="xs:string" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="X509CertificateType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="location" type="xs:string" />
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:simpleType name="MessageBindingEnum">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="post"/>
+            <xs:enumeration value="redirect"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="AssertingPartyDetailsType">
+        <xs:sequence>
+            <xs:element name="entity-id" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="want-authn-requests-signed" type="xs:boolean" minOccurs="0" maxOccurs="1" />
+            <xs:element name="signing-algorithms" type="SigningAlgorithmsType" minOccurs="0" maxOccurs="1" />
+
+            <xs:element name="single-sign-on-service-binding" type="MessageBindingEnum" minOccurs="0" maxOccurs="1" />
+            <xs:element name="single-sign-on-service-location" type="xs:string" minOccurs="0" maxOccurs="1" />
+
+            <xs:element name="single-logout-service-binding" type="MessageBindingEnum" minOccurs="0" maxOccurs="1" />
+            <xs:element name="single-logout-service-location" type="xs:string" minOccurs="0" maxOccurs="1" />
+            <xs:element name="single-logout-service-response-location" type="xs:string" minOccurs="0" maxOccurs="1" />
+
+            <xs:element name="encryption-x509-credentials" type="X509CredentialsType" minOccurs="0" maxOccurs="1" />
+            <xs:element name="verification-x509-credentials" type="X509CredentialsType" minOccurs="0" maxOccurs="1" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SigningAlgorithmsType">
+        <!-- https://litsec.github.io/opensaml-javadoc-mirror/org/opensaml/opensaml-xmlsec-api/3.4.2/constant-values.html#org.opensaml.xmlsec.signature.support.SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS -->
+        <xs:sequence>
+            <xs:element name="signing-algorithm" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
         </xs:sequence>
     </xs:complexType>
 </xs:schema>

@@ -72,6 +72,20 @@ public class AccountDocumentHandler
 
         setTenant(account);
 
+        if (account.getPassword() == null) {
+            // The password is allowed to be null when the user is created with requireSSO == true.
+            // Generate a random password to ensure that it won't be blank if the requireSSO flag
+            // is changed.
+
+            RandomStringGenerator generator = new RandomStringGenerator.Builder()
+                .withinRange(34, 126)
+                .build();
+
+            String randomPassword = generator.generate(24);
+
+            account.setPassword(randomPassword.getBytes());
+        }
+
         if (account.getStatus() == null) {
             account.setStatus(Status.ACTIVE);
         }
@@ -146,6 +160,9 @@ public class AccountDocumentHandler
         }
         if (from.getPersonRefName() != null) {
             to.setPersonRefName(from.getPersonRefName());
+        }
+        if (from.isRequireSSO() != null) {
+            to.setRequireSSO(from.isRequireSSO());
         }
 
         // Note that we do not allow update of locks
@@ -254,6 +271,7 @@ public class AccountDocumentHandler
 
             accListItem.setTenants(account.getTenants());
             accListItem.setEmail(account.getEmail());
+            accListItem.setRequireSSO(account.isRequireSSO());
             accListItem.setStatus(account.getStatus());
             String id = account.getCsid();
             accListItem.setUri(getServiceContextPath() + id);
