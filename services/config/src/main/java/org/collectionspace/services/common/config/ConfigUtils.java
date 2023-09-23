@@ -207,6 +207,16 @@ public class ConfigUtils {
 		return (samlRegistrations != null && samlRegistrations.size() > 0);
 	}
 
+	public static String getUIBaseUrl(TenantBindingType tenantBinding) {
+		UIConfig uiConfig = tenantBinding.getUiConfig();
+
+		if (uiConfig != null) {
+			return uiConfig.getBaseUrl();
+		}
+
+		return null;
+	}
+
 	public static String getUILoginSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {
 		UIConfig uiConfig = tenantBinding.getUiConfig();
 
