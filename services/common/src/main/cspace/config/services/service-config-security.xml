@@ -90,11 +90,20 @@
 
         <sso>
             <saml>
+                <single-logout />
+
                 <relying-party-registrations>
                     <relying-party id="auth0">
                         <name>Auth0</name>
                         <icon location="https://cdn.auth0.com/manhattan/versions/1.4478.0/assets/badge.png" />
                         <metadata location="https://dev-vynkcnqhac3c0s10.us.auth0.com/samlp/metadata/aiXoltFSsQymeHorBxWM5pGLxnslocpe" />
+
+                        <signing-x509-credentials>
+                            <x509-credential>
+                                <private-key location="https://raw.githubusercontent.com/spring-projects/spring-security-samples/main/servlet/xml/java/saml2/login-logout/src/main/resources/credentials/rp-private.key" />
+                                <x509-certificate location="https://raw.githubusercontent.com/spring-projects/spring-security-samples/main/servlet/xml/java/saml2/login-logout/src/main/resources/credentials/rp-certificate.crt" />
+                            </x509-credential>
+                        </signing-x509-credentials>
                     </relying-party>
                 </relying-party-registrations>
             </saml>
