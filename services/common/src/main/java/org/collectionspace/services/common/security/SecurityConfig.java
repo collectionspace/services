@@ -162,7 +162,7 @@ public class SecurityConfig {
 
 		// Read explicitly configured allowed origins from service config.
 
-		List<String> allowedOrigins = ConfigUtils.getCorsAllowedOrigins(serviceConfig);
+		List<String> allowedOrigins = new ArrayList<String>(ConfigUtils.getCorsAllowedOrigins(serviceConfig));
 
 		// Automatically add UI locations as allowed origins.
 
@@ -261,6 +261,8 @@ public class SecurityConfig {
 		Map<String, CorsConfiguration> corsConfigurations = new LinkedHashMap<>();
 
 		if (relyingPartiesConfig != null) {
+			List<String> providerOrigins = new ArrayList<>();
+
 			for (final SAMLRelyingPartyType relyingPartyConfig : relyingPartiesConfig) {
 				String id = relyingPartyConfig.getId();
 				RelyingPartyRegistration registration = relyingPartyRegistrationRepository.findByRegistrationId(id);
@@ -281,6 +283,8 @@ public class SecurityConfig {
 					String responseUrl = "/login/saml2/sso/" + id;
 					String providerOrigin = providerUrl.getProtocol() + "://" + providerUrl.getAuthority();
 
+					providerOrigins.add(providerOrigin);
+
 					configuration.setAllowedOrigins(allowedOrigins);
 					configuration.addAllowedOrigin(providerOrigin);
 
@@ -294,6 +298,27 @@ public class SecurityConfig {
 
 					corsConfigurations.put(responseUrl, configuration);
 				}
+			}
+
+			if (ConfigUtils.isSAMLSingleLogoutEnabled(serviceConfig)) {
+					CorsConfiguration configuration = new CorsConfiguration();
+					String responseUrl = "/logout/saml2/sso";
+
+					configuration.setAllowedOrigins(allowedOrigins);
+
+					for (String providerOrigin : providerOrigins) {
+						configuration.addAllowedOrigin(providerOrigin);
+					}
+
+					if (maxAge != null) {
+						configuration.setMaxAge(maxAge);
+					}
+
+					configuration.setAllowedMethods(Arrays.asList(
+						HttpMethod.POST.toString()
+					));
+
+					corsConfigurations.put(responseUrl, configuration);
 			}
 		}
 
