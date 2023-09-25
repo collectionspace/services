@@ -302,7 +302,7 @@ public class SecurityConfig {
 
 			if (ConfigUtils.isSAMLSingleLogoutEnabled(serviceConfig)) {
 					CorsConfiguration configuration = new CorsConfiguration();
-					String responseUrl = "/logout/saml2/sso";
+					String responseUrl = "/logout/saml2/slo";
 
 					configuration.setAllowedOrigins(allowedOrigins);
 
