@@ -187,6 +187,16 @@ public class ConfigUtils {
 		return null;
 	}
 
+	public static boolean isSAMLSingleLogoutEnabled(ServiceConfig serviceConfig) {
+		SAMLType saml = getSAML(serviceConfig);
+
+		if (saml != null) {
+			return (saml.getSingleLogout() != null);
+		}
+
+		return false;
+	}
+
 	public static List<SAMLRelyingPartyType> getSAMLRelyingPartyRegistrations(ServiceConfig serviceConfig) {
 		SAMLType saml = getSAML(serviceConfig);
 
