@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="artwork_description" pageWidth="1000" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="49b29b35-57c3-422f-8699-01975b0a33f9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["objectproductionperson"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+	obj.objectnumber,
+	ong.objectname,
+	tg.title,
+	person.objectproductionperson,
+	sdg.datedisplaydate,
+	fineart.materialtechniquedescription,
+	material.material,
+	technique.technique,
+	dimension.dimension,
+	media.objectcsid AS mediacsid
+FROM collectionobjects_common obj
+INNER JOIN hierarchy hier on hier.id = obj.id
+INNER JOIN misc ON misc.id = obj.id and misc.lifecyclestate != 'deleted'
+INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
+LEFT JOIN collectionobjects_fineart fineart ON fineart.id = obj.id
+LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
+LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
+LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
+LEFT JOIN titlegroup tg ON tg.id = title_hier.id
+LEFT JOIN hierarchy person_hier ON person_hier.parentid = obj.id AND person_hier.primarytype = 'objectProductionPersonGroup' AND person_hier.pos = 0
+LEFT JOIN objectproductionpersongroup person ON person.id = person_hier.id
+LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = obj.id AND sdg_hier.primarytype = 'structuredDateGroup' AND sdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND sdg_hier.pos = 0
+LEFT JOIN structureddategroup sdg ON sdg.id = sdg_hier.id
+LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup' and material_hier.pos = 0
+LEFT JOIN materialgroup material on material.id = material_hier.id
+LEFT JOIN hierarchy technique_hier on technique_hier.parentid = obj.id and technique_hier.primarytype = 'techniqueGroup' and technique_hier.pos = 0
+LEFT JOIN techniquegroup technique on technique.id = technique_hier.id
+LEFT JOIN (
+ SELECT
+	measured_hier.parentid,
+	string_agg(concat(dimension.dimension, ' ', dimension.value::text, ' ', dimension.measurementunit), ' | ') AS dimension
+	FROM hierarchy measured_hier
+	INNER JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup'
+	LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
+	WHERE measured_hier.primarytype = 'measuredPartGroup'
+	GROUP BY measured_hier.parentid
+) dimension on dimension.parentid = obj.id
+LEFT JOIN (
+	SELECT relation.*
+	FROM relations_common relation
+	INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+	WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+) media ON media.subjectcsid = hier.name
+$P!{whereclause}]]>
+	</queryString>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="objectname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="title"/>
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="titlegroup"/>
+	</field>
+	<field name="objectproductionperson" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectproductionperson"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectproductionperson"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="objectproductionpersongroup"/>
+	</field>
+	<field name="datedisplaydate" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="datedisplaydate"/>
+		<property name="com.jaspersoft.studio.field.label" value="datedisplaydate"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
+	</field>
+	<field name="materialtechniquedescription" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="materialtechniquedescription"/>
+		<property name="com.jaspersoft.studio.field.label" value="materialtechniquedescription"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_fineart"/>
+	</field>
+	<field name="material" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="material"/>
+		<property name="com.jaspersoft.studio.field.label" value="material"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="materialgroup"/>
+	</field>
+	<field name="technique" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="technique"/>
+		<property name="com.jaspersoft.studio.field.label" value="technique"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="techniquegroup"/>
+	</field>
+	<field name="dimension" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="dimension"/>
+		<property name="com.jaspersoft.studio.field.label" value="dimension"/>
+	</field>
+	<field name="mediacsid" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.label" value="mediacsid"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="relations_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="a25b7e00-dc64-44b8-b3cb-c02e4eea961f">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="3e25ffb6-3606-4fbd-bb2a-6eeece4f41e9">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Object Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="b4efbef7-3e35-4796-8993-d7022342b6d4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="3cdbd088-f8c3-442e-974b-374bb2d3a14c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Production Person]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="8e0edd98-6f3f-4bd3-a0a2-b3c6b2306376">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Production Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="cc8bc8f2-e0cc-45e6-b1f2-a761a9b845cd">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Material/Technique Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="d98f1448-ad69-4028-b5ec-63569ff66044">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Material]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="c0b8e895-2d26-4ea9-93e1-43154dc113fe">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Production Technique]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="c72ea836-2194-4c87-aca3-0db148c21ac2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Measurement]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="d81a8943-8525-42ba-815d-32c7dbf837af">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Media]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="a94b63dc-6a68-47b3-9843-016b65caf79d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="484788ab-011c-4079-998c-81f6666f8533">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectname}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="d892212f-d882-4478-89ed-60cef306a91e">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="4e01762a-9a31-4327-bc3a-6bd4442fa784">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{objectproductionperson}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="f2da256f-bdda-44bb-8e58-98b115eee361">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{datedisplaydate}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="a623c09c-2415-40cc-b121-4a275f2e887f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{materialtechniquedescription}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="33ab16b3-d35c-4d66-8c53-c304de906ba1">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{material}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="95326767-7dd8-46db-a369-a296437d5a05">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{technique}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="b5e03fd0-1d20-48b1-a7a6-1e195285b228">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{dimension}]]></textFieldExpression>
+			</textField>
+			<image onErrorType="Blank">
+				<reportElement x="900" y="0" width="50" height="50" uuid="e0d804b1-8cf5-4db9-a910-515e6239210a" />
+				<imageExpression><![CDATA["cspace://media/" + $F{mediacsid} + "/blob/derivatives/Thumbnail/content"]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

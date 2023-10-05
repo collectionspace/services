@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="objectfullcurrentplace" pageWidth="2200" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="5a82d2c4-148b-43c2-8c7c-d2da30c26fe1">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="objectfullcurrentplace" pageWidth="2300" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="5a82d2c4-148b-43c2-8c7c-d2da30c26fe1">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["computedcurrentlocation,placementtype,owner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,broaderplace"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["computedcurrentlocation,placementtype,owner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,broaderplace,placetype"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -41,6 +41,7 @@
 ), movements AS (
   select mvmt.currentlocationnote,
     placement_type.item AS placementtype, pa.placementenvironment,
+    placetype.item AS placetype,
     owner.owner, owner.ownertype, owner.ownershipnote, owner_sdg.datedisplaydate AS ownerdate,
     addr.addressplace1, addr.addressplace2, addr.addressmunicipality, addr.addressstateorprovince,
     addr.addresscountry, addr.addresstype, addr.addresspostcode,
@@ -51,6 +52,7 @@
   INNER JOIN movements_common mvmt ON mvmt.currentlocation = obj.computedcurrentlocation
   INNER JOIN places_common place ON mvmt.currentlocation = place.refname
   INNER JOIN hierarchy place_hier ON place_hier.id = place.id
+  LEFT JOIN places_publicart_publicartplacetypes placetype on placetype.id = place.id AND placetype.pos = 0
   LEFT JOIN places_publicart_placementtypes placement_type ON placement_type.id = place.id AND placement_type.pos = 0
   LEFT JOIN places_publicart pa ON pa.id = place.id
   LEFT JOIN hierarchy owner_hier ON owner_hier.parentid = place.id AND owner_hier.primarytype = 'publicartPlaceOwnerGroup' AND owner_hier.pos = 0
@@ -69,6 +71,7 @@ SELECT
   object.briefdescription,
   object.computedcurrentlocation,
   mvmt.currentlocationnote,
+  mvmt.placetype,
   mvmt.placementtype,
   mvmt.placementenvironment,
   mvmt.owner, mvmt.ownertype, mvmt.ownerdate, mvmt.ownershipnote,
@@ -109,6 +112,11 @@ LEFT JOIN movements mvmt ON mvmt.objcsid = object.csid]]>
 		<property name="com.jaspersoft.studio.field.name" value="currentlocationnote"/>
 		<property name="com.jaspersoft.studio.field.label" value="currentlocationnote"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="movements_common"/>
+	</field>
+	<field name="placetype" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="placetype"/>
+		<property name="com.jaspersoft.studio.field.label" value="placetype"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="places_publicart_publicartplacetypes"/>
 	</field>
 	<field name="placementtype" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="placementtype"/>
@@ -354,6 +362,14 @@ LEFT JOIN movements mvmt ON mvmt.objcsid = object.csid]]>
 				<textElement markup="styled"/>
 				<text><![CDATA[Hierarchy Broader Place]]></text>
 			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="2100" y="0" width="100" height="44"
+					uuid="955bb0bc-b307-4203-ab12-76afb73e7b6a">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Place Type]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -484,6 +500,12 @@ LEFT JOIN movements mvmt ON mvmt.objcsid = object.csid]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{broaderplace}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="1c538723-362b-4729-aafa-b5b2aed583b4">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{placetype}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

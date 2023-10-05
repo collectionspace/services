@@ -35,7 +35,7 @@
   FROM lmis lmi
   INNER JOIN relations_common rels ON rels.subjectcsid = lmi.csid AND rels.objectdocumenttype = 'CollectionObject'
   INNER JOIN misc ON misc.id = rels.id AND misc.lifecyclestate != 'deleted'
-  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
+  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid
   INNER JOIN collectionobjects_common co ON co.id = hier.id
 ), objectnames AS (
   SELECT ong.objectname, co.csid AS objectcsid
