@@ -146,6 +146,12 @@ import com.nimbusds.jose.proc.SecurityContext;
 public class SecurityConfig {
 	private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
+	public static final List<String> EMAIL_ATTR_NAMES = Arrays.asList(
+		"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+		"email",
+		"mail"
+	);
+
 	public static final String LOGIN_FORM_URL = "/login";
 	public static final String LOGOUT_FORM_URL = "/logout";
 
@@ -537,7 +543,7 @@ public class SecurityConfig {
 						.convert(responseToken);
 
 					Assertion assertion = responseToken.getResponse().getAssertions().get(0);
-					String username = assertion.getSubject().getNameID().getValue();
+					String username = SecurityUtils.getSamlAssertionUsername(assertion, EMAIL_ATTR_NAMES);
 
 					try {
 						CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(username);

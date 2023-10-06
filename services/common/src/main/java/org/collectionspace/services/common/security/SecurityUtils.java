@@ -51,6 +51,11 @@ import org.jboss.crypto.digest.DigestCallback;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.jboss.security.Base64Encoder;
 import org.jboss.security.Base64Utils;
+import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.schema.XSString;
+import org.opensaml.saml.saml2.core.Assertion;
+import org.opensaml.saml.saml2.core.Attribute;
+import org.opensaml.saml.saml2.core.AttributeStatement;
 
 /**
  *
@@ -319,4 +324,51 @@ public class SecurityUtils {
 
         return result;
     }
+
+	/*
+	 * Retrieve the CSpace username from a SAML assertion. If the assertion's subject nameID is an
+	 * email address, it is returned. Otherwise, the first value of the given attribute name is
+	 * returned.
+	 */
+	public static String getSamlAssertionUsername(Assertion assertion, List<String> attributeNames) {
+		String subjectNameID = assertion.getSubject().getNameID().getValue();
+
+		if (subjectNameID.contains("@")) {
+			return subjectNameID;
+		}
+
+		for (String attributeName : attributeNames) {
+			String value = findSamlAssertionAttribute(assertion, attributeName);
+
+			if (value != null) {
+				return value;
+			}
+		}
+
+		return null;
+	}
+
+	private static String findSamlAssertionAttribute(Assertion assertion, String attributeName) {
+		for (AttributeStatement statement : assertion.getAttributeStatements()) {
+			for (Attribute attribute : statement.getAttributes()) {
+				String name = attribute.getName();
+
+				if (name.equals(attributeName)) {
+					List<XMLObject> attributeValues = attribute.getAttributeValues();
+
+					if (attributeValues != null && attributeValues.size() > 0) {
+						XMLObject value = attributeValues.get(0);
+
+						if (value instanceof XSString) {
+							XSString stringValue = (XSString) value;
+
+							return stringValue.getValue();
+						}
+					}
+				}
+			}
+		}
+
+		return null;
+	}
 }
