@@ -809,7 +809,7 @@ public class SecurityConfig {
 								}
 
 								if (assertingPartyDetails.getSingleSignOnServiceBinding() != null) {
-									builder.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleSignOnServiceBinding().value()));
+									builder.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleSignOnServiceBinding().value().toUpperCase()));
 								}
 
 								if (assertingPartyDetails.getSingleSignOnServiceLocation() != null) {
@@ -817,7 +817,7 @@ public class SecurityConfig {
 								}
 
 								if (assertingPartyDetails.getSingleLogoutServiceBinding() != null) {
-									builder.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleLogoutServiceBinding().value()));
+									builder.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleLogoutServiceBinding().value().toUpperCase()));
 								}
 
 								if (assertingPartyDetails.getSingleLogoutServiceLocation() != null) {
