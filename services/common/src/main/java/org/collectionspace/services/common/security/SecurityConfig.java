@@ -785,15 +785,22 @@ public class SecurityConfig {
 					registrationBuilder = RelyingPartyRegistrations
 						.fromMetadataLocation(relyingPartyConfig.getMetadata().getLocation())
 						.registrationId(relyingPartyConfig.getId());
-				} else {
-					final AssertingPartyDetailsType assertingPartyDetails = relyingPartyConfig.getAssertingPartyDetails();
-
+				}
+				else {
 					registrationBuilder = RelyingPartyRegistration
-						.withRegistrationId(relyingPartyConfig.getId())
+						.withRegistrationId(relyingPartyConfig.getId());
+				}
+
+				final AssertingPartyDetailsType assertingPartyDetails = relyingPartyConfig.getAssertingPartyDetails();
+
+				if (assertingPartyDetails != null) {
+					registrationBuilder
 						.assertingPartyDetails(new Consumer<AssertingPartyDetails.Builder>() {
 							@Override
 							public void accept(AssertingPartyDetails.Builder builder) {
-								builder.entityId(assertingPartyDetails.getEntityId());
+								if (assertingPartyDetails.getEntityId() != null) {
+									builder.entityId(assertingPartyDetails.getEntityId());
+								}
 
 								if (assertingPartyDetails.isWantAuthnRequestsSigned() != null) {
 									builder.wantAuthnRequestsSigned(assertingPartyDetails.isWantAuthnRequestsSigned());
