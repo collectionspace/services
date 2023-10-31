@@ -1,0 +1,1 @@
+This directory contains jars that need to be installed in the tomcat lib directory to run the cspace-public-gateway app, when it is deployed to the same tomcat container as the services layer.
