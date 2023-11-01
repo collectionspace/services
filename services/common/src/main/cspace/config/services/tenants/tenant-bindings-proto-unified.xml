@@ -1230,6 +1230,16 @@
 								}
 							}
 						},
+						"collectionspace_denorm:materialGroupList": {
+							"type": "object",
+							"properties": {
+								"material": {
+									"type": "keyword",
+									"copy_to": "all_field",
+									"normalizer": "sorting_normalizer"
+								}
+							}
+						},
 
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",

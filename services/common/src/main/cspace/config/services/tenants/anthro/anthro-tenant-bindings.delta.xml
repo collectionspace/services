@@ -31,7 +31,6 @@
 							"collectionobjects_common:contentConcepts",
 							"collectionobjects_common:fieldCollectionDateGroup",
 							"collectionobjects_common:fieldCollectors",
-							"collectionobjects_common:materialGroupList",
 							"collectionobjects_common:measuredPartGroupList",
 							"collectionobjects_common:numberOfObjects",
 							"collectionobjects_common:objectHistoryNote",
@@ -124,6 +123,16 @@
 								}
 							}
 						},
+						"collectionspace_denorm:materialGroupList": {
+							"type": "object",
+							"properties": {
+								"material": {
+									"type": "keyword",
+									"copy_to": "all_field",
+									"normalizer": "sorting_normalizer"
+								}
+							}
+						},
 
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",
@@ -209,15 +218,6 @@
 							"type": "object",
 							"properties": {
 								"objectProductionPlace": {
-									"type": "keyword",
-									"copy_to": "all_field"
-								}
-							}
-						},
-						"collectionobjects_common:materialGroupList": {
-							"type": "object",
-							"properties": {
-								"material": {
 									"type": "keyword",
 									"copy_to": "all_field"
 								}
