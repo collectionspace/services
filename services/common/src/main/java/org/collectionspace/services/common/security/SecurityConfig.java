@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.authentication.spring.CSpaceDaoAuthenticationProvider;
 import org.collectionspace.authentication.spring.CSpaceJwtAuthenticationToken;
@@ -47,6 +48,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.AssertingPartyDetailsType;
+import org.collectionspace.services.config.AssertionProbesType;
 import org.collectionspace.services.config.OAuthAuthorizationGrantTypeEnum;
 import org.collectionspace.services.config.OAuthClientAuthenticationMethodEnum;
 import org.collectionspace.services.config.OAuthClientSettingsType;
@@ -94,6 +96,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.annotation.web.configurers.saml2.Saml2LoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.saml2.Saml2LogoutConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -112,6 +115,7 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
+import org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutRequest;
 import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider.ResponseToken;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
@@ -124,6 +128,8 @@ import org.springframework.security.saml2.provider.service.web.DefaultRelyingPar
 import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
 import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
+import org.springframework.security.saml2.provider.service.web.authentication.logout.OpenSaml3LogoutRequestResolver;
+import org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -529,7 +535,7 @@ public class SecurityConfig {
 			.addFilterBefore(new CSpaceUserAttributeFilter(), LogoutFilter.class);
 
 		if (relyingPartyRegistrationRepository != null) {
-			RelyingPartyRegistrationResolver relyingPartyRegistrationResolver =
+			final RelyingPartyRegistrationResolver relyingPartyRegistrationResolver =
 				new DefaultRelyingPartyRegistrationResolver(relyingPartyRegistrationRepository);
 
 			// TODO: Use OpenSaml4AuthenticationProvider (requires Java 11) instead of deprecated OpenSamlAuthenticationProvider.
@@ -542,19 +548,32 @@ public class SecurityConfig {
 						.createDefaultResponseAuthenticationConverter()
 						.convert(responseToken);
 
+					String registrationId = responseToken.getToken().getRelyingPartyRegistration().getRegistrationId();
+					ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
+					SAMLRelyingPartyType registration = ConfigUtils.getSAMLRelyingPartyRegistration(serviceConfig, registrationId);
+
+					AssertionProbesType assertionProbes = (
+						registration != null
+							? registration.getAssertionUsernameProbes()
+							: null
+					);
+
 					Assertion assertion = responseToken.getResponse().getAssertions().get(0);
-					String username = SecurityUtils.getSamlAssertionUsername(assertion, EMAIL_ATTR_NAMES);
+					List<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
 
-					try {
-						CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(username);
+					for (String candidateUsername : candidateUsernames) {
+						try {
+							CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(candidateUsername);
 
-						return new CSpaceSaml2Authentication(user, authentication);
+							return new CSpaceSaml2Authentication(user, authentication);
+						}
+						catch(UsernameNotFoundException e) {
+						}
 					}
-					catch(UsernameNotFoundException e) {
-						String errorMessage = "No CollectionSpace account was found for " + username + ".";
 
-						throw(new UsernameNotFoundException(errorMessage, e));
-					}
+					String errorMessage = "No CollectionSpace account was found for " + StringUtils.join(candidateUsernames, " / ") + ".";
+
+					throw(new UsernameNotFoundException(errorMessage));
 				}
 			});
 
@@ -589,7 +608,25 @@ public class SecurityConfig {
 							configurer.logoutRequest(new Customizer<Saml2LogoutConfigurer<HttpSecurity>.LogoutRequestConfigurer>() {
 								@Override
 								public void customize(Saml2LogoutConfigurer<HttpSecurity>.LogoutRequestConfigurer configurer) {
-									configurer.logoutRequestRepository(new CSpaceSaml2LogoutRequestRepository());
+									configurer
+										.logoutRequestRepository(new CSpaceSaml2LogoutRequestRepository())
+										.logoutRequestResolver(new Saml2LogoutRequestResolver() {
+											@Override
+											public Saml2LogoutRequest resolve(HttpServletRequest request, Authentication authentication) {
+												// TODO: Use OpenSaml4LogoutRequestResolver (requires Java 11).
+												Saml2LogoutRequestResolver resolver = new OpenSaml3LogoutRequestResolver(relyingPartyRegistrationResolver);
+
+												// The name of the authenticated principal in our CSpaceSaml2Authentication
+												// may have come from an attribute of the SAML assertion instead of the
+												// NameID, but the logout request needs to send the NameID.
+												// CSpaceSaml2Authentication.getWrappedAuthentication will get the
+												// authentication whose principal is the NameID of the assertion.
+
+												Saml2Authentication wrappedAuthentication = ((CSpaceSaml2Authentication) authentication).getWrappedAuthentication();
+
+												return resolver.resolve(request, wrappedAuthentication);
+											}
+										});
 								}
 							});
 						}

@@ -22,10 +22,8 @@
  */
 package org.collectionspace.services.common.security;
 
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.util.StringTokenizer;
 
@@ -36,6 +34,9 @@ import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.config.AssertionAttributeProbeType;
+import org.collectionspace.services.config.AssertionNameIDProbeType;
+import org.collectionspace.services.config.AssertionProbesType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spring.CSpacePasswordEncoderFactory;
@@ -47,10 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.jboss.crypto.digest.DigestCallback;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.security.Base64Encoder;
-import org.jboss.security.Base64Utils;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -73,6 +71,25 @@ public class SecurityUtils {
     public static final String BASE16_ENCODING = "HEX";
     public static final String RFC2617_ENCODING = "RFC2617";
     private static char MD5_HEX[] = "0123456789abcdef".toCharArray();
+
+    private static final List<Object> DEFAULT_SAML_ASSERTION_USERNAME_PROBES = new ArrayList<>();
+
+    static {
+        DEFAULT_SAML_ASSERTION_USERNAME_PROBES.add(new AssertionNameIDProbeType());
+
+        String[] attributeNames = new String[]{
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+            "email",
+            "mail"
+        };
+
+        for (String attributeName : attributeNames) {
+            AssertionAttributeProbeType attributeProbe = new AssertionAttributeProbeType();
+            attributeProbe.setName(attributeName);
+
+            DEFAULT_SAML_ASSERTION_USERNAME_PROBES.add(attributeProbe);
+        }
+    }
 
     /**
      * createPasswordHash creates password has using configured digest algorithm
@@ -325,50 +342,67 @@ public class SecurityUtils {
         return result;
     }
 
-	/*
-	 * Retrieve the CSpace username from a SAML assertion. If the assertion's subject nameID is an
-	 * email address, it is returned. Otherwise, the first value of the given attribute name is
-	 * returned.
-	 */
-	public static String getSamlAssertionUsername(Assertion assertion, List<String> attributeNames) {
-		String subjectNameID = assertion.getSubject().getNameID().getValue();
+    /*
+     * Retrieve the possible CSpace usernames from a SAML assertion.
+     */
+    public static List<String> findSamlAssertionCandidateUsernames(Assertion assertion, AssertionProbesType assertionProbes) {
+        List<String> candidateUsernames = new ArrayList<>();
+        List<Object> probes = null;
 
-		if (subjectNameID.contains("@")) {
-			return subjectNameID;
-		}
+        if (assertionProbes != null) {
+            probes = assertionProbes.getNameIdOrAttribute();
+        }
 
-		for (String attributeName : attributeNames) {
-			String value = findSamlAssertionAttribute(assertion, attributeName);
+        if (probes == null || probes.size() == 0) {
+            probes = DEFAULT_SAML_ASSERTION_USERNAME_PROBES;
+        }
 
-			if (value != null) {
-				return value;
-			}
-		}
+        for (Object probe : probes) {
+            if (probe instanceof AssertionNameIDProbeType) {
+                String subjectNameID = assertion.getSubject().getNameID().getValue();
 
-		return null;
-	}
+                if (subjectNameID != null && subjectNameID.length() > 0) {
+                    candidateUsernames.add(subjectNameID);
+                }
+            } else if (probe instanceof AssertionAttributeProbeType) {
+                String attributeName = ((AssertionAttributeProbeType) probe).getName();
+                List<String> values = getSamlAssertionAttributeValues(assertion, attributeName);
 
-	private static String findSamlAssertionAttribute(Assertion assertion, String attributeName) {
-		for (AttributeStatement statement : assertion.getAttributeStatements()) {
-			for (Attribute attribute : statement.getAttributes()) {
-				String name = attribute.getName();
+                if (values != null) {
+                    candidateUsernames.addAll(values);
+                }
+            }
+        }
 
-				if (name.equals(attributeName)) {
-					List<XMLObject> attributeValues = attribute.getAttributeValues();
+        return candidateUsernames;
+    }
 
-					if (attributeValues != null && attributeValues.size() > 0) {
-						XMLObject value = attributeValues.get(0);
+    private static List<String> getSamlAssertionAttributeValues(Assertion assertion, String attributeName) {
+        List<String> values = new ArrayList<>();
 
-						if (value instanceof XSString) {
-							XSString stringValue = (XSString) value;
+        for (AttributeStatement statement : assertion.getAttributeStatements()) {
+            for (Attribute attribute : statement.getAttributes()) {
+                String name = attribute.getName();
 
-							return stringValue.getValue();
-						}
-					}
-				}
-			}
-		}
+                if (name.equals(attributeName)) {
+                    List<XMLObject> attributeValues = attribute.getAttributeValues();
 
-		return null;
-	}
+                    if (attributeValues != null) {
+                        for (XMLObject value : attributeValues) {
+                            if (value instanceof XSString) {
+                                XSString stringValue = (XSString) value;
+                                String candidateValue = stringValue.getValue();
+
+                                if (candidateValue != null && candidateValue.length() > 0) {
+                                    values.add(candidateValue);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return values;
+    }
 }

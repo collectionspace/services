@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 @JsonIgnoreProperties(value = { "authenticated" }, ignoreUnknown = true)
 public class CSpaceSaml2Authentication extends Saml2Authentication {
   private final CSpaceUser user;
+  private final AuthenticatedPrincipal principal;
 
   public CSpaceSaml2Authentication(CSpaceUser user, Saml2Authentication authentication) {
     this(
@@ -60,6 +61,7 @@ public class CSpaceSaml2Authentication extends Saml2Authentication {
     super(principal, saml2Response, authorities);
 
     this.user = user;
+    this.principal = principal;
 
     this.setAuthenticated(true);
   }
@@ -72,5 +74,9 @@ public class CSpaceSaml2Authentication extends Saml2Authentication {
   @Override
   public Collection<GrantedAuthority> getAuthorities() {
     return user.getAuthorities();
+  }
+
+  public Saml2Authentication getWrappedAuthentication() {
+    return new Saml2Authentication(this.principal, getSaml2Response(), getAuthorities());
   }
 }

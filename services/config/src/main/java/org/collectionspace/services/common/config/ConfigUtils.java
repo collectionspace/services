@@ -211,6 +211,20 @@ public class ConfigUtils {
 		return null;
 	}
 
+	public static SAMLRelyingPartyType getSAMLRelyingPartyRegistration(ServiceConfig serviceConfig, String registrationId) {
+		List<SAMLRelyingPartyType> registrations = getSAMLRelyingPartyRegistrations(serviceConfig);
+
+		if (registrations != null) {
+			for (SAMLRelyingPartyType registration : registrations) {
+				if (registration.getId().equals(registrationId)) {
+					return registration;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public static boolean isSsoAvailable(ServiceConfig serviceConfig) {
 		List<SAMLRelyingPartyType> samlRegistrations = getSAMLRelyingPartyRegistrations(serviceConfig);
 
