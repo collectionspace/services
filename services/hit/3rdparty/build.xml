@@ -1,6 +1,6 @@
-<project name="intake.3rdparty" default="package" basedir=".">
+<project name="hit.3rdparty" default="package" basedir=".">
     <description>
-        intake service 3rdparty
+        hit service 3rdparty
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.." />
@@ -108,21 +108,21 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy intake in ${jee.server.nuxeo}">
+        description="deploy hit in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
-        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="deploy" inheritall="false"/>
         -->
     </target>
 
     <target name="undeploy"
-        description="undeploy intake from ${jee.server.nuxeo}">
+        description="undeploy hit from ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the
         "csmake" tool leaving this only for backwards compatibility reasons. -->
-        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="undeploy" inheritall="false" />
+        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="undeploy" inheritall="false" />
     </target>
 
     <target name="dist"
-        description="generate distribution for intake" depends="package">
-        <ant antfile="nuxeo-platform-cs-intake/build.xml" target="dist" inheritall="false" />
+        description="generate distribution for hit" depends="package">
+        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="dist" inheritall="false" />
     </target>
 </project>
