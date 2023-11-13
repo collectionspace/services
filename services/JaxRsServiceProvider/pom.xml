@@ -197,7 +197,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.hit.service</artifactId>
+            <artifactId>org.collectionspace.services.heldintrust.service</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
