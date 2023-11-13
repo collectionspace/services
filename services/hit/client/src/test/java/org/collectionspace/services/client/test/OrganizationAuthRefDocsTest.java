@@ -61,11 +61,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     private final List<String> hitIdsCreated = new ArrayList<String>();
     private final List<String> orgIdsCreated = new ArrayList<String>();
     private String orgAuthCSID = null;
-    private String currentOwnerOrgCSID = null;
-    private String currentOwnerRefName = null;
+    private String currentContactOrgCSID = null;
+    private String depositorContactRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckerAssessorRefName = null;
-    private String insurerRefName = null;
+    private String externalApprovalIndividualRefName = null;
+    private String correspondenceSenderRefName = null;
     private String valuerRefName = null;
 
     @Override
@@ -112,11 +112,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         HitClient hitClient = new HitClient();
         PoxPayloadOut hitPayload = createHitInstance(
             "entryNumber-" + identifier,
-            currentOwnerRefName,
+            depositorContactRefName,
             // Use currentOwnerRefName twice to test fix for CSPACE-2863
-            currentOwnerRefName,
-            conditionCheckerAssessorRefName,
-            insurerRefName);
+            depositorContactRefName,
+            externalApprovalIndividualRefName,
+            correspondenceSenderRefName);
 
         Response res = hitClient.create(hitPayload);
         try {
@@ -170,10 +170,11 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
             res.close();
         }
 
-        currentOwnerOrgCSID = createOrganization("olivierOwnerCompany", "Olivier Owner Company",
-                                                 "Olivier Owner Company");
-        orgIdsCreated.add(currentOwnerOrgCSID);
-        currentOwnerRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, currentOwnerOrgCSID, orgAuthClient);
+        currentContactOrgCSID = createOrganization("olivierContactCompany", "Olivier Contact Company",
+                                                   "Olivier Contact Company");
+        orgIdsCreated.add(currentContactOrgCSID);
+        depositorContactRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID,
+                                                                        currentContactOrgCSID, orgAuthClient);
 
         String newOrgCSID =
             createOrganization("debbieDepositorAssocs", "Debbie Depositor & Associates",
@@ -181,13 +182,15 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         depositorRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
 
-        newOrgCSID = createOrganization("andrewCheckerAssessorLtd", "Andrew Checker-Assessor Ltd.",
-                                        "Andrew Checker-Assessor Ltd.");
-        conditionCheckerAssessorRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        newOrgCSID = createOrganization("andrewExternalApprovalLtd", "Andrew External-Approval Ltd.",
+                                        "Andrew External-Approval Ltd.");
+        externalApprovalIndividualRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID,
+                                                                                  newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
 
-        newOrgCSID = createOrganization("ingridInsurerBureau", "Ingrid Insurer Bureau", "Ingrid Insurer Bureau");
-        insurerRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
+        newOrgCSID = createOrganization("ingridCorrespondenceSender", "Ingrid Correspondence Sender",
+                                        "Ingrid Correspondence Sender");
+        correspondenceSenderRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, newOrgCSID, orgAuthClient);
         orgIdsCreated.add(newOrgCSID);
 
         newOrgCSID = createOrganization("vinceValuerLLC", "Vince Valuer LLC", "Vince Valuer LLC");
@@ -237,7 +240,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
 
         // Get the auth ref docs and check them
         OrganizationClient orgAuthClient = new OrganizationClient();
-        Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentOwnerOrgCSID);
+        Response refDocListResp = orgAuthClient.getReferencingObjects(orgAuthCSID, currentContactOrgCSID);
         AuthorityRefDocList list;
         try {
             assertStatusCode(refDocListResp, testName);
@@ -253,7 +256,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         int nHitsFound = 0;
         final int EXPECTED_HITS = 3;
         int i = 0;
-        logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
+        logger.debug("{}: Docs that use: {}", testName, depositorContactRefName);
         for (AuthorityRefDocList.AuthorityRefDocItem item : list.getAuthorityRefDocItem()) {
             logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
                          item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
@@ -313,10 +316,13 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber, String currentOwner, String depositor,
-                                            String conditionCheckerAssessor, String insurer) throws Exception {
-        HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
-                                                             conditionCheckerAssessor, insurer);
+    private PoxPayloadOut createHitInstance(String heldInTrustNumber,
+                                            String depositorContact,
+                                            String depositor,
+                                            String externalApprovalIndividual,
+                                            String correspondenceSender) throws Exception {
+        HitsCommon hit = HitClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
+                                                             externalApprovalIndividual, correspondenceSender);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         multipart.addPart(new HitClient().getCommonPartName(), hit);

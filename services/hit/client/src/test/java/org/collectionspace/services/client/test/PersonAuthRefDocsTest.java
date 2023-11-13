@@ -62,13 +62,13 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
     private final List<String> hitIdsCreated = new ArrayList<String>();
     private final List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private String currentOwnerPersonCSID = null;
+    private String currentContactPersonCSID = null;
     private String depositorPersonCSID = null;
     private String insurerPersonCSID = null;
-    private String currentOwnerRefName = null;
+    private String depositorContactRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckerAssessorRefName = null;
-    private String insurerRefName = null;
+    private String externalApprovalIndividualRefName = null;
+    private String correspondenceSenderRefName = null;
     private String valuerRefName = null;
     private final String valuerShortId = null;
 
@@ -116,10 +116,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         HitClient hitClient = new HitClient();
         PoxPayloadOut multipart = createHitInstance(
             "entryNumber-" + identifier,
-            currentOwnerRefName,
+            depositorContactRefName,
             depositorRefName,
-            conditionCheckerAssessorRefName,
-            insurerRefName);
+            externalApprovalIndividualRefName,
+            correspondenceSenderRefName);
 
         Response res = hitClient.create(multipart);
         try {
@@ -173,11 +173,11 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
 
-        String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
+        String csid = createPerson("Olivier", "Contact", "olivierContact", authRefName);
         Assert.assertNotNull(csid);
-        currentOwnerPersonCSID = csid;
-        currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        Assert.assertNotNull(currentOwnerRefName);
+        currentContactPersonCSID = csid;
+        depositorContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(depositorContactRefName);
         personIdsCreated.add(csid);
 
         csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
@@ -187,17 +187,17 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         Assert.assertNotNull(depositorRefName);
         personIdsCreated.add(csid);
 
-        csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
+        csid = createPerson("Andrew", "ApprovalIndividual", "andrewApprovalIndividual", authRefName);
         Assert.assertNotNull(csid);
-        conditionCheckerAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        Assert.assertNotNull(conditionCheckerAssessorRefName);
+        externalApprovalIndividualRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(externalApprovalIndividualRefName);
         personIdsCreated.add(csid);
 
-        csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
+        csid = createPerson("Ingrid", "Sender", "ingridSender", authRefName);
         Assert.assertNotNull(csid);
         insurerPersonCSID = csid;
-        insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-        Assert.assertNotNull(insurerRefName);
+        correspondenceSenderRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        Assert.assertNotNull(correspondenceSenderRefName);
         personIdsCreated.add(csid);
 
         csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
@@ -251,7 +251,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // Get the auth ref docs and check them
 
         PersonClient personAuthClient = new PersonClient();
-        Response res = personAuthClient.getReferencingObjects(personAuthCSID, currentOwnerPersonCSID);
+        Response res = personAuthClient.getReferencingObjects(personAuthCSID, currentContactPersonCSID);
         AuthorityRefDocList list;
         try {
             assertStatusCode(res, testName);
@@ -269,7 +269,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // output additional data about list members for debugging.
         boolean fFoundHit = false;
         int i = 0;
-        logger.debug("{}: Docs that use: {}", testName, currentOwnerRefName);
+        logger.debug("{}: Docs that use: {}", testName, depositorContactRefName);
         for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
             logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
                          item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
@@ -349,7 +349,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // Optionally output additional data about list members for debugging.
         boolean fFoundHit = false;
         int i = 0;
-        logger.debug("{}: Docs that use: {}", testName, insurerRefName);
+        logger.debug("{}: Docs that use: {}", testName, correspondenceSenderRefName);
         for (AuthorityRefDocList.AuthorityRefDocItem item : items) {
             logger.debug("{}: list-item[{}] {} ({}) Name:[{}] Number:[{}] in field:[{}]", testName, i,
                          item.getDocType(), item.getDocId(), item.getDocName(), item.getDocNumber(),
@@ -409,11 +409,14 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber, String currentOwner, String depositor,
-                                            String conditionCheckerAssessor, String insurer) throws Exception {
-        HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
-                                                             conditionCheckerAssessor, insurer);
-        hit.setHitNumber(entryNumber);
+    private PoxPayloadOut createHitInstance(String heldInTrustNumber,
+                                            String depositorContact,
+                                            String depositor,
+                                            String externalApprovalIndividual,
+                                            String correspondenceSender) throws Exception {
+        HitsCommon hit = HitClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
+                                                             externalApprovalIndividual, correspondenceSender);
+        hit.setHitNumber(heldInTrustNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         multipart.addPart(new HitClient().getCommonPartName(), hit);

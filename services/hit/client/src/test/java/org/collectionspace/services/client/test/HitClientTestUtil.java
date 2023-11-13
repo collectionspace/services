@@ -15,14 +15,14 @@ import org.collectionspace.services.hit.InternalApprovalGroupList;
 public class HitClientTestUtil {
 
     protected static HitsCommon createHitInstance(
-        String entryNumber,
-        String currentOwner,
+        String heldInTrustNumber,
+        String depositorContact,
         String depositor,
-        String conditionCheckerAssessor,
-        String insurer) {
+        String externalApprovalIndividual,
+        String correspondenceSender) {
         HitsCommon hit = new HitsCommon();
 
-        hit.setHitNumber(entryNumber);
+        hit.setHitNumber(heldInTrustNumber);
 
         HitDepositorGroupList tempHDGL = hit.getHitDepositorGroupList();
         if (tempHDGL == null) {
@@ -31,7 +31,7 @@ public class HitClientTestUtil {
         List<HitDepositorGroup> hitDepositorGroupList = tempHDGL.getHitDepositorGroup();
         HitDepositorGroup hitDepositorGroup = new HitDepositorGroup();
         hitDepositorGroup.setDepositor(depositor);
-        hitDepositorGroup.setDepositorContact(currentOwner);
+        hitDepositorGroup.setDepositorContact(depositorContact);
         hitDepositorGroupList.add(hitDepositorGroup);
         hit.setHitDepositorGroupList(tempHDGL);
 
@@ -51,7 +51,7 @@ public class HitClientTestUtil {
         }
         List<ExternalApprovalGroup> externalApprovalGroupList = tempEAGL.getExternalApprovalGroup();
         ExternalApprovalGroup externalApprovalGroup = new ExternalApprovalGroup();
-        externalApprovalGroup.setExternalApprovalIndividual(conditionCheckerAssessor);
+        externalApprovalGroup.setExternalApprovalIndividual(externalApprovalIndividual);
         externalApprovalGroupList.add(externalApprovalGroup);
         hit.setExternalApprovalGroupList(tempEAGL);
 
@@ -61,7 +61,7 @@ public class HitClientTestUtil {
         }
         List<CorrespondenceGroup> correspondanceGroupList = tempCGL.getCorrespondenceGroup();
         CorrespondenceGroup correspondenceGroup = new CorrespondenceGroup();
-        correspondenceGroup.setCorrespondenceSender(insurer);
+        correspondenceGroup.setCorrespondenceSender(correspondenceSender);
         correspondanceGroupList.add(correspondenceGroup);
         hit.setCorrespondenceGroupList(tempCGL);
 

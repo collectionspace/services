@@ -63,10 +63,10 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private final List<String> hitIdsCreated = new ArrayList<String>();
     private final List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private String currentOwnerRefName = null;
+    private String depositorContactRefName = null;
     private String depositorRefName = null;
-    private String conditionCheckerOrAssessorRefName = null;
-    private String insurerRefName = null;
+    private String externalApprovalIndividualRefName = null;
+    private String correspondenceSenderRefName = null;
     private String valuerRefName = null;
 
     @Override
@@ -114,10 +114,10 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         HitClient hitClient = new HitClient();
         PoxPayloadOut multipart = createHitInstance(
             "entryNumber-" + identifier,
-            currentOwnerRefName,
+            depositorContactRefName,
             depositorRefName,
-            conditionCheckerOrAssessorRefName,
-            insurerRefName);
+            externalApprovalIndividualRefName,
+            correspondenceSenderRefName);
 
         String newId;
         Response res = hitClient.create(multipart);
@@ -169,20 +169,20 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
 
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        String csid = createPerson("Olivier", "Owner", "olivierOwner", authRefName);
-        currentOwnerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        String csid = createPerson("Olivier", "Contact", "olivierContact", authRefName);
+        depositorContactRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
         csid = createPerson("Debbie", "Depositor", "debbieDepositor", authRefName);
         depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
-        csid = createPerson("Andrew", "Assessor", "andrewAssessor", authRefName);
-        conditionCheckerOrAssessorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        csid = createPerson("Andrew", "ApprovalIndividual", "andrewApprovalIndividual", authRefName);
+        externalApprovalIndividualRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
-        csid = createPerson("Ingrid", "Insurer", "ingridInsurer", authRefName);
-        insurerRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        csid = createPerson("Ingrid", "Sender", "ingridSender", authRefName);
+        correspondenceSenderRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
         personIdsCreated.add(csid);
 
         csid = createPerson("Vince", "Valuer", "vinceValuer", authRefName);
@@ -324,11 +324,14 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber, String currentOwner, String depositor,
-                                            String conditionCheckerAssessor, String insurer) throws Exception {
-        HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
-                                                             conditionCheckerAssessor, insurer);
-        hit.setHitNumber(entryNumber);
+    private PoxPayloadOut createHitInstance(String heldInTrustNumber,
+                                            String depositorContact,
+                                            String depositor,
+                                            String externalApprovalIndividual,
+                                            String correspondenceSender) throws Exception {
+        HitsCommon hit = HitClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
+                                                             externalApprovalIndividual, correspondenceSender);
+        hit.setHitNumber(heldInTrustNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         multipart.addPart(new HitClient().getCommonPartName(), hit);
