@@ -1,10 +1,10 @@
 package org.collectionspace.services.test;
 
 /**
- * A HitServiceTest.
+ * A HeldInTrustServiceTest.
  *
  * @version $Revision:$
  */
-public class HitServiceTest {
+public class HeldintrustServiceTest {
     //empty
 }

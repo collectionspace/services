@@ -21,15 +21,15 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.collectionspace.services.hit.nuxeo;
+package org.collectionspace.services.heldintrust.nuxeo;
 
 /**
- * HitConstants processes CollectionObject document
+ * HeldintrustConstants processes CollectionObject document
  */
-public class HitConstants {
+public class HeldintrustConstants {
 
-    public final static String NUXEO_DOCTYPE = "Hit";
-    public final static String NUXEO_SCHEMA_NAME = "hit";
-    public final static String NUXEO_DC_TITLE = "CollectionSpace-Hit";
+    public final static String NUXEO_DOCTYPE = "Heldintrust";
+    public final static String NUXEO_SCHEMA_NAME = "heldintrust";
+    public final static String NUXEO_DC_TITLE = "CollectionSpace-Heldintrust";
 
 }

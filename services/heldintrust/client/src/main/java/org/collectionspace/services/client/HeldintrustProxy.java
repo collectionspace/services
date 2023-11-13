@@ -27,14 +27,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 /**
- * HitProxy
+ * HeldInTrustProxy
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-@Path(HitClient.SERVICE_PATH_PROXY)
+@Path(HeldintrustClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface HitProxy extends CollectionSpaceCommonListPoxProxy {
+public interface HeldintrustProxy extends CollectionSpaceCommonListPoxProxy {
     // Intentionally left blank
 }

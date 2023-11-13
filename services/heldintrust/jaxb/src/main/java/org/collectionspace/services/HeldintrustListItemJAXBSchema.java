@@ -1,6 +1,6 @@
 package org.collectionspace.services;
 
-public interface HitListItemJAXBSchema {
+public interface HeldintrustListItemJAXBSchema {
     String CSID = "csid";
 
 }

@@ -26,13 +26,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.HitClient;
+import org.collectionspace.services.client.HeldintrustClient;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.Element;
 import org.slf4j.Logger;
@@ -41,42 +41,42 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * HitServiceTest, carries out tests against a deployed and running Hit Service.
+ * HeldintrustServiceTest, carries out tests against a deployed and running Hit Service.
  *
  * FIXME: http://issues.collectionspace.org/browse/CSPACE-1685
  *
  * $LastChangedRevision$
  * $LastChangedDate$
  */
-public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, HitsCommon> {
+public class HeldintrustServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, HeldintrustsCommon> {
 
     private final static String CURRENT_DATE_UTC = GregorianCalendarDateTimeUtils.currentDateUTC();
 
     /**
      * The logger
      */
-    private final Logger logger = LoggerFactory.getLogger(HitServiceTest.class);
+    private final Logger logger = LoggerFactory.getLogger(HeldintrustServiceTest.class);
 
     @Override
     protected CollectionSpaceClient getClientInstance() throws Exception {
-        return new HitClient();
+        return new HeldintrustClient();
     }
 
     @Override
     protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
-        return new HitClient(clientPropertiesFilename);
+        return new HeldintrustClient(clientPropertiesFilename);
     }
 
     @Override
     protected String getServiceName() {
-        return HitClient.SERVICE_NAME;
+        return HeldintrustClient.SERVICE_NAME;
     }
 
     // ---------------------------------------------------------------
     // CRUD tests : READ tests
     // ---------------------------------------------------------------
     @Override
-    protected void compareReadInstances(HitsCommon original, HitsCommon fromRead) {
+    protected void compareReadInstances(HeldintrustsCommon original, HeldintrustsCommon fromRead) {
         // Add test here
     }
 
@@ -112,7 +112,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
         setupUpdate();
 
         // Retrieve the contents of a resource to update.
-        HitClient client = new HitClient();
+        HeldintrustClient client = new HeldintrustClient();
         PoxPayloadIn input;
         Response res = client.read(knownResourceId);
         try {
@@ -203,7 +203,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
      */
     @Override
     public String getServicePathComponent() {
-        return HitClient.SERVICE_PATH_COMPONENT;
+        return HeldintrustClient.SERVICE_PATH_COMPONENT;
     }
 
     /**
@@ -226,15 +226,15 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
      * @throws Exception
      */
     private PoxPayloadOut createHitInstance(String entryNumber) throws Exception {
-        HitsCommon hit = new HitsCommon();
-        hit.setHitNumber(entryNumber);
+        HeldintrustsCommon hit = new HeldintrustsCommon();
+        hit.setHeldInTrustNumber(entryNumber);
 
-        PoxPayloadOut multipart = new PoxPayloadOut(HitClient.SERVICE_PAYLOAD_NAME);
+        PoxPayloadOut multipart = new PoxPayloadOut(HeldintrustClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(hit, MediaType.APPLICATION_XML_TYPE);
-        commonPart.setLabel(new HitClient().getCommonPartName());
+        commonPart.setLabel(new HeldintrustClient().getCommonPartName());
 
         logger.debug("to be created, HitsCommon instance");
-        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
+        logger.debug("{}", objectAsXmlString(hit, HeldintrustsCommon.class));
 
         return multipart;
     }
@@ -245,17 +245,17 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
     }
 
     @Override
-    protected HitsCommon updateInstance(HitsCommon hitsCommon) {
-        HitsCommon result = new HitsCommon();
+    protected HeldintrustsCommon updateInstance(HeldintrustsCommon hitsCommon) {
+        HeldintrustsCommon result = new HeldintrustsCommon();
 
-        result.setHitNumber("hits");
+        result.setHeldInTrustNumber("hits");
 
         return result;
     }
 
     @Override
-    protected void compareUpdatedInstances(HitsCommon original,
-                                           HitsCommon updated) {
+    protected void compareUpdatedInstances(HeldintrustsCommon original,
+                                           HeldintrustsCommon updated) {
         // put test here
     }
 

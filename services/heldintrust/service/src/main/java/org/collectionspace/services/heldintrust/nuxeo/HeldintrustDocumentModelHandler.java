@@ -21,16 +21,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.collectionspace.services.hit.nuxeo;
+package org.collectionspace.services.heldintrust.nuxeo;
 
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
- * HitDocumentModelHandler
+ * HeldintrustDocumentModelHandler
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class HitDocumentModelHandler extends NuxeoDocumentModelHandler<HitsCommon> {
+public class HeldintrustDocumentModelHandler extends NuxeoDocumentModelHandler<HeldintrustsCommon> {
 }

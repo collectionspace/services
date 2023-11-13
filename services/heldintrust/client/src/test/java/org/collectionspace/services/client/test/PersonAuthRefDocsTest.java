@@ -30,12 +30,12 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.HitClient;
+import org.collectionspace.services.client.HeldintrustClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         // Create all the person refs and entities
         createPersonRefs();
 
-        HitClient hitClient = new HitClient();
+        HeldintrustClient heldInTrustClient = new HeldintrustClient();
         PoxPayloadOut multipart = createHitInstance(
             "entryNumber-" + identifier,
             depositorContactRefName,
@@ -121,7 +121,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
             externalApprovalIndividualRefName,
             correspondenceSenderRefName);
 
-        Response res = hitClient.create(multipart);
+        Response res = heldInTrustClient.create(multipart);
         try {
             int statusCode = res.getStatus();
 
@@ -386,10 +386,10 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         }
 
         logger.debug("Cleaning up temporary resources created for testing ...");
-        HitClient hitClient = new HitClient();
+        HeldintrustClient heldInTrustClient = new HeldintrustClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : hitIdsCreated) {
-            hitClient.delete(resourceId).close();
+            heldInTrustClient.delete(resourceId).close();
         }
         // Delete persons before PersonAuth
         PersonClient personAuthClient = new PersonClient();
@@ -414,15 +414,16 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
                                             String depositor,
                                             String externalApprovalIndividual,
                                             String correspondenceSender) throws Exception {
-        HitsCommon hit = HitClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
-                                                             externalApprovalIndividual, correspondenceSender);
-        hit.setHitNumber(heldInTrustNumber);
+        HeldintrustsCommon hit =
+            HeldintrustClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
+                                                        externalApprovalIndividual, correspondenceSender);
+        hit.setHeldInTrustNumber(heldInTrustNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        multipart.addPart(new HitClient().getCommonPartName(), hit);
+        multipart.addPart(new HeldintrustClient().getCommonPartName(), hit);
 
         logger.debug("to be created, hit common");
-        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
+        logger.debug("{}", objectAsXmlString(hit, HeldintrustsCommon.class));
 
         return multipart;
     }

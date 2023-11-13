@@ -30,13 +30,13 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.HitClient;
+import org.collectionspace.services.client.HeldintrustClient;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PersonClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.slf4j.Logger;
@@ -52,12 +52,12 @@ import org.testng.annotations.Test;
  * $LastChangedRevision: 1327 $
  * $LastChangedDate: 2010-02-12 10:35:11 -0800 (Fri, 12 Feb 2010) $
  */
-public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
+public class HeldintrustAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
 
     // Instance variables specific to this test.
-    final String SERVICE_PATH_COMPONENT = HitClient.SERVICE_PATH_COMPONENT;//"hits";
+    final String SERVICE_PATH_COMPONENT = HeldintrustClient.SERVICE_PATH_COMPONENT;
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
-    private final String CLASS_NAME = HitAuthRefsTest.class.getName();
+    private final String CLASS_NAME = HeldintrustAuthRefsTest.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     private final List<String> hitIdsCreated = new ArrayList<String>();
@@ -111,7 +111,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         createPersonRefs();
 
         // Submit the request to the service and store the response.
-        HitClient hitClient = new HitClient();
+        HeldintrustClient heldInTrustClient = new HeldintrustClient();
         PoxPayloadOut multipart = createHitInstance(
             "entryNumber-" + identifier,
             depositorContactRefName,
@@ -120,7 +120,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             correspondenceSenderRefName);
 
         String newId;
-        Response res = hitClient.create(multipart);
+        Response res = heldInTrustClient.create(multipart);
         try {
             int statusCode = res.getStatus();
             // Check the status code of the response: does it match
@@ -231,12 +231,13 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         testSetup(STATUS_OK, ServiceRequestType.READ);
 
         // Submit the request to the service and store the response.
-        HitClient hitClient = new HitClient();
-        Response res = hitClient.read(knownResourceId);
+        HeldintrustClient heldInTrustClient = new HeldintrustClient();
+        Response res = heldInTrustClient.read(knownResourceId);
         try {
             assertStatusCode(res, testName);
             PoxPayloadIn input = new PoxPayloadIn(res.readEntity(String.class));
-            HitsCommon hit = (HitsCommon) extractPart(input, hitClient.getCommonPartName(), HitsCommon.class);
+            HeldintrustsCommon hit = (HeldintrustsCommon) extractPart(input, heldInTrustClient.getCommonPartName(),
+                                                                      HeldintrustsCommon.class);
             Assert.assertNotNull(hit);
             // Check a couple of fields
         } finally {
@@ -246,7 +247,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
 
         // Get the auth refs and check them
-        res = hitClient.getAuthorityRefs(knownResourceId);
+        res = heldInTrustClient.getAuthorityRefs(knownResourceId);
         AuthorityRefList list;
         try {
             assertStatusCode(res, testName);
@@ -302,10 +303,10 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         }
 
         logger.debug("Cleaning up temporary resources created for testing ...");
-        HitClient hitClient = new HitClient();
+        HeldintrustClient heldInTrustClient = new HeldintrustClient();
         // Note: Any non-success responses are ignored and not reported.
         for (String resourceId : hitIdsCreated) {
-            hitClient.delete(resourceId).close();
+            heldInTrustClient.delete(resourceId).close();
         }
         //
         // Delete all the person records then the parent resource
@@ -329,15 +330,16 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
                                             String depositor,
                                             String externalApprovalIndividual,
                                             String correspondenceSender) throws Exception {
-        HitsCommon hit = HitClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
-                                                             externalApprovalIndividual, correspondenceSender);
-        hit.setHitNumber(heldInTrustNumber);
+        HeldintrustsCommon hit =
+            HeldintrustClientTestUtil.createHitInstance(heldInTrustNumber, depositorContact, depositor,
+                                                        externalApprovalIndividual, correspondenceSender);
+        hit.setHeldInTrustNumber(heldInTrustNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        multipart.addPart(new HitClient().getCommonPartName(), hit);
+        multipart.addPart(new HeldintrustClient().getCommonPartName(), hit);
 
         logger.debug("to be created, hit common");
-        logger.debug("{}", objectAsXmlString(hit, HitsCommon.class));
+        logger.debug("{}", objectAsXmlString(hit, HeldintrustsCommon.class));
 
         return multipart;
     }

@@ -1,34 +1,35 @@
-package org.collectionspace.services.hit.nuxeo;
+package org.collectionspace.services.heldintrust.nuxeo;
 
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HitValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+public class HeldintrustValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
     /**
      * Error Message
      */
-    private static final String VALIDATION_ERROR = "The hit record payload was invalid. See log file for more details.";
+    private static final String VALIDATION_ERROR =
+        "The heldintrust record payload was invalid. See log file for more details.";
 
     /**
      * The logger.
      */
-    private final Logger logger = LoggerFactory.getLogger(HitValidatorHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(HeldintrustValidatorHandler.class);
 
     @Override
     protected Class<?> getCommonPartClass() {
-        return HitsCommon.class;
+        return HeldintrustsCommon.class;
     }
 
     @Override
     protected void handleCreate() throws InvalidDocumentException {
         try {
-            HitsCommon hitsCommon = (HitsCommon) getCommonPart();
+            HeldintrustsCommon hitsCommon = (HeldintrustsCommon) getCommonPart();
             assert (hitsCommon != null);
         } catch (AssertionError e) {
             logger.error(e.getMessage(), e);

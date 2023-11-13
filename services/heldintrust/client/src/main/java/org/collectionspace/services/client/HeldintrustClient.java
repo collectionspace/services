@@ -22,27 +22,27 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.heldintrust.HeldintrustsCommon;
 
 /**
- * HitClient
+ * HeldInTrustClient
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
  */
-public class HitClient extends AbstractCommonListPoxServiceClientImpl<HitProxy, HitsCommon> {
+public class HeldintrustClient extends AbstractCommonListPoxServiceClientImpl<HeldintrustProxy, HeldintrustsCommon> {
 
-    public static final String SERVICE_NAME = "hits";
+    public static final String SERVICE_NAME = "heldintrusts";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
     public static final String SERVICE_PAYLOAD_NAME = SERVICE_NAME;
 
-    public HitClient() throws Exception {
+    public HeldintrustClient() throws Exception {
         super();
     }
 
-    public HitClient(String clientPropertiesFilename) throws Exception {
+    public HeldintrustClient(String clientPropertiesFilename) throws Exception {
         super(clientPropertiesFilename);
     }
 
@@ -57,7 +57,7 @@ public class HitClient extends AbstractCommonListPoxServiceClientImpl<HitProxy, 
     }
 
     @Override
-    public Class<HitProxy> getProxyClass() {
-        return HitProxy.class;
+    public Class<HeldintrustProxy> getProxyClass() {
+        return HeldintrustProxy.class;
     }
 }

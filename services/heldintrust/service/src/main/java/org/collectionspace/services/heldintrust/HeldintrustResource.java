@@ -21,19 +21,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.collectionspace.services.hit;
+package org.collectionspace.services.heldintrust;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.collectionspace.services.client.HitClient;
+import org.collectionspace.services.client.HeldintrustClient;
 import org.collectionspace.services.common.NuxeoBasedResource;
 
-@Path(HitClient.SERVICE_PATH)
+@Path(HeldintrustClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class HitResource extends NuxeoBasedResource {
+public class HeldintrustResource extends NuxeoBasedResource {
 
     @Override
     protected String getVersionString() {
@@ -42,12 +42,12 @@ public class HitResource extends NuxeoBasedResource {
 
     @Override
     public String getServiceName() {
-        return HitClient.SERVICE_NAME;
+        return HeldintrustClient.SERVICE_NAME;
     }
 
     @Override
-    public Class<org.collectionspace.services.hit.HitsCommon> getCommonPartClass() {
-        return org.collectionspace.services.hit.HitsCommon.class;
+    public Class<HeldintrustsCommon> getCommonPartClass() {
+        return HeldintrustsCommon.class;
     }
 
 }
