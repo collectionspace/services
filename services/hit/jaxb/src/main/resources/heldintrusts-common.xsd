@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    HIT (held-in-trust) schema (XSD)
+    Held In Trust schema (XSD)
 
-    Entity  : HIT (held-in-trust)
+    Entity  : Held In Trust
     Part    : Common
     Used for: JAXB binding between XML and Java objects
 
@@ -14,19 +14,19 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
     jaxb:version="1.0" elementFormDefault="unqualified"
-    xmlns:ns="http://collectionspace.org/services/hit"
-    targetNamespace="http://collectionspace.org/services/hit" version="4.0">
+    xmlns:ns="http://collectionspace.org/services/heldintrust"
+    targetNamespace="http://collectionspace.org/services/heldintrust" version="4.0">
 
     <!--
     Avoid XmlRootElement nightmare:
     See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
 -->
 
-    <xs:element name="hits_common">
+    <xs:element name="heldintrusts_common">
         <xs:complexType>
             <xs:sequence >
-                <xs:element name="hitDepositorGroupList" type="ns:hitDepositorGroupList"/>
-                <xs:element name="hitNumber" type="xs:string"/>
+                <xs:element name="heldInTrustDepositorGroupList" type="ns:heldInTrustDepositorGroupList"/>
+                <xs:element name="heldInTrustNumber" type="xs:string"/>
                 <xs:element name="entryDate" type="xs:date"/>
                 <xs:element name="externalApprovalGroupList" type="ns:externalApprovalGroupList"/>
                 <xs:element name="entryNote" type="xs:string"/>
@@ -57,14 +57,14 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="hitDepositorGroupList">
+    <xs:complexType name="heldInTrustDepositorGroupList">
         <xs:sequence>
-            <xs:element name="hitDepositorGroup" type="ns:hitDepositorGroup" minOccurs="0"
+            <xs:element name="heldInTrustDepositorGroup" type="ns:heldInTrustDepositorGroup" minOccurs="0"
                 maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 
-    <xs:complexType name="hitDepositorGroup">
+    <xs:complexType name="heldInTrustDepositorGroup">
         <xs:sequence>
             <xs:element name="depositor" type="xs:string"/>
             <xs:element name="depositorContact" type="xs:string"/>
