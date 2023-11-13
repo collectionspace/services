@@ -5,13 +5,13 @@
 
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.hit</artifactId>
+        <artifactId>org.collectionspace.services.heldintrust</artifactId>
         <version>${revision}</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.hit.service</artifactId>
-    <name>services.hit.service</name>
+    <artifactId>org.collectionspace.services.heldintrust.service</artifactId>
+    <name>services.heldintrust.service</name>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -26,12 +26,12 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.hit.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.heldintrust.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.hit.client</artifactId>
+            <artifactId>org.collectionspace.services.heldintrust.client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -90,6 +90,6 @@
     </dependencies>
 
     <build>
-        <finalName>collectionspace-services-hit</finalName>
+        <finalName>collectionspace-services-heldintrust</finalName>
     </build>
 </project>

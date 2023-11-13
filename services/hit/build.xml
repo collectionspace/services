@@ -1,6 +1,6 @@
-<project name="hit" default="package" basedir=".">
+<project name="heldintrust" default="package" basedir=".">
     <description>
-        hit service
+        held in trust service
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../.." />
@@ -103,17 +103,17 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy hit service">
+        description="deploy held in trust service">
         <ant antfile="3rdparty/build.xml" target="deploy" inheritall="false" />
     </target>
 
     <target name="undeploy"
-        description="undeploy hit service">
+        description="undeploy held in trust service">
         <ant antfile="3rdparty/build.xml" target="undeploy" inheritall="false" />
     </target>
 
     <target name="dist" depends="package"
-        description="distribute hit service">
+        description="distribute held in trust service">
         <ant antfile="3rdparty/build.xml" target="dist" inheritall="false" />
     </target>
 

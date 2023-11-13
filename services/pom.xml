@@ -65,7 +65,7 @@
 		<module>group</module>
 		<module>insurance</module>
 		<module>intake</module>
-		<module>hit</module>
+		<module>heldintrust</module>
 		<module>loanin</module>
 		<module>loanout</module>
 		<module>claim</module>

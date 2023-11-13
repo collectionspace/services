@@ -1,6 +1,6 @@
-<project name="hit.3rdparty" default="package" basedir=".">
+<project name="heldintrust.3rdparty" default="package" basedir=".">
     <description>
-        hit service 3rdparty
+        held in trust service 3rdparty
     </description>
     <!-- set global properties for this build -->
     <property name="services.trunk" value="../../.." />
@@ -108,21 +108,21 @@
     </target>
 
     <target name="deploy" depends="install"
-        description="deploy hit in ${jee.server.nuxeo}">
+        description="deploy held in trust in ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the "csmake" tool
-        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-cs-heldintrust/build.xml" target="deploy" inheritall="false"/>
         -->
     </target>
 
     <target name="undeploy"
-        description="undeploy hit from ${jee.server.nuxeo}">
+        description="undeploy held in trust from ${jee.server.nuxeo}">
         <!-- This target is obsolete.  The Nuxeo artifacts are now created and deployed using the
         "csmake" tool leaving this only for backwards compatibility reasons. -->
-        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="undeploy" inheritall="false" />
+        <ant antfile="nuxeo-platform-cs-heldintrust/build.xml" target="undeploy" inheritall="false" />
     </target>
 
     <target name="dist"
-        description="generate distribution for hit" depends="package">
-        <ant antfile="nuxeo-platform-cs-hit/build.xml" target="dist" inheritall="false" />
+        description="generate distribution for held in trust" depends="package">
+        <ant antfile="nuxeo-platform-cs-heldintrust/build.xml" target="dist" inheritall="false" />
     </target>
 </project>

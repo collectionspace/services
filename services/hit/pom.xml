@@ -9,8 +9,8 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.hit</artifactId>
-    <name>services.hit</name>
+    <artifactId>org.collectionspace.services.heldintrust</artifactId>
+    <name>services.heldintrust</name>
     <packaging>pom</packaging>
 
     <modules>

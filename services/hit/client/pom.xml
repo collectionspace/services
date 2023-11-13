@@ -4,13 +4,13 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.hit</artifactId>
+        <artifactId>org.collectionspace.services.heldintrust</artifactId>
         <version>${revision}</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>org.collectionspace.services.hit.client</artifactId>
-    <name>services.hit.client</name>
+    <artifactId>org.collectionspace.services.heldintrust.client</artifactId>
+    <name>services.heldintrust.client</name>
 
     <dependencies>
         <!-- CollectionSpace dependencies -->
@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.hit.jaxb</artifactId>
+            <artifactId>org.collectionspace.services.heldintrust.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -74,6 +74,6 @@
     </dependencies>
 
     <build>
-        <finalName>collectionspace-services-hit-client</finalName>
+        <finalName>collectionspace-services-heldintrust-client</finalName>
     </build>
 </project>
