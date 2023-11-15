@@ -187,6 +187,16 @@ public class ConfigUtils {
 		return null;
 	}
 
+	public static boolean isSAMLSingleLogoutEnabled(ServiceConfig serviceConfig) {
+		SAMLType saml = getSAML(serviceConfig);
+
+		if (saml != null) {
+			return (saml.getSingleLogout() != null);
+		}
+
+		return false;
+	}
+
 	public static List<SAMLRelyingPartyType> getSAMLRelyingPartyRegistrations(ServiceConfig serviceConfig) {
 		SAMLType saml = getSAML(serviceConfig);
 
@@ -201,10 +211,34 @@ public class ConfigUtils {
 		return null;
 	}
 
+	public static SAMLRelyingPartyType getSAMLRelyingPartyRegistration(ServiceConfig serviceConfig, String registrationId) {
+		List<SAMLRelyingPartyType> registrations = getSAMLRelyingPartyRegistrations(serviceConfig);
+
+		if (registrations != null) {
+			for (SAMLRelyingPartyType registration : registrations) {
+				if (registration.getId().equals(registrationId)) {
+					return registration;
+				}
+			}
+		}
+
+		return null;
+	}
+
 	public static boolean isSsoAvailable(ServiceConfig serviceConfig) {
 		List<SAMLRelyingPartyType> samlRegistrations = getSAMLRelyingPartyRegistrations(serviceConfig);
 
 		return (samlRegistrations != null && samlRegistrations.size() > 0);
+	}
+
+	public static String getUIBaseUrl(TenantBindingType tenantBinding) {
+		UIConfig uiConfig = tenantBinding.getUiConfig();
+
+		if (uiConfig != null) {
+			return uiConfig.getBaseUrl();
+		}
+
+		return null;
 	}
 
 	public static String getUILoginSuccessUrl(TenantBindingType tenantBinding) throws MalformedURLException {

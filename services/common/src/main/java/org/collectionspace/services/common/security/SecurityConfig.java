@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -20,6 +21,7 @@ import java.util.Base64;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,8 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.CSpaceUser;
-import org.collectionspace.authentication.spring.CSpaceCorsConfiguration;
 import org.collectionspace.authentication.spring.CSpaceDaoAuthenticationProvider;
 import org.collectionspace.authentication.spring.CSpaceJwtAuthenticationToken;
 import org.collectionspace.authentication.spring.CSpaceLogoutSuccessHandler;
@@ -46,6 +48,7 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.AssertingPartyDetailsType;
+import org.collectionspace.services.config.AssertionProbesType;
 import org.collectionspace.services.config.OAuthAuthorizationGrantTypeEnum;
 import org.collectionspace.services.config.OAuthClientAuthenticationMethodEnum;
 import org.collectionspace.services.config.OAuthClientSettingsType;
@@ -63,7 +66,6 @@ import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -94,6 +96,7 @@ import org.springframework.security.config.annotation.web.configurers.LogoutConf
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.annotation.web.configurers.saml2.Saml2LoginConfigurer;
 import org.springframework.security.config.annotation.web.configurers.saml2.Saml2LogoutConfigurer;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -112,6 +115,7 @@ import org.springframework.security.oauth2.server.authorization.settings.TokenSe
 import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
+import org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutRequest;
 import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider.ResponseToken;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
@@ -124,6 +128,8 @@ import org.springframework.security.saml2.provider.service.web.DefaultRelyingPar
 import org.springframework.security.saml2.provider.service.web.RelyingPartyRegistrationResolver;
 import org.springframework.security.saml2.provider.service.web.Saml2MetadataFilter;
 import org.springframework.security.saml2.provider.service.web.authentication.Saml2WebSsoAuthenticationFilter;
+import org.springframework.security.saml2.provider.service.web.authentication.logout.OpenSaml3LogoutRequestResolver;
+import org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestResolver;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -132,6 +138,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.google.common.io.CharStreams;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -145,6 +152,12 @@ import com.nimbusds.jose.proc.SecurityContext;
 public class SecurityConfig {
 	private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
+	public static final List<String> EMAIL_ATTR_NAMES = Arrays.asList(
+		"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+		"email",
+		"mail"
+	);
+
 	public static final String LOGIN_FORM_URL = "/login";
 	public static final String LOGOUT_FORM_URL = "/logout";
 
@@ -153,11 +166,31 @@ public class SecurityConfig {
 
 	private CorsConfiguration defaultCorsConfiguration = null;
 	private CorsConfiguration oauthServerCorsConfiguration = null;
+	private Map<String, CorsConfiguration> samlCorsConfigurations = null;
 
-	private void initializeCorsConfigurations() {
+	private void initializeCorsConfigurations(RelyingPartyRegistrationRepository relyingPartyRegistrationRepository) {
 		ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
 		Duration maxAge = ConfigUtils.getCorsMaxAge(serviceConfig);
-		List<String> allowedOrigins = ConfigUtils.getCorsAllowedOrigins(serviceConfig);
+
+		// Read explicitly configured allowed origins from service config.
+
+		List<String> allowedOrigins = new ArrayList<String>(ConfigUtils.getCorsAllowedOrigins(serviceConfig));
+
+		// Automatically add UI locations as allowed origins.
+
+		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+
+		for (TenantBindingType tenantBinding : tenantBindingConfigReader.getTenantBindings().values()) {
+			URL uiBaseUrl = null;
+			try {
+				uiBaseUrl = new URL(ConfigUtils.getUIBaseUrl(tenantBinding));
+			} catch (MalformedURLException e) {
+			}
+
+			if (uiBaseUrl != null) {
+				allowedOrigins.add(uiBaseUrl.getProtocol() + "://" + uiBaseUrl.getAuthority());
+			}
+		}
 
 		if (this.defaultCorsConfiguration == null) {
 			this.defaultCorsConfiguration = defaultCorsConfiguration(allowedOrigins, maxAge);
@@ -166,10 +199,16 @@ public class SecurityConfig {
 		if (this.oauthServerCorsConfiguration == null) {
 			this.oauthServerCorsConfiguration = oauthServerCorsConfiguration(allowedOrigins, maxAge);
 		}
+
+		if (relyingPartyRegistrationRepository != null && this.samlCorsConfigurations == null) {
+			// Automatically add SAML providers as allowed origins for SAML response endpoints.
+
+			this.samlCorsConfigurations = samlCorsConfigurations(relyingPartyRegistrationRepository, allowedOrigins, maxAge);
+		}
 	}
 
 	private CorsConfiguration defaultCorsConfiguration(List<String> allowedOrigins, Duration maxAge) {
-		CorsConfiguration configuration = new CSpaceCorsConfiguration();
+		CorsConfiguration configuration = new CorsConfiguration();
 
 		configuration.setAllowedOrigins(allowedOrigins);
 
@@ -199,7 +238,7 @@ public class SecurityConfig {
 	}
 
 	private CorsConfiguration oauthServerCorsConfiguration(List<String> allowedOrigins, Duration maxAge) {
-		CorsConfiguration configuration = new CSpaceCorsConfiguration();
+		CorsConfiguration configuration = new CorsConfiguration();
 
 		configuration.setAllowedOrigins(allowedOrigins);
 
@@ -213,6 +252,89 @@ public class SecurityConfig {
 		));
 
 		return configuration;
+	}
+
+	/**
+	 * Generate CORS configurations for SAML. For each registered SAML provider, POST requests to the
+	 * SAML response endpoint are allowed from the provider's sign on location.
+	 *
+	 * @param relyingPartyRegistrationRepository
+	 * @param allowedOrigins
+	 * @param maxAge
+	 * @return
+	 */
+	private Map<String, CorsConfiguration> samlCorsConfigurations(
+		RelyingPartyRegistrationRepository relyingPartyRegistrationRepository,
+		List<String> allowedOrigins,
+		Duration maxAge)
+	{
+		ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
+		List<SAMLRelyingPartyType> relyingPartiesConfig = ConfigUtils.getSAMLRelyingPartyRegistrations(serviceConfig);
+		Map<String, CorsConfiguration> corsConfigurations = new LinkedHashMap<>();
+
+		if (relyingPartiesConfig != null) {
+			List<String> providerOrigins = new ArrayList<>();
+
+			for (final SAMLRelyingPartyType relyingPartyConfig : relyingPartiesConfig) {
+				String id = relyingPartyConfig.getId();
+				RelyingPartyRegistration registration = relyingPartyRegistrationRepository.findByRegistrationId(id);
+
+				if (registration == null) {
+					continue;
+				}
+
+				URL providerUrl = null;
+
+				try {
+					providerUrl = new URL(registration.getAssertingPartyDetails().getSingleSignOnServiceLocation());
+				} catch (MalformedURLException e) {
+				}
+
+				if (providerUrl != null) {
+					CorsConfiguration configuration = new CorsConfiguration();
+					String responseUrl = "/login/saml2/sso/" + id;
+					String providerOrigin = providerUrl.getProtocol() + "://" + providerUrl.getAuthority();
+
+					providerOrigins.add(providerOrigin);
+
+					configuration.setAllowedOrigins(allowedOrigins);
+					configuration.addAllowedOrigin(providerOrigin);
+
+					if (maxAge != null) {
+						configuration.setMaxAge(maxAge);
+					}
+
+					configuration.setAllowedMethods(Arrays.asList(
+						HttpMethod.POST.toString()
+					));
+
+					corsConfigurations.put(responseUrl, configuration);
+				}
+			}
+
+			if (ConfigUtils.isSAMLSingleLogoutEnabled(serviceConfig)) {
+					CorsConfiguration configuration = new CorsConfiguration();
+					String responseUrl = "/logout/saml2/slo";
+
+					configuration.setAllowedOrigins(allowedOrigins);
+
+					for (String providerOrigin : providerOrigins) {
+						configuration.addAllowedOrigin(providerOrigin);
+					}
+
+					if (maxAge != null) {
+						configuration.setMaxAge(maxAge);
+					}
+
+					configuration.setAllowedMethods(Arrays.asList(
+						HttpMethod.POST.toString()
+					));
+
+					corsConfigurations.put(responseUrl, configuration);
+			}
+		}
+
+		return corsConfigurations;
 	}
 
 	@Bean
@@ -233,7 +355,7 @@ public class SecurityConfig {
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		this.initializeCorsConfigurations();
+		this.initializeCorsConfigurations(null);
 
 		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
 
@@ -251,14 +373,6 @@ public class SecurityConfig {
 						@Override
 						@Nullable
 						public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-							String scheme = request.getScheme();
-							String host = request.getServerName();
-							int port = request.getServerPort();
-
-							System.out.println("scheme=[" + scheme + "]");
-							System.out.println("host=[" + host + "]");
-							System.out.println("port=[" + port + "]");
-
 							return SecurityConfig.this.oauthServerCorsConfiguration;
 						}
 					});
@@ -278,10 +392,12 @@ public class SecurityConfig {
 		final Optional<RelyingPartyRegistrationRepository> optionalRelyingPartyRegistrationRepository
 	) throws Exception {
 
+		final RelyingPartyRegistrationRepository relyingPartyRegistrationRepository = optionalRelyingPartyRegistrationRepository.orElse(null);
+
 		ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
 		SAMLType saml = ConfigUtils.getSAML(serviceConfig);
 
-		this.initializeCorsConfigurations();
+		this.initializeCorsConfigurations(relyingPartyRegistrationRepository);
 
 		http
 			.authorizeHttpRequests(new Customizer<AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry>() {
@@ -400,30 +516,26 @@ public class SecurityConfig {
 			.cors(new Customizer<CorsConfigurer<HttpSecurity>>() {
 				@Override
 				public void customize(CorsConfigurer<HttpSecurity> configurer) {
-					configurer.configurationSource(new CorsConfigurationSource() {
-						@Override
-						@Nullable
-						public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-							String scheme = request.getScheme();
-							String host = request.getServerName();
-							int port = request.getServerPort();
+					UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
+					Map<String, CorsConfiguration> urlMappings = new LinkedHashMap<>();
 
-							System.out.println("scheme=[" + scheme + "]");
-							System.out.println("host=[" + host + "]");
-							System.out.println("port=[" + port + "]");
-
-							return SecurityConfig.this.defaultCorsConfiguration;
+					if (SecurityConfig.this.samlCorsConfigurations != null) {
+						for (Map.Entry<String, CorsConfiguration> entry : SecurityConfig.this.samlCorsConfigurations.entrySet()) {
+							urlMappings.put(entry.getKey(), entry.getValue());
 						}
-					});
+					}
+
+					urlMappings.put("/**", SecurityConfig.this.defaultCorsConfiguration);
+
+					configurationSource.setCorsConfigurations(urlMappings);
+					configurer.configurationSource(configurationSource);
 				}
 			})
 			// Insert the username from the security context into a request attribute for logging.
 			.addFilterBefore(new CSpaceUserAttributeFilter(), LogoutFilter.class);
 
-		RelyingPartyRegistrationRepository relyingPartyRegistrationRepository = optionalRelyingPartyRegistrationRepository.orElse(null);
-
 		if (relyingPartyRegistrationRepository != null) {
-			RelyingPartyRegistrationResolver relyingPartyRegistrationResolver =
+			final RelyingPartyRegistrationResolver relyingPartyRegistrationResolver =
 				new DefaultRelyingPartyRegistrationResolver(relyingPartyRegistrationRepository);
 
 			// TODO: Use OpenSaml4AuthenticationProvider (requires Java 11) instead of deprecated OpenSamlAuthenticationProvider.
@@ -436,19 +548,32 @@ public class SecurityConfig {
 						.createDefaultResponseAuthenticationConverter()
 						.convert(responseToken);
 
+					String registrationId = responseToken.getToken().getRelyingPartyRegistration().getRegistrationId();
+					ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
+					SAMLRelyingPartyType registration = ConfigUtils.getSAMLRelyingPartyRegistration(serviceConfig, registrationId);
+
+					AssertionProbesType assertionProbes = (
+						registration != null
+							? registration.getAssertionUsernameProbes()
+							: null
+					);
+
 					Assertion assertion = responseToken.getResponse().getAssertions().get(0);
-					String username = assertion.getSubject().getNameID().getValue();
+					List<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
 
-					try {
-						CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(username);
+					for (String candidateUsername : candidateUsernames) {
+						try {
+							CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(candidateUsername);
 
-						return new CSpaceSaml2Authentication(user, authentication);
+							return new CSpaceSaml2Authentication(user, authentication);
+						}
+						catch(UsernameNotFoundException e) {
+						}
 					}
-					catch(UsernameNotFoundException e) {
-						String errorMessage = "No CollectionSpace account was found for " + username + ".";
 
-						throw(new UsernameNotFoundException(errorMessage, e));
-					}
+					String errorMessage = "No CollectionSpace account was found for " + StringUtils.join(candidateUsernames, " / ") + ".";
+
+					throw(new UsernameNotFoundException(errorMessage));
 				}
 			});
 
@@ -483,7 +608,25 @@ public class SecurityConfig {
 							configurer.logoutRequest(new Customizer<Saml2LogoutConfigurer<HttpSecurity>.LogoutRequestConfigurer>() {
 								@Override
 								public void customize(Saml2LogoutConfigurer<HttpSecurity>.LogoutRequestConfigurer configurer) {
-									configurer.logoutRequestRepository(new CSpaceSaml2LogoutRequestRepository());
+									configurer
+										.logoutRequestRepository(new CSpaceSaml2LogoutRequestRepository())
+										.logoutRequestResolver(new Saml2LogoutRequestResolver() {
+											@Override
+											public Saml2LogoutRequest resolve(HttpServletRequest request, Authentication authentication) {
+												// TODO: Use OpenSaml4LogoutRequestResolver (requires Java 11).
+												Saml2LogoutRequestResolver resolver = new OpenSaml3LogoutRequestResolver(relyingPartyRegistrationResolver);
+
+												// The name of the authenticated principal in our CSpaceSaml2Authentication
+												// may have come from an attribute of the SAML assertion instead of the
+												// NameID, but the logout request needs to send the NameID.
+												// CSpaceSaml2Authentication.getWrappedAuthentication will get the
+												// authentication whose principal is the NameID of the assertion.
+
+												Saml2Authentication wrappedAuthentication = ((CSpaceSaml2Authentication) authentication).getWrappedAuthentication();
+
+												return resolver.resolve(request, wrappedAuthentication);
+											}
+										});
 								}
 							});
 						}
@@ -679,15 +822,22 @@ public class SecurityConfig {
 					registrationBuilder = RelyingPartyRegistrations
 						.fromMetadataLocation(relyingPartyConfig.getMetadata().getLocation())
 						.registrationId(relyingPartyConfig.getId());
-				} else {
-					final AssertingPartyDetailsType assertingPartyDetails = relyingPartyConfig.getAssertingPartyDetails();
-
+				}
+				else {
 					registrationBuilder = RelyingPartyRegistration
-						.withRegistrationId(relyingPartyConfig.getId())
+						.withRegistrationId(relyingPartyConfig.getId());
+				}
+
+				final AssertingPartyDetailsType assertingPartyDetails = relyingPartyConfig.getAssertingPartyDetails();
+
+				if (assertingPartyDetails != null) {
+					registrationBuilder
 						.assertingPartyDetails(new Consumer<AssertingPartyDetails.Builder>() {
 							@Override
 							public void accept(AssertingPartyDetails.Builder builder) {
-								builder.entityId(assertingPartyDetails.getEntityId());
+								if (assertingPartyDetails.getEntityId() != null) {
+									builder.entityId(assertingPartyDetails.getEntityId());
+								}
 
 								if (assertingPartyDetails.isWantAuthnRequestsSigned() != null) {
 									builder.wantAuthnRequestsSigned(assertingPartyDetails.isWantAuthnRequestsSigned());
@@ -703,7 +853,7 @@ public class SecurityConfig {
 								}
 
 								if (assertingPartyDetails.getSingleSignOnServiceBinding() != null) {
-									builder.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleSignOnServiceBinding().value()));
+									builder.singleSignOnServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleSignOnServiceBinding().value().toUpperCase()));
 								}
 
 								if (assertingPartyDetails.getSingleSignOnServiceLocation() != null) {
@@ -711,7 +861,7 @@ public class SecurityConfig {
 								}
 
 								if (assertingPartyDetails.getSingleLogoutServiceBinding() != null) {
-									builder.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleLogoutServiceBinding().value()));
+									builder.singleLogoutServiceBinding(Saml2MessageBinding.valueOf(assertingPartyDetails.getSingleLogoutServiceBinding().value().toUpperCase()));
 								}
 
 								if (assertingPartyDetails.getSingleLogoutServiceLocation() != null) {

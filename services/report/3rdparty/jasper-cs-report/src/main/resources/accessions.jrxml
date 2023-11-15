@@ -19,7 +19,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["acquisitionsource"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["acquisitionsource,objectname"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -75,7 +75,7 @@
   FROM acquisitions acq
   INNER JOIN relations_common rels ON rels.subjectcsid = acq.csid AND rels.objectdocumenttype = 'CollectionObject'
   INNER JOIN misc on misc.id = rels.id AND misc.lifecyclestate != 'deleted'
-  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid AND hier.primarytype = 'CollectionObject'
+  INNER JOIN hierarchy hier ON hier.name = rels.objectcsid
   INNER JOIN collectionobjects_common object ON object.id = hier.id
   LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = object.id AND bd.pos = 0
   LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = object.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0

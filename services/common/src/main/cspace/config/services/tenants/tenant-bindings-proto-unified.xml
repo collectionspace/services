@@ -707,6 +707,10 @@
 					<types:key>report</types:key>
 					<types:value>outgoing_loan</types:value>
 				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>borrowing_receipt</types:value>
+				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">

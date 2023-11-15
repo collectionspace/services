@@ -260,6 +260,22 @@
                     </xs:documentation>
                 </xs:annotation>
             </xs:element>
+
+            <xs:element name="assertion-username-probes" type="AssertionProbesType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        <![CDATA[
+                        Configures how a SAML assertion is probed to find the CollectionSpace
+                        username. Defaults to:
+
+                        <name-id />
+                        <attribute name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" />
+                        <attribute name="email" />
+                        <attribute name="mail" />
+                        ]]>
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
 
         <xs:attribute name="id" type="xs:string" use="required">
@@ -270,6 +286,43 @@
                 </xs:documentation>
             </xs:annotation>
         </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="AssertionProbesType">
+        <xs:annotation>
+            <xs:documentation>
+                Configures probes in a SAML assertion.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:sequence>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="name-id" type="AssertionNameIDProbeType" />
+                <xs:element name="attribute" type="AssertionAttributeProbeType" />
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AssertionAttributeProbeType">
+        <xs:annotation>
+            <xs:documentation>
+                Configures probing of an attribute in a SAML assertion.
+            </xs:documentation>
+        </xs:annotation>
+
+        <xs:attribute name="name" type="xs:string" use="required">
+            <xs:annotation>
+                <xs:documentation>
+                    The name of the SAML attribute to probe.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="AssertionNameIDProbeType">
+        <xs:annotation>
+            <xs:documentation>Configures probing of the NameID in a SAML assertion.</xs:documentation>
+        </xs:annotation>
     </xs:complexType>
 
     <xs:complexType name="IconType">
@@ -344,7 +397,7 @@
 
     <xs:complexType name="AssertingPartyDetailsType">
         <xs:sequence>
-            <xs:element name="entity-id" type="xs:string" minOccurs="1" maxOccurs="1" />
+            <xs:element name="entity-id" type="xs:string" minOccurs="0" maxOccurs="1" />
             <xs:element name="want-authn-requests-signed" type="xs:boolean" minOccurs="0" maxOccurs="1" />
             <xs:element name="signing-algorithms" type="SigningAlgorithmsType" minOccurs="0" maxOccurs="1" />
 
