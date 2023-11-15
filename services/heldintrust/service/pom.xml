@@ -34,11 +34,6 @@
             <artifactId>org.collectionspace.services.heldintrust.client</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- External dependencies -->
         <dependency>
             <groupId>junit</groupId>
