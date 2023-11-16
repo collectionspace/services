@@ -203,15 +203,14 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 
 		List<JsonNode> denormMaterials = new ArrayList<>();
 		for (Map<String, Object> materialGroup : materialGroupList) {
-			String material;
-
 			String controlledMaterial = (String) materialGroup.get("materialControlled");
 			if (controlledMaterial != null) {
-				material = RefNameUtils.getDisplayName(controlledMaterial);
-			} else {
-				material = (String) materialGroup.get("material");
+				final ObjectNode node = objectMapper.createObjectNode();
+				node.put("material", RefNameUtils.getDisplayName(controlledMaterial));
+				denormMaterials.add(node);
 			}
 
+			String material = (String) materialGroup.get("material");
 			if (material != null) {
 				final ObjectNode node = objectMapper.createObjectNode();
 				node.put("material", material);
