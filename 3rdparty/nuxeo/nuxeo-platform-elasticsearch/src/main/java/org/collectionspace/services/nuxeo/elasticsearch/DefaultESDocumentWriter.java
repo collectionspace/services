@@ -60,7 +60,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormMediaRecords(session, csid, tenantId, denormValues);
 			denormAcquisitionRecords(session, csid, tenantId, denormValues);
 			denormExhibitionRecords(session, csid, tenantId, denormValues);
-			denormMaterialRecords(doc, denormValues);
+			denormMaterialFields(doc, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -197,7 +197,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 	 * @param doc the collectionobject document
 	 * @param denormValues the json node for denormalized fields
 	 */
-	private void denormMaterialRecords(DocumentModel doc, ObjectNode denormValues) {
+	private void denormMaterialFields(DocumentModel doc, ObjectNode denormValues) {
 		List<Map<String, Object>> materialGroupList =
 			(List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "materialGroupList");
 
