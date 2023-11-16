@@ -119,8 +119,7 @@
 							"properties": {
 								"material": {
 									"type": "keyword",
-									"copy_to": "all_field",
-									"normalizer": "sorting_normalizer"
+									"copy_to": "all_field"
 								}
 							}
 						},
