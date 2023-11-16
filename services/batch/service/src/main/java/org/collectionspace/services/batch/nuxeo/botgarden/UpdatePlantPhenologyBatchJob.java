@@ -90,11 +90,9 @@ public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
 
         for (String key : values.keySet()) {
             if (key.equals("sex")) {
-                sex = "<sex>" + values.get(key) + "</sex>";
+                sex = getFieldXml(key, values.get(key));
             } else {
-                valuesToUpdate.append("<").append(key).append(">")
-                              .append(values.get(key))
-                              .append("</").append(key).append(">");
+                valuesToUpdate.append(getFieldXml(key, values.get(key)));
             }
         }
 
