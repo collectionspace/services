@@ -19,7 +19,7 @@
 
 	<target name="deploy_tenant">
 		<basename property="tenant.shortname" file="${basedir}" />
-		<echo>Deploy tenant listers for ${tenant.shortname}</echo>
+		<echo>Deploy tenant listeners for ${tenant.shortname}</echo>
 		<ant antfile="build.xml" target="deploy" inheritall="false"/>
 	</target>
 
@@ -31,7 +31,7 @@
 
 	<target name="undeploy_tenant">
 		<basename property="tenant.shortname" file="${basedir}" />
-		<echo>Deploy tenant listers for ${tenant.shortname}</echo>
+		<echo>Undeploy tenant listeners for ${tenant.shortname}</echo>
 		<ant antfile="build.xml" target="undeploy" inheritall="false"/>
 	</target>
 
