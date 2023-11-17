@@ -923,6 +923,22 @@ public class SecurityConfig {
 					});
 				}
 
+				if (relyingPartyConfig.getDecryptionX509Credentials() != null) {
+					registrationBuilder.decryptionX509Credentials(new Consumer<Collection<Saml2X509Credential>>() {
+						@Override
+						public void accept(Collection<Saml2X509Credential> credentials) {
+							for (X509CredentialType credentialConfig : relyingPartyConfig.getDecryptionX509Credentials().getX509Credential()) {
+								PrivateKey privateKey = privateKeyFromUrl(credentialConfig.getPrivateKey().getLocation());
+								X509Certificate certificate = certificateFromConfig(credentialConfig.getX509Certificate());
+
+								if (certificate != null) {
+									credentials.add(Saml2X509Credential.decryption(privateKey, certificate));
+								}
+							}
+						}
+					});
+				}
+
 				registrations.add(registrationBuilder.build());
 			}
 		}

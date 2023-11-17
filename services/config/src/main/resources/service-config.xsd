@@ -261,6 +261,15 @@
                 </xs:annotation>
             </xs:element>
 
+            <xs:element name="decryption-x509-credentials" type="X509CredentialsType" minOccurs="0" maxOccurs="1">
+                <xs:annotation>
+                    <xs:documentation>
+                        The credentials used to encrypt/decrypt responses from the IdP. Required if
+                        the IdP requires assertions to be signed.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+
             <xs:element name="assertion-username-probes" type="AssertionProbesType" minOccurs="0" maxOccurs="1">
                 <xs:annotation>
                     <xs:documentation>
