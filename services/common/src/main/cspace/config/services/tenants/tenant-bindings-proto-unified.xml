@@ -1141,7 +1141,6 @@
 							"collectionobjects_common:colors",
 							"collectionobjects_common:computedCurrentLocation",
 							"collectionobjects_common:contentConcepts",
-							"collectionobjects_common:materialGroupList",
 							"collectionobjects_common:measuredPartGroupList",
 							"collectionobjects_common:numberOfObjects",
 							"collectionobjects_common:objectHistoryNote",
@@ -1230,6 +1229,15 @@
 								}
 							}
 						},
+						"collectionspace_denorm:materialGroupList": {
+							"type": "object",
+							"properties": {
+								"material": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
 
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",
@@ -1309,15 +1317,6 @@
 							"type": "object",
 							"properties": {
 								"objectProductionPlace": {
-									"type": "keyword",
-									"copy_to": "all_field"
-								}
-							}
-						},
-						"collectionobjects_common:materialGroupList": {
-							"type": "object",
-							"properties": {
-								"material": {
 									"type": "keyword",
 									"copy_to": "all_field"
 								}

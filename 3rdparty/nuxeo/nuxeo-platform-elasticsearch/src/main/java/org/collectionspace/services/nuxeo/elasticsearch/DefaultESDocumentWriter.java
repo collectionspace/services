@@ -60,6 +60,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormMediaRecords(session, csid, tenantId, denormValues);
 			denormAcquisitionRecords(session, csid, tenantId, denormValues);
 			denormExhibitionRecords(session, csid, tenantId, denormValues);
+			denormMaterialFields(doc, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -189,6 +190,36 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 
 	denormValues.putArray("exhibition").addAll(exhibitions);
 }
+
+	/**
+	 * Denormalize the material group list for a collectionobject in order to index the controlled or uncontrolled term
+	 *
+	 * @param doc the collectionobject document
+	 * @param denormValues the json node for denormalized fields
+	 */
+	private void denormMaterialFields(DocumentModel doc, ObjectNode denormValues) {
+		List<Map<String, Object>> materialGroupList =
+			(List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "materialGroupList");
+
+		List<JsonNode> denormMaterials = new ArrayList<>();
+		for (Map<String, Object> materialGroup : materialGroupList) {
+			String controlledMaterial = (String) materialGroup.get("materialControlled");
+			if (controlledMaterial != null) {
+				final ObjectNode node = objectMapper.createObjectNode();
+				node.put("material", RefNameUtils.getDisplayName(controlledMaterial));
+				denormMaterials.add(node);
+			}
+
+			String material = (String) materialGroup.get("material");
+			if (material != null) {
+				final ObjectNode node = objectMapper.createObjectNode();
+				node.put("material", material);
+				denormMaterials.add(node);
+			}
+		}
+
+		denormValues.putArray("materialGroupList").addAll(denormMaterials);
+	}
 
 	/**
 	 * Compute a title for the public browser. This needs to be indexed in ES so that it can
