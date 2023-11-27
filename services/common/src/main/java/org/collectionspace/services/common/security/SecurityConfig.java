@@ -576,7 +576,9 @@ public class SecurityConfig {
 						attemptedUsernames.addAll(candidateUsernames);
 					}
 
-					String errorMessage = "No CollectionSpace account was found for " + StringUtils.join(attemptedUsernames, " / ") + ".";
+					String errorMessage = attemptedUsernames.size() == 0
+						? "The SAML assertion did not contain a CollectionSpace username."
+						: "No CollectionSpace account found for " + StringUtils.join(attemptedUsernames, " / ") + ".";
 
 					throw(new UsernameNotFoundException(errorMessage));
 				}

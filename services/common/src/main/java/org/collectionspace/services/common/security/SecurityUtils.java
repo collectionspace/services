@@ -70,7 +70,6 @@ public class SecurityUtils {
     public static final String BASE64_ENCODING = "BASE64";
     public static final String BASE16_ENCODING = "HEX";
     public static final String RFC2617_ENCODING = "RFC2617";
-    private static char MD5_HEX[] = "0123456789abcdef".toCharArray();
 
     private static final List<Object> DEFAULT_SAML_ASSERTION_USERNAME_PROBES = new ArrayList<>();
 
@@ -78,6 +77,7 @@ public class SecurityUtils {
         DEFAULT_SAML_ASSERTION_USERNAME_PROBES.add(new AssertionNameIDProbeType());
 
         String[] attributeNames = new String[]{
+            "urn:oid:0.9.2342.19200300.100.1.3",
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
             "email",
             "mail"
