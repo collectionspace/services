@@ -558,20 +558,25 @@ public class SecurityConfig {
 							: null
 					);
 
-					Assertion assertion = responseToken.getResponse().getAssertions().get(0);
-					List<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
+					List<String> attemptedUsernames = new ArrayList<>();
 
-					for (String candidateUsername : candidateUsernames) {
-						try {
-							CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(candidateUsername);
+					for (Assertion assertion : responseToken.getResponse().getAssertions()) {
+						List<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
 
-							return new CSpaceSaml2Authentication(user, authentication);
+						for (String candidateUsername : candidateUsernames) {
+							try {
+								CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(candidateUsername);
+
+								return new CSpaceSaml2Authentication(user, authentication);
+							}
+							catch(UsernameNotFoundException e) {
+							}
 						}
-						catch(UsernameNotFoundException e) {
-						}
+
+						attemptedUsernames.addAll(candidateUsernames);
 					}
 
-					String errorMessage = "No CollectionSpace account was found for " + StringUtils.join(candidateUsernames, " / ") + ".";
+					String errorMessage = "No CollectionSpace account was found for " + StringUtils.join(attemptedUsernames, " / ") + ".";
 
 					throw(new UsernameNotFoundException(errorMessage));
 				}
