@@ -561,7 +561,7 @@ public class SecurityConfig {
 					List<String> attemptedUsernames = new ArrayList<>();
 
 					for (Assertion assertion : responseToken.getResponse().getAssertions()) {
-						List<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
+						Set<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
 
 						for (String candidateUsername : candidateUsernames) {
 							try {
