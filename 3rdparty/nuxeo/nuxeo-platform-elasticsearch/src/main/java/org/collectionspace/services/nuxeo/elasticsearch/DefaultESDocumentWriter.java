@@ -233,24 +233,24 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 		List<Map<String, Object>> objectNameList =
 			(List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "objectNameList");
 
-		List<JsonNode> denormMaterials = new ArrayList<>();
+		List<JsonNode> denormObjectNames = new ArrayList<>();
 		for (Map<String, Object> objectNameGroup  : objectNameList) {
 			String controlledName = (String) objectNameGroup.get("objectNameControlled");
 			if (controlledName != null) {
 				final ObjectNode node = objectMapper.createObjectNode();
 				node.put("objectName", RefNameUtils.getDisplayName(controlledName));
-				denormMaterials.add(node);
+				denormObjectNames.add(node);
 			}
 
 			String objectName = (String) objectNameGroup.get("objectName");
 			if (objectName != null) {
 				final ObjectNode node = objectMapper.createObjectNode();
 				node.put("objectName", objectName);
-				denormMaterials.add(node);
+				denormObjectNames.add(node);
 			}
 		}
 
-		denormValues.putArray("objectNameList").addAll(denormMaterials);
+		denormValues.putArray("objectNameList").addAll(denormObjectNames);
 	}
 
 	/**
