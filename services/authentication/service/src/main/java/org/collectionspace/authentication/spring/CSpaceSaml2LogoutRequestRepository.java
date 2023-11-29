@@ -8,7 +8,7 @@ import org.springframework.security.saml2.provider.service.web.authentication.lo
 import org.springframework.security.saml2.provider.service.web.authentication.logout.Saml2LogoutRequestRepository;
 
 /**
- * A Saml2LogoutRequestRepository that saves the redirect paramaeter from the logout request to a
+ * A Saml2LogoutRequestRepository that saves the redirect parameter from the logout request to a
  * request attribute. This allows CSpaceLogoutSuccessHandler to have access to the parameter value
  * following the logout request to the IdP.
  */

@@ -121,35 +121,42 @@
     <target name="deploy_nuxeo"
             description="deploy nuxeo binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/nuxeo"/>
+            <fileset dir="${basedir}/lib/nuxeo" includes="*.jar" />
         </copy>
     </target>
 
     <target name="deploy_spring"
             description="deploy spring binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/spring"/>
+            <fileset dir="${basedir}/lib/spring" includes="*.jar" />
         </copy>
     </target>
 
 	<target name="deploy_aspectj"
             description="deploy AspectJ binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/aspectj"/>
+            <fileset dir="${basedir}/lib/aspectj" includes="*.jar" />
+        </copy>
+    </target>
+
+    <target name="deploy_gateway"
+        description="deploy gateway binaries in ${jee.server.cspace}">
+        <copy todir="${jee.server.cspace}/lib">
+            <fileset dir="${basedir}/lib/gateway" includes="*.jar" />
         </copy>
     </target>
 
     <target name="deploy_slf4j"
             description="deploy spring binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/slf4j"/>
+            <fileset dir="${basedir}/lib/slf4j" includes="*.jar" />
         </copy>
     </target>
 
     <target name="deploy_xmlmerge"
             description="deploy XMLMerge binaries in ${jee.server.cspace}">
         <copy todir="${jee.server.cspace}/lib">
-            <fileset dir="${basedir}/lib/xmlmerge"/>
+            <fileset dir="${basedir}/lib/xmlmerge" includes="*.jar" />
         </copy>
     </target>
 
@@ -178,20 +185,11 @@
 
     <target name="deploy" depends="install"
             description="deploy common elements in ${jee.server.cspace}">
-		<!--
-        <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml.org"
-              file="${jee.server.cspace}/conf/jboss-log4j.xml"
-              overwrite="false"/>
-        <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml"
-              file="${src}/main/cspace/config/log/jboss-log4j.xml"
-              overwrite="true"/>
-        <copy todir="${jee.server.cspace}/conf"
-              file="${src}/main/cspace/config/log/jboss-log4j-release.xml"/>
-		-->
         <copy file="${basedir}/target/${common.jar}" todir="${jee.server.cspace}/lib"/>
 
         <antcall target="deploy_nuxeo" />
         <antcall target="deploy_aspectj" />
+        <antcall target="deploy_gateway" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
@@ -202,7 +200,8 @@
             description="undeploy common elements from ${jee.server.cspace}">
         <antcall target="undeploy_nuxeo" />
         <antcall target="undeploy_aspectj" />
-		<antcall target="undeploy_spring" />
+        <antcall target="undeploy_gateway" />
+        <antcall target="undeploy_spring" />
 		<antcall target="undeploy_slf4j" />
 		<antcall target="undeploy_xmlmerge" />
 		<!--
@@ -218,14 +217,23 @@
         <delete failonerror="false">
             <fileset dir="${jee.server.cspace}/cspace/config/services" excludes="local/**" />
         </delete>
-
     </target>
 
     <target name="undeploy_nuxeo"
             description="undeploy nuxeo binaries from ${jee.server.cspace}">
+        <pathconvert property="nuxeo.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/nuxeo" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="nuxeo-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="${nuxeo.jars}" />
         </delete>
+
         <delete>
             <fileset dir="${jee.deploy.nuxeo.plugins}">
                 <include name="collectionspace.shared.schema.collectionspace_core.jar"/>
@@ -235,38 +243,81 @@
 
     <target name="undeploy_spring"
             description="undeploy spring binaries from ${jee.server.cspace}">
+        <pathconvert property="spring.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/spring" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="aopalliance-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="commons-lang3-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="ehcache-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="groovy-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="jackson-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="org.springframework.*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="spring-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="stax2-api-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="${spring.jars}" />
         </delete>
     </target>
 
 	<target name="undeploy_aspectj"
             description="undeploy AspectJ binaries from ${jee.server.cspace}">
+        <pathconvert property="aspectj.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/aspectj" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="aspectj*-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="${aspectj.jars}" />
+        </delete>
+    </target>
+
+	<target name="undeploy_gateway"
+            description="undeploy gateway binaries from ${jee.server.cspace}">
+        <pathconvert property="gateway.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/gateway" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
+        <delete>
+            <fileset dir="${jee.server.cspace}/lib" includes="${gateway.jars}" />
         </delete>
     </target>
 
     <target name="undeploy_slf4j"
             description="undeploy SLF4J binaries from ${jee.server.cspace}">
+        <pathconvert property="slf4j.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/slf4j" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="slf4j-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="log4j-*.jar"/>
-            <fileset dir="${jee.server.cspace}/lib" includes="jcl-over-slf4j-*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="${slf4j.jars}" />
         </delete>
     </target>
 
     <target name="undeploy_xmlmerge"
             description="undeploy XMLMerge binaries from ${jee.server.cspace}">
+        <pathconvert property="xmlmerge.jars" pathsep=",">
+            <fileset dir="${basedir}/lib/xmlmerge" includes="*.jar" />
+
+            <chainedmapper>
+                <flattenmapper />
+                <regexpmapper from="^(.*?)-[^-]+\.jar$" to="\1-*.jar" />
+            </chainedmapper>
+        </pathconvert>
+
         <delete>
-            <fileset dir="${jee.server.cspace}/lib" includes="module-xml_merge*.jar"/>
+            <fileset dir="${jee.server.cspace}/lib" includes="${xmlmerge.jars}" />
         </delete>
     </target>
 
