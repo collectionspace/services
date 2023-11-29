@@ -101,14 +101,13 @@ LEFT JOIN (
   GROUP BY material_hier.parentid
 ) material ON material.parentid = obj.id
 LEFT JOIN (
-  SELECT relation.subjectcsid, relation.objectcsid
+  SELECT DISTINCT ON (relation.subjectcsid) relation.subjectcsid, relation.objectcsid
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
   INNER JOIN collectionspace_core core ON core.id = hier.id
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
-  ORDER BY core.updatedat DESC
-  LIMIT 1
+  ORDER BY relation.subjectcsid, core.updatedat DESC
 ) media ON media.subjectcsid = hier.name
 $P!{whereclause}]]>
   </queryString>
