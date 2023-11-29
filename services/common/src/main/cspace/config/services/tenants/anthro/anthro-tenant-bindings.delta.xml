@@ -132,6 +132,15 @@
 								}
 							}
 						},
+						"collectionspace_denorm:objectNameList": {
+							"type": "object",
+							"properties": {
+								"objectName": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
 
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",

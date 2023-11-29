@@ -61,6 +61,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormAcquisitionRecords(session, csid, tenantId, denormValues);
 			denormExhibitionRecords(session, csid, tenantId, denormValues);
 			denormMaterialFields(doc, denormValues);
+			denormObjectNameFields(doc, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -219,6 +220,37 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 		}
 
 		denormValues.putArray("materialGroupList").addAll(denormMaterials);
+	}
+
+	/**
+	 * Denormalize the object name group list for a collectionobject in order to index the controlled and
+	 * uncontrolled terms
+	 *
+	 * @param doc the collectionobject document
+	 * @param denormValues the json node for denormalized fields
+	 */
+	private void denormObjectNameFields(DocumentModel doc, ObjectNode denormValues) {
+		List<Map<String, Object>> objectNameList =
+			(List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "objectNameList");
+
+		List<JsonNode> denormObjectNames = new ArrayList<>();
+		for (Map<String, Object> objectNameGroup  : objectNameList) {
+			String controlledName = (String) objectNameGroup.get("objectNameControlled");
+			if (controlledName != null) {
+				final ObjectNode node = objectMapper.createObjectNode();
+				node.put("objectName", RefNameUtils.getDisplayName(controlledName));
+				denormObjectNames.add(node);
+			}
+
+			String objectName = (String) objectNameGroup.get("objectName");
+			if (objectName != null) {
+				final ObjectNode node = objectMapper.createObjectNode();
+				node.put("objectName", objectName);
+				denormObjectNames.add(node);
+			}
+		}
+
+		denormValues.putArray("objectNameList").addAll(denormObjectNames);
 	}
 
 	/**
