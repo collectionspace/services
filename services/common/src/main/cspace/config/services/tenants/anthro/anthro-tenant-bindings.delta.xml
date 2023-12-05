@@ -31,6 +31,7 @@
 							"collectionobjects_common:contentConcepts",
 							"collectionobjects_common:fieldCollectionDateGroup",
 							"collectionobjects_common:fieldCollectors",
+							"collectionobjects_common:materialGroupList",
 							"collectionobjects_common:measuredPartGroupList",
 							"collectionobjects_common:numberOfObjects",
 							"collectionobjects_common:objectHistoryNote",
@@ -234,6 +235,15 @@
 											"normalizer": "refname_displayname_normalizer"
 										}
 									}
+								}
+							}
+						},
+						"collectionobjects_common:materialGroupList": {
+							"type": "object",
+							"properties": {
+								"material": {
+									"type": "keyword",
+									"copy_to": "all_field"
 								}
 							}
 						},
