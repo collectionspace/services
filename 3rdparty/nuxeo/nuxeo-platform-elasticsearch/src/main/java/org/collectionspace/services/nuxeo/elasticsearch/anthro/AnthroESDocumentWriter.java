@@ -34,7 +34,23 @@ public class AnthroESDocumentWriter extends DefaultESDocumentWriter {
 
 		if (objectNameGroups.size() > 0) {
 			Map<String, Object> primaryObjectNameGroup = objectNameGroups.get(0);
-			primaryObjectName = (String) primaryObjectNameGroup.get("objectName");
+
+			primaryObjectName = (String) primaryObjectNameGroup.get("objectNameControlled");
+
+			if (primaryObjectName == null) {
+				primaryObjectName = (String) primaryObjectNameGroup.get("objectName");
+			}
+
+			// The object might be a refname. If it is, use only the display name.
+
+			try {
+				String displayName = RefNameUtils.getDisplayName(primaryObjectName);
+
+				if (displayName != null) {
+					primaryObjectName = displayName;
+				}
+			}
+			catch (Exception e) {}
 		}
 
 		if (StringUtils.isNotEmpty(primaryObjectName)) {
