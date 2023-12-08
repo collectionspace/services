@@ -152,12 +152,6 @@ import com.nimbusds.jose.proc.SecurityContext;
 public class SecurityConfig {
 	private final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
 
-	public static final List<String> EMAIL_ATTR_NAMES = Arrays.asList(
-		"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
-		"email",
-		"mail"
-	);
-
 	public static final String LOGIN_FORM_URL = "/login";
 	public static final String LOGOUT_FORM_URL = "/logout";
 
