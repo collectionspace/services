@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	This config is used by the maven surefire plugin (for tests), as configured in services/pom.xml.
+	For runtime logging config, see services/JaxRsServiceProvider/src/main/resources/log4j2.xml.
+-->
+<Configuration status="WARN">
+	<Properties>
+		<Property name="logPattern">%d %-5p [%t] [%c:%L] %m%n</Property>
+	</Properties>
+
+	<Appenders>
+		<Console name="ConsoleAppender" target="SYSTEM_OUT">
+			<PatternLayout pattern="${logPattern}" />
+		</Console>
+
+		<File name="LogFileAppender" append="false" fileName="target/test.log">
+			<PatternLayout pattern="${logPattern}" />
+		</File>
+	</Appenders>
+
+	<Loggers>
+		<Root level="DEBUG">
+			<AppenderRef ref="ConsoleAppender"/>
+			<AppenderRef ref="LogFileAppender" />
+		</Root>
+
+		<Logger name="httpclient" level="INFO" />
+		<Logger name="org.apache" level="INFO" />
+		<Logger name="org.collectionspace.services.client.PoxPayloadIn" level="DEBUG" />
+		<Logger name="org.collectionspace.services.client.PoxPayloadOut" level="DEBUG" />
+		<Logger name="org.collectionspace" level="DEBUG" />
+		<Logger name="org.jboss.resteasy" level="INFO" />
+	</Loggers>
+</Configuration>
