@@ -171,7 +171,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
                 // Get the CollectionObject's most recent, valid related Movement to use for computing the
                 // object's current location.
                 //
-                DocumentModel mostRecentMovementDocumentModel = getMostRecentLocation(event, session,
+                DocumentModel mostRecentMovementDocumentModel = getMostRecentMovement(event, session,
                     collectionObjectCsid, isAboutToBeRemovedEvent, eventMovementCsid);
                 //
                 // Update the CollectionObject's Computed Current Location field with the Movement record's location
@@ -314,11 +314,12 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * This method currently returns the related Movement record with the latest
      * (i.e. most recent in time) Location Date field value.
      *
+     * @param event a nuxeo event
      * @param session a repository session.
      * @param collectionObjectCsid a CollectionObject identifier (CSID)
      * @param isAboutToBeRemovedEvent whether the current event involves a
      * record that is slated for removal (hard deletion)
-     * @param movementCsidToFilter the CSID of a Movement record slated for
+     * @param eventMovementCsid the CSID of a Movement record slated for
      * deletion, or of a Movement record referenced by a Relation record slated
      * for deletion. This record should be filtered out, prior to returning the
      * most recent Movement record.
@@ -327,12 +328,9 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * identified by the supplied CSID.
      * @throws DocumentException 
      */
-    protected DocumentModel getMostRecentLocation(Event event,
-    		CoreSessionInterface session, String collectionObjectCsid,
-            boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws ClientException {
-    	//
-    	// Assume we can determine the most recent location by creating an indeterminate result
-    	//
+    protected DocumentModel getMostRecentMovement(Event event,
+        CoreSessionInterface session, String collectionObjectCsid,
+        boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws ClientException {
 		DocumentModel result = null;
 		
         //
