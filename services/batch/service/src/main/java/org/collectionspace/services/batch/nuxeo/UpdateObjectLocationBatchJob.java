@@ -75,6 +75,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     }
 
     @Override
+    @Deprecated
     public void run() {
         run(null);
     }
