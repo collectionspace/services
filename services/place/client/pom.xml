@@ -65,7 +65,5 @@
 
     <build>
         <finalName>collectionspace-services-place-client</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>

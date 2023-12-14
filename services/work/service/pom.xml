@@ -108,7 +108,5 @@
 
     <build>
         <finalName>collectionspace-services-work</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>

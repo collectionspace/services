@@ -65,7 +65,5 @@
 
     <build>
         <finalName>collectionspace-services-material-client</finalName>
-        <plugins>
-        </plugins>
     </build>
 </project>
