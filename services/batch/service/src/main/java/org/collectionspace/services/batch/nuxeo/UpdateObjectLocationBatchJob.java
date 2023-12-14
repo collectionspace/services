@@ -75,18 +75,15 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     }
 
     @Override
-    public void run(BatchCommon batchCommon) {
-        String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.",
-                                      getClass().getName());
-        throw new UnsupportedOperationException(errMsg);
+    public void run() {
+        run(null);
     }
 
     /**
      * The main work logic of the batch job. Will be called after setContext.
      */
     @Override
-    public void run() {
-
+    public void run(BatchCommon batchCommon) {
         setCompletionStatus(STATUS_MIN_PROGRESS);
 
         try {
@@ -137,7 +134,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             String errMsg = "Error encountered in " + CLASSNAME + ": " + e.getLocalizedMessage();
             setErrorResult(errMsg);
         }
-
     }
 
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {
