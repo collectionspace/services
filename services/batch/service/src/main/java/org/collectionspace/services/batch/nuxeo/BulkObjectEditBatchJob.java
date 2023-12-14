@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -28,8 +29,7 @@ import org.slf4j.LoggerFactory;
  * collectionobject_common: numberOfObjects, numberValue, material, fieldCollectionPlace, responsibleDepartment,
  * assocPeople, numberType, objectProductionPerson, objectProductionPlace, fieldCollector, objectStatus,
  * contentPlace, objectName
- * collectionobject_naturalistory: taxon
- * collectionobject_pahma: pahmaEthnographicFileCodeList, pahmaFieldLocVerbatim, inventoryCount
+ * collectionobject_naturalhistory: taxon
  *
  * The list contexts is
  * The following parameters are allowed:
@@ -97,7 +97,7 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
                 String mergedPayload = mergePayloads(csid, new PoxPayloadOut(payload.getBytes()));
 
                 if (mergedPayload != null) {
-                    if (updateRecord(csid, mergedPayload) != -1) {
+                    if (updateRecord(csid, mergedPayload)) {
                         numAffected += 1;
                     } else {
                         logger.warn("The record with csid {} was not updated.", csid);
@@ -122,7 +122,7 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
         boolean otherNumFlag = false;
 
         for (String key : fieldsToUpdate.keySet()) {
-            String value = fieldsToUpdate.get(key);
+            String value = StringEscapeUtils.escapeXml(fieldsToUpdate.get(key));
 
             if (key.equals("material")) {
                 commonValues.append("<materialGroupList><materialGroup>")
@@ -285,10 +285,8 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
         return collectionObjectPayload.asXML();
     }
 
-    public int updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
+    public boolean updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
         PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
-
-        int result = 0;
 
         try {
             ResourceMap resource = getResourceMap();
@@ -296,11 +294,10 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
                 (NuxeoBasedResource) resource.get(CollectionObjectClient.SERVICE_NAME);
 
             collectionObjectResource.update(getServiceContext(), resource, createUriInfo(), csid, payload);
+            return true;
         } catch (Exception e) {
-            result = -1;
+            return false;
         }
-        return result;
-
     }
 
     /*
