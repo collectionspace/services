@@ -16,7 +16,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -63,13 +62,6 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
     protected static <T> Set<T> convertListToSet(List<T> list) {
         // create a set from the List
         return (Set<T>) list.stream().collect(Collectors.toSet());
-    }
-
-    @Override
-    public void run(BatchCommon batchCommon) {
-        String errMsg = String.format("%s class does not support run(BatchCommon batchCommon) method.",
-                                      getClass().getName());
-        throw new UnsupportedOperationException(errMsg);
     }
 
 	protected String getFieldXml(Map<String, String> fields, String fieldName) {
