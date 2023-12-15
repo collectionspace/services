@@ -13,7 +13,7 @@ import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 
@@ -74,7 +74,7 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListe
 
 		logger.debug("parentShortId=" + parentShortId);
 
-		if (!parentShortId.equals(TaxonBotGardenConstants.COMMON_VOCABULARY_SHORTID)) {
+		if (!parentShortId.equals(TaxonNaturalHistoryConstants.COMMON_VOCABULARY_SHORTID)) {
 			if (event.getName().equals(DocumentEventTypes.DOCUMENT_CREATED)) {
 				// Save the document, to get the BEFORE_DOC_UPDATE branch to run.
 				doc.getCoreSession().saveDocument(doc);

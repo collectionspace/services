@@ -7,19 +7,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob;
+import org.collectionspace.services.batch.nuxeo.botgarden.UpdateRareFlagBatchJob;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonomyAuthorityConstants;
 
@@ -36,7 +36,7 @@ import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
  * A listener that updates the rare flag on collectionobjects when collectionobjects
  * are created or modified, and when taxon records are modified.
  *
- * @see org.collectionspace.services.batch.nuxeo.UpdateRareFlagBatchJob
+ * @see org.collectionspace.services.batch.nuxeo.botgarden.UpdateRareFlagBatchJob
  * @author ray
  *
  */
@@ -46,7 +46,7 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 	public static final String PREVIOUS_TAXON_PROPERTY_NAME = "UpdateRareFlagListener.previousTaxon";
 	public static final String PREVIOUS_HAS_RARE_CONSERVATION_CATEGORY_PROPERTY_NAME = "UpdateRareFlagListener.previousHasRareConservationCategory";
 
-	private static final String[] CONSERVATION_CATEGORY_PATH_ELEMENTS = TaxonBotGardenConstants.CONSERVATION_CATEGORY_FIELD_NAME.split("/");
+	private static final String[] CONSERVATION_CATEGORY_PATH_ELEMENTS = TaxonNaturalHistoryConstants.CONSERVATION_CATEGORY_FIELD_NAME.split("/");
 	private static final String PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[0];
 	private static final String CONSERVATION_CATEGORY_FIELD_NAME = CONSERVATION_CATEGORY_PATH_ELEMENTS[2];
 
@@ -73,8 +73,8 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 				// Stash the previous primary taxonomic ident, so it can be retrieved in the documentModified handler.
 
 				DocumentModel previousDoc = (DocumentModel) context.getProperty(CoreEventConstants.PREVIOUS_DOCUMENT_MODEL);
-				String previousTaxon = (String) previousDoc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
-						CollectionObjectBotGardenConstants.PRIMARY_TAXON_FIELD_NAME);
+				String previousTaxon = (String) previousDoc.getProperty(CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+						CollectionObjectNaturalHistoryConstants.PRIMARY_TAXON_FIELD_NAME);
 
 				context.setProperty(PREVIOUS_TAXON_PROPERTY_NAME, previousTaxon);
 			}
@@ -86,8 +86,8 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 					// of the collectionobject has changed. We only need to update the rare flag if it has.
 
 					String previousTaxon = (String) context.getProperty(PREVIOUS_TAXON_PROPERTY_NAME);
-					String currentTaxon = (String) doc.getProperty(CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
-							CollectionObjectBotGardenConstants.PRIMARY_TAXON_FIELD_NAME);
+					String currentTaxon = (String) doc.getProperty(CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+							CollectionObjectNaturalHistoryConstants.PRIMARY_TAXON_FIELD_NAME);
 
 					if (previousTaxon == null) {
 						previousTaxon = "";
@@ -177,7 +177,7 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 	}
 
 	private boolean hasRareConservationCategory(DocumentModel doc) {
-		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonBotGardenConstants.CONSERVATION_CATEGORY_SCHEMA_NAME,
+		List<Map<String, Object>> plantAttributesGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonNaturalHistoryConstants.CONSERVATION_CATEGORY_SCHEMA_NAME,
 				PLANT_ATTRIBUTES_GROUP_LIST_FIELD_NAME);
 		boolean hasRareConservationCategory = false;
 

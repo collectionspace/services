@@ -1,4 +1,4 @@
-package org.collectionspace.services.batch.nuxeo;
+package org.collectionspace.services.batch.nuxeo.botgarden;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -8,11 +8,12 @@ import java.util.List;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.nuxeo.AbstractBatchJob;
 import org.collectionspace.services.client.LoanoutClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.TaxonFormatter;
 import org.collectionspace.services.common.invocable.InvocationResults;
@@ -135,19 +136,19 @@ public class FormatVoucherNameBatchJob extends AbstractBatchJob {
 		if (collectionObjectPayload != null) {
 			name = new VoucherName();
 			
-			name.setName(getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME,
-					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME)));
-			name.setHybrid(getBooleanFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_FLAG_SCHEMA_NAME, 
-					CollectionObjectBotGardenConstants.HYBRID_FLAG_FIELD_NAME));
+			name.setName(getDisplayNameFromRefName(getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME)));
+			name.setHybrid(getBooleanFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.HYBRID_FLAG_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.HYBRID_FLAG_FIELD_NAME));
 
 			if (name.isHybrid()) {
-				List<String> hybridParents = this.getFieldValues(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_PARENT_SCHEMA_NAME, 
-						CollectionObjectBotGardenConstants.HYBRID_PARENT_FIELD_NAME);
-				List<String> hybridQualifiers = this.getFieldValues(collectionObjectPayload, CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_SCHEMA_NAME, 
-						CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_FIELD_NAME);
+				List<String> hybridParents = this.getFieldValues(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.HYBRID_PARENT_SCHEMA_NAME,
+						CollectionObjectNaturalHistoryConstants.HYBRID_PARENT_FIELD_NAME);
+				List<String> hybridQualifiers = this.getFieldValues(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.HYBRID_QUALIFIER_SCHEMA_NAME,
+						CollectionObjectNaturalHistoryConstants.HYBRID_QUALIFIER_FIELD_NAME);
 
-				int femaleIndex = hybridQualifiers.indexOf(CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_FEMALE_VALUE);
-				int maleIndex = hybridQualifiers.indexOf(CollectionObjectBotGardenConstants.HYBRID_QUALIFIER_MALE_VALUE);
+				int femaleIndex = hybridQualifiers.indexOf(CollectionObjectNaturalHistoryConstants.HYBRID_QUALIFIER_FEMALE_VALUE);
+				int maleIndex = hybridQualifiers.indexOf(CollectionObjectNaturalHistoryConstants.HYBRID_QUALIFIER_MALE_VALUE);
 				
 				if (femaleIndex >= 0) {
 					name.setFemaleParentName(getDisplayNameFromRefName(hybridParents.get(femaleIndex)));

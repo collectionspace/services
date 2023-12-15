@@ -3,7 +3,7 @@ package org.collectionspace.services.taxonomy.nuxeo;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 
-public class TaxonBotGardenConstants {
+public class TaxonNaturalHistoryConstants {
 	public static final String NATURALHISTORY_SCHEMA_NAME = TaxonomyAuthorityClient.SERVICE_ITEM_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.NATURALHISTORY_EXTENSION_NAME;
 
     public final static String CONSERVATION_CATEGORY_SCHEMA_NAME = NATURALHISTORY_SCHEMA_NAME;

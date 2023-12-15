@@ -28,7 +28,7 @@ package org.collectionspace.services.taxonomy.nuxeo;
  */
 public class TaxonomyAuthorityConstants {
 
-    public final static String NUXEO_DOCTYPE = "TaxonomyAuthority";
+    public final static String NUXEO_DOCTYPE = "Taxonomyauthority";
     public final static String NUXEO_SCHEMA_NAME = "taxonomyauthority";
     public final static String NUXEO_DC_TITLE = "CollectionSpace-TaxonomyAuthority";
 }

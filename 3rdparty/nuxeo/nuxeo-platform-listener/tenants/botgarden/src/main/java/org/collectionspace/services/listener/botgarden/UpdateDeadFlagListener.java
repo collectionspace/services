@@ -4,13 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.batch.nuxeo.UpdateDeadFlagBatchJob;
+import org.collectionspace.services.batch.nuxeo.botgarden.UpdateDeadFlagBatchJob;
 import org.collectionspace.services.client.BatchClient;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
 import org.collectionspace.services.common.ResourceMap;
+import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.relation.nuxeo.RelationConstants;
@@ -36,7 +37,7 @@ public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
     }
 
 	/*
-	 * Set the dead flag and dead date on collectionobjects related to a new or modified movement record.
+	 * Set the dead flag and dead date on CollectionObjects related to a new or modified movement record.
 	 */
 	@Override
 	public void handleCSEvent(Event event) {
@@ -89,7 +90,9 @@ public class UpdateDeadFlagListener extends AbstractCSEventSyncListenerImpl {
 
 				logger.debug("actionCode=" + actionCode);
 
-				if (actionCode != null && (actionCode.equals(MovementBotGardenConstants.DEAD_ACTION_CODE) || actionCode.equals(MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
+				if (actionCode != null &&
+						(RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.DEAD_ACTION_CODE) ||
+						 RefNameUtils.doShortIDsMatch(actionCode, MovementBotGardenConstants.REVIVED_ACTION_CODE))) {
 					String movementCsid = doc.getName();
 
 					try {

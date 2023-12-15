@@ -1,4 +1,4 @@
-package org.collectionspace.services.batch.nuxeo;
+package org.collectionspace.services.batch.nuxeo.botgarden;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -8,18 +8,21 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 
 import org.apache.commons.lang.StringUtils;
+import org.collectionspace.services.batch.nuxeo.AbstractBatchJob;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectBotGardenConstants;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectNaturalHistoryConstants;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
 import org.collectionspace.services.common.invocable.InvocationResults;
-import org.collectionspace.services.taxonomy.nuxeo.TaxonBotGardenConstants;
+import org.collectionspace.services.taxonomy.nuxeo.TaxonNaturalHistoryConstants;
 import org.collectionspace.services.taxonomy.nuxeo.TaxonConstants;
+
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +33,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 	// All conservation categories are considered rare, except for ones that start with the following prefixes.
 	public static final List<String> NON_RARE_CONSERVATION_CATEGORY_PREFIXES = Arrays.asList("none", "DD ", "LC ", "LR (lc) ");
 
-	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectBotGardenConstants.TAXON_FIELD_NAME.split("\\/");
+	private static final String[] TAXON_FIELD_NAME_PARTS = CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME.split("\\/");
 	private static final String TAXON_FIELD_NAME_WITHOUT_PATH = TAXON_FIELD_NAME_PARTS[TAXON_FIELD_NAME_PARTS.length - 1];
 	
 	public UpdateRareFlagBatchJob() {
@@ -120,7 +123,7 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 		String vocabularyShortId = item.getParentShortIdentifier();
 
 		List<String> collectionObjectCsids = findReferencingCollectionObjects(TaxonomyAuthorityClient.SERVICE_NAME, vocabularyShortId, taxonCsid, 
-				CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
+				CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME + ":" + TAXON_FIELD_NAME_WITHOUT_PATH);
 	 	long numFound = 0;
 		long numAffected = 0;
 		
@@ -128,8 +131,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			// Filter out results where the taxon is referenced in the correct field, but isn't the primary value.
 			
 			PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(collectionObjectCsid);
-			String primaryTaxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
-					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME);
+			String primaryTaxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME);
 						
 			if (primaryTaxonRefName.equals(taxonRefName)) {	
 				numFound++;
@@ -190,10 +193,10 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 			logger.debug("skipping deleted collectionobject: " + collectionObjectCsid);
 		}
 		else {
-			String taxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.TAXON_SCHEMA_NAME, 
-					CollectionObjectBotGardenConstants.TAXON_FIELD_NAME);
-			String oldIsRare = getFieldValue(collectionObjectPayload, CollectionObjectBotGardenConstants.RARE_FLAG_SCHEMA_NAME, 
-					CollectionObjectBotGardenConstants.RARE_FLAG_FIELD_NAME);
+			String taxonRefName = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.TAXON_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.TAXON_FIELD_NAME);
+			String oldIsRare = getFieldValue(collectionObjectPayload, CollectionObjectNaturalHistoryConstants.RARE_FLAG_SCHEMA_NAME,
+					CollectionObjectNaturalHistoryConstants.RARE_FLAG_FIELD_NAME);
 			
 			if (oldIsRare == null) {
 				oldIsRare = "";
@@ -214,8 +217,8 @@ public class UpdateRareFlagBatchJob extends AbstractBatchJob {
 				if (taxonPayload != null) {
 					// UCBG-369: Changing this so that it only checks the primary conservation category.
 					
-					String conservationCategory = getFieldValue(taxonPayload, TaxonBotGardenConstants.CONSERVATION_CATEGORY_SCHEMA_NAME, 
-							TaxonBotGardenConstants.CONSERVATION_CATEGORY_FIELD_NAME);
+					String conservationCategory = getFieldValue(taxonPayload, TaxonNaturalHistoryConstants.CONSERVATION_CATEGORY_SCHEMA_NAME,
+							TaxonNaturalHistoryConstants.CONSERVATION_CATEGORY_FIELD_NAME);
 
 					if (isRare(conservationCategory)) {
 						newIsRare = "true";
