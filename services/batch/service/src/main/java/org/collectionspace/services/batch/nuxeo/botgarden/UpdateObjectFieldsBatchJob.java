@@ -18,15 +18,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This batch job updates the fruiting and flowering months, as well as the sex, fruit color and flower color of collectionobject records.
+ * This batch job updates certain fields in collectionobject records, specified as invocation
+ * parameters. Supported fields include: sex in collectionobjects_common, and any top-level
+ * (non-repeating) field in collectionobjects_botgarden.
+ *
  * It can be invoked in either list or single mode.
  * @author Cesar Villalobos
  *
  */
-public class UpdatePlantPhenologyBatchJob extends AbstractBatchJob {
-    final Logger logger = LoggerFactory.getLogger(UpdatePlantPhenologyBatchJob.class);
+public class UpdateObjectFieldsBatchJob extends AbstractBatchJob {
+    final Logger logger = LoggerFactory.getLogger(UpdateObjectFieldsBatchJob.class);
 
-    public UpdatePlantPhenologyBatchJob() {
+    public UpdateObjectFieldsBatchJob() {
         this.setSupportedInvocationModes(Arrays.asList(INVOCATION_MODE_SINGLE, INVOCATION_MODE_LIST));
     }
 
