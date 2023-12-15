@@ -1,7 +1,5 @@
 package org.collectionspace.services.structureddate.antlr;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -35,9 +33,9 @@ import org.collectionspace.services.structureddate.DeferredQuarterCenturyEndDate
 import org.collectionspace.services.structureddate.DeferredQuarterCenturyStartDate;
 import org.collectionspace.services.structureddate.Era;
 import org.collectionspace.services.structureddate.Part;
-import org.collectionspace.services.structureddate.StructuredDateInternal;
 import org.collectionspace.services.structureddate.StructuredDateEvaluator;
 import org.collectionspace.services.structureddate.StructuredDateFormatException;
+import org.collectionspace.services.structureddate.StructuredDateInternal;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.AllOrPartOfContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.BeforeOrAfterDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.CenturyContext;
@@ -78,11 +76,11 @@ import org.collectionspace.services.structureddate.antlr.StructuredDateParser.Pa
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialDecadeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialEraRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.PartialYearContext;
-import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterInYearRangeContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.QuarterYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanMonthContext;
+import org.collectionspace.services.structureddate.antlr.StructuredDateParser.RomanStringDateContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.SeasonYearContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrCenturyContext;
 import org.collectionspace.services.structureddate.antlr.StructuredDateParser.StrDateContext;
@@ -183,7 +181,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
-		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
+		if (earliestDate.getYear() != null) {
 			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
 			if (compareResult == 1) {
 				Date temp;
@@ -589,10 +587,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(dayOfMonth);
 
 		if (dayOfMonth > 31 || dayOfMonth <= 0) {
-			throw new StructuredDateFormatException("unexpected day of month '" + Integer.toString(dayOfMonth) + "'");
+			throw new StructuredDateFormatException("unexpected day of month '" + dayOfMonth + "'");
 		}
 		if (year == 0) {
-			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
+			throw new StructuredDateFormatException("unexpected year '" + year + "'");
 		}
 	}
 
@@ -1248,25 +1246,52 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	}
 
 	@Override
-	public void exitRomanMonth(RomanMonthContext ctx) {
-		int num = DateUtils.romanToDecimal(ctx.ROMANMONTH().getText());
+	public void exitRomanStringDate(RomanStringDateContext ctx) {
+		if (ctx.exception != null) {
+			return;
+		}
 
-		stack.push(num);
-	}
+		// Need to find out whether it is a MONTH, SHORTMONTH, ROMANMONTH here in order to disambiguate the order
+		// Find if there is a month or SHORTMONTH
+		Integer month = (ctx.MONTH() != null && ctx.SHORTMONTH() == null && ctx.ROMANMONTH() == null) ?
+						(Integer) DateUtils.getMonthByName(ctx.MONTH().getText()) :
+						null;
 
-	@Override
-	public void exitRomanDate(RomanDateContext ctx) {
-		if (ctx.exception != null) return;
+		// it was not a MONTH, so it will either be a SHORTMONTH or ROMANMONTH
+		if (month == null) {
+			month = ctx.ROMANMONTH() == null ?
+					(Integer) DateUtils.getMonthByName(ctx.SHORTMONTH().getText()) :
+					(Integer) DateUtils.romanToDecimal(ctx.ROMANMONTH().getText());
+		}
 
+		// Expect the canonical year-month-day-era ordering
 		Era era = (ctx.era() == null) ? null : (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
-		Integer month = (Integer) stack.pop();
-		Integer day = (Integer) stack.pop();
+
+		Integer num1 = (Integer) stack.pop();
+		Integer num2 = (Integer) stack.pop();
+
+		Integer year = num1;
+		Integer day = num2;
+
+
+		if (DateUtils.isValidDate(num1, month, num2, era)) {
+			// it is a valid year-month-day-era, proceed
+		} else if (DateUtils.isValidDate(num2, month, num1, era)) {
+			// check if its day-month-year-era otherwise
+			year = num2;
+			day = num1;
+		}
 
 		stack.push(year);
 		stack.push(month);
 		stack.push(day);
 		stack.push(era);
+	}
+
+	@Override
+	public void exitRomanMonth(RomanMonthContext ctx) {
+		int num = DateUtils.romanToDecimal(ctx.ROMANMONTH().getText());
+		stack.push(num);
 	}
 
 	@Override
