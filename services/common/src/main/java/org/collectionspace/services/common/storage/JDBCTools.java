@@ -594,7 +594,9 @@ public class JDBCTools {
     /**
      * Create a database user, if that user doesn't already exist.
      *
-     * @param conn a database connection.
+     * @param dataSourceName the datasource for the connection
+     * @param repositoryName the repository name for the connection
+     * @param cspaceInstanceId the cspace instance id for the connection
      * @param dbType a database product type.
      * @param username the name of the database user to create.
      * @param userPW the initial password for that database user.
