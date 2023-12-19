@@ -617,10 +617,6 @@ public class JDBCTools {
             }
         } catch (Exception e) {
             logger.error("createNewDatabaseUser failed with exception:", e);
-            if (sql != null) {
-                logger.error("The following SQL statement failed using credentials from datasource named '{}': '{}'",
-                             dataSourceName, sql);
-            }
             throw e;
         }
     }
