@@ -336,12 +336,6 @@ public class JpaStorageUtils {
 	//FIXME: REM - This method should probably be moved to the AccountPermissionDocumentHandler
 	public static AccountRole getAccountRoles(String csid)
 		throws UnauthorizedException, DocumentNotFoundException {
-		return getAccountRoles(csid, null, null);
-	}
-
-	//FIXME: REM - This method should probably be moved to the AccountPermissionDocumentHandler
-	public static AccountRole getAccountRoles(String csid, String currentResource, String permissionResource)
-		throws UnauthorizedException, DocumentNotFoundException {
 		//
 		// Make sure the user asking for this list has the correct
 		// permission -that is, the csid's userId match the currently logged in userId or
