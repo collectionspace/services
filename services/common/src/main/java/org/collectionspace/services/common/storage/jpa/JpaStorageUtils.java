@@ -375,12 +375,18 @@ public class JpaStorageUtils {
 			Query q = em.createQuery(queryStr);
 			resultList = q.getResultList().iterator();
 
-			if (resultList.hasNext()) {
-				List<RoleValue> roleValues = new ArrayList<RoleValue>();
-				while (resultList.hasNext()) {
-					AccountRoleRel accountRolRel = (AccountRoleRel)resultList.next();
-					roleValues.add(AuthorizationRoleRel.buildRoleValue(accountRolRel));
+			List<RoleValue> roleValues = new ArrayList<RoleValue>();
+
+			while (resultList.hasNext()) {
+				AccountRoleRel accountRolRel = (AccountRoleRel) resultList.next();
+				RoleValue roleValue = AuthorizationRoleRel.buildRoleValue(accountRolRel);
+
+				if (roleValue != null) {
+					roleValues.add(roleValue);
 				}
+			}
+
+			if (roleValues.size() > 0) {
 				result.setRole(roleValues);
 			}
 		} catch (NoResultException nre) {
