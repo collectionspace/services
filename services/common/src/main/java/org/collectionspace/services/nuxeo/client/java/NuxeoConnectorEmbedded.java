@@ -155,8 +155,6 @@ public class NuxeoConnectorEmbedded {
 	}
 
 	private void stopNuxeoEP() {
-		boolean success = true;
-
 		try {
 			fb.stop(new MutableClassLoaderDelegate(classLoader));
 			Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -170,11 +168,7 @@ public class NuxeoConnectorEmbedded {
 				}
 			}
 		} catch (IllegalArgumentException | ReflectiveOperationException | JMException e) {
-			success = false;
-		}
-
-        if (!success) {
-			logger.error("CollectionSpace was unable to shutdown Nuxeo cleanly.");
+			logger.error("CollectionSpace was unable to shutdown Nuxeo cleanly.", e);
 		}
 	}
 
