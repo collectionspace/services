@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 
 import javax.management.JMException;
 
-import org.nuxeo.ecm.core.api.model.BlobNotFoundException;
 import org.nuxeo.osgi.application.FrameworkBootstrap;
 import org.nuxeo.osgi.application.MutableClassLoader;
 
@@ -48,11 +47,7 @@ public class NuxeoFrameworkBootstrap extends FrameworkBootstrap {
             throw new IllegalStateException("Framework Loader was not initialized. Call initialize() method first");
         }
         Method start = frameworkLoaderClass.getMethod("start");
-        try {
-            start.invoke(null);
-        } catch (BlobNotFoundException e) {
-            System.err.printf("WARN %s%n", e.getLocalizedMessage());
-        }
+        start.invoke(null);
         printStartedMessage();
     }
 
