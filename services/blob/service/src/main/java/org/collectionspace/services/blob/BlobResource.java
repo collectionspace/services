@@ -58,7 +58,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
@@ -162,41 +161,47 @@ public class BlobResource extends NuxeoBasedResource {
     	return result;
     }
 
-    private File getBlobContentFile(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-                                    String csid,
-                                    String derivativeTerm,
-                                    StringBuffer outMimeType) throws CSWebApplicationException {
-        File result = null;
+	/**
+	 * Create a response for the Blob content. Depending on how the Blob is stored by Nuxeo, this may or may not support
+	 * the Range HTTP header. If a Blob is backed by a File it will support Range, otherwise we can only use the input
+	 * stream which RESTEasy won't apply the header to.
+	 *
+	 * @param ctx the service context
+	 * @param csid the csid of the blob to get
+	 * @return the http response builder for the Blob
+	 * @throws CSWebApplicationException if the Blob or its content can't be retrieved
+	 */
+	private ResponseBuilder getBlobContentResponse(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid) {
+		ResponseBuilder response = null;
 
-        try {
-            BlobInput blobInput = BlobUtil.getBlobInput(ctx);
-            blobInput.setDerivativeTerm(derivativeTerm);
-            blobInput.setContentRequested(true);
+		try {
+			BlobInput blobInput = BlobUtil.getBlobInput(ctx);
+			blobInput.setDerivativeTerm(null);
+			blobInput.setContentRequested(true);
 
-            PoxPayloadOut response = this.get(csid, ctx);
-            logger.debug(response.toString());
+			// refresh the BlobInput
+			PoxPayloadOut poxPayloadOut = this.get(csid, ctx);
 
-            // The result of a successful get should have put the results in the blobInput instance
-            String mimeType = blobInput.getMimeType();
-            if (mimeType != null) {
-                outMimeType.append(mimeType); // blobInput's mime type was set on call to "get" above by the doc handler
-            }
-            result = BlobUtil.getBlobInput(ctx).getBlobFile();
-        } catch (Exception e) {
-            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
-        }
+			if (blobInput.getBlobFile() != null) {
+				response = Response.ok(blobInput.getBlobFile(), blobInput.getMimeType());
+			} else if (blobInput.getContentStream() != null) {
+				response = Response.ok(blobInput.getContentStream(), blobInput.getMimeType());
+			}
+		} catch (Exception e) {
+			throw bigReThrow(e, ServiceMessages.GET_FAILED);
+		}
 
-        if (result == null) {
-            String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
-                                          csid);
-            Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                                        .entity(errMsg)
-                                        .type(MediaType.TEXT_PLAIN).build();
-            throw new CSWebApplicationException(response);
-        }
+		if (response == null) {
+			String errMsg = String.format("Index failed. Could not get the contents for the Blob with CSID = '%s'.",
+										  csid);
+			Response errorResponse = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+										.entity(errMsg)
+										.type(MediaType.TEXT_PLAIN).build();
+			throw new CSWebApplicationException(errorResponse);
+		}
 
-        return result;
-    }
+		return response;
+	}
 
     /*
      * This method can replace the 'createBlob' -specifically, this JAX-RS technique can replace the call to
@@ -323,13 +328,10 @@ public class BlobResource extends NuxeoBasedResource {
     	try {
 	    	ctx = createServiceContext(jaxRsRequest, uriInfo);
 			BlobsCommon blobsCommon = getBlobsCommon(csid);
-	    	StringBuffer mimeType = new StringBuffer();
-			File contentFile = getBlobContentFile(ctx, csid, null /*derivative term*/, mimeType /*will get set*/);
 
-			Response.ResponseBuilder responseBuilder = Response.ok(contentFile, mimeType.toString());
+			Response.ResponseBuilder responseBuilder = getBlobContentResponse(ctx, csid);
 	    	setCacheControl(ctx, responseBuilder);
-	    	responseBuilder = responseBuilder.header("Content-Disposition","inline;filename=\""
-	    			+ blobsCommon.getName() +"\"");
+	    	responseBuilder.header("Content-Disposition","inline;filename=\"" + blobsCommon.getName() + "\"");
 	    	result = responseBuilder.build();
     	} catch (Exception e) {
     		throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
