@@ -111,7 +111,7 @@
     <target name="import" depends="import-unix,import-windows"
             description="import authorization" />
     <target name="import-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
-        <exec executable="mvn" failonerror="true">
+        <exec executable="mvn" failonerror="true"> <!-- To debug, change command here mvn to 'mvnDebug' -->
             <arg value="exec:java" />
             <arg value="-f" />
             <arg value="${basedir}/pom.xml" />

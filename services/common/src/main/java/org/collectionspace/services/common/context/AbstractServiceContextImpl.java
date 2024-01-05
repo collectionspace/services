@@ -626,7 +626,7 @@ public abstract class AbstractServiceContextImpl<IT, OT>
 	        // to specify sort ordering, pagination, etc.
 	        //
 	        MultivaluedMap<String, String> queryParameters = this.getQueryParams();
-	        if (queryParameters != null) {
+	        if (queryParameters != null && !queryParameters.isEmpty()) {
 	          docFilter.setSortOrder(queryParameters);
 	          docFilter.setPagination(queryParameters);
 	          String workflowWhereClause = buildWorkflowWhereClause(queryParameters);

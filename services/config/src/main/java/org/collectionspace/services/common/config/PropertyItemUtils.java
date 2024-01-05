@@ -96,36 +96,35 @@ public class PropertyItemUtils {
     	return getPropertyValuesByName(propItems, propName, qualPrefix, null);
     }
 
-		/**
-		 * @param propNodeList the Item list to search for the named property
-		 * @param propName the name of the property of interest
-		 * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
-		 * @param values and existing list to append values to. If null, a new one will be created.
-		 * @return values, or that is null, a new List of string values found for the named property
-		 */
-		public static List<String> getPropertyValuesByName(
-				List<PropertyItemType> propItems, String propName, String qualPrefix,
-				List<String> values ) {
+	/**
+	 * @param propName the name of the property of interest
+	 * @param qualPrefix a namespace qualifier prefix (with ':') to prepend, or null
+	 * @param values and existing list to append values to. If null, a new one will be created.
+	 * @return values, or that is null, a new List of string values found for the named property
+	 */
+	public static List<String> getPropertyValuesByName(
+			List<PropertyItemType> propItems, String propName, String qualPrefix,
+			List<String> values ) {
 
-			if (values == null) {
-				values = new ArrayList<String>();
-			}
+		if (values == null) {
+			values = new ArrayList<String>();
+		}
 
-			if (propItems != null) {
-				for (PropertyItemType propItem : propItems) {
-					if (propName.equals(propItem.getKey())) {
-						// TODO - the trim() belongs here, not down a few lines.
-						String value = propItem.getValue();
+		if (propItems != null) {
+			for (PropertyItemType propItem : propItems) {
+				if (propName.equals(propItem.getKey())) {
+					// TODO - the trim() belongs here, not down a few lines.
+					String value = propItem.getValue();
 
-						if (value != null) {
-							values.add((qualPrefix != null) ? (qualPrefix + value) : value.trim());
-						}
+					if (value != null) {
+						values.add((qualPrefix != null) ? (qualPrefix + value) : value.trim());
 					}
 				}
 			}
-
-			return values;
 		}
+
+		return values;
+	}
 
     /**
      * @param propNodeList the wrapping list node from JAXB
