@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  This file is based on nuxeo-platform-imaging-core-9.10.jar/OSGI-INF/commandline-imagemagick-contrib.xml
+
+  Reference: https://explorer.nuxeo.com/nuxeo/site/distribution/Nuxeo%20Platform%20LTS%202017-9.10/viewContribution/org.nuxeo.ecm.platform.picture.commandline.imagemagick--command
+-->
 <component name="cspace.org.nuxeo.ecm.platform.picture.commandline.imagemagick">
 
   <require>org.nuxeo.ecm.platform.commandline.executor.service.defaultContrib</require>
