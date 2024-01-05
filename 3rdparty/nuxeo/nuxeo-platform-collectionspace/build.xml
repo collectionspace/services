@@ -61,6 +61,7 @@
     <exec executable="mvn" failonerror="true">
       <arg value="install" />
       <arg value="-Dmaven.test.skip=true" />
+      <arg value="-Dcspace.im.root=${cspace.im.root}" />
       <arg value="-f" />
       <arg value="${basedir}/pom.xml" />
       <arg value="-N" />
