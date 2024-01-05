@@ -166,6 +166,7 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 			if (getContentFlag == true) {
 				if (blobOutput != null) {
 					blobInput.setContentStream(blobOutput.getBlobInputStream());
+					blobInput.setBlobFile(blobOutput.getBlobFile());
 				} else {
 					blobInput.setContentStream(null);
 				}
