@@ -247,7 +247,6 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
     }
 
     public String mergePayloads(String csid, PoxPayloadOut batchPayload) throws Exception {
-        // now we have the bytes for both t
         HashMap<String, Element> batchElementList = new HashMap<String, Element>();
         PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
 
@@ -286,8 +285,6 @@ public class BulkObjectEditBatchJob extends AbstractBatchJob {
     }
 
     public boolean updateRecord(String csid, String payload) throws URISyntaxException, DocumentException {
-        PoxPayloadOut collectionObjectPayload = findCollectionObjectByCsid(csid);
-
         try {
             ResourceMap resource = getResourceMap();
             NuxeoBasedResource collectionObjectResource =
