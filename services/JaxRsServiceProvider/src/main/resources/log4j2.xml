@@ -42,6 +42,7 @@
 		<Logger name="org.collectionspace.services.nuxeo.client.java.NuxeoConnectorEmbedded" level="ERROR" />
 		<Logger name="org.collectionspace.services.nuxeo.client.java.TenantRepository" level="ERROR" />
 		<Logger name="org.collectionspace.services.report.nuxeo.ReportPostInitHandler" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.init.RunSqlScripts" level="ERROR" />
 
 		<!-- Nuxeo loggers -->
 
