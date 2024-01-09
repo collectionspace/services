@@ -1011,7 +1011,7 @@ public class ServiceMain {
 							JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
 						}
 						// Create the database
-						createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser);
+						createDatabaseWithRights(dbType, dbName, nuxeoUser, readerUser);
 						createUtilsSchemaWithRights(dbType, nuxeoUser, repositoryName, cspaceInstanceId);
 						initRepositoryDatabaseVersion(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId);
 					}
@@ -1038,8 +1038,7 @@ public class ServiceMain {
 	 * @param readerPW
 	 * @throws Exception
 	 */
-	private void createDatabaseWithRights(DatabaseProductType dbType, String dbName, String ownerName,
-			String ownerPW, String readerName) throws Exception {
+	private void createDatabaseWithRights(DatabaseProductType dbType, String dbName, String ownerName, String readerName) throws Exception {
 		String sql = null;
 		try (Connection conn = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME).getConnection();
 			 Statement stmt = conn.createStatement()) {
