@@ -30,7 +30,6 @@ import org.collectionspace.services.common.invocable.InvocationResults;
 import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.dom4j.DocumentException;
-//import org.jboss.resteasy.specimpl.UriInfoImpl;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -76,6 +75,7 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
     }
 
     @Override
+    @Deprecated
     public void run() {
         run(null);
     }
@@ -85,7 +85,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
      */
     @Override
     public void run(BatchCommon batchCommon) {
-
         setCompletionStatus(STATUS_MIN_PROGRESS);
 
         try {
@@ -136,7 +135,6 @@ public class UpdateObjectLocationBatchJob extends AbstractBatchInvocable {
             String errMsg = "Error encountered in " + CLASSNAME + ": " + e.getLocalizedMessage();
             setErrorResult(errMsg);
         }
-
     }
 
     private InvocationResults updateComputedCurrentLocations(List<String> csids) {

@@ -234,6 +234,7 @@ public abstract class AbstractBatchInvocable implements BatchInvocable {
     }
 
     @Override
+    @Deprecated
     public abstract void run();
 
 	/**

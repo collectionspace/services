@@ -3,7 +3,6 @@ package org.collectionspace.services.batch.nuxeo;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 
-import org.collectionspace.services.batch.BatchCommon;
 import org.collectionspace.services.batch.AbstractBatchInvocable;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -31,11 +29,8 @@ import org.collectionspace.services.client.RelationClient;
 import org.collectionspace.services.client.TaxonomyAuthorityClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectConstants;
-import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.UriTemplateRegistry;
 import org.collectionspace.services.common.api.RefName;
 import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -43,6 +38,7 @@ import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.media.nuxeo.MediaConstants;
 import org.collectionspace.services.movement.nuxeo.MovementConstants;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
@@ -58,13 +54,12 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 
-	final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
+	protected final Logger logger = LoggerFactory.getLogger(AbstractBatchJob.class);
 
 	private Map<String, String> authorityServiceNamesByDocType;
 
-	@SuppressWarnings("unchecked")
-	protected static <T> Set<T> convertListToSet(List<T> list)
-    {
+    @SuppressWarnings("unchecked")
+    protected static <T> Set<T> convertListToSet(List<T> list) {
         // create a set from the List
         return (Set<T>) list.stream().collect(Collectors.toSet());
     }
@@ -163,6 +158,10 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 	protected List<String> findRelatedMovements(String subjectCsid) throws URISyntaxException {
 		return findRelatedObjects(subjectCsid, null, "affects", null, MovementConstants.NUXEO_DOCTYPE);
 	}
+
+    protected List<String> findRelatedMedia(String subjectCsid) throws URISyntaxException {
+        return findRelatedObjects(subjectCsid, null, "affects", null, MediaConstants.NUXEO_DOCTYPE);
+    }
 
 	protected String findBroader(String subjectCsid) throws URISyntaxException {
 		List<String> relatedObjects = findRelatedObjects(subjectCsid, null, "hasBroader", null, null);
@@ -681,7 +680,7 @@ public abstract class AbstractBatchJob extends AbstractBatchInvocable {
 		return getFieldValue(payload, CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA, CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
 	}
 
-	protected class ResourceException extends Exception {
+	public class ResourceException extends Exception {
 		private static final long serialVersionUID = 1L;
 
 		private Response response;

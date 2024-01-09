@@ -15,15 +15,27 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
 
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
-    		DocumentModel movementDocModel,
-    		String movementRecordsLocation) throws ClientException {
-    	boolean result = false;
+                                                     DocumentModel movementDocModel, //FIXME: Not needed?
+                                                     DocumentModel mostRecentMovementDocumentModel) throws ClientException {
+        boolean result = false;
+
+        //
+        // The the most recent movement record is null, that means the CollectionObject has
+        // been unrelated to all movement records.  Therefore, we need to clear the 'computedCurrentLocation' field.
+        //
+        if (mostRecentMovementDocumentModel == null) {
+            collectionObjectDocModel.setProperty(COLLECTIONOBJECTS_COMMON_SCHEMA,
+                                                 COMPUTED_CURRENT_LOCATION_PROPERTY, null);
+            return true;
+        }
 
         // Check that the location value returned, which is expected to be a reference (refName) to an authority term (such as a storage
         // location or organization term):
         // 	* Ensure it is not blank.
         // 	* Ensure it is successfully parsed by the authority item parser.
         //
+        String movementRecordsLocation = (String) mostRecentMovementDocumentModel.getProperty(
+            MOVEMENTS_COMMON_SCHEMA, CURRENT_LOCATION_ELEMENT_NAME);
         if (Tools.isBlank(movementRecordsLocation)) {
             return result;
         } else if (RefNameUtils.parseAuthorityTermInfo(movementRecordsLocation) == null) {
