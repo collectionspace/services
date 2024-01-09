@@ -70,6 +70,8 @@
 			<service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
+				<service:params>
+				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
 		<!-- end runsqlscripts service meta-data -->
