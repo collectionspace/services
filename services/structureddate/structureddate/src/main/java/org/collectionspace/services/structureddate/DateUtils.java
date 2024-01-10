@@ -14,8 +14,8 @@ import org.joda.time.format.DateTimeFormatter;
 
 public class DateUtils {
 	private static final DateTimeFormatter monthFormatter = DateTimeFormat.forPattern("MMMM");
-	private static final DateTimeFormatter scalarValueFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-	private static final DateTimeFormatter timestampFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	private static final DateTimeFormatter timestampFormatter =
+		DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
 	// The chronology to use for date calculations, which are done using the joda-time library.
 	// See http://www.joda.org/joda-time/apidocs/org/joda/time/Chronology.html for descriptions of
@@ -1282,28 +1282,19 @@ public class DateUtils {
 	}
 
 	public static String formatEarliestScalarValue(Date date) {
-		return formatEarliest(date, scalarValueFormatter);
+		return formatEarliest(date, timestampFormatter);
 	}
 
 	public static String formatEarliest(Date date, DateTimeFormatter formatter) {
-		Era era = date.getEra();
-
-		if (era == null) {
-			era = Date.DEFAULT_ERA;
-		}
-
 		MutableDateTime dateTime = null;
 
 		try {
 			dateTime = convertToDateTime(date);
-		}
-		catch(IllegalFieldValueException e) {
+		} catch(IllegalFieldValueException e) {
 			throw new InvalidDateException(e.getMessage());
 		}
 
-		String scalarDate = formatter.print(dateTime);
-
-		return scalarDate;
+		return formatter.print(dateTime);
 	}
 
 	public static String formatLatestTimestamp(Date date) {
@@ -1311,30 +1302,19 @@ public class DateUtils {
 	}
 
 	public static String formatLatestScalarValue(Date date) {
-		return formatLatest(date, scalarValueFormatter);
+		return formatLatest(date, timestampFormatter);
 	}
 
 	public static String formatLatest(Date date, DateTimeFormatter formatter) {
-		Era era = date.getEra();
-
-		if (era == null) {
-			era = Date.DEFAULT_ERA;
-		}
-
 		MutableDateTime dateTime = null;
 
 		try {
 			dateTime = convertToDateTime(date);
-		}
-		catch(IllegalFieldValueException e) {
+		} catch(IllegalFieldValueException e) {
 			throw new InvalidDateException(e.getMessage());
 		}
 
-		dateTime.setTime(23, 59, 59, 999);
-
-		String scalarDate = formatter.print(dateTime);
-
-		return scalarDate;
+		return formatter.print(dateTime);
 	}
 
 	public static boolean isValidDate(int year, int month, int day, Era era) {
