@@ -57,10 +57,15 @@ LEFT JOIN hierarchy place_hier ON place_hier.parentid = place.id AND place_hier.
 LEFT JOIN placetermgroup place_term ON place_term.id = place_hier.id
 -- related media
 LEFT JOIN (
-  SELECT relation.*
+  SELECT DISTINCT ON (relation.subjectcsid)
+    relation.objectcsid,
+    relation.subjectcsid
   FROM relations_common relation
   INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
   WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY relation.subjectcsid, core.updatedat DESC
 ) related_media ON related_media.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>

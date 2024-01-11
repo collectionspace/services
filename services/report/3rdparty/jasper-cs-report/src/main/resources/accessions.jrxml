@@ -83,12 +83,15 @@
   LEFT JOIN hierarchy opdg_hier ON opdg_hier.parentid = object.id AND opdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND opdg_hier.pos = 0
   LEFT JOIN structureddategroup sdg ON sdg.id = opdg_hier.id
 ), related_media AS (
-  SELECT
+  SELECT DISTINCT ON (object.csid)
     object.csid AS objcsid,
     media.objectcsid AS mediacsid
   FROM related_objects object
   INNER JOIN relations_common media ON media.subjectcsid = object.csid AND media.objectdocumenttype = 'Media'
   INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = media.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
+  ORDER BY object.csid, core.updatedat DESC
 )
 SELECT
   acq.acquisitionreferencenumber,

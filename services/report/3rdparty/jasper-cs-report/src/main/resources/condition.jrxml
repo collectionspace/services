@@ -24,7 +24,7 @@
 	</parameter>
 	<queryString language="SQL">
 		<![CDATA[WITH media AS (
-  SELECT
+  SELECT DISTINCT ON (relation.subjectcsid)
     relation.subjectcsid,
     relation.objectcsid AS mediacsid
   FROM media_common media
@@ -32,6 +32,8 @@
   INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN relations_common relation ON relation.objectcsid = hier.name
     AND (relation.subjectdocumenttype = 'Conditioncheck' OR relation.subjectdocumenttype = 'CollectionObject')
+  INNER JOIN collectionspace_core core ON core.id = media.id
+  ORDER BY relation.subjectcsid, core.updatedat DESC
 )
 SELECT
   obj.objectnumber,
