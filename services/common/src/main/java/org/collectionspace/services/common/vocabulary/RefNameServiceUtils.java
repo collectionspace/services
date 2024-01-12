@@ -99,7 +99,7 @@ public class RefNameServiceUtils {
         final static int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
         final static String URN_PREFIX_ID = "id(";
         final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
-    	
+
         public SpecifierForm form;
         public String value;
 
@@ -107,7 +107,7 @@ public class RefNameServiceUtils {
             this.form = form;
             this.value = value;
         }
-        
+
         /*
          *  identifier can be a CSID form like a8ad38ec-1d7d-4bf2-bd31 or a URN form like urn:cspace:name(shortid) or urn:cspace:id(a8ad38ec-1d7d-4bf2-bd31)
          *
@@ -149,10 +149,10 @@ public class RefNameServiceUtils {
                     }
                 }
             }
-            
+
             return result;
         }
-        
+
         /**
          * Creates a refName in the name / shortIdentifier form.
          *
@@ -163,23 +163,23 @@ public class RefNameServiceUtils {
          */
         public static String createShortIdURNValue(String shortId) {
         	String result = null;
-        	
+
             if (shortId != null || !shortId.trim().isEmpty()) {
                 result = String.format("urn:cspace:name(%s)", shortId);
             }
-            
+
             return result;
-        }        
-        
+        }
+
         /**
          * Returns a URN string identifier -e.g., urn:cspace:name(patrick) or urn:cspace:id(579d18a6-b464-4b11-ba3a)
-         * 
+         *
          * @return
          * @throws Exception
          */
         public String getURNValue() throws Exception {
         	String result = null;
-        	
+
         	if (form == SpecifierForm.CSID) {
         		result = String.format("urn:cspace:id(%s)", value);
         	} else if (form == SpecifierForm.URN_NAME) {
@@ -187,44 +187,44 @@ public class RefNameServiceUtils {
         	} else {
         		throw new Exception(String.format("Unknown specifier form '%s'.", form));
         	}
-        	
+
         	return result;
         }
     }
-    
+
     public static class AuthorityItemSpecifier {
     	private Specifier parentSpecifier;
     	private Specifier itemSpecifier;
-    	
+
     	public AuthorityItemSpecifier(Specifier parentSpecifier, Specifier itemSpecifier) {
     		this.parentSpecifier = parentSpecifier;
     		this.itemSpecifier = itemSpecifier;
     	}
-    	
+
     	public AuthorityItemSpecifier(SpecifierForm form, String parentCsidOrShortId, String itemCsidOrShortId) {
     		this.parentSpecifier = new Specifier(form, parentCsidOrShortId);
     		this.itemSpecifier = new Specifier(form, itemCsidOrShortId);
-    	}    	
-    	
+    	}
+
     	public Specifier getParentSpecifier() {
     		return this.parentSpecifier;
     	}
-    	
+
     	public Specifier getItemSpecifier() {
     		return this.itemSpecifier;
     	}
-    	
+
     	@Override
     	public String toString() {
     		String result = "%s/items/%s";
-    		
+
     		try {
 				result = String.format(result, this.parentSpecifier.getURNValue(), this.itemSpecifier.getURNValue());
 			} catch (Exception e) {
 				result = "Unknown error trying to get string representation of Specifier.";
 				logger.error(result, e);
 			}
-    		
+
     		return result;
     	}
     }
@@ -356,7 +356,7 @@ public class RefNameServiceUtils {
             this.property = prop;
         }
     }
-    
+
     private static final Logger logger = LoggerFactory.getLogger(RefNameServiceUtils.class);
     private static ArrayList<String> refNameServiceTypes = null;
 
@@ -370,13 +370,13 @@ public class RefNameServiceUtils {
     	// First, look for and update all the places where the refName is the "subject" of the relationship
     	//
     	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.SUBJECT_REFNAME, oldRefName, newRefName);
-    	
+
     	//
     	// Next, look for and update all the places where the refName is the "object" of the relationship
     	//
     	RelationUtils.updateRefNamesInRelations(ctx, repoClient, repoSession, IRelationsManager.OBJECT_REFNAME, oldRefName, newRefName);
     }
-    
+
 	public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		List<String> authRefFields = ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
 				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
@@ -402,7 +402,7 @@ public class RefNameServiceUtils {
         AbstractCommonList commonList = (AbstractCommonList) wrapperList;
         int pageNum = filter.getStartPage();
         int pageSize = filter.getPageSize();
-        
+
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();
 
@@ -415,22 +415,22 @@ public class RefNameServiceUtils {
             // the following call, as they pertain to the list of authority
             // references to be returned, not to the list of documents to be
             // scanned for those references.
-            
+
             // Get a list of possibly referencing documents. This list is
             // lazily loaded, page by page. Ideally, only one page will
             // need to be loaded to fill one page of results. Some number
             // of possibly referencing documents will be false positives,
             // so use a page size of double the requested page size to
             // account for those.
-            DocumentModelList docList = findAllAuthorityRefDocs(ctx, 
-                    repoClient, 
+            DocumentModelList docList = findAllAuthorityRefDocs(ctx,
+                    repoClient,
                     repoSession,
-                    serviceTypes, 
-                    refName, 
-                    refPropName, 
-                    queriedServiceBindings, 
+                    serviceTypes,
+                    refName,
+                    refPropName,
+                    queriedServiceBindings,
                     authRefFieldsByService,
-                    filter.getWhereClause(), 
+                    filter.getWhereClause(),
                     null, // orderByClause
                     2, // pageScale
                     pageSize,
@@ -453,17 +453,17 @@ public class RefNameServiceUtils {
             // authority references may potentially exceed the total number
             // of documents scanned.
 
-            // Strip off displayName and only match the base, so we get references to all 
+            // Strip off displayName and only match the base, so we get references to all
             // the NPTs as well as the PT.
     		String strippedRefName = RefNameUtils.stripAuthorityTermDisplayName(refName);
-    		
-    		// *** Need to pass in pagination info here. 
-            long nRefsFound = processRefObjsDocListForList(docList, ctx.getTenantId(), strippedRefName, 
+
+    		// *** Need to pass in pagination info here.
+            long nRefsFound = processRefObjsDocListForList(docList, ctx.getTenantId(), strippedRefName,
             		queriedServiceBindings, authRefFieldsByService, // the actual list size needs to be updated to the size of "list"
                     list, pageSize, pageNum);
-            	
+
             commonList.setPageSize(pageSize);
-            
+
             // Values returned in the pagination block above the list items
             // need to reflect the number of references to authority items
             // returned, rather than the number of documents originally scanned
@@ -472,7 +472,7 @@ public class RefNameServiceUtils {
             commonList.setPageNum(pageNum);
            	commonList.setTotalItems(nRefsFound);	// Accurate if total was scanned, otherwise, just an estimate
             commonList.setItemsInPage(list.size());
-            
+
             if (logger.isDebugEnabled() && (nRefsFound < docList.size())) {
                 logger.debug("Internal curiosity: got fewer matches of refs than # docs matched..."); // We found a ref to ourself and have excluded it.
             }
@@ -493,7 +493,7 @@ public class RefNameServiceUtils {
         }
         return refNameServiceTypes;
     }
-    
+
     // Seems like a good value - no real data to set this well.
     // Note: can set this value lower during debugging; e.g. to 3 - ADR 2012-07-10
     private static final int N_OBJS_TO_UPDATE_PER_LOOP = 100;
@@ -519,22 +519,22 @@ public class RefNameServiceUtils {
         if (repoClient instanceof NuxeoRepositoryClientImpl == false) {
             throw new InternalError("updateAuthorityRefDocs() called with unknown repoClient type!");
         }
-        
+
         try { // REM - How can we deal with transaction and timeout issues here?
             final int pageSize = N_OBJS_TO_UPDATE_PER_LOOP;
             DocumentModelList docList;
             boolean morePages = true;
             while (morePages) {
 
-                docList = findAuthorityRefDocs(ctx, 
-                        repoClient, 
+                docList = findAuthorityRefDocs(ctx,
+                        repoClient,
                         repoSession,
-                        getRefNameServiceTypes(), 
-                        oldRefName, 
+                        getRefNameServiceTypes(),
+                        oldRefName,
                         refPropName,
-                        queriedServiceBindings, 
-                        authRefFieldsByService, 
-                        WHERE_CLAUSE_ADDITIONS_VALUE, 
+                        queriedServiceBindings,
+                        authRefFieldsByService,
+                        WHERE_CLAUSE_ADDITIONS_VALUE,
                         ORDER_BY_VALUE,
                         currentPage,
                         pageSize,
@@ -558,7 +558,7 @@ public class RefNameServiceUtils {
 
                 // Only match complete refNames - unless and until we decide how to resolve changes
                 // to NPTs we will defer that and only change PTs or refNames as passed in.
-                long nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName, 
+                long nRefsFoundThisPage = processRefObjsDocListForUpdate(ctx, docList, ctx.getTenantId(), oldRefName,
                 		queriedServiceBindings, authRefFieldsByService, // Perform the refName updates on the list of document models
                         newRefName);
                 if (nRefsFoundThisPage > 0) {
@@ -597,22 +597,22 @@ public class RefNameServiceUtils {
             int pageSize,
             boolean useDefaultOrderByClause,
             boolean computeTotal) throws DocumentException, DocumentNotFoundException {
-    	    	
-        	return new LazyAuthorityRefDocList(ctx, 
-        	        repoClient, 
+
+        	return new LazyAuthorityRefDocList(ctx,
+        	        repoClient,
         	        repoSession,
-        			serviceTypes, 
-        			refName, 
-        			refPropName, 
-        			queriedServiceBindings, 
+        			serviceTypes,
+        			refName,
+        			refPropName,
+        			queriedServiceBindings,
         			authRefFieldsByService,
-        			whereClauseAdditions, 
+        			whereClauseAdditions,
         			orderByClause,
-        			pageSize*pageScale, 
-        			useDefaultOrderByClause, 
+        			pageSize*pageScale,
+        			useDefaultOrderByClause,
         			computeTotal);
     }
-    
+
     protected static DocumentModelList findAuthorityRefDocs(
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
@@ -630,7 +630,7 @@ public class RefNameServiceUtils {
 
         // Get the service bindings for this tenant
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        
+
         // We need to get all the procedures, authorities, and objects.
         List<ServiceBindingType> servicebindings = tReader.getServiceBindingsByType(ctx.getTenantId(), serviceTypes);
         if (servicebindings == null || servicebindings.isEmpty()) {
@@ -647,28 +647,28 @@ public class RefNameServiceUtils {
         if (query == null) { // found no authRef fields - nothing to query
             return null;
         }
-        
+
         // Additional qualifications, like workflow state
         if (Tools.notBlank(whereClauseAdditions)) {
             query += " AND " + whereClauseAdditions;
         }
-        
+
         // Now we have to issue the search
         DocumentModelList docList = findDocs(
         		repoClient,
                 ctx,
                 repoSession,
-                docTypes, 
-                query, 
+                docTypes,
+                query,
                 orderByClause,
                 pageNum,
                 pageSize,
-                useDefaultOrderByClause, 
+                useDefaultOrderByClause,
                 computeTotal);
 
         return docList;
     }
-    
+
     private static final DocumentModelList findDocs(
     		RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
@@ -705,12 +705,12 @@ public class RefNameServiceUtils {
        DocumentWrapper<DocumentModelList> docListWrapper = nuxeoRepoClient.findDocs(
                ctx,
                repoSession,
-               docTypes, 
-               query, 
+               docTypes,
+               query,
                orderByClause,
                pageNum,
                pageSize,
-               useDefaultOrderByClause, 
+               useDefaultOrderByClause,
                computeTotal);
        // Now we gather the info for each document into the list and return
        DocumentModelList docList = docListWrapper.getWrappedObject();
@@ -728,10 +728,10 @@ public class RefNameServiceUtils {
         profiler.log(csvMsg, FORMAT_LOG_MESSAGE);
 
         profiler.reset();
-    	
+
         return docList;
     }
-    
+
     private static final boolean READY_FOR_COMPLEX_QUERY = true;
 
     private static String computeWhereClauseForAuthorityRefDocs(
@@ -772,10 +772,10 @@ public class RefNameServiceUtils {
         // Note that this will also match the term item itself, but that will get filtered out when
         // we compute actual matches.
         AuthorityTermInfo authTermInfo = RefNameUtils.parseAuthorityTermInfo(refName);
-        
+
         // Example refname: urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
         // Corresponding phrase: "urn cspace pahma cspace berkeley edu personauthorities name person item name ReneRichie1586477168934
-        
+
         String refnamePhrase = String.format("urn cspace %s %s name %s item name %s",
         		RefNameUtils.domainToPhrase(authTermInfo.inAuthority.domain),
         		authTermInfo.inAuthority.resource,
@@ -792,7 +792,7 @@ public class RefNameServiceUtils {
 
         return whereClauseStr;
     }
-    
+
     // TODO there are multiple copies of this that should be put somewhere common.
 	protected static String getRefname(DocumentModel docModel) throws ClientException {
 		String result = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
@@ -809,28 +809,28 @@ public class RefNameServiceUtils {
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
             String newAuthorityRefName) {
     	boolean matchBaseOnly = false;
-    	
+
     	if (ctx.shouldForceUpdateRefnameReferences() == true) {
     		refName = RefNameUtils.stripAuthorityTermDisplayName(refName);
     		matchBaseOnly = true;
     	}
-    	
+
     	return processRefObjsDocList(docList, tenantId, refName, matchBaseOnly, queriedServiceBindings,
     			authRefFieldsByService, null, 0, 0, newAuthorityRefName);
     }
-    			
+
     private static long processRefObjsDocListForList(
             DocumentModelList docList,
             String tenantId,
             String refName,
             Map<String, ServiceBindingType> queriedServiceBindings,
             Map<String, List<AuthRefConfigInfo>> authRefFieldsByService,
-            List<AuthorityRefDocList.AuthorityRefDocItem> list, 
+            List<AuthorityRefDocList.AuthorityRefDocItem> list,
             int pageSize, int pageNum) {
     	return processRefObjsDocList(docList, tenantId, refName, true, queriedServiceBindings,
     			authRefFieldsByService, list, pageSize, pageNum, null);
     }
-    			
+
 
 	/*
      * Runs through the list of found docs, processing them. If list is
@@ -858,7 +858,7 @@ public class RefNameServiceUtils {
         boolean warningLogged = false;
 
         // When paginating results, we have to guess at the total. First guess is the number of docs returned
-        // by the query. However, this returns some false positives, so may be high. 
+        // by the query. However, this returns some false positives, so may be high.
         // In addition, we can match multiple fields per doc, so this may be low. Fun, eh?
         long nDocsReturnedInQuery = (int)docList.totalSize();
         long nDocsProcessed = 0;
@@ -905,7 +905,7 @@ public class RefNameServiceUtils {
                 	ilistItem.setRefName(itemRefName);
                 } catch (ClientException ce) {
                     throw new RuntimeException(
-                            "processRefObjsDocList: Problem fetching refName from item Object: " 
+                            "processRefObjsDocList: Problem fetching refName from item Object: "
                             		+ ce.getLocalizedMessage());
                 }
                 ilistItem.setDocId(csid);
@@ -971,8 +971,9 @@ public class RefNameServiceUtils {
                 			if(nRefsFoundTotal >= firstItemInPage) {	// skipped enough already
                 				if (nRefsFoundInDoc == 0) {    // First one?
                 					ilistItem.setSourceField(ari.getQualifiedDisplayName());
+                 					ilistItem.setValue((String) ari.getProperty().getValue());
                 				} else {    // duplicates from one object
-                					ilistItem = cloneAuthRefDocItem(ilistItem, ari.getQualifiedDisplayName());
+                					ilistItem = cloneAuthRefDocItem(ilistItem, ari.getQualifiedDisplayName(), (String) ari.getProperty().getValue());
                 				}
                 				list.add(ilistItem);
                         		nRefsFoundInDoc++;	// Only increment if processed, or clone logic above will fail
@@ -1018,7 +1019,7 @@ public class RefNameServiceUtils {
             	if (unprocessedDocs > 0) {
             		// We generally match ourselves in the keyword search. If we already saw ourselves
             		// then do not try to correct for this. Otherwise, decrement the total.
-            		// Yes, this is fairly goofy, but the whole estimation mechanism is goofy. 
+            		// Yes, this is fairly goofy, but the whole estimation mechanism is goofy.
                 	if (!foundSelf)
                 		unprocessedDocs--;
                 	nRefsFoundTotal += unprocessedDocs;
@@ -1026,7 +1027,7 @@ public class RefNameServiceUtils {
             	break;
             }
         } // close while(iterator)
-        
+
         // Log a final warning if we find too many false-positives.
         if ((float)nRefsFalsePositives / nDocsReturnedInQuery > 0.33) {
         	String msg = String.format("Found %d false-positives and %d only true references the refname:%s",
@@ -1045,7 +1046,7 @@ public class RefNameServiceUtils {
      * @return
      */
     private static AuthorityRefDocList.AuthorityRefDocItem cloneAuthRefDocItem(
-            AuthorityRefDocList.AuthorityRefDocItem ilistItem, String sourceField) {
+            AuthorityRefDocList.AuthorityRefDocItem ilistItem, String sourceField, String value) {
         AuthorityRefDocList.AuthorityRefDocItem newlistItem = new AuthorityRefDocList.AuthorityRefDocItem();
         newlistItem.setDocId(ilistItem.getDocId());
         newlistItem.setDocName(ilistItem.getDocName());
@@ -1053,6 +1054,7 @@ public class RefNameServiceUtils {
         newlistItem.setDocType(ilistItem.getDocType());
         newlistItem.setUri(ilistItem.getUri());
         newlistItem.setSourceField(sourceField);
+        newlistItem.setValue(value);
         newlistItem.setRefName(ilistItem.getRefName());
         newlistItem.setUpdatedAt(ilistItem.getUpdatedAt());
         newlistItem.setWorkflowState(ilistItem.getWorkflowState());
@@ -1064,10 +1066,10 @@ public class RefNameServiceUtils {
             List<AuthRefConfigInfo> authRefFieldInfoList,
             String refNameToMatch,
             List<AuthRefInfo> foundProps) {
-    	return findAuthRefPropertiesInDoc(docModel, authRefFieldInfoList, 
+    	return findAuthRefPropertiesInDoc(docModel, authRefFieldInfoList,
     									refNameToMatch, false, foundProps);
     }
-    
+
     public static List<AuthRefInfo> findAuthRefPropertiesInDoc(
             DocumentModel docModel,
             List<AuthRefConfigInfo> authRefFieldInfoList,
@@ -1129,8 +1131,8 @@ public class RefNameServiceUtils {
                         addARIifMatches(refNameToMatch, matchBaseOnly, arci, listItemProp, authRefInfoList);
                     }
                 } else if (listItemProp.isComplex()) {
-                    // Just recurse to handle this. Note that since this is a list of complex, 
-                    // which should look like listName/*/... we add 2 to the path start index 
+                    // Just recurse to handle this. Note that since this is a list of complex,
+                    // which should look like listName/*/... we add 2 to the path start index
                     findAuthRefPropertiesInProperty(authRefInfoList, listItemProp, arci,
                             pathStartIndex + 2, refNameToMatch, matchBaseOnly);
                 } else {
@@ -1169,11 +1171,11 @@ public class RefNameServiceUtils {
             AuthRefConfigInfo arci,
             Property prop,
             List<AuthRefInfo> authRefInfoList) {
-        // Need to either match a passed refName 
+        // Need to either match a passed refName
         // OR have no refName to match but be non-empty
         try {
             String value = (String) prop.getValue();
-            if (((refNameToMatch != null) && 
+            if (((refNameToMatch != null) &&
 	            		(matchBaseOnly?
 	            			(value!=null && value.startsWith(refNameToMatch))
 	            			:refNameToMatch.equals(value)))
@@ -1187,7 +1189,7 @@ public class RefNameServiceUtils {
             logger.debug("PropertyException on: " + prop.getPath() + pe.getLocalizedMessage());
         }
     }
-    
+
     public static String buildWhereForAuthByName(String authorityCommonSchemaName, String name) {
         return authorityCommonSchemaName
                 + ":" + AuthorityJAXBSchema.SHORT_IDENTIFIER
@@ -1196,7 +1198,7 @@ public class RefNameServiceUtils {
 
     /**
      * Build an NXQL query for finding an item by its short ID
-     * 
+     *
      * @param authorityItemCommonSchemaName
      * @param shortId
      * @param parentcsid
@@ -1204,7 +1206,7 @@ public class RefNameServiceUtils {
      */
     public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentcsid) {
     	String result = null;
-    	
+
         result = String.format("%s:%s='%s'", authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
         //
         // Technically, we don't need the parent CSID since the short ID is unique so it can be null
@@ -1213,9 +1215,9 @@ public class RefNameServiceUtils {
         	result = String.format("%s AND %s:%s='%s'",
         			result, authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentcsid);
         }
-        
+
         return result;
-    }    
+    }
 
     /*
      * Identifies whether the refName was found in the supplied field. If passed
