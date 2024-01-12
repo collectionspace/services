@@ -117,7 +117,8 @@
             <arg value="${basedir}/pom.xml" />
             <arg value="-N" />
             <arg value="${mvn.opts}" />
-            <arg value="-X" />
+            <arg value="-e" />
+            <!-- <arg value="-X" /> -->
         </exec>
     </target>
     <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">

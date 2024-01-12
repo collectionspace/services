@@ -151,7 +151,7 @@
 
     <target name="create_cspace_db"
             description="create tables(s), indices for authentication service">
-    		<echo>Creating users table in the cspace database using credentials ${db.cspace.user}:${db.cspace.user.password}</echo>
+    		<echo>Creating users table in the cspace database using user ${db.cspace.user}</echo>
 				<sql driver="${db.jdbc.driver.class}"
              url="${db.jdbc.cspace.url}"
              userid="${db.cspace.user}"
@@ -205,7 +205,7 @@
             <fileset dir="${src}/main/resources/"/>
         </copy>
     </target>
-    
+
     <target name="check.db.scripts.deploy.dir">
         <property name="db.scripts.deploy.dir" value="${jee.server.cspace}/cspace/services/db/${db}"/>
         <condition property="db.scripts.deploy.dir.exists">

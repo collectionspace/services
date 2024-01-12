@@ -256,7 +256,7 @@
 	</target>
 
 	<target name="drop_nuxeo_db" if="${create_db.recreate}" description="drop nuxeo database">
-		<echo>Dropping nuxeo databases with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<echo>Dropping nuxeo databases with user ${db.csadmin.user}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/drop_nuxeo_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
@@ -269,7 +269,7 @@
 	</target>
 
 	<target name="drop_cspace_db" if="${create_db.recreate}" description="drop cspace database">
-		<echo>Dropping the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<echo>Dropping the cspace database with user ${db.csadmin.user}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/drop_cspace_db.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
@@ -278,7 +278,7 @@
 	</target>
 
 	<target name="create_cspace_db" depends="drop_cspace_db">
-		<echo>Creating the cspace database with credentials ${db.csadmin.user}:${db.csadmin.user.password}</echo>
+		<echo>Creating the cspace database with user ${db.csadmin.user}</echo>
 		<!--
 			The SQL create role/database statements may fail if the cspace role/database already exists. Since the goal of this target
 			is for the cspace role and database to be created, it's fine if they already exist, so onerror is set to "continue".
