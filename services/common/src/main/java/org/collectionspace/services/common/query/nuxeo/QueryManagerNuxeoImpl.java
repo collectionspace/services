@@ -53,21 +53,13 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private final Logger logger = LoggerFactory
 			.getLogger(QueryManagerNuxeoImpl.class);
 
-	// Consider that letters, letter-markers, numbers, '_' and apostrophe are
-	// words
-	private static Pattern nonWordChars = Pattern
-			.compile("[^\\p{L}\\p{M}\\p{N}_']");
-	private static Pattern kwdTokenizer = Pattern.compile("(?:(['\"])(.*?)(?<!\\\\)(?>\\\\\\\\)*\\1|([^ ]+))");
-	private static Pattern unescapedDblQuotes = Pattern.compile("(?<!\\\\)\"");
+	private static Pattern kwdTokenizer = Pattern.compile("(\".*?\")|\\S+");
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
-	//private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
-	// HACK to work around Nuxeo regression that tokenizes on '.'.
-	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\-\\:\\(\\)\\*\\%\\./]");
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[^\\*\\d\\p{IsAlphabetic}\\\"]");
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
 	// Base Nuxeo document type for all CollectionSpace documents/resources
 	public static String COLLECTIONSPACE_DOCUMENT_TYPE = "CollectionSpaceDocument";
 	public static final String NUXEO_DOCUMENT_TYPE = "Document";
-
 
 	private static String getLikeForm(String dataSourceName, String repositoryName, String cspaceInstanceId) {
 		if (SEARCH_LIKE_FORM == null) {
@@ -132,92 +124,63 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	 * @see org.collectionspace.services.common.query.IQueryManager#
 	 * createWhereClauseFromKeywords(java.lang.String)
 	 */
-	// TODO handle keywords containing escaped punctuation chars, then we need
-	// to qualify the
-	// search by matching on the fulltext.simpletext field.
-	// TODO handle keywords containing unescaped double quotes by matching the
-	// phrase
-	// against the fulltext.simpletext field.
-	// Both these require using JDBC, since we cannot get to the fulltext table
-	// in NXQL
 	@Override
 	public String createWhereClauseFromKeywords(String keywords) {
-		String result = null;
 		StringBuffer fullTextWhereClause = new StringBuffer();
-		// Split on unescaped double quotes to handle phrases
-		Matcher regexMatcher = kwdTokenizer.matcher(keywords.trim());
+
+		String cleanKeywords = kwdSearchProblemChars.matcher(keywords).replaceAll(" ").trim();
+		Matcher regexMatcher = kwdTokenizer.matcher(cleanKeywords);
+
 		boolean addNOT = false;
 		boolean newWordSet = true;
+
 		while (regexMatcher.find()) {
 			String phrase = regexMatcher.group();
-			// Not needed - already trimmed by split:
-			// String trimmed = phrase.trim();
-			// Ignore empty strings from match, or goofy input
-			if (phrase.isEmpty())
+
+			if (phrase.isEmpty()) {
+				// Ignore empty strings from match, or goofy input
 				continue;
+			}
+
 			// Note we let OR through as is
-			if("AND".equalsIgnoreCase(phrase)) {
+			if ("AND".equalsIgnoreCase(phrase)) {
 				continue;	// AND is default
-			} else if("NOT".equalsIgnoreCase(phrase)) {
+			}
+
+			if ("NOT".equalsIgnoreCase(phrase)) {
 				addNOT = true;
 				continue;
 			}
-			// Next comment block of questionable value...
 
-			// ignore the special chars except single quote here - can't hurt
-			// TODO this should become a special function that strips things the
-			// fulltext will ignore, including non-word chars and too-short
-			// words,
-			// and escaping single quotes. Can return a boolean for anything
-			// stripped,
-			// which triggers the back-up search. We can think about whether
-			// stripping
-			// short words not in a quoted phrase should trigger the backup.
-			String escapedAndTrimmed = unescapedSingleQuote.matcher(phrase).replaceAll("\\\\'");
-			// If there are non-word chars in the phrase, we need to match the
-			// phrase exactly against the fulltext table for this object
-			// if(nonWordChars.matcher(trimmed).matches()) {
-			// }
-			// Replace problem chars with spaces. Patches CSPACE-4147,
-			// CSPACE-4106
-			escapedAndTrimmed = kwdSearchProblemChars.matcher(escapedAndTrimmed).replaceAll(" ").trim();
-
-			if(escapedAndTrimmed.isEmpty()) {
-				if (logger.isDebugEnabled() == true) {
-					logger.debug("Phrase reduced to empty after replacements: " + phrase);
-				}
-				continue;
-			}
-
-			if (fullTextWhereClause.length()==0) {
+			if (fullTextWhereClause.length() == 0) {
 				fullTextWhereClause.append(SEARCH_GROUP_OPEN);
 			}
+
 			if (newWordSet) {
 				fullTextWhereClause.append(ECM_FULLTEXT_LIKE + "'");
 				newWordSet = false;
 			} else {
 				fullTextWhereClause.append(SEARCH_TERM_SEPARATOR);
 			}
-			if(addNOT) {
+
+			if (addNOT) {
 				fullTextWhereClause.append("-");	// Negate the next term
 				addNOT = false;
 			}
-			fullTextWhereClause.append(escapedAndTrimmed);
 
-			if (logger.isTraceEnabled() == true) {
-				logger.trace("Current built whereClause is: "
-						+ fullTextWhereClause.toString());
-			}
+			fullTextWhereClause.append(phrase);
+
+			logger.trace("Current built whereClause is: " + fullTextWhereClause.toString());
 		}
-		if (fullTextWhereClause.length()==0) {
-			if (logger.isDebugEnabled() == true) {
-				logger.debug("No usable keywords specified in string:[" + keywords + "]");
-			}
+
+		if (fullTextWhereClause.length() == 0) {
+			logger.debug("No usable keywords specified in string: [" + keywords + "]");
 		} else {
 			fullTextWhereClause.append("'" + SEARCH_GROUP_CLOSE);
 		}
 
-		result = fullTextWhereClause.toString();
+		String result = fullTextWhereClause.toString();
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Final built WHERE clause is: " + result);
 		}
