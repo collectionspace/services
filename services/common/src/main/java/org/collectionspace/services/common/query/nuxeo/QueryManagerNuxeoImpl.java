@@ -62,8 +62,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	private static Pattern unescapedSingleQuote = Pattern.compile("(?<!\\\\)'");
 	//private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%]");
 	// HACK to work around Nuxeo regression that tokenizes on '.'.
-	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\:\\(\\)\\*\\%\\.]");
-	private static Pattern kwdSearchHyphen = Pattern.compile(" - ");
+	private static Pattern kwdSearchProblemChars = Pattern.compile("[\\-\\:\\(\\)\\*\\%\\./]");
 	private static Pattern advSearchSqlWildcard = Pattern.compile(".*?[I]*LIKE\\s*\\\"\\%\\\".*?");
 	// Base Nuxeo document type for all CollectionSpace documents/resources
 	public static String COLLECTIONSPACE_DOCUMENT_TYPE = "CollectionSpaceDocument";
@@ -182,7 +181,7 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 			// Replace problem chars with spaces. Patches CSPACE-4147,
 			// CSPACE-4106
 			escapedAndTrimmed = kwdSearchProblemChars.matcher(escapedAndTrimmed).replaceAll(" ").trim();
-			escapedAndTrimmed = kwdSearchHyphen.matcher(escapedAndTrimmed).replaceAll(" ").trim();
+
 			if(escapedAndTrimmed.isEmpty()) {
 				if (logger.isDebugEnabled() == true) {
 					logger.debug("Phrase reduced to empty after replacements: " + phrase);
