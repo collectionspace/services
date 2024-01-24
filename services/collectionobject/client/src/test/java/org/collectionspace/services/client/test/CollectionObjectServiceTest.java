@@ -28,21 +28,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//import org.collectionspace.services.client.AbstractServiceClientImpl;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
