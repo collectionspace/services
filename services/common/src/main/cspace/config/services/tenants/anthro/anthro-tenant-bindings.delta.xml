@@ -34,6 +34,7 @@
 							"collectionobjects_common:materialGroupList",
 							"collectionobjects_common:measuredPartGroupList",
 							"collectionobjects_common:numberOfObjects",
+							"collectionobjects_common:objectCountGroupList",
 							"collectionobjects_common:objectHistoryNote",
 							"collectionobjects_common:objectNameList",
 							"collectionobjects_common:objectNumber",
