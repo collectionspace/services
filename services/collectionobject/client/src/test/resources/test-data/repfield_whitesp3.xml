@@ -10,6 +10,13 @@
 
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
 <numberOfObjects>numberOfObjects</numberOfObjects>
+
+<objectCountGroupList>
+<objectCountGroup>
+<objectCount>1</objectCount>
+</objectCountGroup>
+</objectCountGroupList>
+
 <!-- test newline whitespace -->
 <responsibleDepartments>
 <!-- test childnode as whitespace -->

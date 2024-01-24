@@ -4,6 +4,7 @@
 <briefDescriptions> <briefDescription> briefDescription</briefDescription></briefDescriptions>
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
 <numberOfObjects>1</numberOfObjects>
+<objectCountGroupList> <objectCountGroup><objectCount>1</objectCount></objectCountGroup></objectCountGroupList>
 <!-- test whitespace as first child node -->
 <responsibleDepartments> <responsibleDepartment> responsibleDept1</responsibleDepartment><responsibleDepartment>responsibleDept2</responsibleDepartment></responsibleDepartments>
 <titleGroupList><titleGroup><title>title</title></titleGroup></titleGroupList>
