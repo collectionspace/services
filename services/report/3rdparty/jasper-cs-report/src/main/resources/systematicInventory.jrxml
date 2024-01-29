@@ -22,12 +22,14 @@
 regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1') as storageLocation,
 replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') as locationkey,
 c.objectnumber objectNumber,
-c.numberofobjects objectCount,
+objectCountGroup.objectcount objectCount,
 ong.objectName objectName
 FROM collectionobjects_common c
 left outer join hierarchy h1 on (c.id = h1.parentid and h1.pos=0 and h1.name='collectionobjects_common:objectNameList')
 left outer join objectnamegroup ong on (ong.id=h1.id)
 join misc ms on (c.id=ms.id and ms.lifecyclestate <> 'deleted')
+left join hierarchy count_hier ON (c.id = count_hier.parentid AND count_hier.primarytype='objectCountGroup' AND count_hier.pos=0)
+left join objectcountgroup objectCountGroup ON count_hier.id = objectCountGroup.id
 WHERE replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') >= replace(regexp_replace($P{startLocation}, '^.*\)''(.*)''$', '\1'), ' ', '0')
   and replace(regexp_replace(c.computedcurrentlocation, '^.*\)''(.*)''$', '\1'), ' ', '0') <= replace(regexp_replace($P{endLocation}, '^.*\)''(.*)''$', '\1'), ' ', '0')
 order by locationkey, objectnumber, objectName desc]]>
