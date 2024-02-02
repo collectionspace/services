@@ -81,6 +81,11 @@
               <contentConcept></contentConcept>
             </collectionobjects_common:contentConcepts>
             <collectionobjects_common:numberOfObjects>1</collectionobjects_common:numberOfObjects>
+            <collectionobjects_common:objectCountGroupList>
+              <collectionobjects_common:objectCountGroup>
+                <collectionobjects_common:objectCount>1</collectionobjects_common:objectCount>
+              </collectionobjects_common:objectCountGroup>
+            </collectionobjects_common:objectCountGroupList>
             <collectionobjects_common:ownershipExchangePriceCurrency>poundsterling</collectionobjects_common:ownershipExchangePriceCurrency>
             <collectionobjects_common:contentOtherGroupList>
               <contentOtherGroup>

@@ -11,4 +11,9 @@
   <objectNumber>objectNumber</objectNumber>
   <distinguishingFeatures>distFeatures</distinguishingFeatures>
   <numberOfObjects>numberOfObjects</numberOfObjects>
-</ns2:collectionobjects_common> 
+  <objectCountGroupList>
+    <objectCountGroup>
+      <objectCount>1</objectCount>
+    </objectCountGroup>
+  </objectCountGroupList>
+</ns2:collectionobjects_common>

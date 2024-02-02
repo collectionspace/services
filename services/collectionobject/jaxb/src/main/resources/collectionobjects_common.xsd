@@ -42,6 +42,7 @@
                 <xs:element name="comments" type="commentList"/>
                 <xs:element name="distinguishingFeatures" type="xs:string"/>
                 <xs:element name="numberOfObjects" type="xs:integer"/>
+                <xs:element name="objectCountGroupList" type="objectCountGroupList" />
                 <xs:element name="objectNameList" type="ns:objectNameList"/>
                 <xs:element name="responsibleDepartments" type="responsibleDepartmentList"/>
                 <xs:element name="collection" type="xs:string"/>
@@ -172,6 +173,22 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="objectCountGroupList">
+        <xs:sequence>
+            <xs:element name="objectCountGroup" type="objectCountGroup" minOccurs="0"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="objectCountGroup">
+        <xs:sequence>
+            <xs:element name="objectCount" type="xs:integer" />
+            <xs:element name="objectCountType" type="xs:string" />
+            <xs:element name="objectCountCountedBy" type="xs:string" />
+            <xs:element name="objectCountDate" type="xs:date" />
+            <xs:element name="objectCountNote" type="xs:string" />
+        </xs:sequence>
+    </xs:complexType>
 
     <xs:complexType name="otherNumberList">
         <xs:sequence>

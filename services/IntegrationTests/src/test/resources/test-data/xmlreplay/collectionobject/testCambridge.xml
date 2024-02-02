@@ -5,6 +5,11 @@
   <comments>comments</comments>
   <distinguishingFeatures>distFeatures</distinguishingFeatures>
   <numberOfObjects>1</numberOfObjects>
+  <objectCountGroupList>
+    <objectCountGroup>
+      <objectCount>1</objectCount>
+    </objectCountGroup>
+  </objectCountGroupList>
   <responsibleDepartments>
   </responsibleDepartments>
   <titleGroupList>

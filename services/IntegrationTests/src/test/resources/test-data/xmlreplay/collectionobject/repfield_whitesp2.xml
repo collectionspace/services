@@ -8,6 +8,11 @@
 </briefDescriptions>
 <distinguishingFeatures>distFeatures</distinguishingFeatures>
 <numberOfObjects>1</numberOfObjects>
+<objectCountGroupList>
+<objectCountGroup>
+<objectCount>1</objectCount>
+</objectCountGroup>
+</objectCountGroupList>
 <!-- test newline whitespace -->
 <responsibleDepartments>
 <responsibleDepartment>responsibleDept1</responsibleDepartment>
