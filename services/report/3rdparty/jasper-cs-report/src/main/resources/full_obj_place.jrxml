@@ -31,7 +31,7 @@
 	obj.recordstatus,
 	publishto.item AS publishto,
 	installationtype.item AS installationtype,
-	obj.numberofobjects,
+	objectCountGroup.objectcount AS numberofobjects,
 	worktype.objectname AS worktype,
 	material.material, -- deurn
 	bd.item AS briefdescription,
@@ -81,6 +81,8 @@ LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and materia
 LEFT JOIN materialgroup material on material.id = material_hier.id
 LEFT JOIN collectionobjects_publicart_publicartcollections collections ON collections.id = obj.id AND collections.pos = 0
 LEFT JOIN collectionobjects_common_owners owners ON owners.id = obj.id AND owners.pos = 0
+LEFT JOIN hierarchy count_hier ON obj.id = count_hier.parentid AND count_hier.primarytype='objectCountGroup' AND count_hier.pos=0
+LEFT JOIN objectcountgroup objectCountGroup ON count_hier.id = objectCountGroup.id
 -- aggregate for the dimension
 LEFT JOIN (
 	SELECT

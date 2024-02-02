@@ -9,7 +9,7 @@
 		<defaultValueExpression><![CDATA["341e66cc-4848-4211-afe2"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[select co_c.objectnumber, co_c.numberofobjects, co_c.collection, ltg.termname,
+		<![CDATA[select co_c.objectnumber, objectCountGroup.objectcount numberofobjects, co_c.collection, ltg.termname,
 		 co_c.editionnumber, vic.displayname, co_fa.materialtechniquedescription, tg.title, dg.datedisplaydate, string_agg(distinct oppeepg.objectproductionpeople,', '),
 		 string_agg(distinct ptg.termdisplayname,', '), string_agg(distinct oporgg.objectproductionorganization,', '), string_agg(distinct mg.material,', '), string_agg(distinct tqg.technique,', '),
 		 co_c2.objectnumber, concat(mpg.measuredpart, ' -- ',string_agg(distinct concat(dsg.dimension, ': ',dsg.value, ' ', dsg.measurementunit), '; '))
@@ -47,6 +47,8 @@ left join hierarchy as h13 on (co_c.id = h13.parentid and h13.primarytype = 'mea
 left join measuredpartgroup as mpg on (mpg.id = h13.id)
 left join hierarchy as h14 on (h13.id = h14.parentid and h14.primarytype = 'dimensionSubGroup')
 left join dimensionsubgroup as dsg on (h14.id = dsg.id)
+LEFT OUTER JOIN hierarchy countHierarchy ON (co_c.id = countHierarchy.parentid AND countHierarchy.primarytype='objectCountGroup' AND countHierarchy.pos=0)
+LEFT OUTER JOIN objectcountgroup objectCountGroup ON (countHierarchy.id = objectCountGroup.id)
 WHERE h0.name = $P{csid}
 GROUP BY co_c.objectnumber, co_c.numberofobjects, co_c.collection, ltg.termname,
 		 co_c.editionnumber, co_fa.cataloglevel, tg.title, dg.datedisplaydate, oppeepg.objectproductionpeople, co_fa.materialtechniquedescription, vic.displayname,

@@ -32,7 +32,7 @@
 						ptg.termdisplayname opperson,
 						objectproductionpeople,
 						datedisplaydate,
-						numberofobjects,
+						objectCountGroup.objectcount numberofobjects,
 						dimensionsummary,
 						computedcurrentlocation
 	FROM acquisitions_common ac
@@ -63,6 +63,8 @@
 	LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id = h10.id)
 	LEFT OUTER JOIN collectionspace_core core ON (coc.id = core.id)
 	LEFT OUTER JOIN misc misc ON (misc.id = coc.id)
+	LEFT OUTER JOIN hierarchy countHierarchy ON (coc.id = countHierarchy.parentid AND countHierarchy.primarytype='objectCountGroup' AND countHierarchy.pos=0)
+	LEFT OUTER JOIN objectcountgroup objectCountGroup ON (countHierarchy.id = objectCountGroup.id)
 	WHERE core.tenantid = $P{tenantid} AND misc.lifecyclestate != 'deleted'
 	AND h1.name = $P{csid}]]>
 	</queryString>

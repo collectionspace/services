@@ -65,7 +65,7 @@
 						objectproductionperson,
 						objectproductionpeople,
 						datedisplaydate,
-						numberofobjects,
+						objectCountGroup.objectcount numberofobjects,
 						dimensionsummary,
 						computedcurrentlocation
 	FROM collectionobjects_common coc
@@ -87,6 +87,8 @@
 	LEFT OUTER JOIN structureddategroup sdg ON (sdg.id = h9.id)
 	LEFT OUTER JOIN hierarchy h10 ON (coc.id = h10.parentid AND h10.primarytype='measuredPartGroup' AND h10.pos=0)
 	LEFT OUTER JOIN measuredpartgroup mpg ON (mpg.id = h10.id)
+	LEFT OUTER JOIN hierarchy countHierarchy ON (coc.id = countHierarchy.parentid AND countHierarchy.primarytype='objectCountGroup' AND countHierarchy.pos=0)
+	LEFT OUTER JOIN objectcountgroup objectCountGroup ON (countHierarchy.id = objectCountGroup.id)
 	$P!{whereclause}]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String"/>
