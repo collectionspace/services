@@ -168,7 +168,6 @@
         <ant antfile="servicegroup/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="deploy" inheritAll="false"/>
-        <ant antfile="heldintrust/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="imports/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="loanout/build.xml" target="deploy" inheritAll="false"/>
@@ -239,7 +238,6 @@
         <ant antfile="loanout/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="media/build.xml" target="undeploy" inheritAll="false"/>
-        <ant antfile="heldintrust/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="imports/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="group/build.xml" target="undeploy" inheritAll="false"/>
@@ -283,7 +281,6 @@
         <ant antfile="servicegroup/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="group/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="intake/build.xml" target="dist" inheritAll="false"/>
-        <ant antfile="heldintrust/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="loanin/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="loanout/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="location/build.xml" target="dist" inheritAll="false"/>

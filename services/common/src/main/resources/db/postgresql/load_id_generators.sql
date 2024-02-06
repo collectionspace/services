@@ -236,51 +236,6 @@ INSERT INTO id_generators
         FROM    id_generators
         );
 
--- HIT_NUMBER
-
-INSERT INTO id_generators
-    (csid, displayname, description, priority, last_generated_id, id_generator_state)
-  SELECT
-     '038b61f2-2975-4b33-ac93-ce8d8b6042f0',
-     'Held-in-Trust Number',
-     'Identifies a Held-in-Trust.',
-     '9',
-     '',
-'<org.collectionspace.services.id.SettableIDGenerator>
-  <parts>
-    <org.collectionspace.services.id.StringIDGeneratorPart>
-      <initialValue>HIT</initialValue>
-      <currentValue>HIT</currentValue>
-    </org.collectionspace.services.id.StringIDGeneratorPart>
-    <org.collectionspace.services.id.YearIDGeneratorPart>
-      <currentValue></currentValue>
-    </org.collectionspace.services.id.YearIDGeneratorPart>
-    <org.collectionspace.services.id.StringIDGeneratorPart>
-      <initialValue>.</initialValue>
-      <currentValue>.</currentValue>
-    </org.collectionspace.services.id.StringIDGeneratorPart>
-    <org.collectionspace.services.id.NumericIDGeneratorPart>
-      <maxLength>6</maxLength>
-      <initialValue>1</initialValue>
-      <currentValue>-1</currentValue>
-    </org.collectionspace.services.id.NumericIDGeneratorPart>
-    <org.collectionspace.services.id.StringIDGeneratorPart>
-      <initialValue>.</initialValue>
-      <currentValue>.</currentValue>
-    </org.collectionspace.services.id.StringIDGeneratorPart>
-    <org.collectionspace.services.id.NumericIDGeneratorPart>
-      <maxLength>6</maxLength>
-      <initialValue>1</initialValue>
-      <currentValue>-1</currentValue>
-    </org.collectionspace.services.id.NumericIDGeneratorPart>
-  </parts>
-</org.collectionspace.services.id.SettableIDGenerator>'
-  WHERE '038b61f2-2975-4b33-ac93-ce8d8b6042f0' NOT IN
-        (
-        SELECT  csid
-        FROM    id_generators
-        );
-
 -- CONDITIONCHECK_NUMBER
 
 INSERT INTO id_generators
