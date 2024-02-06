@@ -71,6 +71,10 @@
                     "materials_common:rapidPrototypingProcesses",
                     "materials_common:additionalProcessGroupList",
                     "materials_common:processNote",
+                    "collectionobjects_common:contentDescription",
+                    "collectionobjects_common:contentEvents",
+                    "collectionobjects_common:contentOrganizations",
+                    "collectionobjects_common:contentPersons",
                     "collectionobjects_common:objectHistoryNote",
                     "collectionobjects_common:objectNumber",
                     "collectionobjects_common:objectStatusList",
@@ -93,6 +97,9 @@
                     "collectionobjects_common:briefDescriptions",
                     "collectionobjects_common:measuredPartGroupList",
                     "collectionobjects_common:viewersContributionNote",
+                    "collectionobjects_common:rightsGroupList.rightStatement",
+                    "collectionobjects_common:rightsGroupList.standardizedRightStatement",
+                    "collectionobjects_common:rightsInGroupList.rightReproductionStatement",
                     "media_common:blobCsid",
                     "media_materials:publishToList"
                   ]
@@ -617,6 +624,40 @@
                   "collectionobjects_common:briefDescriptions": {
                     "type": "text",
                     "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:contentDescription": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:contentEvents": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:contentOrganizations": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:contentPersons": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
                   },
                   "collectionobjects_common:materialGroupList": {
                     "type": "object",
