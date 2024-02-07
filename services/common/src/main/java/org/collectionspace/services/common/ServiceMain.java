@@ -687,6 +687,37 @@ public class ServiceMain {
 		}
 	}
 
+	void createRequiredExtensions() throws Exception {
+		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
+
+		// Loop through all tenants in tenant-bindings.xml
+
+		String cspaceInstanceId = getCspaceInstanceId();
+
+		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
+			List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
+
+			if (repositoryNameList != null && repositoryNameList.isEmpty() == false) {
+				// Loop through each repo/DB defined in a tenant bindings file
+
+				for (String repositoryName : repositoryNameList) {
+					try {
+						JDBCTools.executeUpdate(JDBCTools.CSADMIN_NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId, "CREATE EXTENSION IF NOT EXISTS \"unaccent\"");
+					}
+					catch(Exception e) {
+						logger.warn("Could not install unaccent postgresql extension. Accent-insensitive full text search is not available without this extension. On some platforms you may need to manually install this extension as a superuser.");
+					}
+				}
+			} else {
+				String errMsg = "repositoryNameList was empty or null.";
+
+				logger.error(errMsg);
+
+				throw new Exception(errMsg);
+			}
+		}
+	}
+
 	/**
 	 * Create required indexes (aka indices) in database tables not associated
 	 * with any specific tenant.
@@ -762,7 +793,7 @@ public class ServiceMain {
             for (ServiceBindingType sbt: sbtList) {
                 if (sbt.getName().equalsIgnoreCase(RUNSQLSCRIPTS_SERVICE_NAME)) {
                     runInitHandler(cspaceInstanceId, tbt, sbt);
-                    return;
+                    continue;
                 }
             }
         }

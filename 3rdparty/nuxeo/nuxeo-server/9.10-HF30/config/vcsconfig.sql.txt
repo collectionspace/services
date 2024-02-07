@@ -4,6 +4,27 @@
 # or https://doc.nuxeo.com/nxdoc/repository-configuration/#page-title
 #
 
+#CATEGORY: first
+
+#
+# Ensure that a configuration exists for the CSpace-specific fulltext analyzer named in
+# proto-repo-config.xml.
+#
+# We modify the configuration later (see unaccent_text_search_configuration.sql). Those
+# modifications can't be done here, because they require having postgres extensions installed,
+# and script does not run as a superuser, which is required to install extensions.
+#
+# For now, the text search configuration just needs to exist, so Nuxeo will be able to start.
+#
+
+#TEST:
+SELECT 1 FROM pg_ts_config WHERE cfgname = '${fulltextAnalyzer}';
+
+#IF: emptyResult
+CREATE TEXT SEARCH CONFIGURATION ${fulltextAnalyzer} ( COPY = english );
+
+
+
 #CATEGORY: afterTableCreation
 
 #

@@ -29,6 +29,9 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
             // Upgrade database schema
             svcMain.upgradeDatabase();
 
+            // Create required postgres extensions
+            svcMain.createRequiredExtensions();
+
             // Create required indexes (aka indices) in tables not associated
             // with any specific tenant.
             svcMain.createRequiredIndices();

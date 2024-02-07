@@ -5,7 +5,7 @@
 	tenant bindings file, we will create a corresponding Nuxeo repository config-
 	uration file.  You won't have to change the value for most of these elements
 	and attributes because they will be set when CollectionSpace starts.
-	
+
 	*** NOTE *** One value you may want to change is the 'binaryStore' path which is the location
 	that Nuxeo places binary files like images and PDF documents. Be sure to read the comment to
 	the right of the <binaryStore> element below.
@@ -16,7 +16,7 @@
 <!-- Values in the following elements are primarily added during execution -->
 <!-- of the 'ant deploy' command, within the Services source code tree. -->
 <!-- (Several values are also added during system startup, into repository-specific -->
-<!-- 'clones' of this prototype configuration file, as noted below.) --> 
+<!-- 'clones' of this prototype configuration file, as noted below.) -->
 <!-- See http://doc.nuxeo.com/display/ADMINDOC/VCS+Configuration for more config details -->
 <component name="config:default-repository">
 	<extension target="org.nuxeo.ecm.core.blob.BlobManager" point="configuration">
@@ -29,15 +29,15 @@
     <extension target="org.nuxeo.ecm.core.storage.sql.RepositoryService" point="repository">
         <repository name="default" factory="org.nuxeo.ecm.core.storage.sql.ra.PoolingRepositoryFactory">
 			<pool minPoolSize="0" maxPoolSize="20" blockingTimeoutMillis="100" idleTimeoutMinutes="10"/>
-			<clustering enabled="false" delay="1000"/>                
+			<clustering enabled="false" delay="1000"/>
 			<xa-datasource>@XA_DATASOURCE@</xa-datasource> <!-- The transactional datasource for Nuxeo -->
 			<noDDL>false</noDDL>
-			<sqlInitFile>vcsconfig.sql.txt</sqlInitFile> <!-- see https://doc.nuxeo.com/display/ADMINDOC/VCS+Configuration#VCSConfiguration-DatabaseCreationOption -->		
+			<sqlInitFile>vcsconfig.sql.txt</sqlInitFile> <!-- see https://doc.nuxeo.com/display/ADMINDOC/VCS+Configuration#VCSConfiguration-DatabaseCreationOption -->
 			<aclOptimizations enabled="true"/>
 			<pathOptimizations enabled="true"/>
 			<idType>varchar</idType>
 			<indexing>
-			<fulltext disabled="false" analyzer="english">
+			<fulltext disabled="false" analyzer="cspace_english">
 			  <index name="default">
 				<!-- all props implied -->
 			  </index>
@@ -49,7 +49,7 @@
 			  </index>
 			</fulltext>
 			</indexing>
-			<usersSeparator key="," />			
+			<usersSeparator key="," />
 			<property name="ServerName">@DB_SERVER_HOSTNAME@</property>
 			<property name="DatabaseName"></property> <!-- The value of the database name element is inserted during system startup. -->
 			<property name="JDBCOptions">@DB_JDBC_OPTIONS@</property>
