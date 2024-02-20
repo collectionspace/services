@@ -71,6 +71,10 @@
 			<service:initHandler xmlns:service="http://collectionspace.org/services/config/service">
 				<service:classname>org.collectionspace.services.common.init.RunSqlScripts</service:classname>
 				<service:params>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>unaccent_text_search_configuration.sql</service:value>
+					</service:property>
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
