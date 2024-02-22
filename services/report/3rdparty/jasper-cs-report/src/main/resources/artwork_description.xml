@@ -7,7 +7,7 @@
       <forDocType>CollectionObject</forDocType>
     </forDocTypes>
     <supportsSingleDoc>true</supportsSingleDoc>
-    <supportsDocList>false</supportsDocList>
+    <supportsDocList>true</supportsDocList>
     <supportsGroup>false</supportsGroup>
     <supportsNoContext>true</supportsNoContext>
     <filename>artwork_description.jrxml</filename>
