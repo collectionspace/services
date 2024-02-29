@@ -66,7 +66,7 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 
-		DateTime dateTime = new DateTime(chronology)
+		DateTime dateTime = new DateTime(0, chronology)
 				.withEra((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD)
 				.withYearOfEra(year)
 				.withMonthOfYear(month);
@@ -1225,7 +1225,7 @@ public class DateUtils {
 			return interval;
 		}
 
-		MutableDateTime dateTime = new MutableDateTime(chronology);
+		MutableDateTime dateTime = new MutableDateTime(0, chronology);
 		dateTime.era().set((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD);
 		dateTime.yearOfEra().set(year);
 		dateTime.monthOfYear().set(1);
@@ -1379,7 +1379,7 @@ public class DateUtils {
 			era = Date.DEFAULT_ERA;
 		}
 
-		MutableDateTime dateTime = new MutableDateTime(chronology);
+		MutableDateTime dateTime = new MutableDateTime(0, chronology);
 		dateTime.era().set((era == Era.BCE) ? DateTimeConstants.BC : DateTimeConstants.AD);
 		dateTime.yearOfEra().set(date.getYear());
 		dateTime.monthOfYear().set(date.getMonth());
