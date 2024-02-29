@@ -255,7 +255,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 	}
 
 	/**
-	 * Denormalize the content concept, content event, content person, content organization, and content description
+	 * Denormalize the content concept, content event, content person, and content organization
 	 * fields for a collectionobject so that they are indexed under a single field
 	 *
 	 * @param doc the collectionobject document
@@ -278,13 +278,6 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 					denormContentSubject.add(node);
 				}
 			}
-		}
-
-		String description = (String) doc.getProperty("collectionobjects_common", "contentDescription");
-		if (description != null) {
-			final ObjectNode node = objectMapper.createObjectNode();
-			node.put("subject", description);
-			denormContentSubject.add(node);
 		}
 
 		denormValues.putArray("contentSubjectList").addAll(denormContentSubject);
