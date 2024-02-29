@@ -16,11 +16,12 @@
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
   <parameter name="csidlist" class="java.lang.String" isForPrompting="false" />
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
   <parameter name="csids" class="java.lang.String" isForPrompting="false">
     <defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
   </parameter>
   <parameter name="whereclause" class="java.lang.String" isForPrompting="false">
-    <defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+    <defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ($P{csid} != null ? "WHERE hier.name = '" + $P{csid} + "'" : "") ]]></defaultValueExpression>
   </parameter>
 	<queryString language="SQL">
 		<![CDATA[WITH dimensions AS (
