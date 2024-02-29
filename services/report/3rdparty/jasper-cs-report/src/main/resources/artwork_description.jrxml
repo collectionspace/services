@@ -112,10 +112,15 @@ LEFT JOIN (
 	GROUP BY dimensions.parentid
 ) dimension on dimension.parentid = obj.id
 LEFT JOIN (
-	SELECT relation.*
+	SELECT DISTINCT ON (relation.subjectcsid)
+		relation.subjectcsid,
+		relation.objectcsid
 	FROM relations_common relation
 	INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
 	WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY relation.subjectcsid, core.updatedat DESC
 ) media ON media.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>
