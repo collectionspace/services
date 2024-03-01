@@ -15,15 +15,29 @@
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
+  <parameter name="csidlist" class="java.lang.String" isForPrompting="false" />
 	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
-	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
-	</parameter>
+  <parameter name="csids" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+  </parameter>
+  <parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE hier.name IN (" + $P{csids} + ")" ) : ($P{csid} != null ? "WHERE hier.name = '" + $P{csid} + "'" : "") ]]></defaultValueExpression>
+  </parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT
+		<![CDATA[WITH dimensions AS (
+	SELECT
+		measured_hier.parentid,
+		string_agg(concat(dimension.dimension, ' ', dimension.value::text, ' ', dimension.measurementunit), ' | ') AS dimension
+	FROM hierarchy measured_hier
+	INNER JOIN measuredpartgroup measuredpart on measuredpart.id = measured_hier.id
+	INNER JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup'
+	LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
+	WHERE measured_hier.primarytype = 'measuredPartGroup'
+	GROUP BY measured_hier.id, measured_hier.parentid
+) SELECT
 	obj.objectnumber,
 	ong.objectname,
-	tg.title,
+	titlegroup.title,
 	person.objectproductionperson,
 	sdg.datedisplaydate,
 	fineart.materialtechniquedescription,
@@ -36,33 +50,77 @@ INNER JOIN hierarchy hier on hier.id = obj.id
 INNER JOIN misc ON misc.id = obj.id and misc.lifecyclestate != 'deleted'
 INNER JOIN collectionspace_core core ON misc.id = core.id AND core.tenantid = $P{tenantid}
 LEFT JOIN collectionobjects_fineart fineart ON fineart.id = obj.id
-LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
-LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
-LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
-LEFT JOIN titlegroup tg ON tg.id = title_hier.id
-LEFT JOIN hierarchy person_hier ON person_hier.parentid = obj.id AND person_hier.primarytype = 'objectProductionPersonGroup' AND person_hier.pos = 0
-LEFT JOIN objectproductionpersongroup person ON person.id = person_hier.id
-LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = obj.id AND sdg_hier.primarytype = 'structuredDateGroup' AND sdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND sdg_hier.pos = 0
-LEFT JOIN structureddategroup sdg ON sdg.id = sdg_hier.id
-LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup' and material_hier.pos = 0
-LEFT JOIN materialgroup material on material.id = material_hier.id
-LEFT JOIN hierarchy technique_hier on technique_hier.parentid = obj.id and technique_hier.primarytype = 'techniqueGroup' and technique_hier.pos = 0
-LEFT JOIN techniquegroup technique on technique.id = technique_hier.id
 LEFT JOIN (
  SELECT
-	measured_hier.parentid,
-	string_agg(concat(dimension.dimension, ' ', dimension.value::text, ' ', dimension.measurementunit), ' | ') AS dimension
-	FROM hierarchy measured_hier
-	INNER JOIN hierarchy dimension_hier on dimension_hier.parentid = measured_hier.id and dimension_hier.primarytype = 'dimensionSubGroup'
-	LEFT JOIN dimensionsubgroup dimension on dimension.id = dimension_hier.id
-	WHERE measured_hier.primarytype = 'measuredPartGroup'
-	GROUP BY measured_hier.parentid
+	hierarchy.parentid,
+	string_agg(ong.objectname, ';') AS objectname
+	FROM hierarchy
+	INNER JOIN objectnamegroup ong ON ong.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'objectNameGroup'
+	GROUP BY hierarchy.parentid
+) ong on ong.parentid = obj.id
+LEFT JOIN (
+ SELECT
+	hierarchy.parentid,
+	string_agg(title.title, ';') AS title
+	FROM hierarchy
+	INNER JOIN titlegroup title ON title.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'titleGroup'
+	GROUP BY hierarchy.parentid
+) titlegroup on titlegroup.parentid = obj.id
+LEFT JOIN (
+ SELECT
+	hierarchy.parentid,
+	string_agg(regexp_replace(person.objectproductionperson, '^.*\)''(.*)''$', '\1'), ';') AS objectproductionperson
+	FROM hierarchy
+	INNER JOIN objectproductionpersongroup person ON person.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'objectProductionPersonGroup'
+	GROUP BY hierarchy.parentid
+) person on person.parentid = obj.id
+LEFT JOIN (
+ SELECT
+	hierarchy.parentid,
+	string_agg(sdg.datedisplaydate, ';') AS datedisplaydate
+	FROM hierarchy
+	INNER JOIN structureddategroup sdg ON sdg.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'structuredDateGroup' AND hierarchy.name = 'collectionobjects_common:objectProductionDateGroupList'
+	GROUP BY hierarchy.parentid
+) sdg on sdg.parentid = obj.id
+LEFT JOIN (
+ SELECT
+	hierarchy.parentid,
+	string_agg(material.material, ';') AS material
+	FROM hierarchy
+	INNER JOIN materialgroup material on material.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'materialGroup'
+	GROUP BY hierarchy.parentid
+) material on material.parentid = obj.id
+LEFT JOIN (
+ SELECT
+	hierarchy.parentid,
+	string_agg(technique.technique, ';') AS technique
+	FROM hierarchy
+	INNER JOIN techniquegroup technique on technique.id = hierarchy.id
+	WHERE hierarchy.primarytype = 'techniqueGroup'
+	GROUP BY hierarchy.parentid
+) technique on technique.parentid = obj.id
+LEFT JOIN (
+	SELECT
+		dimensions.parentid,
+		string_agg(dimensions.dimension, ';') dimension
+	FROM dimensions
+	GROUP BY dimensions.parentid
 ) dimension on dimension.parentid = obj.id
 LEFT JOIN (
-	SELECT relation.*
+	SELECT DISTINCT ON (relation.subjectcsid)
+		relation.subjectcsid,
+		relation.objectcsid
 	FROM relations_common relation
 	INNER JOIN misc ON misc.id = relation.id AND misc.lifecyclestate != 'deleted'
+  INNER JOIN hierarchy hier ON hier.name = relation.objectcsid
+  INNER JOIN collectionspace_core core ON core.id = hier.id
 	WHERE relation.objectdocumenttype = 'Media' AND relation.subjectdocumenttype = 'CollectionObject'
+  ORDER BY relation.subjectcsid, core.updatedat DESC
 ) media ON media.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>
