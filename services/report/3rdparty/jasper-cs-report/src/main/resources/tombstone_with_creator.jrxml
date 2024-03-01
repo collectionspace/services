@@ -51,8 +51,9 @@ LEFT JOIN collectionobjects_common_inventorystatuslist inventory ON inventory.id
 LEFT JOIN (
   SELECT
     hier.parentid,
-    string_agg(sd.datedisplaydate, '|') as artworkdate
+    string_agg(concat_ws(';', sd.datedisplaydate, regexp_replace(papdg.publicartproductiondatetype,'^.*\)''(.*)''$', '\1')), '|') as artworkdate
   FROM hierarchy hier
+  LEFT JOIN publicartproductiondategroup papdg on papdg.id = hier.id
   LEFT JOIN hierarchy sdg_hier on sdg_hier.parentid = hier.id AND sdg_hier.primarytype = 'structuredDateGroup'
   LEFT JOIN structureddategroup sd on sd.id = sdg_hier.id
   WHERE hier.primarytype = 'publicartProductionDateGroup'
