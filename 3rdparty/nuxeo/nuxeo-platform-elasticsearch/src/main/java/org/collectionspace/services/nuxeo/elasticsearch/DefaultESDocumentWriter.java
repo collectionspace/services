@@ -60,6 +60,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormMediaRecords(session, csid, tenantId, denormValues);
 			denormAcquisitionRecords(session, csid, tenantId, denormValues);
 			denormExhibitionRecords(session, csid, tenantId, denormValues);
+			denormConceptFields(doc, denormValues);
 			denormMaterialFields(doc, denormValues);
 			denormObjectNameFields(doc, denormValues);
 
@@ -251,6 +252,35 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 		}
 
 		denormValues.putArray("objectNameList").addAll(denormObjectNames);
+	}
+
+	/**
+	 * Denormalize the content concept, content event, content person, and content organization
+	 * fields for a collectionobject so that they are indexed under a single field
+	 *
+	 * @param doc the collectionobject document
+	 * @param denormValues the json node for denormalized fields
+	 */
+	private void denormConceptFields(final DocumentModel doc, final ObjectNode denormValues) {
+		final List<JsonNode> denormContentSubject = new ArrayList<>();
+		final List<String> fields = Arrays.asList("contentConcepts",
+			"contentEvents",
+			"contentPersons",
+			"contentOrganizations");
+
+		for (String field : fields) {
+			List<String> contentList = (List<String>) doc.getProperty("collectionobjects_common", field);
+
+			for (String content  : contentList) {
+				if (content != null) {
+					final ObjectNode node = objectMapper.createObjectNode();
+					node.put("subject", RefNameUtils.getDisplayName(content));
+					denormContentSubject.add(node);
+				}
+			}
+		}
+
+		denormValues.putArray("contentSubjectList").addAll(denormContentSubject);
 	}
 
 	/**

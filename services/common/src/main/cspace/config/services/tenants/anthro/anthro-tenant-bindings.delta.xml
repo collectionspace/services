@@ -150,6 +150,15 @@
 								}
 							}
 						},
+						"collectionspace_denorm:contentSubjectList": {
+							"type": "object",
+							"properties": {
+								"subject": {
+									"type": "keyword",
+									"copy_to": "all_field"
+								}
+							}
+						},
 
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",
