@@ -20,7 +20,50 @@
 		<defaultValueExpression><![CDATA[$P{csid} != null ?  "WHERE hier.name = '" + $P{csid} + "'"  : ""]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[SELECT
+		<![CDATA[WITH ong AS (
+	SELECT
+		hier.parentid,
+		string_agg(ong.objectname, ';') AS objectname
+	FROM hierarchy hier
+	LEFT JOIN objectnamegroup ong ON ong.id = hier.id
+	WHERE hier.primarytype = 'objectNameGroup'
+	GROUP BY hier.parentid
+), titles AS (
+	SELECT
+		hier.parentid,
+		string_agg(tg.title, ';') AS title
+	FROM hierarchy hier
+	LEFT JOIN titlegroup tg ON tg.id = hier.id
+	WHERE hier.primarytype = 'titleGroup'
+	GROUP BY hier.parentid
+), productionpeople AS (
+	SELECT
+		hier.parentid,
+		string_agg(regexp_replace(person.objectproductionperson, '^.*\)''(.*)''$', '\1'), ';') AS objectproductionperson
+	FROM hierarchy hier
+	LEFT JOIN objectproductionpersongroup person ON person.id = hier.id
+	WHERE hier.primarytype = 'objectProductionPersonGroup'
+	GROUP BY hier.parentid
+), productiondates AS (
+	SELECT
+		hier.parentid,
+		string_agg(sdg.datedisplaydate, ';') AS objectproductiondate
+	FROM hierarchy hier
+	LEFT JOIN structureddategroup sdg ON sdg.id = hier.id
+	WHERE hier.primarytype = 'structuredDateGroup' AND hier.name = 'collectionobjects_common:objectProductionDateGroupList'
+	GROUP BY hier.parentid
+), relatedmedia AS (
+	SELECT DISTINCT ON (relation.subjectcsid)
+		relation.subjectcsid,
+		relation.objectcsid AS mediacsid
+	FROM media_common media
+	INNER JOIN hierarchy hier ON hier.id = media.id
+	INNER JOIN misc ON misc.id = media.id AND misc.lifecyclestate != 'deleted'
+	INNER JOIN relations_common relation ON relation.objectcsid = hier.name AND relation.subjectdocumenttype = 'CollectionObject'
+	INNER JOIN collectionspace_core core ON core.id = media.id
+	ORDER BY relation.subjectcsid, core.updatedat DESC
+)
+SELECT
 	loan.loanoutnumber,
 	loan.borrower,
 	object.objectnumber,
@@ -42,25 +85,21 @@ LEFT JOIN (
 		obj.objectnumber,
 		obj.computedcurrentlocation,
 		ong.objectname,
-		tg.title,
+		titles.title,
 		person.objectproductionperson,
-		sdg.datedisplaydate AS objectproductiondate,
-		media.objectcsid AS mediacsid
+		productiondate.objectproductiondate,
+		media.mediacsid
 	FROM collectionobjects_common obj
 	INNER JOIN hierarchy hier ON hier.id = obj.id
 	INNER JOIN misc on misc.id = obj.id AND misc.lifecyclestate != 'deleted'
 	INNER JOIN relations_common relation ON relation.objectcsid = hier.name
 		AND relation.subjectdocumenttype = 'Loanout'
 		AND relation.objectdocumenttype = 'CollectionObject'
-	LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
-	LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
-	LEFT JOIN hierarchy title_hier ON title_hier.parentid = obj.id AND title_hier.primarytype = 'titleGroup' AND title_hier.pos = 0
-	LEFT JOIN titlegroup tg ON tg.id = title_hier.id
-	LEFT JOIN hierarchy person_hier ON person_hier.parentid = obj.id AND person_hier.primarytype = 'objectProductionPersonGroup' AND person_hier.pos = 0
-	LEFT JOIN objectproductionpersongroup person ON person.id = person_hier.id
-	LEFT JOIN hierarchy sdg_hier ON sdg_hier.parentid = obj.id AND sdg_hier.primarytype = 'structuredDateGroup' AND sdg_hier.name = 'collectionobjects_common:objectProductionDateGroupList' AND sdg_hier.pos = 0
-	LEFT JOIN structureddategroup sdg ON sdg.id = sdg_hier.id
-	LEFT JOIN relations_common media ON media.subjectcsid = hier.name AND media.objectdocumenttype = 'Media' AND media.subjectdocumenttype = 'CollectionObject'
+	LEFT JOIN ong ON ong.parentid = obj.id
+	LEFT JOIN titles ON titles.parentid = obj.id
+	LEFT JOIN productionpeople person ON person.parentid = obj.id
+	LEFT JOIN productiondates productiondate ON productiondate.parentid = obj.id
+	LEFT JOIN relatedmedia media ON media.subjectcsid = hier.name
 ) object ON object.subjectcsid = hier.name
 $P!{whereclause}]]>
 	</queryString>
