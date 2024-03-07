@@ -13,30 +13,49 @@ import org.postgresql.util.PSQLState;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AuthorizationCodeRequestAuthenticationToken;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<AuthenticationSuccessEvent> {
 
-	private static final String UPDATE_USER_SQL =
-			"UPDATE users SET lastlogin = now() WHERE username = ?";
+    private static final String UPDATE_USER_SQL =
+            "UPDATE users SET lastlogin = now() WHERE username = ?";
 
-	@Override
-	public void onApplicationEvent(AuthenticationSuccessEvent event) {
-		if (event.getSource() instanceof Authentication) {
-			Authentication eventSource = (Authentication) event.getSource();
+    private static final String DELETE_EXPIRED_AUTHORIZATIONS_SQL =
+            "DELETE FROM oauth2_authorization WHERE access_token_expires_at < now()";
 
-			if (eventSource.getPrincipal() instanceof CSpaceUser) {
-				CSpaceDbRealm cspaceDbRealm = new CSpaceDbRealm();
-				CSpaceUser cspaceUser = (CSpaceUser) eventSource.getPrincipal();
-				String username = cspaceUser.getUsername();
+    @Override
+    public void onApplicationEvent(AuthenticationSuccessEvent event) {
+        Object eventSource = event.getSource();
 
-				try {
-					setLastLogin(cspaceDbRealm, username);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+        if (
+            eventSource instanceof Authentication
+            // Ignore authentication via JWT token, since this indicates a continuing session -- not what a user would consider a "log in"
+            && !(eventSource instanceof JwtAuthenticationToken)
+            // Ignore authorization code requests
+            && !(eventSource instanceof OAuth2AuthorizationCodeRequestAuthenticationToken)
+        ) {
+            Authentication authentication = (Authentication) eventSource;
+
+            if (authentication.getPrincipal() instanceof CSpaceUser) {
+                CSpaceDbRealm cspaceDbRealm = new CSpaceDbRealm();
+                CSpaceUser cspaceUser = (CSpaceUser) authentication.getPrincipal();
+                String username = cspaceUser.getUsername();
+
+                try {
+                    setLastLogin(cspaceDbRealm, username);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    deleteExpiredAuthorizations(cspaceDbRealm);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
 	private void setLastLogin(CSpaceDbRealm cspaceDbRealm, String username) throws AccountException {
         Connection conn = null;
@@ -63,6 +82,41 @@ public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<Aut
             }
         } catch (AccountNotFoundException ex) {
             throw ex;
+        } catch (Exception ex) {
+            AccountException ae = new AccountException("Unknown Exception");
+            ae.initCause(ex);
+            throw ae;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+    }
+
+    private void deleteExpiredAuthorizations(CSpaceDbRealm cspaceDbRealm) throws AccountException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = cspaceDbRealm.getConnection();
+            ps = conn.prepareStatement(DELETE_EXPIRED_AUTHORIZATIONS_SQL);
+            ps.executeUpdate();
         } catch (Exception ex) {
             AccountException ae = new AccountException("Unknown Exception");
             ae.initCause(ex);
