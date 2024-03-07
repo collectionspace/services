@@ -348,9 +348,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             if (ctx.isRollbackOnException()) {
                 rollbackTransaction(repoSession);
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception trying to reindex Nuxeo repository ", e);
-            }
+
+            logger.error("Error reindexing Nuxeo repository", e);
+
             throw new NuxeoDocumentException(e);
         } finally {
             if (repoSession != null) {
