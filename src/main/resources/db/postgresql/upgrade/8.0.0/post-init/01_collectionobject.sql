@@ -16,7 +16,7 @@ BEGIN
             WHERE co.fieldcollectionplace IS NOT NULL AND co.fieldcollectionplace != '' AND co_fcp.item IS NULL
 
             LOOP
-                -- Get max pos value for the collectionobject record's current owner field:
+                -- Get max pos value for the collectionobject record's field collection place field:
                 SELECT coalesce(max(pos), -1) INTO maxpos
                 FROM public.collectionobjects_common_fieldcollectionplaces
                 WHERE id = trow.id;
