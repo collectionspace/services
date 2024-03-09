@@ -75,11 +75,11 @@ public class IndexResource extends NuxeoBasedResource {
             return null;
         }
     }
-    
+
 	/*
 	 * HTTP Methods
 	 */
-    
+
 	@Override
 	@POST
 	public Response create(@Context ResourceMap resourceMap, @Context UriInfo ui, String xmlPayload) {
@@ -87,7 +87,7 @@ public class IndexResource extends NuxeoBasedResource {
 				.entity(ServiceMessages.POST_UNSUPPORTED).type("text/plain").build();
 		return response;
 	}
-	
+
     @Override
 	@DELETE
     @Path("{csid}")
@@ -97,7 +97,7 @@ public class IndexResource extends NuxeoBasedResource {
 				.build();
 		return response;
     }
-    
+
 	@POST
     @Path("{indexid}")
 	public Response reindex(
@@ -108,7 +108,7 @@ public class IndexResource extends NuxeoBasedResource {
        	Response result = Response.ok().build();
        	boolean success = false;
        	String docType = null;
-       	
+
         try {
             RemoteServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = (RemoteServiceContext<PoxPayloadIn, PoxPayloadOut>) createServiceContext(uriInfo);
             docType = ctx.getTenantQualifiedDoctype(); // this will used in the error message if an error occurs
@@ -117,19 +117,19 @@ public class IndexResource extends NuxeoBasedResource {
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.REINDEX_FAILED);
         }
-        
+
         if (success == false) {
             Response response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(
                     ServiceMessages.REINDEX_FAILED + ServiceMessages.indexResourceNotFoundMsg(indexid)).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-       	
+
        	return result;
     }
-    
+
 	/* (non-Javadoc)
 	 * @see org.collectionspace.services.common.ResourceBase#getList(javax.ws.rs.core.UriInfo, java.lang.String)
-	 * 
+	 *
 	 * The index sub-resource does not support a getList operation.
 	 */
 	@Override

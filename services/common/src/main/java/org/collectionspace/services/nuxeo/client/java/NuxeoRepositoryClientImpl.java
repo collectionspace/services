@@ -87,6 +87,7 @@ import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
 import org.nuxeo.ecm.core.opencmis.bindings.NuxeoCmisServiceFactory;
 import org.nuxeo.ecm.core.opencmis.impl.server.NuxeoCmisService;
 import org.nuxeo.elasticsearch.ElasticSearchComponent;
+import org.nuxeo.elasticsearch.api.ESClient;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionRuntimeException;
@@ -314,11 +315,36 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
         CoreSessionInterface repoSession = null;
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = handler.getServiceContext();
+        ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
+        ESClient esClient = null;
+
+        try {
+            // Ensure an Elasticsearch connection has been established. This should have happened
+            // on startup, but may not have, if the Elasticsearch service wasn't reachable when
+            // Nuxeo started.
+
+            esClient = es.getClient();
+        } catch (Exception e) {
+            esClient = null;
+        }
 
         try {
             repoSession = getRepositorySession(ctx);
 
-            ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
+            if (esClient == null) {
+                // The connection to ES has not been established.
+                // Attempt to start the ElasticSearchService.
+
+                es.start(null);
+
+                try {
+                    // Wait for startup configuration to complete.
+
+                    Thread.sleep(5000);
+                } catch (InterruptedException ex) {
+                }
+            }
+
             String repositoryName = repoSession.getRepositoryName();
 
             logger.info(String.format("Rebuilding Elasticsearch index for repository %s", repositoryName));
