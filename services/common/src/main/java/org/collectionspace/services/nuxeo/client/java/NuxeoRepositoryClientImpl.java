@@ -338,9 +338,9 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
                 es.start(null);
 
                 try {
-                    // Wait for startup configuration to complete.
+                    // Wait for startup requests to complete.
 
-                    Thread.sleep(5000);
+                    Thread.sleep(10000);
                 } catch (InterruptedException ex) {
                 }
             }
