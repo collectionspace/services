@@ -27,7 +27,3 @@ CREATE TABLE IF NOT EXISTS tokens (
   created_at TIMESTAMP NOT NULL,
   updated_at TIMESTAMP
 );
-
--- Upgrade older acl_object_identity tables to 8.0
-
-ALTER TABLE acl_object_identity ALTER COLUMN object_id_identity TYPE VARCHAR (36);
