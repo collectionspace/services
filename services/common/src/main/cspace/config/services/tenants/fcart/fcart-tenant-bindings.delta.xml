@@ -8,6 +8,15 @@
 	<!-- value in cspace/config/services/tenants/fcart-tenant-bindings-proto.xml -->
 
 	<tenant:tenantBinding id="1000">
+		<tenant:serviceBindings merge:matcher="id" id="Reports">
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>artwork_description</types:value>
+				</types:item>
+			</service:properties>
+		</tenant:serviceBindings>
+
 		<tenant:elasticSearchIndexConfig merge:action="replace">
 			<tenant:mapping merge:action="replace">
 				{
@@ -339,14 +348,5 @@
 				}
 			</tenant:mapping>
 		</tenant:elasticSearchIndexConfig>
-
-		<tenant:serviceBindings merge:matcher="id" id="Reports">
-			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
-				<types:item merge:matcher="skip" merge:action="insert">
-					<types:key>report</types:key>
-					<types:value>artwork_description</types:value>
-				</types:item>
-			</service:properties>
-		</tenant:serviceBindings>
 	</tenant:tenantBinding>
 </tenant:TenantBindingConfig>
