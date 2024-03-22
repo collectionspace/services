@@ -10,7 +10,7 @@
 	<name>services</name>
 
 	<properties>
-		<revision>8.0.0-SNAPSHOT</revision>
+		<revision>8.0.0</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>${revision}</cspace.services.version>
 		<cspace.services.client.version>${revision}</cspace.services.client.version>
