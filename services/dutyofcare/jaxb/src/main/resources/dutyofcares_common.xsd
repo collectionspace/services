@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Dutyofcare schema (XSD)
+    Entity  : Dutyofcare
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns="http://collectionspace.org/services/dutyofcare"
+  targetNamespace="http://collectionspace.org/services/dutyofcare"
+  version="0.1"
+>
+
+  <!--
+      Avoid XmlRootElement nightmare:
+      See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+  -->
+
+  <!--  Dutyofcare Information Group -->
+  <xs:element name="dutyofcares_common">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="dutyOfCareNumber" type="xs:string"/>
+        <xs:element name="dutyOfCareDate" type="xs:date"/>
+        <xs:element name="dutyOfCareTitle" type="xs:string"/>
+
+        <xs:element name="dutyOfCareNotes" type="dutyOfCareNotes"/>
+        <xs:element name="partiesInvolvedGroupList" type="partiesInvolvedGroupList"/>
+        <xs:element name="dutyOfCareDetailGroupList" type="dutyOfCareDetailGroupList"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="dutyOfCareNotes">
+    <xs:sequence>
+      <xs:element name="dutyOfCareNote" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="partiesInvolvedGroupList">
+    <xs:sequence>
+      <xs:element name="partiesInvolvedGroup" type="partiesInvolvedGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="partiesInvolvedGroup">
+    <xs:sequence>
+      <xs:element name="involvedParty" type="xs:string"/>
+      <xs:element name="involvedOnBehalfOf" type="xs:string"/>
+      <xs:element name="involvedRole" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dutyOfCareDetailGroupList">
+    <xs:sequence>
+      <xs:element name="dutyOfCareDetailGroup" type="dutyOfCareDetailGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dutyOfCareDetailGroup">
+    <xs:sequence>
+      <xs:element name="detailType" type="xs:string"/>
+      <xs:element name="detailLevel" type="xs:string"/>
+      <xs:element name="detailDeterminedBy" type="xs:string"/>
+      <xs:element name="detailDeterminationDate" type="xs:date"/>
+      <xs:element name="detailNote" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

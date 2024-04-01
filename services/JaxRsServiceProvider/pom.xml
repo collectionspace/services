@@ -415,9 +415,14 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.collectionspace.services</groupId>
-          <artifactId>org.collectionspace.services.chronology.service</artifactId>
-          <version>${project.version}</version>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.chronology.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.dutyofcare.service</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <!--dependency>
             <groupId>org.collectionspace.services</groupId>
