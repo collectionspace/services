@@ -254,6 +254,8 @@
 
         <delete>
             <fileset dir="${jee.server.cspace}/lib" includes="${spring.jars}" />
+            <!-- Clear out Spring jars that used to be deployed in older versions of CollectionSpace -->
+            <fileset dir="${jee.server.cspace}/lib" includes="spring-instrument-*.jar,spring-security-jwt-*.jar,spring-security-oauth2-*.jar,spring-webmvc-*.jar" />
         </delete>
     </target>
 
