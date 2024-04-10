@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Nagpraclaim schema (XSD)
+
+    Entity  : Nagpraclaim
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns:ns="http://collectionspace.org/services/nagpraclaim"
+  xmlns="http://collectionspace.org/services/nagpraclaim"
+  targetNamespace="http://collectionspace.org/services/nagpraclaim"
+  version="0.1"
+>
+
+<!--
+    Avoid XmlRootElement nightmare:
+    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
+-->
+
+  <!--  NagpraClaim Information Group -->
+  <xs:element name="nagpraclaims_common">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="claimNumber" type="xs:string" />
+        <xs:element name="title" type="xs:string" />
+        <xs:element name="claimDate" type="xs:date" />
+        <xs:element name="types" type="types" />
+        <xs:element name="notes" type="notes" />
+        <xs:element name="treatmentNotes" type="treatmentNotes" />
+        <xs:element name="alternativeTitleGroupList" type="alternativeTitleGroupList" />
+
+        <xs:element name="partiesInvolvedGroupList" type="partiesInvolvedGroupList" />
+        <xs:element name="geographicPlaceGroupList" type="geographicPlaceGroupList" />
+        <xs:element name="timePeriodGroupList" type="timePeriodGroupList" />
+        <xs:element name="culturalGroupList" type="culturalGroupList" />
+        <xs:element name="archaeologicalSiteGroupList" type="archaeologicalSiteGroupList" />
+
+        <xs:element name="nagpraStatusGroupList" type="nagpraStatusGroupList" />
+        <xs:element name="nagpraDocumentationGroupList" type="nagpraDocumentationGroupList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="types">
+    <xs:sequence>
+      <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="notes">
+    <xs:sequence>
+      <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="treatmentNotes">
+    <xs:sequence>
+      <xs:element name="treatmentNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="alternativeTitleGroupList">
+    <xs:sequence>
+      <xs:element name="alternativeTitleGroup" type="alternativeTitleGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="partiesInvolvedGroupList">
+    <xs:sequence>
+      <xs:element name="partiesInvolvedGroup" type="partiesInvolvedGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="geographicPlaceGroupList">
+    <xs:sequence>
+      <xs:element name="geographicPlaceGroup" type="geographicPlaceGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="timePeriodGroupList">
+    <xs:sequence>
+      <xs:element name="timePeriodGroup" type="timePeriodGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="culturalGroupList">
+    <xs:sequence>
+      <xs:element name="culturalGroup" type="culturalGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="archaeologicalSiteGroupList">
+    <xs:sequence>
+      <xs:element name="archaeologicalSiteGroup" type="archaeologicalSiteGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraStatusGroupList">
+    <xs:sequence>
+      <xs:element name="nagpraStatusGroup" type="nagpraStatusGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraDocumentationGroupList">
+    <xs:sequence>
+      <xs:element name="nagpraDocumentationGroup" type="nagpraDocumentationGroup" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="alternativeTitleGroup">
+    <xs:sequence>
+      <xs:element name="alternativeTitle" type="xs:string" />
+      <xs:element name="alternativeTitleNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="partiesInvolvedGroup">
+    <xs:sequence>
+      <xs:element name="involvedParty" type="xs:string" />
+      <xs:element name="involvedOnBehalfOf" type="xs:string" />
+      <xs:element name="involvedRole" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="geographicPlaceGroup">
+    <xs:sequence>
+      <xs:element name="geographicPlace" type="xs:string" />
+      <xs:element name="geographicPlaceNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="timePeriodGroup">
+    <xs:sequence>
+      <xs:element name="timePeriod" type="xs:string" />
+      <xs:element name="timePeriodNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="culturalGroup">
+    <xs:sequence>
+      <xs:element name="culture" type="xs:string" />
+      <xs:element name="cultureNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="archaeologicalSiteGroup">
+    <xs:sequence>
+      <xs:element name="archaeologicalSite" type="xs:string" />
+      <xs:element name="archaeologicalSiteNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraStatusGroup">
+    <xs:sequence>
+      <xs:element name="statusGroup" type="xs:string" />
+      <xs:element name="statusIndividual" type="xs:string" />
+      <xs:element name="status" type="xs:string" />
+      <xs:element name="statusDate" type="xs:date" />
+      <xs:element name="statusNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraDocumentationGroup">
+    <xs:sequence>
+      <xs:element name="documentationGroup" type="xs:string" />
+      <xs:element name="documentationIndividual" type="xs:string" />
+      <xs:element name="documentationStatus" type="xs:string" />
+      <xs:element name="documentationDate" type="xs:date" />
+      <xs:element name="documentationNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
