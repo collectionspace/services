@@ -27,18 +27,18 @@
       <xs:sequence>
         <xs:element name="dutyOfCareNumber" type="xs:string"/>
         <xs:element name="dutyOfCareDate" type="xs:date"/>
-        <xs:element name="dutyOfCareTitle" type="xs:string"/>
+        <xs:element name="title" type="xs:string"/>
 
-        <xs:element name="dutyOfCareNotes" type="dutyOfCareNotes"/>
+        <xs:element name="notes" type="notes"/>
         <xs:element name="partiesInvolvedGroupList" type="partiesInvolvedGroupList"/>
-        <xs:element name="dutyOfCareDetailGroupList" type="dutyOfCareDetailGroupList"/>
+        <xs:element name="detailGroupList" type="detailGroupList"/>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
 
-  <xs:complexType name="dutyOfCareNotes">
+  <xs:complexType name="notes">
     <xs:sequence>
-      <xs:element name="dutyOfCareNote" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
@@ -56,13 +56,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="dutyOfCareDetailGroupList">
+  <xs:complexType name="detailGroupList">
     <xs:sequence>
-      <xs:element name="dutyOfCareDetailGroup" type="dutyOfCareDetailGroup" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="detailGroup" type="detailGroup" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="dutyOfCareDetailGroup">
+  <xs:complexType name="detailGroup">
     <xs:sequence>
       <xs:element name="detailType" type="xs:string"/>
       <xs:element name="detailLevel" type="xs:string"/>
