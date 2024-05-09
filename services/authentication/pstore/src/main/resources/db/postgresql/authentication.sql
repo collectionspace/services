@@ -14,7 +14,16 @@ ALTER TABLE users ADD COLUMN IF NOT EXISTS salt VARCHAR(128);
 
 -- Upgrade older users tables to 8.0
 
-UPDATE users SET passwd = concat('{SHA-256}', '{', salt, '}', passwd)  WHERE left(passwd, 1) <> '{';
+UPDATE users
+SET passwd = concat(
+  '{SHA-256}',
+  CASE
+    WHEN salt IS NULL THEN ''
+    ELSE concat('{', salt, '}')
+  END,
+  passwd
+)
+WHERE left(passwd, 1) <> '{';
 
 -- Create tokens table required in 8.0
 
