@@ -27,6 +27,7 @@ import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.chronology.ChronologyAuthorityResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
+import org.collectionspace.services.dutyofcare.DutyofcareResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
 import org.collectionspace.services.iterationreport.IterationreportResource;
@@ -80,7 +81,6 @@ import java.util.Set;
 
 
 
-//import org.collectionspace.services.common.FileUtils;
 import org.collectionspace.services.authorization.RoleResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
@@ -142,6 +142,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new InsuranceResource());
         addResourceToMapAndSingletons(new IntakeResource());
         addResourceToMapAndSingletons(new DimensionResource());
+        addResourceToMapAndSingletons(new DutyofcareResource());
         addResourceToMapAndSingletons(new RelationResource());
         addResourceToMapAndSingletons(new LoaninResource());
         addResourceToMapAndSingletons(new LoanoutResource());

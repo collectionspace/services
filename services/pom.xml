@@ -73,6 +73,7 @@
 		<module>transport</module>
 		<module>conditioncheck</module>
 		<module>conservation</module>
+		<module>dutyofcare</module>
 		<module>valuationcontrol</module>
 		<module>objectexit</module>
 		<module>propagation</module>
