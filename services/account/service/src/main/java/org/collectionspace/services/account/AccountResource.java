@@ -285,8 +285,13 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             uiConfig.put("csrf", csrfConfig);
         }
 
+        String tenantId = token.getTenantId();
+        TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        TenantBindingType tenantBinding = tenantBindingConfigReader.getTenantBinding(tenantId);
+
         uiConfig.put("token", tokenId);
-        uiConfig.put("tenantId", token.getTenantId());
+        uiConfig.put("tenantId", tenantId);
+        uiConfig.put("tenantLoginUrl", ConfigUtils.getUILoginSuccessUrl(tenantBinding));
 
         String uiConfigJS;
 
