@@ -4,6 +4,7 @@
 package org.collectionspace.services.common;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -23,6 +24,7 @@ import javax.servlet.ServletContext;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 
 import org.collectionspace.authentication.AuthN;
@@ -468,7 +470,10 @@ public class ServiceMain {
     }
 
 	private String applyRepositoryUpgradeScripts(Connection conn, String dataSourceName, String repositoryName, String fromVersion, String stage) throws Exception {
-		Map<String, List<File>> upgradeScriptFiles = getRepositoryUpgradeScripts(dataSourceName, repositoryName, fromVersion, stage);
+		String currentVersion = getClass().getPackage().getImplementationVersion();
+		String toVersion = currentVersion.replaceFirst("-SNAPSHOT$", "");
+
+		Map<String, List<File>> upgradeScriptFiles = getRepositoryUpgradeScripts(dataSourceName, repositoryName, fromVersion, toVersion, stage);
 		Set<String> versions = upgradeScriptFiles.keySet();
 
 		String upgradedToVersion = null;
@@ -479,13 +484,10 @@ public class ServiceMain {
 
 				List<File> scriptFiles =  upgradeScriptFiles.get(version);
 
-				for (File file : scriptFiles) {
-					if (file.getName().endsWith(".sql")) {
-						logger.info(String.format("Running %s", file.getName()));
+				// getRepositoryUpgradeScripts ensures that version is a safe string.
+				String versionUpdateStatement = "UPDATE cspace.meta SET version = '" + version + "';";
 
-						JDBCTools.runScript(conn, file);
-					}
-				}
+				JDBCTools.runScripts(conn, scriptFiles, versionUpdateStatement);
 
 				upgradedToVersion = version;
 			}
@@ -511,29 +513,22 @@ public class ServiceMain {
 		try {
 			conn = JDBCTools.getConnection(dataSourceName, repositoryName, cspaceInstanceId);
 
-			conn.setAutoCommit(false);
+			JDBCTools.createCspaceMetaTableIfNotExists(conn);
 
 			String version = JDBCTools.getRepositoryDatabaseVersion(conn);
 
 			logger.info(String.format("%s repository current version is %s", repositoryName, version));
 
-			String upgradedToVersion = applyRepositoryUpgradeScripts(conn, dataSourceName, repositoryName, version, stage);
+			String fromVersion = (version == null) ? "0" : version;
+			String upgradedToVersion = applyRepositoryUpgradeScripts(conn, dataSourceName, repositoryName, fromVersion, stage);
 
 			if (upgradedToVersion != null) {
 				logger.info(String.format("%s repository upgraded to version %s", repositoryName, upgradedToVersion));
-
-				JDBCTools.setRepositoryDatabaseVersion(conn, upgradedToVersion);
 			}
-
-			conn.commit();
 		}
 		catch (Exception e) {
 			logger.error(String.format("Could not upgrade %s repository", repositoryName));
 			logger.error(e.toString());
-
-			if (conn != null) {
-				conn.rollback();
-			}
 		}
 		finally {
 			if (conn != null) {
@@ -568,7 +563,7 @@ public class ServiceMain {
 		}
 	}
 
-	public static Map<String, List<File>> getRepositoryUpgradeScripts(String dataSourceName, String repositoryName, String fromVersion, String stage) throws Exception {
+	public static Map<String, List<File>> getRepositoryUpgradeScripts(String dataSourceName, String repositoryName, String fromVersion, String toVersion, String stage) throws Exception {
 		Map<String, List<File>> upgradeScriptFiles = new LinkedHashMap<>();
 
 		Path upgradesPath = Paths.get(
@@ -586,14 +581,19 @@ public class ServiceMain {
 
 		File[] upgradesDirectoryFiles = upgradesDirectory.listFiles();
 		List<File> versionDirectories = new ArrayList<>();
-		VersionComparator versionComparator = new VersionComparator();
+		ComparableVersion comparableFromVersion = new ComparableVersion(fromVersion);
+		ComparableVersion comparableToVersion = new ComparableVersion(toVersion);
 
 		for (File file : upgradesDirectoryFiles) {
+			String filename = file.getName();
+			ComparableVersion comparableFilenameVersion = new ComparableVersion(filename);
+
 			if (
 				file.isDirectory()
 				&& file.canRead()
-				&& file.getName().matches("^\\d+\\.\\d+(\\.\\d+)?$")
-				&& versionComparator.compare(fromVersion, file.getName()) < 0
+				&& filename.matches("^\\d+\\.\\d+(\\.\\d+)?$")
+				&& comparableFromVersion.compareTo(comparableFilenameVersion) < 0
+				&& comparableToVersion.compareTo(comparableFilenameVersion) >= 0
 			) {
 				versionDirectories.add(file);
 			}
@@ -606,23 +606,21 @@ public class ServiceMain {
 			File versionStageDirectory = versionStagePath.toFile();
 
 			if (versionStageDirectory.isDirectory()) {
-				File[] versionStageFiles = versionStageDirectory.listFiles();
-
-				Arrays.sort(versionStageFiles);
-
-				List<File> scriptFiles = new ArrayList<>();
-
-				for (File file : versionStageFiles) {
-					if (
-						file.isFile()
-						&& file.canRead()
-					) {
-						scriptFiles.add(file);
+				File[] versionScriptFiles = versionStageDirectory.listFiles(new FileFilter() {
+					@Override
+					public boolean accept(File pathname) {
+						return (
+							pathname.isFile()
+							&& pathname.getName().endsWith(".sql")
+							&& pathname.canRead()
+						);
 					}
-				}
+				});
 
-				if (scriptFiles.size() > 0) {
-					upgradeScriptFiles.put(versionDir.getName(), scriptFiles);
+				Arrays.sort(versionScriptFiles);
+
+				if (versionScriptFiles.length > 0) {
+					upgradeScriptFiles.put(versionDir.getName(), Arrays.asList(versionScriptFiles));
 				}
 			}
 		}
@@ -630,60 +628,13 @@ public class ServiceMain {
 		return upgradeScriptFiles;
 	}
 
-	/**
-	 * From https://dzone.com/articles/semantically-ordering-versioned-file-names-in-java
-	 */
-	public static class VersionComparator implements Comparator<String> {
-		private static final Pattern NUMBERS = Pattern.compile("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-
-		@Override
-		public final int compare(String o1, String o2) {
-			// Optional "NULLS LAST" semantics:
-			if (o1 == null || o2 == null) {
-				return o1 == null ? o2 == null ? 0 : -1 : 1;
-			}
-
-			// Splitting both input strings by the above patterns
-			String[] split1 = NUMBERS.split(o1);
-			String[] split2 = NUMBERS.split(o2);
-			int length = Math.min(split1.length, split2.length);
-
-			// Looping over the individual segments
-			for (int i = 0; i < length; i++) {
-				char c1 = split1[i].charAt(0);
-				char c2 = split2[i].charAt(0);
-				int cmp = 0;
-
-				// If both segments start with a digit, sort them
-				// numerically using BigInteger to stay safe
-				if (c1 >= '0' && c1 <= '9' && c2 >= 0 && c2 <= '9')
-					cmp = new BigInteger(split1[i]).compareTo(
-							new BigInteger(split2[i]));
-
-				// If we haven't sorted numerically before, or if
-				// numeric sorting yielded equality (e.g 007 and 7)
-				// then sort lexicographically
-				if (cmp == 0)
-					cmp = split1[i].compareTo(split2[i]);
-
-				// Abort once some prefix has unequal ordering
-				if (cmp != 0)
-					return cmp;
-			}
-
-			// If we reach this, then both strings have equally
-			// ordered prefixes, but maybe one string is longer than
-			// the other (i.e. has more segments)
-			return split1.length - split2.length;
-		}
-	}
-
 	public static class VersionFileNameComparator implements Comparator<File> {
-		private final VersionComparator versionComparator = new VersionComparator();
-
 		@Override
 		public final int compare(File o1, File o2) {
-			return versionComparator.compare(o1.getName(), o2.getName());
+			ComparableVersion v1 = new ComparableVersion(o1.getName());
+			ComparableVersion v2 = new ComparableVersion(o2.getName());
+
+			return v1.compareTo(v2);
 		}
 	}
 

@@ -30,8 +30,15 @@ import javax.sql.DataSource;
 import java.sql.DatabaseMetaData;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.SequenceInputStream;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -40,6 +47,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -47,6 +55,7 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 
@@ -781,18 +790,18 @@ public class JDBCTools {
         return exists;
     }
 
-    public static void createCspaceMetaTable(Connection conn) throws SQLException {
+    public static void createCspaceMetaTableIfNotExists(Connection conn) throws SQLException {
         Statement stmt = conn.createStatement();
 
-        stmt.executeUpdate("CREATE SCHEMA cspace");
-        stmt.executeUpdate("CREATE TABLE cspace.meta (version varchar(32))");
-        stmt.executeUpdate("INSERT INTO cspace.meta (version) values (null)");
+        stmt.executeUpdate("CREATE SCHEMA IF NOT EXISTS cspace");
+        stmt.executeUpdate("CREATE TABLE IF NOT EXISTS cspace.meta (version varchar(32))");
+        stmt.executeUpdate("INSERT INTO cspace.meta (version) SELECT NULL WHERE NOT EXISTS (SELECT * FROM cspace.meta)");
 
         stmt.close();
     }
 
     public static String getRepositoryDatabaseVersion(Connection conn) throws SQLException {
-        String version = "0";
+        String version = null;
 
         if (cspaceMetaTableExists(conn)) {
             Statement stmt = conn.createStatement();
@@ -810,9 +819,7 @@ public class JDBCTools {
     }
 
     public static void setRepositoryDatabaseVersion(Connection conn, String version) throws SQLException {
-        if (!cspaceMetaTableExists(conn)) {
-            createCspaceMetaTable(conn);
-        }
+        createCspaceMetaTableIfNotExists(conn);
 
         PreparedStatement stmt = conn.prepareStatement("UPDATE cspace.meta SET version = ?");
 
@@ -822,13 +829,48 @@ public class JDBCTools {
         stmt.close();
     }
 
+    /**
+     * Run multiple SQL scripts followed by a given SQL statement, in a single transaction.
+     *
+     * @param conn The database connection.
+     * @param scriptFiles The SQL script files to run.
+     * @param afterStatement An SQL statement to execute after the statements in the script files have been executed. Can be null.
+     * @throws FileNotFoundException
+     * @throws UnsupportedEncodingException
+     */
+    public static void runScripts(Connection conn, List<File> scriptFiles, String afterStatement) throws FileNotFoundException, UnsupportedEncodingException {
+        List<InputStream> streams = new ArrayList<>();
+
+        for (File scriptFile : scriptFiles) {
+            streams.add(new FileInputStream(scriptFile));
+        }
+
+        if (afterStatement != null) {
+            streams.add(IOUtils.toInputStream(";" + afterStatement, Charset.forName("UTF-8")));
+        }
+
+        InputStream concatenatedStream = new SequenceInputStream(Collections.enumeration(streams));
+
+        runScript(conn, new BufferedReader(new InputStreamReader(concatenatedStream, Charset.forName("UTF-8"))));
+    }
+
+    /**
+     * Run an SQL script. The statements in the given file are executed in a single transaction.
+     * @param conn The database connection.
+     * @param scriptFile The SQL script file to run.
+     * @throws FileNotFoundException
+     */
     public static void runScript(Connection conn, File scriptFile) throws FileNotFoundException {
+        runScript(conn, new BufferedReader(new FileReader(scriptFile)));
+    }
+
+    private static void runScript(Connection conn, Reader reader) throws FileNotFoundException {
         ScriptRunner scriptRunner = new ScriptRunner(conn);
 
         scriptRunner.setAutoCommit(false);
         scriptRunner.setStopOnError(true);
         scriptRunner.setSendFullScript(true);
 
-        scriptRunner.runScript(new BufferedReader(new FileReader(scriptFile)));
+        scriptRunner.runScript(reader);
     }
 }

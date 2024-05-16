@@ -346,6 +346,7 @@
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/config" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/scripts" />
 		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/db/jdbc_drivers" />
+		<delete failonerror="false" dir="${jee.server.cspace}/cspace/services/db/postgresql/upgrade" />
 		<delete failonerror="false">
 			<fileset dir="${jee.server.cspace}/cspace/config/services" excludes="local/**" />
 		</delete>
