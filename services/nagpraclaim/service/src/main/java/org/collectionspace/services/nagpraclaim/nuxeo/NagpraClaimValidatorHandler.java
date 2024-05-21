@@ -14,16 +14,54 @@
  */
 package org.collectionspace.services.nagpraclaim.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.nagpraclaim.NagpraclaimsCommon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class NagpraClaimValidatorHandler implements ValidatorHandler {
+/**
+ * Validation handler for NagpraClaim. Checks for the common part and claimNumber on create.
+ */
+public class NagpraClaimValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+
+    private static final String COMMON_PART_MISSING = "Validation exception: nagpraclaims_common part is missing";
+    private static final String CLAIM_NUMBER_MISSING =
+            "Validation exception: The nagpra claim field \"claimNumber\" cannot be empty or missing";
+
+    private final Logger logger = LoggerFactory.getLogger(NagpraClaimValidatorHandler.class);
 
     @Override
-    public void validate(Action action, ServiceContext ctx) throws InvalidDocumentException {
-        // TODO Auto-generated method stub
-        System.out.println("NagpraClaimValidatorHandler executed.");
+    protected Class<?> getCommonPartClass() {
+        return NagpraclaimsCommon.class;
     }
+
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
+        final NagpraclaimsCommon claim = (NagpraclaimsCommon) getCommonPart();
+        if (claim == null) {
+            logger.error(COMMON_PART_MISSING);
+            throw new InvalidDocumentException(COMMON_PART_MISSING);
+        }
+
+        final String claimNumber = claim.getClaimNumber();
+        if (claimNumber == null || claimNumber.isEmpty()) {
+            logger.error(CLAIM_NUMBER_MISSING);
+            throw new InvalidDocumentException(CLAIM_NUMBER_MISSING);
+        }
+    }
+
+    @Override
+    protected void handleGet() {}
+
+    @Override
+    protected void handleGetAll() {}
+
+    @Override
+    protected void handleUpdate() {}
+
+    @Override
+    protected void handleDelete() {}
 }
