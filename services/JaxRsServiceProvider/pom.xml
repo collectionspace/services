@@ -234,11 +234,18 @@
             <artifactId>org.collectionspace.services.uoc.service</artifactId>
             <version>${project.version}</version>
         </dependency>
+      <!-- legacy claim -->
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.claim.service</artifactId>
             <version>${project.version}</version>
         </dependency>
+      <!-- new claim as of 8.1.0 -->
+      <dependency>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>org.collectionspace.services.nagpraclaim.service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.exhibition.service</artifactId>
