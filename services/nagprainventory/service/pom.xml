@@ -29,11 +29,6 @@
       <artifactId>org.collectionspace.services.nagprainventory.client</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
 
     <!-- External dependencies -->
     <dependency>
@@ -44,6 +39,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
+      <scope>test</scope>
     </dependency>
 
     <!-- javax -->
