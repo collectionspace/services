@@ -93,7 +93,7 @@
   <xs:complexType name="culturalAffiliationGroup">
     <xs:sequence>
       <xs:element name="tribeOrNation" type="xs:string"/>
-      <xs:element name="includeInNotice" type="xs:boolean"/>
+      <xs:element name="includeInNotice" type="xs:string"/>
       <xs:element name="determinedBy" type="xs:string"/>
       <xs:element name="determinationDate" type="xs:date"/>
       <xs:element name="basisOfDetermination" type="xs:string"/>
