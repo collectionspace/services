@@ -14,16 +14,52 @@
  */
 package org.collectionspace.services.summarydocumentation.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.summarydocumentation.SummaryDocumentationsCommon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SummaryDocumentationValidatorHandler implements ValidatorHandler {
+public class SummaryDocumentationValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+
+    private static final String COMMON_PART_MISSING =
+            "Validation exception: summarydocumentations_common part is missing";
+    private static final String DOCUMENTATION_NUMBER_MISSING =
+            "Validation exception: The summary documentation field \"documentationNumber\" cannot be empty or missing";
+
+    private final Logger logger = LoggerFactory.getLogger(SummaryDocumentationValidatorHandler.class);
 
     @Override
-    public void validate(Action action, ServiceContext ctx) throws InvalidDocumentException {
-        // TODO Auto-generated method stub
-        System.out.println("SummarydocumentationValidatorHandler executed.");
+    protected Class<?> getCommonPartClass() {
+        return SummaryDocumentationsCommon.class;
     }
+
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
+        final SummaryDocumentationsCommon summary = (SummaryDocumentationsCommon) getCommonPart();
+        if (summary == null) {
+            logger.error(COMMON_PART_MISSING);
+            throw new InvalidDocumentException(COMMON_PART_MISSING);
+        }
+
+        final String documentationNumber = summary.getDocumentationNumber();
+        if (documentationNumber == null || documentationNumber.isEmpty()) {
+            logger.error(DOCUMENTATION_NUMBER_MISSING);
+            throw new InvalidDocumentException(DOCUMENTATION_NUMBER_MISSING);
+        }
+    }
+
+    @Override
+    protected void handleGet() {}
+
+    @Override
+    protected void handleGetAll() {}
+
+    @Override
+    protected void handleUpdate() {}
+
+    @Override
+    protected void handleDelete() {}
 }
