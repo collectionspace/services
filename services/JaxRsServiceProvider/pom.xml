@@ -436,6 +436,12 @@
         <artifactId>org.collectionspace.services.nagprainventory.service</artifactId>
         <version>${project.version}</version>
       </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.summarydocumentation.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
       <!--dependency>
           <groupId>org.collectionspace.services</groupId>
           <artifactId>org.collectionspace.services.query.service</artifactId>

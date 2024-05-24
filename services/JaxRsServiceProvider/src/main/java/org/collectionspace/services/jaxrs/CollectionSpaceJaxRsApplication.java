@@ -39,6 +39,7 @@ import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
 import org.collectionspace.services.nagpraclaim.NagpraClaimResource;
 import org.collectionspace.services.nagprainventory.NagpraInventoryResource;
+import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
 import org.collectionspace.services.transport.TransportResource;
 import org.collectionspace.services.uoc.UocResource;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
@@ -169,6 +170,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new IterationreportResource());
         addResourceToMapAndSingletons(new ChronologyAuthorityResource());
         addResourceToMapAndSingletons(new NagpraInventoryResource());
+        addResourceToMapAndSingletons(new SummaryDocumentationResource());
 
         singletons.add(new IDResource());
 
