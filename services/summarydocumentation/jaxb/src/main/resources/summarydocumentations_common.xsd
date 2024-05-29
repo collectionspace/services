@@ -19,7 +19,13 @@
 >
 
   <!--  SummaryDocumentation Information Group -->
-  <xs:element name="summary_documentations_common">
+  <xs:element name="summarydocumentations_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="SummaryDocumentationsCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element name="documentationNumber" type="xs:string" />
