@@ -100,10 +100,16 @@
     <xs:sequence>
       <xs:element name="tribeOrNation" type="xs:string"/>
       <xs:element name="includeInNotice" type="xs:string"/>
-      <xs:element name="determinedBy" type="xs:string"/>
+      <xs:element name="determinedByList" type="determinedByList"/>
       <xs:element name="determinationDate" type="xs:date"/>
       <xs:element name="basisOfDetermination" type="xs:string"/>
       <xs:element name="determinationNote" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="determinedByList">
+    <xs:sequence>
+      <xs:element name="determinedBy" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
