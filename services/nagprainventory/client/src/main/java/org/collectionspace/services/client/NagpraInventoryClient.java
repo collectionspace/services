@@ -14,13 +14,13 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.nagprainventory.NagprainventoriesCommon;
+import org.collectionspace.services.nagprainventory.NagpraInventoriesCommon;
 
 /**
  * NagpraInventoryClient.java
  */
 public class NagpraInventoryClient
-        extends AbstractCommonListPoxServiceClientImpl<NagpraInventoryProxy, NagprainventoriesCommon> {
+        extends AbstractCommonListPoxServiceClientImpl<NagpraInventoryProxy, NagpraInventoriesCommon> {
 
     public static final String SERVICE_NAME = "nagprainventories";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;

@@ -18,7 +18,7 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
 import org.collectionspace.services.common.document.ValidatorHandlerImpl;
-import org.collectionspace.services.nagprainventory.NagprainventoriesCommon;
+import org.collectionspace.services.nagprainventory.NagpraInventoriesCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,12 +35,12 @@ public class NagpraInventoryValidatorHandler extends ValidatorHandlerImpl<PoxPay
 
     @Override
     protected Class<?> getCommonPartClass() {
-        return NagprainventoriesCommon.class;
+        return NagpraInventoriesCommon.class;
     }
 
     @Override
     protected void handleCreate() throws InvalidDocumentException {
-        final NagprainventoriesCommon inventory = (NagprainventoriesCommon) getCommonPart();
+        final NagpraInventoriesCommon inventory = (NagpraInventoriesCommon) getCommonPart();
         if (inventory == null) {
             logger.error(COMMON_PART_MISSING);
             throw new InvalidDocumentException(COMMON_PART_MISSING);

@@ -25,6 +25,12 @@
 
   <!--  NagpraInventory Information Group -->
   <xs:element name="nagprainventories_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="NagpraInventoriesCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element name="inventoryNumber" type="xs:string" />

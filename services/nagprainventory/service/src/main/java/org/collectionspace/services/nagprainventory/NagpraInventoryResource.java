@@ -48,7 +48,7 @@ public class NagpraInventoryResource extends NuxeoBasedResource {
     }
 
     @Override
-    public Class<NagprainventoriesCommon> getCommonPartClass() {
-        return NagprainventoriesCommon.class;
+    public Class<NagpraInventoriesCommon> getCommonPartClass() {
+        return NagpraInventoriesCommon.class;
     }
 }

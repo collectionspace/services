@@ -31,13 +31,13 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.nagprainventory.NagprainventoriesCommon;
+import org.collectionspace.services.nagprainventory.NagpraInventoriesCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
 public class NagpraInventoryServiceTest
-        extends AbstractPoxServiceTestImpl<AbstractCommonList, NagprainventoriesCommon> {
+        extends AbstractPoxServiceTestImpl<AbstractCommonList, NagpraInventoriesCommon> {
 
     private final Logger logger = LoggerFactory.getLogger(NagpraInventoryServiceTest.class);
 
@@ -162,9 +162,9 @@ public class NagpraInventoryServiceTest
 
         // Get the common part of the response and verify that it is not null.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        NagprainventoriesCommon nagprainventoryCommon = null;
+        NagpraInventoriesCommon nagprainventoryCommon = null;
         if (payloadInputPart != null) {
-            nagprainventoryCommon = (NagprainventoriesCommon) payloadInputPart.getBody();
+            nagprainventoryCommon = (NagpraInventoriesCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(nagprainventoryCommon);
     }
@@ -271,9 +271,9 @@ public class NagpraInventoryServiceTest
 
         // Extract the common part from the response.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        NagprainventoriesCommon nagprainventoryCommon = null;
+        NagpraInventoriesCommon nagprainventoryCommon = null;
         if (payloadInputPart != null) {
-            nagprainventoryCommon = (NagprainventoriesCommon) payloadInputPart.getBody();
+            nagprainventoryCommon = (NagpraInventoriesCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(nagprainventoryCommon);
 
@@ -281,7 +281,7 @@ public class NagpraInventoryServiceTest
         nagprainventoryCommon.setInventoryNumber("updated-" + nagprainventoryCommon.getInventoryNumber());
 
         logger.debug("to be updated object");
-        logger.debug(objectAsXmlString(nagprainventoryCommon, NagprainventoriesCommon.class));
+        logger.debug(objectAsXmlString(nagprainventoryCommon, NagpraInventoriesCommon.class));
 
         setupUpdate();
 
@@ -308,15 +308,15 @@ public class NagpraInventoryServiceTest
 
         // Extract the updated common part from the response.
         payloadInputPart = input.getPart(client.getCommonPartName());
-        NagprainventoriesCommon updatedNagprainventoriesCommon = null;
+        NagpraInventoriesCommon updatedNagpraInventoriesCommon = null;
         if (payloadInputPart != null) {
-            updatedNagprainventoriesCommon = (NagprainventoriesCommon) payloadInputPart.getBody();
+            updatedNagpraInventoriesCommon = (NagpraInventoriesCommon) payloadInputPart.getBody();
         }
-        Assert.assertNotNull(updatedNagprainventoriesCommon);
+        Assert.assertNotNull(updatedNagpraInventoriesCommon);
 
         // Check selected fields in the updated common part.
         Assert.assertEquals(
-                updatedNagprainventoriesCommon.getInventoryNumber(),
+                updatedNagpraInventoriesCommon.getInventoryNumber(),
                 nagprainventoryCommon.getInventoryNumber(),
                 "Data in updated object did not match submitted data.");
     }
@@ -467,7 +467,7 @@ public class NagpraInventoryServiceTest
      * @throws Exception
      */
     private PoxPayloadOut createNagpraInventoryInstance(String nagprainventoryNumber) throws Exception {
-        NagprainventoriesCommon nagprainventoryCommon = new NagprainventoriesCommon();
+        NagpraInventoriesCommon nagprainventoryCommon = new NagpraInventoriesCommon();
         nagprainventoryCommon.setInventoryNumber(nagprainventoryNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
@@ -475,7 +475,7 @@ public class NagpraInventoryServiceTest
                 multipart.addPart(new NagpraInventoryClient().getCommonPartName(), nagprainventoryCommon);
 
         logger.debug("to be created, nagprainventory common");
-        logger.debug(objectAsXmlString(nagprainventoryCommon, NagprainventoriesCommon.class));
+        logger.debug(objectAsXmlString(nagprainventoryCommon, NagpraInventoriesCommon.class));
 
         return multipart;
     }
@@ -492,13 +492,13 @@ public class NagpraInventoryServiceTest
     }
 
     @Override
-    protected NagprainventoriesCommon updateInstance(NagprainventoriesCommon commonPartObject) {
+    protected NagpraInventoriesCommon updateInstance(NagpraInventoriesCommon commonPartObject) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected void compareUpdatedInstances(NagprainventoriesCommon original, NagprainventoriesCommon updated) {
+    protected void compareUpdatedInstances(NagpraInventoriesCommon original, NagpraInventoriesCommon updated) {
         // TODO Auto-generated method stub
     }
 }

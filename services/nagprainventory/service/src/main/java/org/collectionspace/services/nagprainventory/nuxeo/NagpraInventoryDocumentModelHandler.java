@@ -21,10 +21,10 @@
  */
 package org.collectionspace.services.nagprainventory.nuxeo;
 
-import org.collectionspace.services.nagprainventory.NagprainventoriesCommon;
+import org.collectionspace.services.nagprainventory.NagpraInventoriesCommon;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * NagpraInventoryDocumentModelHandler
  */
-public class NagpraInventoryDocumentModelHandler extends NuxeoDocumentModelHandler<NagprainventoriesCommon> {}
+public class NagpraInventoryDocumentModelHandler extends NuxeoDocumentModelHandler<NagpraInventoriesCommon> {}
