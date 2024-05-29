@@ -34,8 +34,6 @@ import org.slf4j.LoggerFactory;
 @Produces("application/xml")
 public class NagpraInventoryResource extends NuxeoBasedResource {
 
-    final Logger logger = LoggerFactory.getLogger(NagpraInventoryResource.class);
-
     @Override
     protected String getVersionString() {
         final String lastChangeRevision = "$LastChangedRevision$";
