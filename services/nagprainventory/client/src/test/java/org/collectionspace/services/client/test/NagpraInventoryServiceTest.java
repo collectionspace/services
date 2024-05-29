@@ -462,7 +462,7 @@ public class NagpraInventoryServiceTest
     /**
      * Creates the nagprainventory instance.
      *
-     * @param nagprainventoryNumber the exhibition number
+     * @param nagprainventoryNumber the inventory number
      * @return the multipart output
      * @throws Exception
      */
