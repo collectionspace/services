@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    HeldInTrust schema (XSD)
+
+    Entity  : HeldInTrust
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="1.0" elementFormDefault="unqualified"
+  xmlns="http://collectionspace.org/services/heldintrust"
+  targetNamespace="http://collectionspace.org/services/heldintrust"
+  version="0.1"
+>
+
+  <!--  HeldInTrust Information Group -->
+  <xs:element name="heldintrusts_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="HeldInTrustsCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="heldInTrustNumber" type="xs:string" />
+        <xs:element name="typeOfAgreement" type="xs:string" />
+        <xs:element name="owners" type="owners" />
+        <xs:element name="plannedReturnGroupList" type="plannedReturnGroupList" />
+        <xs:element name="agreementDescriptions" type="agreementDescriptions" />
+        <xs:element name="agreementRenewalDates" type="agreementRenewalDates" />
+        <xs:element name="agreementApprovalGroupList" type="agreementApprovalGroupList" />
+        <xs:element name="correspondenceGroupList" type="correspondenceGroupList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="owners">
+    <xs:sequence>
+      <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="plannedReturnGroupList">
+    <xs:sequence>
+      <xs:element name="plannedReturnGroup" type="plannedReturnGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="plannedReturnGroup">
+    <xs:sequence>
+      <xs:element name="plannedReturnDate" type="xs:date" />
+      <xs:element name="plannedReturnNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agreementDescriptions">
+    <xs:sequence>
+      <xs:element name="agreementDescription" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agreementRenewalDates">
+    <xs:sequence>
+      <xs:element name="agreementRenewalDate" type="xs:date" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agreementApprovalGroupList">
+    <xs:sequence>
+      <xs:element name="agreementApprovalGroup" type="agreementApprovalGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="agreementApprovalGroup">
+    <xs:sequence>
+      <xs:element name="agreementGroup" type="xs:string" />
+      <xs:element name="agreementIndividual" type="xs:string" />
+      <xs:element name="agreementStatus" type="xs:string" />
+      <xs:element name="agreementDate" type="xs:date" />
+      <xs:element name="agreementNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="correspondenceGroupList">
+    <xs:sequence>
+      <xs:element name="correspondenceGroup" type="correspondenceGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="correspondenceGroup">
+    <xs:sequence>
+      <xs:element name="correspondenceSender" type="xs:string" />
+      <xs:element name="correspondenceRecipient" type="xs:string" />
+      <xs:element name="correspondenceType" type="xs:string" />
+      <xs:element name="correspondenceDate" type="xs:date" />
+      <xs:element name="correspondenceSummary" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
