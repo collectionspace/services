@@ -99,6 +99,7 @@
 		<module>iterationreport</module>
 		<module>chronology</module>
 		<module>nagpraclaim</module>
+		<module>nagprainventory</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>
