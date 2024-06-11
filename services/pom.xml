@@ -44,6 +44,7 @@
 		<module>hyperjaxb</module>
 		<module>common</module>
 		<module>structureddate</module>
+		<module>nagpra-jaxb</module>
 		<module>systeminfo</module>
 		<module>authority</module>
 		<module>authorization-mgt</module>		<!-- relies on authorization -->
@@ -100,6 +101,7 @@
 		<module>chronology</module>
 		<module>nagpraclaim</module>
 		<module>nagprainventory</module>
+		<module>summarydocumentation</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>
@@ -112,7 +114,6 @@
 		<dependency>
 			<groupId>org.testng</groupId>
 			<artifactId>testng</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>

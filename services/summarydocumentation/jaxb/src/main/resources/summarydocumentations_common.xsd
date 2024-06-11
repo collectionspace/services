@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Summarydocumentation schema (XSD)
+
+    Entity  : SummaryDocumentation
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns:nagpra="http://collectionspace.org/services/nagpra"
+  xmlns="http://collectionspace.org/services/summarydocumentation"
+  targetNamespace="http://collectionspace.org/services/summarydocumentation"
+  version="0.1"
+>
+
+  <xs:import namespace="http://collectionspace.org/services/nagpra"
+             schemaLocation="maven:org.collectionspace.services:org.collectionspace.services.nagpra-jaxb:jar::!/nagpra_common.xsd"/>
+
+  <!--  SummaryDocumentation Information Group -->
+  <xs:element name="summarydocumentations_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="SummaryDocumentationsCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="documentationNumber" type="xs:string" />
+        <xs:element name="originationDate" type="xs:date" />
+        <xs:element name="titles" type="titles" />
+        <xs:element name="types" type="types" />
+        <xs:element name="consultationNotes" type="nagpra:consultationNotes" />
+        <xs:element name="treatmentNotes" type="nagpra:treatmentNotes" />
+
+        <xs:element name="partiesInvolvedGroupList" type="nagpra:partiesInvolvedGroupList" />
+        <xs:element name="culturalAffiliationGroupList" type="nagpra:culturalAffiliationGroupList" />
+        <xs:element name="statusGroupList" type="nagpra:statusGroupList" />
+        <xs:element name="geographicPlaceGroupList" type="nagpra:geographicPlaceGroupList" />
+        <xs:element name="timePeriodGroupList" type="nagpra:timePeriodGroupList" />
+        <xs:element name="culturalGroupList" type="nagpra:culturalGroupList" />
+        <xs:element name="archaeologicalSiteGroupList" type="nagpra:archaeologicalSiteGroupList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="titles">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string" minOccurs="0" maxOccurs="unbounded"  />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="types">
+    <xs:sequence>
+      <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
