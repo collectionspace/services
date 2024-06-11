@@ -103,6 +103,7 @@
 		<module>nagprainventory</module>
 		<module>summarydocumentation</module>
 		<module>heldintrust</module>
+		<module>consultation</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>
