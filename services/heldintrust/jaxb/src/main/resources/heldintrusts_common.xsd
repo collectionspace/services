@@ -34,6 +34,9 @@
         <xs:element name="agreementRenewalDates" type="agreementRenewalDates" />
         <xs:element name="agreementApprovalGroupList" type="agreementApprovalGroupList" />
         <xs:element name="correspondenceGroupList" type="correspondenceGroupList" />
+
+        <xs:element name="culturalCareNotes" type="culturalCareNotes" />
+        <xs:element name="accessLimitationsGroupList" type="accessLimitationsGroupList" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -41,6 +44,12 @@
   <xs:complexType name="owners">
     <xs:sequence>
       <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="culturalCareNotes">
+    <xs:sequence>
+      <xs:element name="culturalCareNote" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 
@@ -98,6 +107,23 @@
       <xs:element name="correspondenceType" type="xs:string" />
       <xs:element name="correspondenceDate" type="xs:date" />
       <xs:element name="correspondenceSummary" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessLimitationsGroupList">
+    <xs:sequence>
+      <xs:element name="accessLimitationsGroup" type="accessLimitationsGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="accessLimitationsGroup">
+    <xs:sequence>
+      <xs:element name="limitationType" type="xs:string" />
+      <xs:element name="limitationLevel" type="xs:string" />
+      <xs:element name="limitationDetails" type="xs:string" />
+      <xs:element name="requester" type="xs:string" />
+      <xs:element name="requestOnBehalfOf" type="xs:string" />
+      <xs:element name="requestDate" type="xs:date" />
     </xs:sequence>
   </xs:complexType>
 </xs:schema>
