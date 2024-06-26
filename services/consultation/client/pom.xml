@@ -16,33 +16,12 @@
     <!-- CollectionSpace dependencies -->
     <dependency>
       <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
-      <optional>true</optional>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.jaxb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.common</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
       <artifactId>org.collectionspace.services.client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.collectionspace.services</groupId>
       <artifactId>org.collectionspace.services.consultation.jaxb</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.person.client</artifactId>
       <version>${project.version}</version>
     </dependency>
 
