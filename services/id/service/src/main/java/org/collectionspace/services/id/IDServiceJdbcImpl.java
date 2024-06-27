@@ -52,8 +52,6 @@
 // At that point, we'll also need to add code to handle concurrent
 // requests to modify that state.
 // @TODO Verify access (public, protected, or private) to service methods.
-// @TODO As long as we're using JDBC, use PreparedStatements, not Statements,
-// throughout the code below.
 // @TODO Re-consider beginnings of method names:
 // - "store/get" versus:
 // - "store/retrieve"
@@ -96,6 +94,10 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate$
  */
 public class IDServiceJdbcImpl implements IDService {
+
+    private static final String SELECT_LAST_ID = "SELECT last_generated_id FROM id_generators WHERE csid = ?";
+    private static final String SELECT_LAST_ID_FOR_UPDATE =
+        "SELECT last_generated_id FROM id_generators WHERE csid = ? FOR UPDATE";
 
     final Logger logger = LoggerFactory.getLogger(IDServiceJdbcImpl.class);
     final String TABLE_NAME = "id_generator";
@@ -221,12 +223,10 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @param  csid     An identifier for an ID generator.
      *
-     * @param  generator  An ID generator, including the values of its constituent parts.
-     *
      * @param  lastId  The value of the last-generated ID associated with that ID generator.
      *
      * @throws  IllegalStateException if a storage-related error occurred.
-     *      *
+     *
      * @throws  DocumentNotFoundException if the requested ID generator could not be found.
      */
     public void updateLastID(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, String csid, String lastId)
@@ -239,36 +239,26 @@ public class IDServiceJdbcImpl implements IDService {
 
         // @TODO: Add checks for authorization to perform this operation.
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName))) {
             conn.setAutoCommit(false);
-            Statement stmt = conn.createStatement();
+            boolean idGeneratorFound;
 
             // Test whether this ID generator already exists in the database.
             // Using a 'SELECT ... FOR UPDATE' statement will temporarily
             // lock this row for updates from any other connection, until
             // the UPDATE is committed, below.
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid "
-                    + "FROM id_generators "
-                    + "WHERE csid='"
-                    + csid
-                    + "' FOR UPDATE");
-
-            boolean moreRows = rs.next();
-
-            boolean idGeneratorFound = true;
-            if (!moreRows) {
-                idGeneratorFound = false;
+            try (PreparedStatement select = conn.prepareStatement(SELECT_LAST_ID_FOR_UPDATE)) {
+                select.setString(1, csid);
+                try (ResultSet rs = select.executeQuery()) {
+                    idGeneratorFound = rs.next();
+                }
             }
 
             // If this ID generator was not found in the
             // database, an update can't be performed.
             // Close the connection and throw an exception.
             if (!idGeneratorFound) {
-                conn.close();
                 throw new DocumentNotFoundException(
                         "Error updating ID generator '" + csid
                         + "': generator could not be found in the database.");
@@ -277,15 +267,16 @@ public class IDServiceJdbcImpl implements IDService {
             // Otherwise, if this ID generator exists in the database,
             // update its Last ID value.
             final String SQL_STATEMENT_STRING =
-                    "UPDATE id_generators SET "
-                    + "last_generated_id = ? "
-                    + "WHERE csid = ?";
+                "UPDATE id_generators SET "
+                + "last_generated_id = ? "
+                + "WHERE csid = ?";
 
-            PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-            ps.setString(1, lastId);
-            ps.setString(2, csid);
-
-            int rowsUpdated = ps.executeUpdate();
+            int rowsUpdated;
+            try (PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING)) {
+                ps.setString(1, lastId);
+                ps.setString(2, csid);
+                rowsUpdated = ps.executeUpdate();
+            }
 
             if (rowsUpdated != 1) {
                 throw new IllegalStateException(
@@ -294,26 +285,12 @@ public class IDServiceJdbcImpl implements IDService {
             }
 
             conn.commit();
-            conn.close();
 
             logger.debug("Successfully updated last-generated ID: " + lastId);
-
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             throw new IllegalStateException("Error updating last-generated "
                     + "ID in the database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-            	logger.error("Error closing JDBC connection: ", e);
-                // Do nothing here
-            }
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -341,39 +318,23 @@ public class IDServiceJdbcImpl implements IDService {
         // @TODO: Add checks for authorization to perform this operation.
 
         String lastId = null;
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
-            Statement stmt = conn.createStatement();
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+             PreparedStatement stmt = conn.prepareStatement(SELECT_LAST_ID)) {
+            stmt.setString(1, csid);
 
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT last_generated_id FROM id_generators "
-                    + "WHERE csid='" + csid + "'");
-
-            boolean moreRows = rs.next();
-            if (!moreRows) {
-                throw new DocumentNotFoundException(
-                        "ID generator " + "\'" + csid + "\'" + " could not be found.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                boolean moreRows = rs.next();
+                if (!moreRows) {
+                    throw new DocumentNotFoundException("ID generator '" + csid + "' could not be found.");
+                }
+                lastId = (rs.getString(1) != null ? rs.getString(1) : "");
+                logger.debug("> retrieved ID: " + lastId);
             }
-            lastId = (rs.getString(1) != null ? rs.getString(1) : "");
-            logger.debug("> retrieved ID: " + lastId);
 
-            rs.close();
-
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             throw new IllegalStateException("Error retrieving last ID "
                     + "from the database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
         }
 
         logger.debug("> returning ID: " + lastId);
@@ -440,8 +401,8 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @param  csid     An identifier for an ID generator.
      *
-     * @param  serializedGenerator  A serialized ID generator, reflecting its current state,
-     *                              including the values of its constituent parts.
+     * @param  serializedIDGenerator  A serialized ID generator, reflecting its current state,
+     *                                including the values of its constituent parts.
      *
      * @throws  BadRequestException if the provided representation of an
      *          ID generator instance is not in the correct format, contains
@@ -458,31 +419,24 @@ public class IDServiceJdbcImpl implements IDService {
         // @TODO Add checks for authorization to perform this operation.
 
         if (Tools.isBlank(serializedIDGenerator)) {
-            String msg = String.format("ID generator payload is null or empty.");
+            String msg = "ID generator payload is null or empty.";
             logger.warn(msg);
             throw new BadRequestException(msg);
         }
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
-            Statement stmt = conn.createStatement();
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+             PreparedStatement stmt = conn.prepareStatement(SELECT_LAST_ID)) {
+            stmt.setString(1, csid);
+
+            // @TODO This check should extend further, to other aspects
 
             // Test whether this ID generator already exists in the database.
-            //
-            // @TODO This check should extend further, to other aspects
             // of the generator, such as its URI, if any, and its structure,
             // so we avoid duplication based on content as well as identifier.
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid FROM id_generators "
-                    + "WHERE csid='" + csid + "'");
-
-            boolean moreRows = rs.next();
-
-            boolean idGeneratorFound = true;
-            if (!moreRows) {
-                idGeneratorFound = false;
+            boolean idGeneratorFound;
+            try (ResultSet rs = stmt.executeQuery()) {
+                idGeneratorFound = rs.next();
             }
 
             // If this ID generator already exists in the database,
@@ -500,25 +454,20 @@ public class IDServiceJdbcImpl implements IDService {
                 // Otherwise, add this new ID generator, as a new record to
                 // the database.
             } else {
+                int rowsUpdated;
 
                 final String SQL_STATEMENT_STRING =
-                        "INSERT INTO id_generators "
-                        + "("
-                        + "csid, "
-                        + "id_generator_state, "
-                        + "last_generated_id"
-                        + ")"
-                        + " VALUES (?, ?, ?)";
+                    "INSERT INTO id_generators (csid, id_generator_state, last_generated_id) VALUES (?, ?, ?)";
 
-                PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-                ps.setString(1, csid);
-                ps.setString(2, serializedIDGenerator);
-                ps.setNull(3, java.sql.Types.VARCHAR);
+                try (PreparedStatement insert = conn.prepareStatement(SQL_STATEMENT_STRING)) {
+                    insert.setString(1, csid);
+                    insert.setString(2, serializedIDGenerator);
+                    insert.setNull(3, java.sql.Types.VARCHAR);
+                    rowsUpdated = insert.executeUpdate();
+                }
 
-                int rowsUpdated = ps.executeUpdate();
                 if (rowsUpdated != 1) {
-                    String msg =
-                        String.format("Error adding new ID generator '%s'to the database.", csid);
+                    String msg = String.format("Error adding new ID generator '%s' to the database.", csid);
                     logger.warn(msg);
                     throw new IllegalStateException(msg);
                 }
@@ -527,20 +476,10 @@ public class IDServiceJdbcImpl implements IDService {
 
             logger.debug("> successfully added ID generator: " + csid);
 
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             String msg = "Error adding new ID generator to the database: " + e.getMessage();
             logger.warn(msg);
             throw new IllegalStateException(msg);
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
         }
 
     }
@@ -565,49 +504,31 @@ public class IDServiceJdbcImpl implements IDService {
 
         IDGeneratorInstance instance = null;
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
-            Statement stmt = conn.createStatement();
+        final String query = "SELECT csid, displayname, description, id_generator_state, last_generated_id " +
+                             "FROM id_generators WHERE csid= ?";
 
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid, displayname, description, "
-                    + "id_generator_state, last_generated_id FROM id_generators "
-                    + "WHERE csid='" + csid + "'");
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, csid);
 
-            boolean moreRows = rs.next();
-            if (!moreRows) {
-                throw new DocumentNotFoundException(
-                        "ID generator with ID "
-                        + "\'" + csid + "\'"
-                        + " could not be found.");
+            try (ResultSet rs = stmt.executeQuery()) {
+                boolean moreRows = rs.next();
+                if (!moreRows) {
+                    throw new DocumentNotFoundException("ID generator with ID '" + csid + "' could not be found.");
+                }
+
+                instance = new IDGeneratorInstance();
+                instance.setDisplayName(rs.getString(2) != null ? rs.getString(2) : "");
+                instance.setDescription(rs.getString(3) != null ? rs.getString(3) : "");
+                instance.setGeneratorState(rs.getString(4) != null ? rs.getString(4) : "");
+                instance.setLastGeneratedID(rs.getString(5) != null ? rs.getString(5) : "");
             }
-
-            instance = new IDGeneratorInstance();
-            instance.setDisplayName(rs.getString(2) != null ? rs.getString(2) : "");
-            instance.setDescription(rs.getString(3) != null ? rs.getString(3) : "");
-            instance.setGeneratorState(rs.getString(4) != null ? rs.getString(4) : "");
-            instance.setLastGeneratedID(rs.getString(5) != null ? rs.getString(5) : "");
-
-            rs.close();
-
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             throw new IllegalStateException(
-                    "Error retrieving ID generator "
-                    + "\'" + csid + "\'"
-                    + " from database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
+                "Error retrieving ID generator '" + csid + "' from database: " + e.getMessage());
         }
+        // Do nothing here
 
         logger.debug("> retrieved SettableIDGenerator: "
                 + instance.getGeneratorState());
@@ -635,24 +556,16 @@ public class IDServiceJdbcImpl implements IDService {
         Map<String, IDGeneratorInstance> generators =
                 new LinkedHashMap<String, IDGeneratorInstance>();
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
-            Statement stmt = conn.createStatement();
+        final String query = "SELECT csid, displayname, description, "
+                             + "id_generator_state, last_generated_id FROM id_generators "
+                             + "ORDER BY displayname ASC";
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
 
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid, displayname, description, "
-                    + "id_generator_state, last_generated_id FROM id_generators "
-                    + "ORDER BY displayname ASC"); // , priority ASC");
-
-            boolean moreRows = rs.next();
-            if (!moreRows) {
-                return generators;
-            }
-
-            IDGeneratorInstance instance = null;
-            while (moreRows = rs.next()) {
+            IDGeneratorInstance instance;
+            while (rs.next()) {
                 instance = new IDGeneratorInstance();
                 instance.setDisplayName(rs.getString(2) != null ? rs.getString(2) : "[No display name]");
                 instance.setDescription(rs.getString(3) != null ? rs.getString(3) : "[No description]");
@@ -660,23 +573,9 @@ public class IDServiceJdbcImpl implements IDService {
                 instance.setLastGeneratedID(rs.getString(5) != null ? rs.getString(5) : "[No last generated ID]");
                 generators.put(rs.getString(1), instance);
             }
-
-            rs.close();
-
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             throw new IllegalStateException(
-                    "Error retrieving ID generators "
-                    + " from database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
+                "Error retrieving ID generators  from database: " + e.getMessage());
         }
 
         return generators;
@@ -743,7 +642,7 @@ public class IDServiceJdbcImpl implements IDService {
      *
      * @param  csid  An identifier for an ID generator.
      *
-     * @param  serializedGenerator
+     * @param  serializedIDGenerator
      *           A serialized ID generator, reflecting its current state,
      *           including the values of its constituent parts.
      *
@@ -778,82 +677,54 @@ public class IDServiceJdbcImpl implements IDService {
         }
         String lastId = generator.getCurrentID();
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
+        // Test whether this ID generator already exists in the database.
+        // Using a 'SELECT ... FOR UPDATE' statement will temporarily
+        // lock this row for updates from any other connection, until
+        // the UPDATE is committed, below.
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+             PreparedStatement select = conn.prepareStatement(SELECT_LAST_ID_FOR_UPDATE)) {
             conn.setAutoCommit(false);
-            Statement stmt = conn.createStatement();
+            select.setString(1, csid);
 
-            // Test whether this ID generator already exists in the database.
-            // Using a 'SELECT ... FOR UPDATE' statement will temporarily
-            // lock this row for updates from any other connection, until
-            // the UPDATE is committed, below.
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid "
-                    + "FROM id_generators "
-                    + "WHERE csid='"
-                    + csid
-                    + "' FOR UPDATE");
-
-            boolean moreRows = rs.next();
-
-            boolean idGeneratorFound = true;
-            if (!moreRows) {
-                idGeneratorFound = false;
+            boolean idGeneratorFound;
+            try (ResultSet rs = select.executeQuery()) {
+                idGeneratorFound = rs.next();
             }
 
             // If this ID generator was not found in the
             // database, an update can't be performed.
             // Close the connection and throw an exception.
             if (!idGeneratorFound) {
-                conn.close();
                 throw new DocumentNotFoundException(
-                        "Error updating ID generator '" + csid
-                        + "': generator could not be found in the database.");
+                    "Error updating ID generator '" + csid
+                    + "': generator could not be found in the database.");
             } // end if (idGeneratorFound)
 
             // Otherwise, if this ID generator exists in the database,
             // update its record.
-            final String SQL_STATEMENT_STRING =
-                    "UPDATE id_generators SET "
-                    + "id_generator_state = ?, "
-                    + "last_generated_id = ? "
-                    + "WHERE csid = ?";
-
-            PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-            ps.setString(1, serializedIDGenerator);
-            ps.setString(2, lastId);
-            ps.setString(3, csid);
-
-            int rowsUpdated = ps.executeUpdate();
+            int rowsUpdated;
+            final String SQL_STATEMENT_STRING = "UPDATE id_generators SET "
+                                      + "id_generator_state = ?, "
+                                      + "last_generated_id = ? "
+                                      + "WHERE csid = ?";
+            try (PreparedStatement update = conn.prepareStatement(SQL_STATEMENT_STRING)) {
+                update.setString(1, serializedIDGenerator);
+                update.setString(2, lastId);
+                update.setString(3, csid);
+                rowsUpdated = update.executeUpdate();
+            }
 
             if (rowsUpdated != 1) {
-                throw new IllegalStateException(
-                        "Error updating ID generator '" + csid
-                        + "'" + " in the database.");
+                throw new IllegalStateException("Error updating ID generator '" + csid + "' in the database.");
             }
 
             conn.commit();
-            conn.close();
 
             logger.debug("Successfully updated ID Generator: " + csid);
-
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
-            throw new IllegalStateException(
-                    "Error updating ID generator in the database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
+            throw new IllegalStateException("Error updating ID generator in the database: " + e.getMessage());
         }
-
     }
 
     //////////////////////////////////////////////////////////////////////
@@ -875,66 +746,43 @@ public class IDServiceJdbcImpl implements IDService {
 
         // @TODO: Add checks for authorization to perform this operation.
 
-        Connection conn = null;
-        try {
-            String repositoryName = ctx.getRepositoryName();
-            conn = getJdbcConnection(getDatabaseName(repositoryName));
-            Statement stmt = conn.createStatement();
-
+        String repositoryName = ctx.getRepositoryName();
+        try (Connection conn = getJdbcConnection(getDatabaseName(repositoryName));
+             PreparedStatement select = conn.prepareStatement(SELECT_LAST_ID)) {
+            select.setString(1, csid);
             // Test whether this ID generator already exists in the database.
-            ResultSet rs = stmt.executeQuery(
-                    "SELECT csid FROM id_generators "
-                    + "WHERE csid='"
-                    + csid + "'");
-            boolean moreRows = rs.next();
-
-            boolean idGeneratorFound = true;
-            if (!moreRows) {
-                idGeneratorFound = false;
+            boolean idGeneratorFound;
+            try (ResultSet rs = select.executeQuery()) {
+                idGeneratorFound = rs.next();
             }
 
             // If this ID generator already exists in the database,
             // update its record.
             if (idGeneratorFound) {
-
-                final String SQL_STATEMENT_STRING =
-                        "DELETE FROM id_generators WHERE csid = ?";
-
-                PreparedStatement ps = conn.prepareStatement(SQL_STATEMENT_STRING);
-                ps.setString(1, csid);
-
-                int rowsUpdated = ps.executeUpdate();
+                int rowsUpdated;
+                final String SQL_DELETE = "DELETE FROM id_generators WHERE csid = ?";
+                try (PreparedStatement delete = conn.prepareStatement(SQL_DELETE)) {
+                    delete.setString(1, csid);
+                    rowsUpdated = delete.executeUpdate();
+                }
                 if (rowsUpdated != 1) {
-                    throw new IllegalStateException(
-                            "Error deleting ID generator '" + csid
-                            + "'" + " in the database.");
+                    throw new IllegalStateException("Error deleting ID generator '" + csid + "' in the database.");
                 }
 
                 // Otherwise, throw an exception, which indicates that the requested
                 // ID generator was not found.
             } else {
                 throw new DocumentNotFoundException(
-                        "Error deleting ID generator '" + csid
-                        + "': generator could not be found in the database.");
+                    "Error deleting ID generator '" + csid
+                    + "': generator could not be found in the database.");
             } // end if (idGeneratorFound)
 
             logger.debug("Successfully deleted ID generator: " + csid);
 
-        } catch (IllegalStateException ise) {
-            throw ise;
         } catch (SQLException e) {
             throw new IllegalStateException(
-                    "Error deleting ID generator in database: " + e.getMessage());
-        } finally {
-            try {
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                // Do nothing here
-            }
+                "Error deleting ID generator in database: " + e.getMessage());
         }
-
     }
 
     // -------------------
