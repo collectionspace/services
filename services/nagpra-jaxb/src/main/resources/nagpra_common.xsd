@@ -23,16 +23,16 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="alternativeTitleGroupList">
+  <xs:complexType name="alternativeIdentifierGroupList">
     <xs:sequence>
-      <xs:element name="alternativeTitleGroup" type="alternativeTitleGroup" minOccurs="0" maxOccurs="unbounded"  />
+      <xs:element name="alternativeIdentifierGroup" type="alternativeIdentifierGroup" minOccurs="0" maxOccurs="unbounded"  />
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="alternativeTitleGroup">
+  <xs:complexType name="alternativeIdentifierGroup">
     <xs:sequence>
-      <xs:element name="alternativeTitle" type="xs:string" />
-      <xs:element name="alternativeTitleNote" type="xs:string" />
+      <xs:element name="alternativeIdentifier" type="xs:string" />
+      <xs:element name="alternativeIdentifierNote" type="xs:string" />
     </xs:sequence>
   </xs:complexType>
 
