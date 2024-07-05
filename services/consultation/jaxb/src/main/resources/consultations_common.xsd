@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Consultation schema (XSD)
+
+    Entity  : Consultation
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0" elementFormDefault="unqualified"
+  xmlns="http://collectionspace.org/services/consultation"
+  targetNamespace="http://collectionspace.org/services/consultation"
+  version="0.1"
+>
+
+  <!--  Consultation Information Group -->
+  <xs:element name="consultations_common">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="consultationNumber" type="xs:string" />
+        <xs:element name="consultationDate" type="xs:date" />
+        <xs:element name="reason" type="xs:string" />
+        <xs:element name="note" type="notes" />
+
+        <xs:element name="consultationLogGroupList" type="consultationLogGroupList" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="notes">
+    <xs:sequence>
+      <xs:element name="note" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="consultationLogGroupList">
+    <xs:sequence>
+      <xs:element name="consultationLogGroup" type="consultationLogGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="consultationLogGroup">
+    <xs:sequence>
+      <xs:element name="consultType" type="xs:string" />
+      <xs:element name="consultParties" type="consultParties" />
+      <xs:element name="consultStatus" type="xs:string" />
+      <xs:element name="consultDate" type="xs:date" />
+      <xs:element name="consultNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="consultParties">
+    <xs:sequence>
+      <xs:element name="consultParty" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

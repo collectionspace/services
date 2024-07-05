@@ -27,6 +27,7 @@ import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.chronology.ChronologyAuthorityResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
+import org.collectionspace.services.consultation.ConsultationResource;
 import org.collectionspace.services.dutyofcare.DutyofcareResource;
 import org.collectionspace.services.heldintrust.HeldInTrustResource;
 import org.collectionspace.services.id.IDResource;
@@ -173,6 +174,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new NagpraInventoryResource());
         addResourceToMapAndSingletons(new SummaryDocumentationResource());
         addResourceToMapAndSingletons(new HeldInTrustResource());
+        addResourceToMapAndSingletons(new ConsultationResource());
 
         singletons.add(new IDResource());
 
