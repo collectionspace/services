@@ -42,6 +42,7 @@
 ), person_owners AS (
   SELECT ag.*,
     string_agg(primaryterm.termdisplayname, '|' ORDER BY term_hier.pos) as primarydisplayname,
+    string_agg(regexp_replace(primaryterm.termflag, '^.*\)''(.*)''$', '\1'), '|' ORDER BY term_hier.pos) as primarytermflag,
     intake.csid as intakecsid
   FROM intakes intake
   INNER JOIN intakes_common_currentowners co ON co.id = intake.id AND co.pos = 0
@@ -79,6 +80,7 @@
   INNER JOIN misc on misc.id = media.id AND misc.lifecyclestate != 'deleted'
 )
 select owner.primarydisplayname as primarydisplayname,
+  owner.primarytermflag as primarytermflag,
   owner.addressplace1 as addressplace1,
   owner.addressplace2 as addressplace2,
   owner.addresstype as addresstype,
@@ -99,6 +101,11 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 	<field name="primarydisplayname" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="primarydisplayname"/>
 		<property name="com.jaspersoft.studio.field.label" value="primarydisplayname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="primarytermflag" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="primarytermflag"/>
+		<property name="com.jaspersoft.studio.field.label" value="primarytermflag"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
 	<field name="addressplace1" class="java.lang.String">
@@ -185,6 +192,14 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Current Owner]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44"
+					uuid="74dd1df6-9339-458e-bf3f-1dc3153ed738">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Term Flag]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="200" y="0" width="100" height="44"
@@ -293,6 +308,13 @@ left join related_object_media media on media.objcsid = obj.csid]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{primarydisplayname}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30"
+					uuid="d3843a94-a23e-4fed-abf5-4a2f605996d0">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{primarytermflag}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30"
