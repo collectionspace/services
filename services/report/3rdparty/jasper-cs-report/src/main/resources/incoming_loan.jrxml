@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="incomingloan" pageWidth="2050" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1445cbb0-a0d2-462a-9e21-e9d0696bcd9a">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="incomingloan" pageWidth="2450" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="1445cbb0-a0d2-462a-9e21-e9d0696bcd9a">
     <property name="com.jaspersoft.studio.data.sql.tables" value=""/>
     <property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
     <property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -46,8 +46,11 @@ SELECT
   address.addressstateorprovince,
   loanin.loanindate,
   loanin.loanrenewalapplicationdate,
+  loanin.loanpurpose,
+  loanin.loaninconditions,
   objects.objectnumber,
   objects.objectname,
+  objects.briefdescription,
   loanvaluation.valueamount AS loanvalueamount,
   loanvaluation.valuecurrency AS loanvaluecurrency,
   objvaluation.valueamount AS objvalueamount,
@@ -73,15 +76,18 @@ LEFT JOIN (
     hier.name AS csid,
     relation.subjectcsid,
     obj.objectnumber,
-    ong.objectname
+    ong.objectname,
+    string_agg(bd.item, '; ') AS briefdescription
   FROM collectionobjects_common obj
   INNER JOIN hierarchy hier ON hier.id = obj.id
   INNER JOIN misc on misc.id = obj.id AND misc.lifecyclestate != 'deleted'
   INNER JOIN relations_common relation ON relation.objectcsid = hier.name
     AND relation.subjectdocumenttype = 'Loanin'
     AND relation.objectdocumenttype = 'CollectionObject'
+  LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id
   LEFT JOIN hierarchy ong_hier ON ong_hier.parentid = obj.id AND ong_hier.primarytype = 'objectNameGroup' AND ong_hier.pos = 0
   LEFT JOIN objectnamegroup ong ON ong.id = ong_hier.id
+  GROUP BY relation.subjectcsid, obj.objectnumber, ong.objectname, hier.name
 ) objects ON objects.subjectcsid = hier.name
 LEFT JOIN valuations loanvaluation ON loanvaluation.subjectcsid = hier.name
 LEFT JOIN valuations objvaluation ON objvaluation.subjectcsid = objects.csid
@@ -186,6 +192,21 @@ $P!{whereclause}]]>
         <property name="com.jaspersoft.studio.field.name" value="loanstatusdate"/>
         <property name="com.jaspersoft.studio.field.label" value="loanstatusdate"/>
         <property name="com.jaspersoft.studio.field.tree.path" value="loanstatusgroup"/>
+    </field>
+    <field name="briefdescription" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="briefdescription"/>
+        <property name="com.jaspersoft.studio.field.label" value="briefdescription"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+    </field>
+    <field name="loanpurpose" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="loanpurpose"/>
+        <property name="com.jaspersoft.studio.field.label" value="loanpurpose"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="loansin_common"/>
+    </field>
+    <field name="loaninconditions" class="java.lang.String">
+        <property name="com.jaspersoft.studio.field.name" value="loaninconditions"/>
+        <property name="com.jaspersoft.studio.field.label" value="loaninconditions"/>
+        <property name="com.jaspersoft.studio.field.tree.path" value="loansin_common"/>
     </field>
     <background>
         <band splitType="Stretch"/>
@@ -344,6 +365,27 @@ $P!{whereclause}]]>
                 <textElement markup="styled"/>
                 <text><![CDATA[Loan status date]]></text>
             </staticText>
+            <staticText>
+                <reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="16bb764d-d439-4260-9693-7e8d2b1cf987">
+                <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <textElement markup="styled"/>
+                <text><![CDATA[Related object description]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Column header" x="2100" y="0" width="100" height="44" uuid="47e84d71-02e6-478d-9a4f-b17fe6b06ff2">
+                <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <textElement markup="styled"/>
+                <text><![CDATA[Loan condition]]></text>
+            </staticText>
+            <staticText>
+                <reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="0b79ca91-bc7e-44b9-be35-c742145a81ce">
+                <property name="com.jaspersoft.studio.unit.width" value="px"/>
+                </reportElement>
+                <textElement markup="styled"/>
+                <text><![CDATA[Loan purpose]]></text>
+            </staticText>
         </band>
     </columnHeader>
     <detail>
@@ -468,6 +510,24 @@ $P!{whereclause}]]>
                     <property name="com.jaspersoft.studio.unit.y" value="px"/>
                 </reportElement>
                 <textFieldExpression><![CDATA[$F{loanstatusdate}]]></textFieldExpression>
+            </textField>
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="1a55ae01-a09d-4932-92f1-e9ab02418a7b">
+                <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{briefdescription}]]></textFieldExpression>
+            </textField>
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="85052a12-c720-4f29-a904-6e255c4cd0f3">
+                <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{loaninconditions}]]></textFieldExpression>
+            </textField>
+            <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+                <reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="1cc83667-f7d1-4d52-a38b-b0a6f18e9713">
+                <property name="com.jaspersoft.studio.unit.y" value="px"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{loanpurpose}]]></textFieldExpression>
             </textField>
         </band>
     </detail>
