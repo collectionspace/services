@@ -211,22 +211,6 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
         createBlob(testName, false /*with POST*/);
     }
 
-    //    @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods =
-    // {"update"})
-    //    public void updateWithBlob(String testName) throws Exception {
-    //        logger.debug(testBanner(testName, CLASS_NAME));
-    //        setupCreate();
-    //        RestrictedMediaClient client = new RestrictedMediaClient();
-    //        PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-    //        Response res = client.create(multipart);
-    //        assertStatusCode(res, testName);
-    //        String csid = extractId(res);
-    //
-    //
-    //        allResourceIdsCreated.add(extractId(res)); // Store the IDs from every resource created by tests so they
-    // can be deleted after tests have been run.
-    //    }
-
     // ---------------------------------------------------------------
     // Utility tests : tests of code used in tests above
     // ---------------------------------------------------------------
@@ -288,8 +272,5 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
     @Override
     @Test(dataProvider = "testName",
           dependsOnMethods = {"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
-    public void CRUDTests(String testName) {
-        // TODO Auto-generated method stub
-
-    }
+    public void CRUDTests(String testName) {}
 }
