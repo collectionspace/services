@@ -36,7 +36,6 @@ import org.collectionspace.services.restrictedmedia.LanguageList;
 import org.collectionspace.services.restrictedmedia.RestrictedMediaCommon;
 import org.collectionspace.services.restrictedmedia.SubjectList;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
-import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -108,7 +107,7 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
     public void createBlob(String testName, boolean fromUri) throws Exception {
         setupCreate();
 
-        // First create a media record
+        // First create a restricted media record
         RestrictedMediaClient client = new RestrictedMediaClient();
         PoxPayloadOut multipart = createMediaInstance(createIdentifier());
         Response mediaRes = client.create(multipart);
@@ -121,66 +120,65 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
                 mediaRes.close();
             }
         }
-        //
-        // Next, create a blob record to associate with the media record
-        // FIXME: REM - 1/2012, This method is too large.  Break it up.  The code below
-        // could be put into a utility class that could also be used by the blob service tests.
-        //
-        String currentDir = this.getResourceDir();
-        String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
-        File blobsDir = new File(blobsDirPath);
-        if (blobsDir.exists()) {
+
+        String currentDir = getResourceDir();
+        File blobsDir = new File(currentDir, BLOBS_DIR);
+        File blob = findBlobForMedia(blobsDir);
+        if (blob != null) {
+            createBlob(blob, fromUri, testName, mediaCsid);
+        } else {
+            logger.warn("Could not find blobbable file in {}", blobsDir);
+        }
+    }
+
+    public File findBlobForMedia(File blobsDir) {
+        if (blobsDir.exists() && blobsDir.canRead()) {
             File[] children = blobsDir.listFiles();
             if (children != null && children.length > 0) {
-                File blobFile = null;
-                //
                 // Since Media records can have only a single associated
                 // blob, we'll stop after we find a valid candidate.
-                //
                 for (File child : children) {
                     if (isBlobbable(child)) {
-                        blobFile = child;
-                        break;
+                        return child;
                     }
-                }
-                //
-                // If we found a good blob candidate file, then try to
-                // create the blob record
-                //
-                if (blobFile != null) {
-                    client = new RestrictedMediaClient();
-                    Response res = null;
-                    String mimeType = this.getMimeType(blobFile);
-                    logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
-                    logger.debug("MIME type is: " + mimeType);
-                    if (fromUri) {
-                        URL childUrl = blobFile.toURI().toURL();
-                        res = client.createBlobFromUri(mediaCsid, childUrl.toString());
-                    } else {
-                        MultipartFormDataOutput formData = new MultipartFormDataOutput();
-                        OutputPart outputPart = formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
-                        res = client.createBlobFromFormData(mediaCsid, formData);
-                    }
-                    try {
-                        assertStatusCode(res, testName);
-                        String blobCsid = extractId(res);
-                        if (isMediaCleanup()) {
-                            allResourceIdsCreated.add(blobCsid);
-                            allResourceIdsCreated.add(mediaCsid);
-                        }
-                    } finally {
-                        if (res != null) {
-                            res.close();
-                        }
-                    }
-                } else {
-                    logger.debug("Directory: " + blobsDirPath + " contains no readable files.");
                 }
             } else {
-                logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
+                logger.warn("Directory: {} is empty or cannot be read.", blobsDir);
             }
         } else {
-            logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+            logger.warn("Directory: {} is missing or cannot be read.", blobsDir);
+        }
+
+        return null;
+    }
+
+    public void createBlob(File blobFile, boolean fromUri, String testName, String mediaCsid) throws Exception {
+        logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
+
+        String mimeType = getMimeType(blobFile);
+        logger.debug("MIME type is: " + mimeType);
+
+        Response res;
+        RestrictedMediaClient client = new RestrictedMediaClient();
+        if (fromUri) {
+            URL childUrl = blobFile.toURI().toURL();
+            res = client.createBlobFromUri(mediaCsid, childUrl.toString());
+        } else {
+            MultipartFormDataOutput formData = new MultipartFormDataOutput();
+            formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
+            res = client.createBlobFromFormData(mediaCsid, formData);
+        }
+        try {
+            assertStatusCode(res, testName);
+            String blobCsid = extractId(res);
+            if (isMediaCleanup()) {
+                allResourceIdsCreated.add(blobCsid);
+                allResourceIdsCreated.add(mediaCsid);
+            }
+        } finally {
+            if (res != null) {
+                res.close();
+            }
         }
     }
 
@@ -258,9 +256,7 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
     @Override
     protected RestrictedMediaCommon updateInstance(final RestrictedMediaCommon original) {
         RestrictedMediaCommon result = new RestrictedMediaCommon();
-
         result.setTitle("updated-" + original.getTitle());
-
         return result;
     }
 
