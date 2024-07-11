@@ -42,9 +42,7 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
- * MediaServiceTest, carries out tests against a deployed and running Media Service. <p/>
- * $LastChangedRevision:  $
- * $LastChangedDate:  $
+ * RestrictedMediaServiceTest, carries out tests against a deployed and running Restricted Media Service.
  */
 public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, RestrictedMediaCommon> {
 
@@ -131,6 +129,12 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
         }
     }
 
+    /**
+     * Iterate a directory for a file which matches isBlobbable
+     *
+     * @param blobsDir the directory to iterate
+     * @return a blob or null
+     */
     public File findBlobForMedia(File blobsDir) {
         if (blobsDir.exists() && blobsDir.canRead()) {
             File[] children = blobsDir.listFiles();
@@ -153,10 +157,10 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
     }
 
     public void createBlob(File blobFile, boolean fromUri, String testName, String mediaCsid) throws Exception {
-        logger.debug("Processing file URI: " + blobFile.getAbsolutePath());
+        logger.debug("Processing file URI: {}", blobFile.getAbsolutePath());
 
         String mimeType = getMimeType(blobFile);
-        logger.debug("MIME type is: " + mimeType);
+        logger.debug("MIME type is: {}", mimeType);
 
         Response res;
         RestrictedMediaClient client = new RestrictedMediaClient();
@@ -168,6 +172,7 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
             formData.addFormData("file", blobFile, MediaType.valueOf(mimeType));
             res = client.createBlobFromFormData(mediaCsid, formData);
         }
+
         try {
             assertStatusCode(res, testName);
             String blobCsid = extractId(res);
@@ -191,12 +196,16 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
     public void createMediaAndBlobWithUri(String testName) throws Exception {
         RestrictedMediaClient client = new RestrictedMediaClient();
         PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-        Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
+
+        // purge the original
+        Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true);
         String mediaCsid = null;
         try {
             assertStatusCode(mediaRes, testName);
             mediaCsid = extractId(mediaRes);
-            //			allResourceIdsCreated.add(mediaCsid); // Re-enable this and also add code to delete the associated blob
+            if (isMediaCleanup()) {
+                allResourceIdsCreated.add(mediaCsid);
+            }
         } finally {
             if (mediaRes != null) {
                 mediaRes.close();
