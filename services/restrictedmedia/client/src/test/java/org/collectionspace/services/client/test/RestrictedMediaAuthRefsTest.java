@@ -29,26 +29,21 @@ import java.util.Map;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PersonAuthorityClientUtils;
 import org.collectionspace.services.client.PersonClient;
-import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.RestrictedMediaClient;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.collectionspace.services.restrictedmedia.RestrictedMediaCommon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
 /**
- * MediaAuthRefsTest, carries out Authority References tests against a deployed and running Media (aka Loans Out) Service.
- * $LastChangedRevision:  $
- * $LastChangedDate:  $
+ * RestrictedMediaAuthRefsTest, carries out Authority References tests against a deployed and running
+ * Restricted Media Service.
  */
 public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     private final Logger logger = LoggerFactory.getLogger(RestrictedMediaAuthRefsTest.class);
@@ -57,8 +52,7 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
     private List<String> mediaIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
-    private String depositorRefName = null;
-    private String title = null;
+    private String publisherRefName = null;
 
     @Override
     public String getServicePathComponent() {
@@ -72,40 +66,42 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
 
     @Override
     protected CollectionSpaceClient getClientInstance() {
-        throw new UnsupportedOperationException(); // method not supported (or needed) in this test class
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
-        throw new UnsupportedOperationException(); // method not supported (or needed) in this test class
+        throw new UnsupportedOperationException();
     }
 
     @Override
     protected AbstractCommonList getCommonList(Response response) {
-        throw new UnsupportedOperationException(); // method not supported (or needed) in this test class
+        throw new UnsupportedOperationException();
     }
 
     private PoxPayloadOut createMediaInstance(String depositorRefName, String title) throws Exception {
-        this.title = title;
-        this.depositorRefName = depositorRefName;
         RestrictedMediaCommon media = new RestrictedMediaCommon();
         media.setTitle(title);
+        media.setPublisher(depositorRefName);
 
         PoxPayloadOut multipart = new PoxPayloadOut(RestrictedMediaClient.SERVICE_PAYLOAD_NAME);
-        PayloadOutputPart commonPart = multipart.addPart(new RestrictedMediaClient().getCommonPartName(), media);
-        logger.debug("to be created, media common: " + objectAsXmlString(media, RestrictedMediaCommon.class));
+        multipart.addPart(new RestrictedMediaClient().getCommonPartName(), media);
+        logger.debug("to be created, media common: {}", objectAsXmlString(media, RestrictedMediaCommon.class));
         return multipart;
     }
 
     @Test(dataProvider = "testName")
     public void createWithAuthRefs(String testName) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
-        String identifier = createIdentifier(); // Submit the request to the service and store the response.
-        createPersonRefs(); // Create all the person refs and entities
-        // Create a new Loans In resource. One or more fields in this resource will be PersonAuthority
-        //    references, and will refer to Person resources by their refNames.
+        String identifier = createIdentifier();
+
+        createPersonRefs();
+
+        // Create a new RestrictedMedia resource.
+        // One or more fields in this resource will be PersonAuthority references
+        // and will refer to Person resources by their refNames.
         RestrictedMediaClient mediaClient = new RestrictedMediaClient();
-        PoxPayloadOut multipart = createMediaInstance(depositorRefName, "media.title-" + identifier);
+        PoxPayloadOut multipart = createMediaInstance(publisherRefName, "media.title-" + identifier);
         Response res = mediaClient.create(multipart);
         try {
             assertStatusCode(res, testName);
@@ -128,31 +124,18 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
                 PERSON_AUTHORITY_NAME, PERSON_AUTHORITY_NAME, personAuthClient.getCommonPartName());
         Response res = personAuthClient.create(multipart);
-        try {
-            assertStatusCode(res, "createPersonRefs (not a surefire test)");
-            personAuthCSID = extractId(res);
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
+        assertStatusCode(res, "createPersonRefs (not a surefire test)");
+        personAuthCSID = extractId(res);
+
         String authRefName = PersonAuthorityClientUtils.getAuthorityRefName(personAuthCSID, null);
-        // Create temporary Person resources, and their corresponding refNames by which they can be identified.
-        String csid = "";
 
-        csid = createPerson("Owen the Cur", "Owner", "owenCurOwner", authRefName);
+        String csid = createPerson("Owen the Cur", "Owner", "owenCurOwner", authRefName);
         personIdsCreated.add(csid);
-        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
-
-        csid = createPerson("Davenport", "Depositor", "davenportDepositor", authRefName);
-        personIdsCreated.add(csid);
-        depositorRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
+        publisherRefName = PersonAuthorityClientUtils.getPersonRefName(personAuthCSID, csid, null);
     }
 
     protected String createPerson(String firstName, String surName, String shortId, String authRefName)
             throws Exception {
-        String result = null;
-
         PersonClient personAuthClient = new PersonClient();
         Map<String, String> personInfo = new HashMap<String, String>();
         personInfo.put(PersonJAXBSchema.FORE_NAME, firstName);
@@ -167,78 +150,8 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
         PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonInstance(
                 personAuthCSID, authRefName, personInfo, personTerms, personAuthClient.getItemCommonPartName());
         Response res = personAuthClient.createItem(personAuthCSID, multipart);
-        try {
-            assertStatusCode(res, "createPerson (not a surefire test)");
-            result = extractId(res);
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
-
-        return result;
-    }
-
-    // @Test annotation commented out by Aron 2010-12-02 until media payload is set to the
-    // actual payload - it currently appears to be cloned from another record type - and
-    // it's determined that this payload has at least one authority field.
-    //
-    // When that happens, this test class will also need to be revised accordingly to
-    // reflect the actual names and number of authref fields in that payload.
-    //
-    // @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class, dependsOnMethods =
-    // {"createWithAuthRefs"})
-    public void readAndCheckAuthRefs(String testName) throws Exception {
-        testSetup(STATUS_OK, ServiceRequestType.READ);
-
-        RestrictedMediaClient mediaClient = new RestrictedMediaClient();
-        Response res = mediaClient.read(knownResourceId);
-        PoxPayloadIn input = null;
-        RestrictedMediaCommon media = null;
-        try {
-            assertStatusCode(res, testName);
-            input = new PoxPayloadIn(res.readEntity(String.class));
-            media = (RestrictedMediaCommon)
-                    extractPart(input, mediaClient.getCommonPartName(), RestrictedMediaCommon.class);
-            Assert.assertNotNull(media);
-            logger.debug(objectAsXmlString(media, RestrictedMediaCommon.class));
-        } finally {
-            if (res != null) {
-                res.close();
-            }
-        }
-
-        // Check a couple of fields
-        Assert.assertEquals(media.getTitle(), title);
-
-        // Get the auth refs and check them
-        Response res2 = mediaClient.getAuthorityRefs(knownResourceId);
-        AuthorityRefList list = null;
-        try {
-            assertStatusCode(res2, testName);
-            list = res2.readEntity(AuthorityRefList.class);
-        } finally {
-            if (res2 != null) {
-                res2.close();
-            }
-        }
-
-        List<AuthorityRefList.AuthorityRefItem> items = list.getAuthorityRefItem();
-        int numAuthRefsFound = items.size();
-        logger.debug("Authority references, found " + numAuthRefsFound);
-        // Assert.assertEquals(numAuthRefsFound, NUM_AUTH_REFS_EXPECTED,
-        //                    "Did not find all expected authority references! " +
-        //                    "Expected " + NUM_AUTH_REFS_EXPECTED + ", found " + numAuthRefsFound);
-        if (logger.isDebugEnabled()) {
-            int i = 0;
-            for (AuthorityRefList.AuthorityRefItem item : items) {
-                logger.debug(testName + ": list-item[" + i + "] Field:" + item.getSourceField() + "= "
-                        + item.getAuthDisplayName() + item.getItemDisplayName());
-                logger.debug(testName + ": list-item[" + i + "] refName=" + item.getRefName());
-                logger.debug(testName + ": list-item[" + i + "] URI=" + item.getUri());
-                i++;
-            }
-        }
+        assertStatusCode(res, "createPerson (not a surefire test)");
+        return extractId(res);
     }
 
     /**
@@ -247,33 +160,31 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
      * This cleanup method will always be run, even if one or more tests fail.
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
-     * may be expected to be deleted by certain tests.
+     * may be expected to be deleted by certain tests. Non-successful deletes are ignored and not reported
      * @throws Exception
      */
     @AfterClass(alwaysRun = true)
     public void cleanUp() throws Exception {
         String noTestCleanup = System.getProperty("noTestCleanup");
         if (Boolean.parseBoolean(noTestCleanup)) {
-            logger.debug("Skipping Cleanup phase ...");
+            logger.debug("Skipping Cleanup phase...");
             return;
         }
-        logger.debug("Cleaning up temporary resources created for testing ...");
+        logger.debug("Cleaning up temporary resources created for testing...");
         PersonClient personAuthClient = new PersonClient();
         // Delete Person resource(s) (before PersonAuthority resources).
         for (String resourceId : personIdsCreated) {
             // Note: Any non-success responses are ignored and not reported.
-            personAuthClient.deleteItem(personAuthCSID, resourceId).close();
+            personAuthClient.deleteItem(personAuthCSID, resourceId);
         }
-        // Delete PersonAuthority resource(s).
-        // Note: Any non-success response is ignored and not reported.
+
         if (personAuthCSID != null) {
             personAuthClient.delete(personAuthCSID);
-            // Delete Loans In resource(s).
-            RestrictedMediaClient mediaClient = new RestrictedMediaClient();
-            for (String resourceId : mediaIdsCreated) {
-                // Note: Any non-success responses are ignored and not reported.
-                mediaClient.delete(resourceId);
-            }
+        }
+
+        RestrictedMediaClient mediaClient = new RestrictedMediaClient();
+        for (String resourceId : mediaIdsCreated) {
+            mediaClient.delete(resourceId);
         }
     }
 }
