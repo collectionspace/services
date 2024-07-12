@@ -14,16 +14,56 @@
  */
 package org.collectionspace.services.restrictedmedia.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.restrictedmedia.RestrictedMediaCommon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RestrictedMediaValidatorHandler implements ValidatorHandler {
+/**
+ * ValidatorHandler for RestrictedMedia
+ *
+ * Checks for presence of restrictedmedia_common and restrictedmedia_common/identificationNumber
+ */
+public class RestrictedMediaValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+    private final Logger logger = LoggerFactory.getLogger(RestrictedMediaValidatorHandler.class);
+
+    private static final String COMMON_PART_MISSING =
+        "Validation exception: restrictedmedia_common part is missing";
+    private static final String IDENTIFICATION_NUMBER_MISSING =
+        "Validation exception: The restricted media field \"identificationNumber\" cannot be empty or missing";
 
     @Override
-    public void validate(Action action, ServiceContext ctx) throws InvalidDocumentException {
-        // TODO Auto-generated method stub
-        System.out.println("RestrictedmediaValidatorHandler executed.");
+    protected Class<?> getCommonPartClass() {
+        return RestrictedMediaCommon.class;
     }
+
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
+        final RestrictedMediaCommon restrictedMedia = (RestrictedMediaCommon) getCommonPart();
+        if (restrictedMedia == null) {
+            logger.error(COMMON_PART_MISSING);
+            throw new InvalidDocumentException(COMMON_PART_MISSING);
+        }
+
+        final String identificationNumber = restrictedMedia.getIdentificationNumber();
+        if (identificationNumber == null || identificationNumber.isEmpty()) {
+            logger.error(IDENTIFICATION_NUMBER_MISSING);
+            throw new InvalidDocumentException(IDENTIFICATION_NUMBER_MISSING);
+        }
+    }
+
+    @Override
+    protected void handleGet() {}
+
+    @Override
+    protected void handleGetAll() {}
+
+    @Override
+    protected void handleUpdate() {}
+
+    @Override
+    protected void handleDelete() {}
 }
