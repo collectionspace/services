@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.PersonJAXBSchema;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -81,6 +82,7 @@ public class RestrictedMediaAuthRefsTest extends BaseServiceTest<AbstractCommonL
 
     private PoxPayloadOut createMediaInstance(String depositorRefName, String title) throws Exception {
         RestrictedMediaCommon media = new RestrictedMediaCommon();
+        media.setIdentificationNumber(UUID.randomUUID().toString());
         media.setTitle(title);
         media.setPublisher(depositorRefName);
 

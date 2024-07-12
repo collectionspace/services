@@ -25,6 +25,7 @@ package org.collectionspace.services.client.test;
 import java.io.File;
 import java.net.URL;
 import java.util.List;
+import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -234,6 +235,7 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
         String identifier = "media.title-" + title;
         RestrictedMediaCommon media = new RestrictedMediaCommon();
         media.setTitle(identifier);
+        media.setIdentificationNumber(UUID.randomUUID().toString());
         media.setContributor("Joe-bob briggs");
         media.setCoverage("Lots of stuff");
         media.setPublisher("Ludicrum Enterprises");
