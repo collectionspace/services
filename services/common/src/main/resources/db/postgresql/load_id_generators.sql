@@ -1270,3 +1270,39 @@ INSERT INTO id_generators
         SELECT  csid
         FROM    id_generators
         );
+
+-- RESTRICTED_MEDIA_NUMBER
+
+INSERT INTO id_generators
+    (csid, displayname, description, priority, last_generated_id, id_generator_state)
+  SELECT
+     '17772cbd-8de1-4969-ac2e-c51798bc4e75',
+     'Restricted Media Number',
+     'Identifies a restricted media document.',
+     '9',
+     '',
+'<org.collectionspace.services.id.SettableIDGenerator>
+  <parts>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>RMR</initialValue>
+      <currentValue>RMR</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.YearIDGeneratorPart>
+      <currentValue></currentValue>
+    </org.collectionspace.services.id.YearIDGeneratorPart>
+    <org.collectionspace.services.id.StringIDGeneratorPart>
+      <initialValue>.</initialValue>
+      <currentValue>.</currentValue>
+    </org.collectionspace.services.id.StringIDGeneratorPart>
+    <org.collectionspace.services.id.NumericIDGeneratorPart>
+      <maxLength>6</maxLength>
+      <initialValue>1</initialValue>
+      <currentValue>-1</currentValue>
+    </org.collectionspace.services.id.NumericIDGeneratorPart>
+  </parts>
+</org.collectionspace.services.id.SettableIDGenerator>'
+  WHERE '17772cbd-8de1-4969-ac2e-c51798bc4e75' NOT IN
+        (
+        SELECT  csid
+        FROM    id_generators
+        );
