@@ -864,6 +864,10 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             if (handler.isCMISQuery() == true) {
                 String inList = buildInListForDocTypes(docTypes);
                 ctx.getQueryParams().add(IQueryManager.SEARCH_RELATED_MATCH_OBJ_DOCTYPES, inList);
+                // TODO: If there is an existing SEARCH_RELATED_MATCH_OBJ_DOCTYPES parameter,
+                // filter it using the values in inList, instead of adding another value.
+                // Just adding inList as another parameter value doesn't do anything to a parameter
+                // that was passed in, and that unfiltered list ends up being used for the search.
                 if (isSubjectOrObjectQuery(ctx)) {
                 	docList = getFilteredCMISForSubjectOrObject(repoSession, ctx, handler, queryContext);
                 } else {
