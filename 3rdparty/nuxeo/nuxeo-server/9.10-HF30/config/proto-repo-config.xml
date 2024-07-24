@@ -37,7 +37,7 @@
 			<pathOptimizations enabled="true"/>
 			<idType>varchar</idType>
 			<indexing>
-			<fulltext disabled="false" analyzer="cspace_english">
+			<fulltext disabled="false" analyzer="public.cspace_english">
 			  <index name="default">
 				<!-- all props implied -->
 			  </index>
