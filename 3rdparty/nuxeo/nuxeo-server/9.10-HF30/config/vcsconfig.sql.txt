@@ -18,10 +18,10 @@
 #
 
 #TEST:
-SELECT 1 FROM pg_ts_config WHERE cfgname = '${fulltextAnalyzer}';
+SELECT 1 FROM pg_ts_config WHERE cfgname = 'cspace_english';
 
 #IF: emptyResult
-CREATE TEXT SEARCH CONFIGURATION ${fulltextAnalyzer} ( COPY = english );
+CREATE TEXT SEARCH CONFIGURATION public.cspace_english ( COPY = english );
 
 
 
