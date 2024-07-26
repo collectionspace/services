@@ -14,16 +14,51 @@
  */
 package org.collectionspace.services.dutyofcare.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
+import org.collectionspace.services.dutyofcare.DutiesOfCareCommon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DutyofcareValidatorHandler implements ValidatorHandler {
+public class DutyofcareValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
+
+    private final Logger logger = LoggerFactory.getLogger(DutyofcareValidatorHandler.class);
+
+    private static final String COMMON_PART_MISSING = "Validation exception: dutiesofcare_common part is missing";
+    private static final String DOCUMENTATION_NUMBER_MISSING =
+            "Validation exception: The duty of care field \"dutyOfCareNumber\" cannot be empty or missing";
 
     @Override
-    public void validate(Action action, ServiceContext ctx) throws InvalidDocumentException {
-        // TODO Auto-generated method stub
-        System.out.println("DutyofcareValidatorHandler executed.");
+    protected Class<?> getCommonPartClass() {
+        return DutiesOfCareCommon.class;
     }
+
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
+        final DutiesOfCareCommon common = (DutiesOfCareCommon) getCommonPart();
+        if (common == null) {
+            logger.error(COMMON_PART_MISSING);
+            throw new InvalidDocumentException(COMMON_PART_MISSING);
+        }
+
+        final String dutyOfCareNumber = common.getDutyOfCareNumber();
+        if (dutyOfCareNumber == null || dutyOfCareNumber.isEmpty()) {
+            logger.error(DOCUMENTATION_NUMBER_MISSING);
+            throw new InvalidDocumentException(DOCUMENTATION_NUMBER_MISSING);
+        }
+    }
+
+    @Override
+    protected void handleGet() throws InvalidDocumentException {}
+
+    @Override
+    protected void handleGetAll() throws InvalidDocumentException {}
+
+    @Override
+    protected void handleUpdate() throws InvalidDocumentException {}
+
+    @Override
+    protected void handleDelete() throws InvalidDocumentException {}
 }
