@@ -48,7 +48,7 @@ public class DutyofcareResource extends NuxeoBasedResource {
     }
 
     @Override
-    public Class<DutyofcaresCommon> getCommonPartClass() {
-        return DutyofcaresCommon.class;
+    public Class<DutiesOfCareCommon> getCommonPartClass() {
+        return DutiesOfCareCommon.class;
     }
 }

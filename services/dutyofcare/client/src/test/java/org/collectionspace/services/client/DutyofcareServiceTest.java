@@ -25,20 +25,20 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.test.AbstractPoxServiceTestImpl;
 import org.collectionspace.services.client.test.ServiceRequestType;
-import org.collectionspace.services.dutyofcare.DutyofcaresCommon;
+import org.collectionspace.services.dutyofcare.DutiesOfCareCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 
-public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, DutyofcaresCommon> {
+public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, DutiesOfCareCommon> {
 
     private final Logger logger = LoggerFactory.getLogger(DutyofcareServiceTest.class);
 
     /** The service path component. */
-    final String SERVICE_NAME = "dutyofcares";
+    final String SERVICE_NAME = "dutiesofcare";
 
-    final String SERVICE_PATH_COMPONENT = "dutyofcares";
+    final String SERVICE_PATH_COMPONENT = "dutiesofcare";
 
     /* (non-Javadoc)
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
@@ -156,9 +156,9 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Get the common part of the response and verify that it is not null.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        DutyofcaresCommon dutyofcareCommon = null;
+        DutiesOfCareCommon dutyofcareCommon = null;
         if (payloadInputPart != null) {
-            dutyofcareCommon = (DutyofcaresCommon) payloadInputPart.getBody();
+            dutyofcareCommon = (DutiesOfCareCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(dutyofcareCommon);
     }
@@ -265,9 +265,9 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Extract the common part from the response.
         PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
-        DutyofcaresCommon dutyofcareCommon = null;
+        DutiesOfCareCommon dutyofcareCommon = null;
         if (payloadInputPart != null) {
-            dutyofcareCommon = (DutyofcaresCommon) payloadInputPart.getBody();
+            dutyofcareCommon = (DutiesOfCareCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(dutyofcareCommon);
 
@@ -275,7 +275,7 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
         dutyofcareCommon.setDutyOfCareNumber("updated-" + dutyofcareCommon.getDutyOfCareNumber());
 
         logger.debug("to be updated object");
-        logger.debug(objectAsXmlString(dutyofcareCommon, DutyofcaresCommon.class));
+        logger.debug(objectAsXmlString(dutyofcareCommon, DutiesOfCareCommon.class));
 
         setupUpdate();
 
@@ -302,9 +302,9 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
 
         // Extract the updated common part from the response.
         payloadInputPart = input.getPart(client.getCommonPartName());
-        DutyofcaresCommon updatedDutyofcareCommon = null;
+        DutiesOfCareCommon updatedDutyofcareCommon = null;
         if (payloadInputPart != null) {
-            updatedDutyofcareCommon = (DutyofcaresCommon) payloadInputPart.getBody();
+            updatedDutyofcareCommon = (DutiesOfCareCommon) payloadInputPart.getBody();
         }
         Assert.assertNotNull(updatedDutyofcareCommon);
 
@@ -461,14 +461,14 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
      * @throws Exception
      */
     private PoxPayloadOut createDutyofcareInstance(String dutyofcareNumber) throws Exception {
-        DutyofcaresCommon dutyofcareCommon = new DutyofcaresCommon();
+        DutiesOfCareCommon dutyofcareCommon = new DutiesOfCareCommon();
         dutyofcareCommon.setDutyOfCareNumber(dutyofcareNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart = multipart.addPart(new DutyofcareClient().getCommonPartName(), dutyofcareCommon);
 
         logger.debug("to be created, dutyofcare common");
-        logger.debug(objectAsXmlString(dutyofcareCommon, DutyofcaresCommon.class));
+        logger.debug(objectAsXmlString(dutyofcareCommon, DutiesOfCareCommon.class));
 
         return multipart;
     }
@@ -485,13 +485,13 @@ public class DutyofcareServiceTest extends AbstractPoxServiceTestImpl<AbstractCo
     }
 
     @Override
-    protected DutyofcaresCommon updateInstance(DutyofcaresCommon commonPartObject) {
+    protected DutiesOfCareCommon updateInstance(DutiesOfCareCommon commonPartObject) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected void compareUpdatedInstances(DutyofcaresCommon original, DutyofcaresCommon updated) {
+    protected void compareUpdatedInstances(DutiesOfCareCommon original, DutiesOfCareCommon updated) {
         // TODO Auto-generated method stub
     }
 }

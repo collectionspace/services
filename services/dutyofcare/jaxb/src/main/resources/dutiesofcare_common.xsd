@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
-    Dutyofcare schema (XSD)
+    Duty-of-Care schema (XSD)
     Entity  : Dutyofcare
     Part    : Common
     Used for: JAXB binding between XML and Java objects
@@ -16,13 +16,14 @@
   version="0.1"
 >
 
-  <!--
-      Avoid XmlRootElement nightmare:
-      See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
-  -->
-
   <!--  Dutyofcare Information Group -->
-  <xs:element name="dutyofcares_common">
+  <xs:element name="dutiesofcare_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="DutiesOfCareCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element name="dutyOfCareNumber" type="xs:string"/>

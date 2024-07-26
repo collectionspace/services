@@ -21,10 +21,10 @@
  */
 package org.collectionspace.services.dutyofcare.nuxeo;
 
-import org.collectionspace.services.dutyofcare.DutyofcaresCommon;
+import org.collectionspace.services.dutyofcare.DutiesOfCareCommon;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
 /**
  * DutyofcareDocumentModelHandler
  */
-public class DutyofcareDocumentModelHandler extends NuxeoDocumentModelHandler<DutyofcaresCommon> {}
+public class DutyofcareDocumentModelHandler extends NuxeoDocumentModelHandler<DutiesOfCareCommon> {}
