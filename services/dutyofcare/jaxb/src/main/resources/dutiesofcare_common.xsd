@@ -28,7 +28,7 @@
       <xs:sequence>
         <xs:element name="dutyOfCareNumber" type="xs:string"/>
         <xs:element name="dutyOfCareDate" type="xs:date"/>
-        <xs:element name="title" type="xs:string"/>
+        <xs:element name="dutyOfCareTitle" type="xs:string"/>
 
         <xs:element name="notes" type="notes"/>
         <xs:element name="partiesInvolvedGroupList" type="partiesInvolvedGroupList"/>
