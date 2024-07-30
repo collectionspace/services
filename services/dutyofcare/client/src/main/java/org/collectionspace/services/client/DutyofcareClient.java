@@ -14,14 +14,14 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.dutyofcare.DutyofcaresCommon;
+import org.collectionspace.services.dutyofcare.DutiesOfCareCommon;
 
 /**
  * DutyofcareClient.java
  */
-public class DutyofcareClient extends AbstractCommonListPoxServiceClientImpl<DutyofcareProxy, DutyofcaresCommon> {
+public class DutyofcareClient extends AbstractCommonListPoxServiceClientImpl<DutyofcareProxy, DutiesOfCareCommon> {
 
-    public static final String SERVICE_NAME = "dutyofcares";
+    public static final String SERVICE_NAME = "dutiesofcare";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
     public static final String SERVICE_PATH = "/" + SERVICE_PATH_COMPONENT;
     public static final String SERVICE_PATH_PROXY = SERVICE_PATH + "/";
