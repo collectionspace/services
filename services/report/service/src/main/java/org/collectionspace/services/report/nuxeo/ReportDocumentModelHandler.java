@@ -105,7 +105,6 @@ import org.collectionspace.services.report.ReportsCommon.ForRoles;
 import org.collectionspace.services.report.ReportsOuputMimeList;
 import org.collectionspace.services.report.ResourceActionGroup;
 import org.collectionspace.services.report.ResourceActionGroupList;
-import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
@@ -368,8 +367,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		HashMap<String, Object> params,
 		String reportFileName,
 		String outputMimeType,
-		StringBuffer outReportFileName
-										 ) throws Exception {
+		StringBuffer outReportFileName) throws Exception {
 
 		Connection conn = null;
 		InputStream result = null;
@@ -528,7 +526,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			if (logger.isDebugEnabled()) {
 				SQLException tempException = sqle;
 				while (null != tempException) {
-					logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+					logger.debug("SQL Exception: {}", sqle.getLocalizedMessage());
 
 					// loop to the next exception
 					tempException = tempException.getNextException();
@@ -539,17 +537,13 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
 			throw new CSWebApplicationException(sqle, response);
 		} catch (JRException jre) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: " + jre.getCause());
-			}
+			logger.error("JasperReports Exception: {} Cause: {}", jre.getLocalizedMessage(), jre.getCause());
 			Response response = Response.status(
 				Response.Status.INTERNAL_SERVER_ERROR).entity(
 				"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
 			throw new CSWebApplicationException(jre, response);
 		} catch (FileNotFoundException fnfe) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
-			}
+			logger.error("FileNotFoundException: {}", fnfe.getLocalizedMessage());
 			Response response = Response.status(
 				Response.Status.INTERNAL_SERVER_ERROR).entity(
 				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
@@ -562,14 +556,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 					// SQLExceptions can be chained. We have at least one exception, so
 					// set up a loop to make sure we let the user know about all of them
 					// if there happens to be more than one.
-					if (logger.isDebugEnabled()) {
-						logger.debug("SQL Exception closing connection: "
-									 + sqle.getLocalizedMessage());
-					}
+					logger.debug("SQL Exception closing connection: {}", sqle.getLocalizedMessage());
 				} catch (Exception e) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("Exception closing connection", e);
-					}
+					logger.debug("Exception closing connection", e);
 				}
 			}
 		}
@@ -587,7 +576,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
 			}
 		} catch (Exception e) {
-			Log.error(e);
+			logger.error("Error getting database connection", e);
 			throw new NamingException();
 		}
 
