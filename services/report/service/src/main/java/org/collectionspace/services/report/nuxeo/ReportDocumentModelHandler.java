@@ -355,49 +355,49 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 	}
 
-    private InputStream buildReportResult(
-			String reportCSID,
-			HashMap<String, Object> params,
-			String reportFileName,
-			String outputMimeType,
-			StringBuffer outReportFileName
-		) throws Exception {
+	private InputStream buildReportResult(
+		String reportCSID,
+		HashMap<String, Object> params,
+		String reportFileName,
+		String outputMimeType,
+		StringBuffer outReportFileName
+										 ) throws Exception {
 
-			Connection conn = null;
-			InputStream result = null;
+		Connection conn = null;
+		InputStream result = null;
 
-    	try {
-				String reportName = Tools.getFilenameBase(reportFileName);
-				File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
+		try {
+			String reportName = Tools.getFilenameBase(reportFileName);
+			File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
 
-				if (!reportCompiledFile.exists()) {
-					// Need to compile the file.
+			if (!reportCompiledFile.exists()) {
+				// Need to compile the file.
 
-					File reportSourceFile = ReportResource.getReportSourceFile(reportName);
+				File reportSourceFile = ReportResource.getReportSourceFile(reportName);
 
-					if(!reportSourceFile.exists()) {
-						logger.error("Report for csid={} is missing source file: {}",
-								reportCSID, reportSourceFile.getAbsolutePath());
+				if (!reportSourceFile.exists()) {
+					logger.error("Report for csid={} is missing source file: {}",
+								 reportCSID, reportSourceFile.getAbsolutePath());
 
-						throw new RuntimeException("Report is missing source file");
-					}
+					throw new RuntimeException("Report is missing source file");
+				}
 
-					logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+				logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
 							reportCSID, reportCompiledFile.getAbsolutePath());
 
-					JasperDesign design = JRXmlLoader.load(reportSourceFile.getAbsolutePath());
+				JasperDesign design = JRXmlLoader.load(reportSourceFile.getAbsolutePath());
 
-					design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
+				design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
 
-					JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
-				}
+				JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
+			}
 
-				conn = getConnection();
+			conn = getConnection();
 
-				if (logger.isTraceEnabled()) {
-					logger.trace("ReportResource for csid=" + reportCSID
-							+ " output as " + outputMimeType + " using report file: " + reportCompiledFile.getAbsolutePath());
-				}
+			if (logger.isTraceEnabled()) {
+				logger.trace("ReportResource for csid=" + reportCSID
+							 + " output as " + outputMimeType + " using report file: " + reportCompiledFile.getAbsolutePath());
+			}
 
 			FileInputStream fileStream = new FileInputStream(reportCompiledFile);
 
@@ -420,48 +420,48 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRXmlExporter();
-				outputFilename = outputFilename+".xml";
-			} else if(outputMimeType.equals(MediaType.TEXT_HTML)) {
+				outputFilename = outputFilename + ".xml";
+			} else if (outputMimeType.equals(MediaType.TEXT_HTML)) {
 				exporter = new HtmlExporter();
-				outputFilename = outputFilename+".html";
-			} else if(outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
+				outputFilename = outputFilename + ".html";
+			} else if (outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
 				exporter = new JRPdfExporter();
-				outputFilename = outputFilename+".pdf";
-			} else if(outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
+				outputFilename = outputFilename + ".pdf";
+			} else if (outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRCsvExporter();
 				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ",");
-				outputFilename = outputFilename+".csv";
-			} else if(outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
+				outputFilename = outputFilename + ".csv";
+			} else if (outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRCsvExporter();
 				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
-				outputFilename = outputFilename+".csv";
-			} else if(outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)	// Understand msword as docx
-					|| outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
+				outputFilename = outputFilename + ".csv";
+			} else if (outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)    // Understand msword as docx
+					   || outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
 				exporter = new JRDocxExporter();
-				outputFilename = outputFilename+".docx";
-			} else if(outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)	// Understand msexcel as xlsx
-					|| outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
+				outputFilename = outputFilename + ".docx";
+			} else if (outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)    // Understand msexcel as xlsx
+					   || outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
 				exporter = new JRXlsxExporter();
-				outputFilename = outputFilename+".xlsx";
-			} else if(outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)	// Understand msppt as xlsx
-					|| outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
+				outputFilename = outputFilename + ".xlsx";
+			} else if (outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)    // Understand msppt as xlsx
+					   || outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
 				exporter = new JRPptxExporter();
-				outputFilename = outputFilename+".pptx";
+				outputFilename = outputFilename + ".pptx";
 			} else {
 				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
 				exporter = new JRPdfExporter();
-				outputFilename = outputFilename+"-default-to.pdf";
+				outputFilename = outputFilename + "-default-to.pdf";
 			}
 			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
-                        // FIXME: Logging temporarily set to INFO level for CSPACE-5766;
-                        // can change to TRACE or DEBUG level as warranted thereafter
-                        if (logger.isInfoEnabled()) {
-                            logger.info(FileTools.getJavaTmpDirInfo());
-                        }
-                        // fill the report
-			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
+			// FIXME: Logging temporarily set to INFO level for CSPACE-5766;
+			// can change to TRACE or DEBUG level as warranted thereafter
+			if (logger.isInfoEnabled()) {
+				logger.info(FileTools.getJavaTmpDirInfo());
+			}
+			// fill the report
+			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params, conn);
 
 			// Report will be to a temporary file.
 			File tempOutputFile = Files.createTempFile("report-", null).toFile();
@@ -472,79 +472,79 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			tempOutputStream.close();
 
 			result = new FileInputStream(tempOutputFile);
-	       	return result;
-        } catch (SQLException sqle) {
-            // SQLExceptions can be chained. We have at least one exception, so
-            // set up a loop to make sure we let the user know about all of them
-            // if there happens to be more than one.
-            if (logger.isDebugEnabled()) {
-	            SQLException tempException = sqle;
-	            while (null != tempException) {
-	                	logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+			return result;
+		} catch (SQLException sqle) {
+			// SQLExceptions can be chained. We have at least one exception, so
+			// set up a loop to make sure we let the user know about all of them
+			// if there happens to be more than one.
+			if (logger.isDebugEnabled()) {
+				SQLException tempException = sqle;
+				while (null != tempException) {
+					logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
 
-	                // loop to the next exception
-	                tempException = tempException.getNextException();
-	            }
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(sqle, response);
-        } catch (JRException jre) {
-            if (logger.isDebugEnabled()) {
-            	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(jre, response);
-        } catch (FileNotFoundException fnfe) {
-            if (logger.isDebugEnabled()) {
-            	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(fnfe, response);
+					// loop to the next exception
+					tempException = tempException.getNextException();
+				}
+			}
+			Response response = Response.status(
+				Response.Status.INTERNAL_SERVER_ERROR).entity(
+				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+			throw new CSWebApplicationException(sqle, response);
+		} catch (JRException jre) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: " + jre.getCause());
+			}
+			Response response = Response.status(
+				Response.Status.INTERNAL_SERVER_ERROR).entity(
+				"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
+			throw new CSWebApplicationException(jre, response);
+		} catch (FileNotFoundException fnfe) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
+			}
+			Response response = Response.status(
+				Response.Status.INTERNAL_SERVER_ERROR).entity(
+				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+			throw new CSWebApplicationException(fnfe, response);
 		} finally {
-        	if (conn!=null) {
-        		try {
-        			conn.close();
-                } catch (SQLException sqle) {
-                    // SQLExceptions can be chained. We have at least one exception, so
-                    // set up a loop to make sure we let the user know about all of them
-                    // if there happens to be more than one.
-                    if (logger.isDebugEnabled()) {
-   	                	logger.debug("SQL Exception closing connection: "
-   	                			+ sqle.getLocalizedMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Exception closing connection", e);
-                    }
-                }
-        	}
-        }
-    }
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException sqle) {
+					// SQLExceptions can be chained. We have at least one exception, so
+					// set up a loop to make sure we let the user know about all of them
+					// if there happens to be more than one.
+					if (logger.isDebugEnabled()) {
+						logger.debug("SQL Exception closing connection: "
+									 + sqle.getLocalizedMessage());
+					}
+				} catch (Exception e) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Exception closing connection", e);
+					}
+				}
+			}
+		}
+	}
 
-    private Connection getConnection() throws NamingException, SQLException {
-    	Connection result = null;
+	private Connection getConnection() throws NamingException, SQLException {
+		Connection result = null;
 
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	try {
-    		String repositoryName = ctx.getRepositoryName();
-	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
-                        String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
-                        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
-	    	}
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+		try {
+			String repositoryName = ctx.getRepositoryName();
+			if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
+				String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
+				String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+				result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
+			}
 		} catch (Exception e) {
 			Log.error(e);
 			throw new NamingException();
 		}
 
-    	return result;
-    }
+		return result;
+	}
 
 	/**
 	 * Check to see if the current user is authorized to run/invoke this report.  If the report
