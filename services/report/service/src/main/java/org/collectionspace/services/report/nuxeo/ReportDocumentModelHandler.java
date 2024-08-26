@@ -441,9 +441,46 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 					   || outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
 				exporter = new JRDocxExporter();
 				outputFilename = outputFilename + ".docx";
-			} else if (outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)    // Understand msexcel as xlsx
+			} else if (outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE) // Understand msexcel as xlsx
 					   || outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
-				exporter = new JRXlsxExporter();
+				// Kind of unnecessary but avoids complaining about unchecked typing issues
+				JRXlsxExporter xlsxExporter = new JRXlsxExporter();
+				/**
+				 * 	??
+				 * 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1"
+				 * 	value="pageHeader"/>
+				 * 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
+				 */
+				params.put(JRParameter.IS_IGNORE_PAGINATION, true);
+				params.put(JRBreak.PROPERTY_PAGE_BREAK_NO_PAGINATION, JRBreak.PAGE_BREAK_NO_PAGINATION_APPLY);
+				params.put(JRTextElement.PROPERTY_PRINT_KEEP_FULL_TEXT, true);
+
+				SimpleXlsxReportConfiguration reportConfig = new SimpleXlsxReportConfiguration();
+				reportConfig.setCollapseRowSpan(true);
+				reportConfig.setRemoveEmptySpaceBetweenRows(true);
+				reportConfig.setRemoveEmptySpaceBetweenColumns(true);
+				reportConfig.setDetectCellType(true);
+				reportConfig.setOnePagePerSheet(false);
+				reportConfig.setFontSizeFixEnabled(true);
+				reportConfig.setFreezeRow(2);
+				reportConfig.setSheetNames(new String[] {outputFilename});
+				xlsxExporter.setConfiguration(reportConfig);
+				xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
+				exporter = xlsxExporter;
+
+				// Note: Configuration properties added as parameters do not work
+				// Also note: This should be done through exporter.setConfiguration, however this can't be mixed with
+				//            setParameter
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_COLLAPSE_ROW_SPAN, true);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, true);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, true);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_DETECT_CELL_TYPE, true);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_ONE_PAGE_PER_SHEET, false);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_WHITE_PAGE_BACKGROUND, false);
+				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_FONT_SIZE_FIX_ENABLED, false);
+				// WHERE DO THESE GO????
+				// params.put(XlsReportConfiguration.PROPERTY_FREEZE_ROW, 2);
+				// params.put(XlsReportConfiguration.PROPERTY_SHEET_NAMES_PREFIX + "all", outputFilename);
 				outputFilename = outputFilename + ".xlsx";
 			} else if (outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)    // Understand msppt as xlsx
 					   || outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
