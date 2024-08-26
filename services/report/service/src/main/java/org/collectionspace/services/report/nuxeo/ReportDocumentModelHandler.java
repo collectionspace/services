@@ -40,23 +40,32 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import net.sf.jasperreports.engine.JRBreak;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JRTextElement;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.HtmlExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXmlExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.ReportExportConfiguration;
+import net.sf.jasperreports.export.SimpleCsvExporterConfiguration;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleReportExportConfiguration;
+import net.sf.jasperreports.export.SimpleWriterExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
+import net.sf.jasperreports.export.SimpleXmlExporterOutput;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.account.AccountResource;
@@ -70,7 +79,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.ActionGroup;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -400,11 +408,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			}
 
 			FileInputStream fileStream = new FileInputStream(reportCompiledFile);
+			// Report will be to a temporary file.
+			File tempOutputFile = Files.createTempFile("report-", null).toFile();
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
 
-			// export report to pdf and build a response with the bytes
-			//JasperExportManager.exportReportToPdf(jasperprint);
-
-			JRExporter exporter = null;
+			Exporter exporter = null;
+			ReportExportConfiguration configuration = new SimpleReportExportConfiguration();
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
@@ -420,26 +429,35 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRXmlExporter();
+				exporter.setExporterOutput(new SimpleXmlExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".xml";
 			} else if (outputMimeType.equals(MediaType.TEXT_HTML)) {
 				exporter = new HtmlExporter();
+				exporter.setExporterOutput(new SimpleHtmlExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".html";
 			} else if (outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
 				exporter = new JRPdfExporter();
+				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".pdf";
 			} else if (outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
 				exporter = new JRCsvExporter();
-				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ",");
+				exporter.setExporterOutput(new SimpleWriterExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".csv";
 			} else if (outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
+				// Kind of unnecessary but avoids complaining about unchecked typing issues
+				JRCsvExporter csvExporter = new JRCsvExporter();
+				final SimpleCsvExporterConfiguration exportConfig = new SimpleCsvExporterConfiguration();
+				exportConfig.setFieldDelimiter("\t");
+				csvExporter.setConfiguration(exportConfig);
+				csvExporter.setExporterOutput(new SimpleWriterExporterOutput(tempOutputStream));
+				exporter = csvExporter;
 				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRCsvExporter();
-				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
 				outputFilename = outputFilename + ".csv";
-			} else if (outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)    // Understand msword as docx
+			} else if (outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE) // Understand msword as docx
 					   || outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
 				exporter = new JRDocxExporter();
+				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".docx";
 			} else if (outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE) // Understand msexcel as xlsx
 					   || outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
@@ -485,26 +503,19 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			} else if (outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)    // Understand msppt as xlsx
 					   || outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
 				exporter = new JRPptxExporter();
+				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + ".pptx";
 			} else {
 				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
 				exporter = new JRPdfExporter();
+				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
 				outputFilename = outputFilename + "-default-to.pdf";
 			}
-			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
-			// FIXME: Logging temporarily set to INFO level for CSPACE-5766;
-			// can change to TRACE or DEBUG level as warranted thereafter
-			if (logger.isInfoEnabled()) {
-				logger.info(FileTools.getJavaTmpDirInfo());
-			}
+			outReportFileName.append(outputFilename); // Set the outgoing param to the report's final file name
+
 			// fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params, conn);
-
-			// Report will be to a temporary file.
-			File tempOutputFile = Files.createTempFile("report-", null).toFile();
-			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
-			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
+			exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 			exporter.exportReport();
 			tempOutputStream.close();
 
