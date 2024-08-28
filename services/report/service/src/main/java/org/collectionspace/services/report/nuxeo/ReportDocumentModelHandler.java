@@ -367,10 +367,9 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		String outputMimeType,
 		StringBuffer outReportFileName) throws Exception {
 
-		Connection conn = null;
 		InputStream result = null;
 
-		try {
+		try (Connection conn = getConnection()) {
 			String reportName = Tools.getFilenameBase(reportFileName);
 			File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
 
@@ -395,8 +394,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 				JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
 			}
-
-			conn = getConnection();
 
 			logger.trace("ReportResource for csid={} output as {} using report file: {}", reportCSID, outputMimeType,
 						 reportCompiledFile.getAbsolutePath());
@@ -508,19 +505,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				Response.Status.INTERNAL_SERVER_ERROR).entity(
 				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
 			throw new CSWebApplicationException(fnfe, response);
-		} finally {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException sqle) {
-					// SQLExceptions can be chained. We have at least one exception, so
-					// set up a loop to make sure we let the user know about all of them
-					// if there happens to be more than one.
-					logger.debug("SQL Exception closing connection: {}", sqle.getLocalizedMessage());
-				} catch (Exception e) {
-					logger.debug("Exception closing connection", e);
-				}
-			}
 		}
 	}
 
