@@ -474,18 +474,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 			return new FileInputStream(tempOutputFile);
 		} catch (SQLException sqle) {
-			// SQLExceptions can be chained. We have at least one exception, so
-			// set up a loop to make sure we let the user know about all of them
-			// if there happens to be more than one.
-			if (logger.isDebugEnabled()) {
-				SQLException tempException = sqle;
-				while (null != tempException) {
-					logger.debug("SQL Exception: {}", sqle.getLocalizedMessage());
-
-					// loop to the next exception
-					tempException = tempException.getNextException();
-				}
-			}
+			logger.error("SQL Exception in report {}", reportCSID, sqle);
 			Response response = Response.status(
 				Response.Status.INTERNAL_SERVER_ERROR).entity(
 				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
