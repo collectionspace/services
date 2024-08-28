@@ -11,6 +11,6 @@
     <supportsGroup>false</supportsGroup>
     <supportsNoContext>true</supportsNoContext>
     <filename>tombstone_with_budget.jrxml</filename>
-    <outputMIME>text/csv</outputMIME>
+    <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
   </ns2:reports_common>
 </document>
