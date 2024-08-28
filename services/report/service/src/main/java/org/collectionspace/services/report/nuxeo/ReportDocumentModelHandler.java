@@ -398,10 +398,8 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 			conn = getConnection();
 
-			if (logger.isTraceEnabled()) {
-				logger.trace("ReportResource for csid=" + reportCSID
-							 + " output as " + outputMimeType + " using report file: " + reportCompiledFile.getAbsolutePath());
-			}
+			logger.trace("ReportResource for csid={} output as {} using report file: {}", reportCSID, outputMimeType,
+						 reportCompiledFile.getAbsolutePath());
 
 			FileInputStream fileStream = new FileInputStream(reportCompiledFile);
 			// Report will be to a temporary file.
