@@ -503,7 +503,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			logger.error("FileNotFoundException: {}", fnfe.getLocalizedMessage());
 			Response response = Response.status(
 				Response.Status.INTERNAL_SERVER_ERROR).entity(
-				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+				"Invoke failed (FileNotFound) on Report csid=" + reportCSID).type("text/plain").build();
 			throw new CSWebApplicationException(fnfe, response);
 		}
 	}
