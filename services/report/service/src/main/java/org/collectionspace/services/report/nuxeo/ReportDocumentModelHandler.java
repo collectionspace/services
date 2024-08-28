@@ -57,12 +57,10 @@ import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.export.Exporter;
-import net.sf.jasperreports.export.ReportExportConfiguration;
 import net.sf.jasperreports.export.SimpleCsvExporterConfiguration;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
-import net.sf.jasperreports.export.SimpleReportExportConfiguration;
 import net.sf.jasperreports.export.SimpleWriterExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import net.sf.jasperreports.export.SimpleXmlExporterOutput;
@@ -410,8 +408,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			File tempOutputFile = Files.createTempFile("report-", null).toFile();
 			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
 
-			Exporter exporter = null;
-			ReportExportConfiguration configuration = new SimpleReportExportConfiguration();
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
@@ -424,91 +420,57 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			if (idx > 0) {
 				outputFilename = outputFilename.substring(idx + 1);
 			}
-			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRXmlExporter();
-				exporter.setExporterOutput(new SimpleXmlExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".xml";
-			} else if (outputMimeType.equals(MediaType.TEXT_HTML)) {
-				exporter = new HtmlExporter();
-				exporter.setExporterOutput(new SimpleHtmlExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".html";
-			} else if (outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
-				exporter = new JRPdfExporter();
-				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".pdf";
-			} else if (outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRCsvExporter();
-				exporter.setExporterOutput(new SimpleWriterExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".csv";
-			} else if (outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
-				// Kind of unnecessary but avoids complaining about unchecked typing issues
-				JRCsvExporter csvExporter = new JRCsvExporter();
-				final SimpleCsvExporterConfiguration exportConfig = new SimpleCsvExporterConfiguration();
-				exportConfig.setFieldDelimiter("\t");
-				csvExporter.setConfiguration(exportConfig);
-				csvExporter.setExporterOutput(new SimpleWriterExporterOutput(tempOutputStream));
-				exporter = csvExporter;
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				outputFilename = outputFilename + ".csv";
-			} else if (outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE) // Understand msword as docx
-					   || outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
-				exporter = new JRDocxExporter();
-				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".docx";
-			} else if (outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE) // Understand msexcel as xlsx
-					   || outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
-				// Kind of unnecessary but avoids complaining about unchecked typing issues
-				JRXlsxExporter xlsxExporter = new JRXlsxExporter();
-				/**
-				 * 	??
-				 * 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1"
-				 * 	value="pageHeader"/>
-				 * 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
-				 */
-				params.put(JRParameter.IS_IGNORE_PAGINATION, true);
-				params.put(JRBreak.PROPERTY_PAGE_BREAK_NO_PAGINATION, JRBreak.PAGE_BREAK_NO_PAGINATION_APPLY);
-				params.put(JRTextElement.PROPERTY_PRINT_KEEP_FULL_TEXT, true);
 
-				SimpleXlsxReportConfiguration reportConfig = new SimpleXlsxReportConfiguration();
-				reportConfig.setCollapseRowSpan(true);
-				reportConfig.setRemoveEmptySpaceBetweenRows(true);
-				reportConfig.setRemoveEmptySpaceBetweenColumns(true);
-				reportConfig.setDetectCellType(true);
-				reportConfig.setOnePagePerSheet(false);
-				reportConfig.setFontSizeFixEnabled(true);
-				reportConfig.setFreezeRow(2);
-				reportConfig.setSheetNames(new String[] {outputFilename});
-				xlsxExporter.setConfiguration(reportConfig);
-				xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
-				exporter = xlsxExporter;
-
-				// Note: Configuration properties added as parameters do not work
-				// Also note: This should be done through exporter.setConfiguration, however this can't be mixed with
-				//            setParameter
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_COLLAPSE_ROW_SPAN, true);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, true);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, true);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_DETECT_CELL_TYPE, true);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_ONE_PAGE_PER_SHEET, false);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_WHITE_PAGE_BACKGROUND, false);
-				// exporter.setParameter(JRXlsAbstractExporterParameter.IS_FONT_SIZE_FIX_ENABLED, false);
-				// WHERE DO THESE GO????
-				// params.put(XlsReportConfiguration.PROPERTY_FREEZE_ROW, 2);
-				// params.put(XlsReportConfiguration.PROPERTY_SHEET_NAMES_PREFIX + "all", outputFilename);
-				outputFilename = outputFilename + ".xlsx";
-			} else if (outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)    // Understand msppt as xlsx
-					   || outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
-				exporter = new JRPptxExporter();
-				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + ".pptx";
-			} else {
-				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
-				exporter = new JRPdfExporter();
-				exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(tempOutputStream));
-				outputFilename = outputFilename + "-default-to.pdf";
+			Exporter exporter;
+			switch (outputMimeType) {
+				case MediaType.APPLICATION_XML:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = xmlExporter(tempOutputStream);
+					outputFilename = outputFilename + ".xml";
+					break;
+				case MediaType.TEXT_HTML:
+					exporter = htmlExporter(tempOutputStream);
+					outputFilename = outputFilename + ".html";
+					break;
+				case ReportClient.PDF_MIME_TYPE:
+					exporter = pdfExporter(tempOutputStream);
+					outputFilename = outputFilename + ".pdf";
+					break;
+				case ReportClient.CSV_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = csvExporter(tempOutputStream);
+					outputFilename = outputFilename + ".csv";
+					break;
+				case ReportClient.TSV_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = tsvExporter(tempOutputStream);
+					outputFilename = outputFilename + ".csv";
+					break;
+				case ReportClient.MSWORD_MIME_TYPE:
+				case ReportClient.OPEN_DOCX_MIME_TYPE:
+					exporter = docxExporter(tempOutputStream);
+					outputFilename = outputFilename + ".docx";
+					break;
+				case ReportClient.MSEXCEL_MIME_TYPE:
+				case ReportClient.OPEN_XLSX_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, true);
+					params.put(JRBreak.PROPERTY_PAGE_BREAK_NO_PAGINATION, JRBreak.PAGE_BREAK_NO_PAGINATION_APPLY);
+					params.put(JRTextElement.PROPERTY_PRINT_KEEP_FULL_TEXT, true);
+					exporter = xlsxExporter(tempOutputStream, outputFilename);
+					outputFilename = outputFilename + ".xlsx";
+					break;
+				case ReportClient.MSPPT_MIME_TYPE:
+				case ReportClient.OPEN_PPTX_MIME_TYPE:
+					exporter = pptxExporter(tempOutputStream);
+					outputFilename = outputFilename + ".pptx";
+					break;
+				default:
+					logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
+					exporter = pdfExporter(tempOutputStream);
+					outputFilename = outputFilename + "-default-to.pdf";
+					break;
 			}
+
 			outReportFileName.append(outputFilename); // Set the outgoing param to the report's final file name
 
 			// fill the report
@@ -562,6 +524,69 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 			}
 		}
+	}
+
+	private JRPptxExporter pptxExporter(FileOutputStream outputStream) {
+		JRPptxExporter exporter = new JRPptxExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRXlsxExporter xlsxExporter(FileOutputStream outputStream, String outputFilename) {
+		JRXlsxExporter exporter = new JRXlsxExporter();
+		SimpleXlsxReportConfiguration reportConfig = new SimpleXlsxReportConfiguration();
+		reportConfig.setCollapseRowSpan(true);
+		reportConfig.setDetectCellType(true);
+		reportConfig.setRemoveEmptySpaceBetweenRows(true);
+		reportConfig.setRemoveEmptySpaceBetweenColumns(true);
+		reportConfig.setOnePagePerSheet(false);
+		reportConfig.setFontSizeFixEnabled(false);
+		reportConfig.setWhitePageBackground(false);
+		reportConfig.setFreezeRow(2);
+		reportConfig.setSheetNames(new String[] {outputFilename});
+
+		exporter.setConfiguration(reportConfig);
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRDocxExporter docxExporter(FileOutputStream outputStream) {
+		JRDocxExporter exporter = new JRDocxExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRCsvExporter tsvExporter(FileOutputStream outputStream) {
+		JRCsvExporter exporter = new JRCsvExporter();
+		final SimpleCsvExporterConfiguration exportConfig = new SimpleCsvExporterConfiguration();
+		exportConfig.setFieldDelimiter("\t");
+		exporter.setConfiguration(exportConfig);
+		exporter.setExporterOutput(new SimpleWriterExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRCsvExporter csvExporter(FileOutputStream outputStream) {
+		JRCsvExporter exporter = new JRCsvExporter();
+		exporter.setExporterOutput(new SimpleWriterExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRPdfExporter pdfExporter(FileOutputStream outputStream) {
+		JRPdfExporter exporter = new JRPdfExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private HtmlExporter htmlExporter(FileOutputStream outputStream) {
+		HtmlExporter exporter = new HtmlExporter();
+		exporter.setExporterOutput(new SimpleHtmlExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRXmlExporter xmlExporter(FileOutputStream outputStream) {
+		JRXmlExporter exporter = new JRXmlExporter();
+		exporter.setExporterOutput(new SimpleXmlExporterOutput(outputStream));
+		return exporter;
 	}
 
 	private Connection getConnection() throws NamingException, SQLException {
