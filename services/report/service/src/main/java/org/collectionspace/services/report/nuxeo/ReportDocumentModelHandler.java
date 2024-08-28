@@ -205,7 +205,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		boolean releaseRepoSession = false;
 
 		// Ensure the current user has permission to run this report
-		if (isAuthoritzed(reportsCommon) == false) {
+		if (!isAuthorized(reportsCommon)) {
 			String msg = String.format("Report Resource: The user '%s' is not authorized to run the report '%s' CSID='%s'",
 					AuthN.get().getUserId(), reportsCommon.getName(), csid);
 			throw new PermissionException(msg);
@@ -596,7 +596,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	 * @param reportsCommon
 	 * @return
 	 */
-	protected boolean isAuthoritzedWithPermissions(ReportsCommon reportsCommon) {
+	protected boolean isAuthorizedWithPermissions(ReportsCommon reportsCommon) {
 		boolean result = true;
 
 		ResourceActionGroupList resourceActionGroupList = reportsCommon.getResourceActionGroupList();
@@ -662,13 +662,13 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	 * @param reportsCommon
 	 * @return
 	 */
-	protected boolean isAuthoritzed(ReportsCommon reportsCommon) {
+	protected boolean isAuthorized(ReportsCommon reportsCommon) {
 		boolean result = true;
 
 		if (hasRequiredRoles(reportsCommon)) {
 			result = isAuthorizedWithRoles(reportsCommon);
 		} else if (hasRequiredPermissions(reportsCommon)) {
-			result = isAuthoritzedWithPermissions(reportsCommon);
+			result = isAuthorizedWithPermissions(reportsCommon);
 		}
 
 		return result;
