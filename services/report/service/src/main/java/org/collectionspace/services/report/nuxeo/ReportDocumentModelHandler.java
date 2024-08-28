@@ -475,21 +475,21 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			return new FileInputStream(tempOutputFile);
 		} catch (SQLException sqle) {
 			logger.error("SQL Exception in report {}", reportCSID, sqle);
-			Response response = Response.status(
-				Response.Status.INTERNAL_SERVER_ERROR).entity(
-				"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
+			Response response = Response.serverError()
+				.entity("Invoke failed (SQL problem) on Report csid=" + reportCSID)
+				.type("text/plain").build();
 			throw new CSWebApplicationException(sqle, response);
 		} catch (JRException jre) {
 			logger.error("JasperReports Exception: {} Cause: {}", jre.getLocalizedMessage(), jre.getCause());
-			Response response = Response.status(
-				Response.Status.INTERNAL_SERVER_ERROR).entity(
-				"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
+			Response response = Response.serverError()
+				.entity("Invoke failed (Jasper problem) on Report csid=" + reportCSID)
+				.type("text/plain").build();
 			throw new CSWebApplicationException(jre, response);
 		} catch (FileNotFoundException fnfe) {
 			logger.error("FileNotFoundException: {}", fnfe.getLocalizedMessage());
-			Response response = Response.status(
-				Response.Status.INTERNAL_SERVER_ERROR).entity(
-				"Invoke failed (FileNotFound) on Report csid=" + reportCSID).type("text/plain").build();
+			Response response = Response.serverError()
+				.entity("Invoke failed (FileNotFound) on Report csid=" + reportCSID)
+				.type("text/plain").build();
 			throw new CSWebApplicationException(fnfe, response);
 		}
 	}
