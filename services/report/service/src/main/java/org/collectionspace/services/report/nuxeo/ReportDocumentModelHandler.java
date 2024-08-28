@@ -367,8 +367,6 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		String outputMimeType,
 		StringBuffer outReportFileName) throws Exception {
 
-		InputStream result = null;
-
 		try (Connection conn = getConnection()) {
 			String reportName = Tools.getFilenameBase(reportFileName);
 			File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
@@ -474,8 +472,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			exporter.exportReport();
 			tempOutputStream.close();
 
-			result = new FileInputStream(tempOutputFile);
-			return result;
+			return new FileInputStream(tempOutputFile);
 		} catch (SQLException sqle) {
 			// SQLExceptions can be chained. We have at least one exception, so
 			// set up a loop to make sure we let the user know about all of them
