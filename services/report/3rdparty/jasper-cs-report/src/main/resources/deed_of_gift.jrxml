@@ -4,19 +4,8 @@
 	xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
 	name="deedofgift" pageWidth="1500" pageHeight="800" orientation="Landscape" columnWidth="1460" leftMargin="20" rightMargin="20"
 	topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="202f91ff-d0dd-4eda-90de-a15938303d79">
-	<property name="net.sf.jasperreports.jrparameter.is.ignore.pagination" value="true" />
-	<property name="net.sf.jasperreports.export.xls.one.page.per.sheet" value="false" />
-	<property name="net.sf.jasperreports.export.xls.sheet.names.all" value="DeedOfGift-Report/Footnotes" />
-	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true" />
-	<property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true" />
-	<property name="net.sf.jasperreports.export.xls.white.page.background" value="false" />
-	<property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true" />
-	<property name="net.sf.jasperreports.page.break.no.pagination" value="apply" />
-	<property name="net.sf.jasperreports.export.xls.freeze.row" value="2" />
-	<property name="net.sf.jasperreports.print.keep.full.text" value="true" />
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="pageHeader" />
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter" />
-	<property name="net.sf.jasperreports.exports.xls.font.size.fix.enabled" value="false" />
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>

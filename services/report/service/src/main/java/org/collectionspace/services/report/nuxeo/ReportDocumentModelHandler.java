@@ -40,23 +40,30 @@ import javax.naming.NamingException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import net.sf.jasperreports.engine.JRBreak;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRExporter;
-import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JRTextElement;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.HtmlExporter;
 import net.sf.jasperreports.engine.export.JRCsvExporter;
-import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
 import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRXmlExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRPptxExporter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.export.Exporter;
+import net.sf.jasperreports.export.SimpleCsvExporterConfiguration;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleWriterExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
+import net.sf.jasperreports.export.SimpleXmlExporterOutput;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.ReportJAXBSchema;
 import org.collectionspace.services.account.AccountResource;
@@ -70,7 +77,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.ReportClient;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.ActionGroup;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -97,7 +103,6 @@ import org.collectionspace.services.report.ReportsCommon.ForRoles;
 import org.collectionspace.services.report.ReportsOuputMimeList;
 import org.collectionspace.services.report.ResourceActionGroup;
 import org.collectionspace.services.report.ResourceActionGroupList;
-import org.jfree.util.Log;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.slf4j.Logger;
@@ -200,7 +205,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		boolean releaseRepoSession = false;
 
 		// Ensure the current user has permission to run this report
-		if (isAuthoritzed(reportsCommon) == false) {
+		if (!isAuthorized(reportsCommon)) {
 			String msg = String.format("Report Resource: The user '%s' is not authorized to run the report '%s' CSID='%s'",
 					AuthN.get().getUserId(), reportsCommon.getName(), csid);
 			throw new PermissionException(msg);
@@ -355,56 +360,47 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
 	}
 
-    private InputStream buildReportResult(
-			String reportCSID,
-			HashMap<String, Object> params,
-			String reportFileName,
-			String outputMimeType,
-			StringBuffer outReportFileName
-		) throws Exception {
+	private InputStream buildReportResult(
+		String reportCSID,
+		HashMap<String, Object> params,
+		String reportFileName,
+		String outputMimeType,
+		StringBuffer outReportFileName) throws Exception {
 
-			Connection conn = null;
-			InputStream result = null;
+		try (Connection conn = getConnection()) {
+			String reportName = Tools.getFilenameBase(reportFileName);
+			File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
 
-    	try {
-				String reportName = Tools.getFilenameBase(reportFileName);
-				File reportCompiledFile = ReportResource.getReportCompiledFile(reportName);
+			if (!reportCompiledFile.exists()) {
+				// Need to compile the file.
 
-				if (!reportCompiledFile.exists()) {
-					// Need to compile the file.
+				File reportSourceFile = ReportResource.getReportSourceFile(reportName);
 
-					File reportSourceFile = ReportResource.getReportSourceFile(reportName);
+				if (!reportSourceFile.exists()) {
+					logger.error("Report for csid={} is missing source file: {}",
+								 reportCSID, reportSourceFile.getAbsolutePath());
 
-					if(!reportSourceFile.exists()) {
-						logger.error("Report for csid={} is missing source file: {}",
-								reportCSID, reportSourceFile.getAbsolutePath());
+					throw new RuntimeException("Report is missing source file");
+				}
 
-						throw new RuntimeException("Report is missing source file");
-					}
-
-					logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
+				logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
 							reportCSID, reportCompiledFile.getAbsolutePath());
 
-					JasperDesign design = JRXmlLoader.load(reportSourceFile.getAbsolutePath());
+				JasperDesign design = JRXmlLoader.load(reportSourceFile.getAbsolutePath());
 
-					design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
+				design.setScriptletClass("org.collectionspace.services.report.jasperreports.CSpaceReportScriptlet");
 
-					JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
-				}
+				JasperCompileManager.compileReportToFile(design, reportCompiledFile.getAbsolutePath());
+			}
 
-				conn = getConnection();
-
-				if (logger.isTraceEnabled()) {
-					logger.trace("ReportResource for csid=" + reportCSID
-							+ " output as " + outputMimeType + " using report file: " + reportCompiledFile.getAbsolutePath());
-				}
+			logger.trace("ReportResource for csid={} output as {} using report file: {}", reportCSID, outputMimeType,
+						 reportCompiledFile.getAbsolutePath());
 
 			FileInputStream fileStream = new FileInputStream(reportCompiledFile);
+			// Report will be to a temporary file.
+			File tempOutputFile = Files.createTempFile("report-", null).toFile();
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
 
-			// export report to pdf and build a response with the bytes
-			//JasperExportManager.exportReportToPdf(jasperprint);
-
-			JRExporter exporter = null;
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
@@ -417,134 +413,168 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			if (idx > 0) {
 				outputFilename = outputFilename.substring(idx + 1);
 			}
-			if (outputMimeType.equals(MediaType.APPLICATION_XML)) {
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRXmlExporter();
-				outputFilename = outputFilename+".xml";
-			} else if(outputMimeType.equals(MediaType.TEXT_HTML)) {
-				exporter = new HtmlExporter();
-				outputFilename = outputFilename+".html";
-			} else if(outputMimeType.equals(ReportClient.PDF_MIME_TYPE)) {
-				exporter = new JRPdfExporter();
-				outputFilename = outputFilename+".pdf";
-			} else if(outputMimeType.equals(ReportClient.CSV_MIME_TYPE)) {
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRCsvExporter();
-				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, ",");
-				outputFilename = outputFilename+".csv";
-			} else if(outputMimeType.equals(ReportClient.TSV_MIME_TYPE)) {
-				params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
-				exporter = new JRCsvExporter();
-				exporter.setParameter(JRCsvExporterParameter.FIELD_DELIMITER, "\t");
-				outputFilename = outputFilename+".csv";
-			} else if(outputMimeType.equals(ReportClient.MSWORD_MIME_TYPE)	// Understand msword as docx
-					|| outputMimeType.equals(ReportClient.OPEN_DOCX_MIME_TYPE)) {
-				exporter = new JRDocxExporter();
-				outputFilename = outputFilename+".docx";
-			} else if(outputMimeType.equals(ReportClient.MSEXCEL_MIME_TYPE)	// Understand msexcel as xlsx
-					|| outputMimeType.equals(ReportClient.OPEN_XLSX_MIME_TYPE)) {
-				exporter = new JRXlsxExporter();
-				outputFilename = outputFilename+".xlsx";
-			} else if(outputMimeType.equals(ReportClient.MSPPT_MIME_TYPE)	// Understand msppt as xlsx
-					|| outputMimeType.equals(ReportClient.OPEN_PPTX_MIME_TYPE)) {
-				exporter = new JRPptxExporter();
-				outputFilename = outputFilename+".pptx";
-			} else {
-				logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
-				exporter = new JRPdfExporter();
-				outputFilename = outputFilename+"-default-to.pdf";
-			}
-			outReportFileName.append(outputFilename); // Set the out going param to the report's final file name
-                        // FIXME: Logging temporarily set to INFO level for CSPACE-5766;
-                        // can change to TRACE or DEBUG level as warranted thereafter
-                        if (logger.isInfoEnabled()) {
-                            logger.info(FileTools.getJavaTmpDirInfo());
-                        }
-                        // fill the report
-			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
 
-			// Report will be to a temporary file.
-			File tempOutputFile = Files.createTempFile("report-", null).toFile();
-			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
-			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
+			Exporter exporter;
+			switch (outputMimeType) {
+				case MediaType.APPLICATION_XML:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = xmlExporter(tempOutputStream);
+					outputFilename = outputFilename + ".xml";
+					break;
+				case MediaType.TEXT_HTML:
+					exporter = htmlExporter(tempOutputStream);
+					outputFilename = outputFilename + ".html";
+					break;
+				case ReportClient.PDF_MIME_TYPE:
+					exporter = pdfExporter(tempOutputStream);
+					outputFilename = outputFilename + ".pdf";
+					break;
+				case ReportClient.CSV_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = csvExporter(tempOutputStream);
+					outputFilename = outputFilename + ".csv";
+					break;
+				case ReportClient.TSV_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, Boolean.TRUE);
+					exporter = tsvExporter(tempOutputStream);
+					outputFilename = outputFilename + ".csv";
+					break;
+				case ReportClient.MSWORD_MIME_TYPE:
+				case ReportClient.OPEN_DOCX_MIME_TYPE:
+					exporter = docxExporter(tempOutputStream);
+					outputFilename = outputFilename + ".docx";
+					break;
+				case ReportClient.MSEXCEL_MIME_TYPE:
+				case ReportClient.OPEN_XLSX_MIME_TYPE:
+					params.put(JRParameter.IS_IGNORE_PAGINATION, true);
+					params.put(JRBreak.PROPERTY_PAGE_BREAK_NO_PAGINATION, JRBreak.PAGE_BREAK_NO_PAGINATION_APPLY);
+					params.put(JRTextElement.PROPERTY_PRINT_KEEP_FULL_TEXT, true);
+					exporter = xlsxExporter(tempOutputStream, outputFilename);
+					outputFilename = outputFilename + ".xlsx";
+					break;
+				case ReportClient.MSPPT_MIME_TYPE:
+				case ReportClient.OPEN_PPTX_MIME_TYPE:
+					exporter = pptxExporter(tempOutputStream);
+					outputFilename = outputFilename + ".pptx";
+					break;
+				default:
+					logger.error("Reporting: unsupported output MIME type - defaulting to PDF");
+					exporter = pdfExporter(tempOutputStream);
+					outputFilename = outputFilename + "-default-to.pdf";
+					break;
+			}
+
+			outReportFileName.append(outputFilename); // Set the outgoing param to the report's final file name
+
+			// fill the report
+			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params, conn);
+			exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
 			exporter.exportReport();
 			tempOutputStream.close();
 
-			result = new FileInputStream(tempOutputFile);
-	       	return result;
-        } catch (SQLException sqle) {
-            // SQLExceptions can be chained. We have at least one exception, so
-            // set up a loop to make sure we let the user know about all of them
-            // if there happens to be more than one.
-            if (logger.isDebugEnabled()) {
-	            SQLException tempException = sqle;
-	            while (null != tempException) {
-	                	logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
+			return new FileInputStream(tempOutputFile);
+		} catch (SQLException sqle) {
+			logger.error("SQL Exception in report {}", reportCSID, sqle);
+			Response response = Response.serverError()
+				.entity("Invoke failed (SQL problem) on Report csid=" + reportCSID)
+				.type("text/plain").build();
+			throw new CSWebApplicationException(sqle, response);
+		} catch (JRException jre) {
+			logger.error("JasperReports Exception: {} Cause: {}", jre.getLocalizedMessage(), jre.getCause());
+			Response response = Response.serverError()
+				.entity("Invoke failed (Jasper problem) on Report csid=" + reportCSID)
+				.type("text/plain").build();
+			throw new CSWebApplicationException(jre, response);
+		} catch (FileNotFoundException fnfe) {
+			logger.error("FileNotFoundException: {}", fnfe.getLocalizedMessage());
+			Response response = Response.serverError()
+				.entity("Invoke failed (FileNotFound) on Report csid=" + reportCSID)
+				.type("text/plain").build();
+			throw new CSWebApplicationException(fnfe, response);
+		}
+	}
 
-	                // loop to the next exception
-	                tempException = tempException.getNextException();
-	            }
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(sqle, response);
-        } catch (JRException jre) {
-            if (logger.isDebugEnabled()) {
-            	logger.debug("JR Exception: " + jre.getLocalizedMessage() + " Cause: "+jre.getCause());
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (Jasper problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(jre, response);
-        } catch (FileNotFoundException fnfe) {
-            if (logger.isDebugEnabled()) {
-            	logger.debug("FileNotFoundException: " + fnfe.getLocalizedMessage());
-            }
-            Response response = Response.status(
-                    Response.Status.INTERNAL_SERVER_ERROR).entity(
-                    		"Invoke failed (SQL problem) on Report csid=" + reportCSID).type("text/plain").build();
-            throw new CSWebApplicationException(fnfe, response);
-		} finally {
-        	if (conn!=null) {
-        		try {
-        			conn.close();
-                } catch (SQLException sqle) {
-                    // SQLExceptions can be chained. We have at least one exception, so
-                    // set up a loop to make sure we let the user know about all of them
-                    // if there happens to be more than one.
-                    if (logger.isDebugEnabled()) {
-   	                	logger.debug("SQL Exception closing connection: "
-   	                			+ sqle.getLocalizedMessage());
-                    }
-                } catch (Exception e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Exception closing connection", e);
-                    }
-                }
-        	}
-        }
-    }
+	private JRPptxExporter pptxExporter(FileOutputStream outputStream) {
+		JRPptxExporter exporter = new JRPptxExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
 
-    private Connection getConnection() throws NamingException, SQLException {
-    	Connection result = null;
+	private JRXlsxExporter xlsxExporter(FileOutputStream outputStream, String outputFilename) {
+		JRXlsxExporter exporter = new JRXlsxExporter();
+		SimpleXlsxReportConfiguration reportConfig = new SimpleXlsxReportConfiguration();
+		reportConfig.setCollapseRowSpan(true);
+		reportConfig.setDetectCellType(true);
+		reportConfig.setRemoveEmptySpaceBetweenRows(true);
+		reportConfig.setRemoveEmptySpaceBetweenColumns(true);
+		reportConfig.setOnePagePerSheet(false);
+		reportConfig.setFontSizeFixEnabled(false);
+		reportConfig.setWhitePageBackground(false);
+		reportConfig.setFreezeRow(2);
+		reportConfig.setSheetNames(new String[] {outputFilename});
 
-    	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-    	try {
-    		String repositoryName = ctx.getRepositoryName();
-	    	if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
-                        String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
-                        String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-	    		result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
-	    	}
+		exporter.setConfiguration(reportConfig);
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRDocxExporter docxExporter(FileOutputStream outputStream) {
+		JRDocxExporter exporter = new JRDocxExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRCsvExporter tsvExporter(FileOutputStream outputStream) {
+		JRCsvExporter exporter = new JRCsvExporter();
+		final SimpleCsvExporterConfiguration exportConfig = new SimpleCsvExporterConfiguration();
+		exportConfig.setFieldDelimiter("\t");
+		exporter.setConfiguration(exportConfig);
+		exporter.setExporterOutput(new SimpleWriterExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRCsvExporter csvExporter(FileOutputStream outputStream) {
+		JRCsvExporter exporter = new JRCsvExporter();
+		exporter.setExporterOutput(new SimpleWriterExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRPdfExporter pdfExporter(FileOutputStream outputStream) {
+		JRPdfExporter exporter = new JRPdfExporter();
+		exporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private HtmlExporter htmlExporter(FileOutputStream outputStream) {
+		HtmlExporter exporter = new HtmlExporter();
+		exporter.setExporterOutput(new SimpleHtmlExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private JRXmlExporter xmlExporter(FileOutputStream outputStream) {
+		JRXmlExporter exporter = new JRXmlExporter();
+		exporter.setExporterOutput(new SimpleXmlExporterOutput(outputStream));
+		return exporter;
+	}
+
+	private Connection getConnection() throws NamingException, SQLException {
+		Connection result = null;
+
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
+		try {
+			String repositoryName = ctx.getRepositoryName();
+			if (repositoryName != null && repositoryName.trim().isEmpty() == false) {
+				String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
+				String databaseName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+				result = JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, databaseName);
+			}
 		} catch (Exception e) {
-			Log.error(e);
+			logger.error("Error getting database connection", e);
 			throw new NamingException();
 		}
 
-    	return result;
-    }
+		return result;
+	}
 
 	/**
 	 * Check to see if the current user is authorized to run/invoke this report.  If the report
@@ -552,7 +582,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	 * @param reportsCommon
 	 * @return
 	 */
-	protected boolean isAuthoritzedWithPermissions(ReportsCommon reportsCommon) {
+	protected boolean isAuthorizedWithPermissions(ReportsCommon reportsCommon) {
 		boolean result = true;
 
 		ResourceActionGroupList resourceActionGroupList = reportsCommon.getResourceActionGroupList();
@@ -618,13 +648,13 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	 * @param reportsCommon
 	 * @return
 	 */
-	protected boolean isAuthoritzed(ReportsCommon reportsCommon) {
+	protected boolean isAuthorized(ReportsCommon reportsCommon) {
 		boolean result = true;
 
 		if (hasRequiredRoles(reportsCommon)) {
 			result = isAuthorizedWithRoles(reportsCommon);
 		} else if (hasRequiredPermissions(reportsCommon)) {
-			result = isAuthoritzedWithPermissions(reportsCommon);
+			result = isAuthorizedWithPermissions(reportsCommon);
 		}
 
 		return result;
