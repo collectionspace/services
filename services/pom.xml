@@ -104,6 +104,7 @@
 		<module>summarydocumentation</module>
 		<module>heldintrust</module>
 		<module>consultation</module>
+		<module>deaccession</module>
 		<module>IntegrationTests</module>
 		<module>PerformanceTests</module>
 		<module>security</module>
