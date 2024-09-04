@@ -11,22 +11,20 @@
 <xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/deaccession"
+  jaxb:version="2.0"
   xmlns="http://collectionspace.org/services/deaccession"
   targetNamespace="http://collectionspace.org/services/deaccession"
   version="0.1"
 >
-
-<!--
-    Avoid XmlRootElement nightmare:
-    See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html
--->
-
   <!--  Deaccession Information Group -->
   <xs:element name="deaccessions_common">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="deaccessionNumber" type="xs:string" />
+        <xs:element name="deaccessionDate" type="xs:date" />
+        <xs:element name="deaccessionRationale" type="xs:string" />
+        <xs:element name="deaccessionNote" type="xs:string" />
+        <!-- todo: complex types -->
       </xs:sequence>
     </xs:complexType>
   </xs:element>
