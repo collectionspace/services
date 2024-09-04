@@ -211,6 +211,7 @@
         <ant antfile="citation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="person/build.xml" target="undeploy" inheritAll="false"/>
+        <ant antfile="deaccession/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="transport/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="uoc/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="publicitem/build.xml" target="undeploy" inheritAll="false"/>

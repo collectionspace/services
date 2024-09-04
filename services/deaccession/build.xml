@@ -10,6 +10,9 @@
   <property name="mvn.opts" value="-V" />
   <property name="src" location="src" />
 
+  <property name="nuxeo.deaccession.doctype.jars.all" value="collectionspace.deaccession.doctype.*.jar" />
+  <property name="nuxeo.deaccession.schema.jars.all" value="collectionspace.deaccession.schema.*.jar" />
+
   <condition property="osfamily-unix">
     <os family="unix" />
   </condition>
@@ -102,5 +105,18 @@
       <arg value="test" />
       <arg value="${mvn.opts}" />
     </exec>
+  </target>
+
+  <target name="undeploy"
+    description="undeploy deaccession doctype from ${jee.server.nuxeo}">
+    <delete>
+      <!-- Undeploy doctype and schema artifacts -->
+      <fileset dir="${jee.deploy.nuxeo.plugins}">
+        <include name="${nuxeo.deaccession.doctype.jars.all}" />
+      </fileset>
+      <fileset dir="${jee.deploy.nuxeo.plugins}">
+        <include name="${nuxeo.deaccession.schema.jars.all}" />
+      </fileset>
+    </delete>
   </target>
 </project>
