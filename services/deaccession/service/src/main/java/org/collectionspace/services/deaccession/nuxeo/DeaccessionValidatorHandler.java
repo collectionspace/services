@@ -14,19 +14,40 @@
  */
 package org.collectionspace.services.deaccession.nuxeo;
 
-import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.document.InvalidDocumentException;
-import org.collectionspace.services.common.document.ValidatorHandler;
-import org.collectionspace.services.common.document.DocumentHandler.Action;
+import org.collectionspace.services.common.document.ValidatorHandlerImpl;
 
-public class DeaccessionValidatorHandler implements ValidatorHandler {
+public class DeaccessionValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, PoxPayloadOut> {
 
     @Override
-    public void validate(Action action, ServiceContext ctx)
-                throws InvalidDocumentException {
-        // TODO Auto-generated method stub
-        System.out.println("DeaccessionValidatorHandler executed.");
+    protected Class<?> getCommonPartClass() {
+        return null;
+    }
+
+    @Override
+    protected void handleCreate() throws InvalidDocumentException {
 
     }
 
+    @Override
+    protected void handleGet() throws InvalidDocumentException {
+
+    }
+
+    @Override
+    protected void handleGetAll() throws InvalidDocumentException {
+
+    }
+
+    @Override
+    protected void handleUpdate() throws InvalidDocumentException {
+
+    }
+
+    @Override
+    protected void handleDelete() throws InvalidDocumentException {
+
+    }
 }
