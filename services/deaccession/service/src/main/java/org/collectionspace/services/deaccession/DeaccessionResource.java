@@ -23,8 +23,6 @@ package org.collectionspace.services.deaccession;
 
 import org.collectionspace.services.client.DeaccessionClient;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
@@ -35,12 +33,9 @@ import javax.ws.rs.Produces;
 @Produces("application/xml")
 public class DeaccessionResource extends NuxeoBasedResource {
 
-    final Logger logger = LoggerFactory.getLogger(DeaccessionResource.class);
-
     @Override
     protected String getVersionString() {
-        final String lastChangeRevision = "$LastChangedRevision$";
-        return lastChangeRevision;
+        return "$LastChangedRevision$";
     }
 
     @Override

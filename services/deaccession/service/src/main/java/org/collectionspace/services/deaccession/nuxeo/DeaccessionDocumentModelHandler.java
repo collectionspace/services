@@ -24,7 +24,8 @@ package org.collectionspace.services.deaccession.nuxeo;
 import org.collectionspace.services.deaccession.DeaccessionsCommon;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 
-/** DeaccessionDocumentModelHandler
+/**
+ * DeaccessionDocumentModelHandler
  */
 public class DeaccessionDocumentModelHandler
         extends NuxeoDocumentModelHandler<DeaccessionsCommon> {
