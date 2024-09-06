@@ -24,5 +24,4 @@ import javax.ws.rs.Produces;
 @Path(DeaccessionClient.SERVICE_PATH_PROXY)
 @Produces({"application/xml"})
 @Consumes({"application/xml"})
-public interface DeaccessionProxy extends CollectionSpaceCommonListPoxProxy {
-}
+public interface DeaccessionProxy extends CollectionSpaceCommonListPoxProxy {}

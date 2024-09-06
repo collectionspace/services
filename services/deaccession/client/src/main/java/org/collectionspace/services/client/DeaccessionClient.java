@@ -48,5 +48,4 @@ public class DeaccessionClient extends AbstractCommonListPoxServiceClientImpl<De
     public Class<DeaccessionProxy> getProxyClass() {
         return DeaccessionProxy.class;
     }
-
 }

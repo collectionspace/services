@@ -21,12 +21,11 @@
  */
 package org.collectionspace.services.deaccession;
 
-import org.collectionspace.services.client.DeaccessionClient;
-import org.collectionspace.services.common.NuxeoBasedResource;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import org.collectionspace.services.client.DeaccessionClient;
+import org.collectionspace.services.common.NuxeoBasedResource;
 
 @Path(DeaccessionClient.SERVICE_PATH)
 @Consumes("application/xml")

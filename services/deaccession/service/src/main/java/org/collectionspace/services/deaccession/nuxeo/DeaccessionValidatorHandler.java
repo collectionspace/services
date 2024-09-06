@@ -28,7 +28,7 @@ public class DeaccessionValidatorHandler extends ValidatorHandlerImpl<PoxPayload
 
     private static final String COMMON_PART_MISSING = "Validation exception: deaccessions_common part is missing";
     private static final String DEACCESSION_NUMBER_MISSING =
-        "Validation exception: The field \"deaccessionNumber\" cannot be empty or missing";
+            "Validation exception: The field \"deaccessionNumber\" cannot be empty or missing";
 
     @Override
     protected Class<?> getCommonPartClass() {
