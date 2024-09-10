@@ -29,6 +29,7 @@
 	<property environment="env" />
 	<property file="${services.trunk}/build.properties" />
 	<propertycopy name="cspace.ui.build" from="env.CSPACE_UI_BUILD" />
+	<propertycopy name="cspace.public.browser.build" from="env.CSPACE_UI_BUILD" />
 
 	<target name="clean">
 		<delete includeEmptyDirs="true">
@@ -51,14 +52,14 @@
 		</exec>
 	</target>
 
-	<target name="install_node" depends="install_nvm" if="${cspace.ui.build}">
+	<target name="install_cspace_ui_node" depends="install_nvm" if="${cspace.ui.build}">
 		<exec executable="bash" failonerror="true">
 			<arg value="-c" />
 			<arg value='source "$HOME/.nvm/nvm.sh" &amp;&amp; nvm install ${cspace.ui.build.node.ver} &amp;&amp; nvm use ${cspace.ui.build.node.ver} &amp;&amp; nvm install-latest-npm' />
 		</exec>
 	</target>
 
-	<target name="build_cspace_ui_js" depends="ensure_staging_dir,ensure_source_dir,install_node" if="${cspace.ui.build}">
+	<target name="build_cspace_ui_js" depends="ensure_staging_dir,ensure_source_dir,install_cspace_ui_node" if="${cspace.ui.build}">
 		<exec executable="bash" failonerror="true">
 			<arg value="-c" />
 			<arg value="./build_js.sh ${cspace.ui.package.name} ${cspace.ui.build.branch} ${source.dir} ${staging.dir} ${cspace.ui.library.name} ${service.ui.library.name}"/>
@@ -67,13 +68,7 @@
 
 	<target name="download_cspace_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
 		<exec executable="curl" failonerror="true">
-			<arg line="-o ${staging.dir}/${cspace.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/cspace-ui@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
-		</exec>
-	</target>
-
-	<target name="download_service_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
-		<exec executable="curl" failonerror="true">
-			<arg line="-o ${staging.dir}/${service.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/cspace-ui@${cspace.ui.version}/dist/${service.ui.library.name}.min.js"/>
+			<arg line="-o ${staging.dir}/${cspace.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/${cspace.ui.package.name}@${cspace.ui.version}/dist/${cspace.ui.library.name}.min.js"/>
 		</exec>
 	</target>
 
@@ -89,6 +84,12 @@
 		<copy file="${staging.dir}/${cspace.ui.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
+	<target name="download_service_ui_js" depends="ensure_staging_dir" unless="${cspace.ui.build}">
+		<exec executable="curl" failonerror="true">
+			<arg line="-o ${staging.dir}/${service.ui.library.name}@${cspace.ui.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/${cspace.ui.package.name}@${cspace.ui.version}/dist/${service.ui.library.name}.min.js"/>
+		</exec>
+	</target>
+
 	<target name="deploy_service_ui_js" depends="build_cspace_ui_js,download_service_ui_js">
 		<pathconvert property="service.ui.install.filename" targetos="unix">
 			<first>
@@ -101,7 +102,39 @@
 		<copy file="${staging.dir}/${service.ui.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
 	</target>
 
-	<target name="deploy_tenants" depends="deploy_cspace_ui_js">
+	<target name="install_cspace_public_browser_node" depends="install_nvm" if="${cspace.public.browser.build}">
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg value='source "$HOME/.nvm/nvm.sh" &amp;&amp; nvm install ${cspace.public.browser.build.node.ver} &amp;&amp; nvm use ${cspace.public.browser.build.node.ver} &amp;&amp; nvm install-latest-npm' />
+		</exec>
+	</target>
+
+	<target name="build_cspace_public_browser_js" depends="ensure_staging_dir,ensure_source_dir,install_cspace_public_browser_node" if="${cspace.public.browser.build}">
+		<exec executable="bash" failonerror="true">
+			<arg value="-c" />
+			<arg value="./build_js.sh ${cspace.public.browser.package.name} ${cspace.public.browser.build.branch} ${source.dir} ${staging.dir} ${cspace.public.browser.library.name}"/>
+		</exec>
+	</target>
+
+	<target name="download_cspace_public_browser_js" depends="ensure_staging_dir" unless="${cspace.public.browser.build}">
+		<exec executable="curl" failonerror="true">
+			<arg line="-o ${staging.dir}/${cspace.public.browser.library.name}@${cspace.public.browser.version}.min.js --fail --insecure --location https://cdn.jsdelivr.net/npm/${cspace.public.browser.package.name}@${cspace.public.browser.version}/dist/${cspace.public.browser.library.name}.min.js"/>
+		</exec>
+	</target>
+
+	<target name="deploy_cspace_public_browser_js" depends="build_cspace_public_browser_js,download_cspace_public_browser_js">
+		<pathconvert property="cspace.public.browser.install.filename" targetos="unix">
+			<first>
+				<fileset dir="${staging.dir}" includes="${cspace.public.browser.library.name}@*.min.js" />
+			</first>
+
+			<mapper type="flatten" />
+		</pathconvert>
+
+		<copy file="${staging.dir}/${cspace.public.browser.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
+	</target>
+
+	<target name="deploy_tenants" depends="deploy_cspace_ui_js,deploy_cspace_public_browser_js">
 		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
 			<dirset dir="." includes="*" excludes="${build.dir.name}" />
 		</subant>
@@ -155,7 +188,7 @@
 		</condition>
 	</target>
 
-	<target name="build_tenant_js" depends="check_build_tenant_js,ensure_staging_dir,ensure_source_dir,install_node" if="should.build.tenant.js">
+	<target name="build_tenant_js" depends="check_build_tenant_js,ensure_staging_dir,ensure_source_dir,install_cspace_ui_node" if="should.build.tenant.js">
 		<fail message="Build branch not found for ${tenant.shortname}. Set the tenant.ui.profile.plugin.build.branch property in ${basedir}/build.properties.">
 			<condition>
 				<not>
@@ -199,11 +232,17 @@
 	</target>
 
 	<target name="deploy_tenant_webapp" depends="deploy_tenant_js" unless="${tenant.create.disabled}">
+		<!-- Default values, in case these weren't set in the tenant's build.properties. -->
+		<property name="tenant.public.browser.gateway.url" value="" />
+
 		<filter token="UI_FILENAME" value="${cspace.ui.install.filename}" />
 		<filter token="UI_PROFILE_PLUGIN_FILENAME" value="${tenant.ui.profile.plugin.install.filename}" />
 		<filter token="UI_PROFILE_PLUGIN_LIBRARY_NAME" value="${tenant.ui.profile.plugin.library.name}" />
 		<filter token="BASENAME" value="${tenant.ui.basename}" />
+		<filter token="PUBLIC_BROWSER_FILENAME" value="${cspace.public.browser.install.filename}" />
+		<filter token="GATEWAY_URL" value="${tenant.public.browser.gateway.url}" />
 		<filter token="TENANT_ID" value="${resolved.tenant.id}" />
+		<filter token="TENANT_SHORTNAME" value="${tenant.shortname}" />
 
 		<copy todir="${jee.deploy.cspace}/${tenant.ui.webapp.dir}" failonerror="false" filtering="true" overwrite="true">
 			<fileset dir="${basedir}">
