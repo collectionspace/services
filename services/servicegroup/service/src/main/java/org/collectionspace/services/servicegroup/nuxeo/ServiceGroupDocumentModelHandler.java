@@ -185,8 +185,7 @@ public class ServiceGroupDocumentModelHandler
     		Map<String, ServiceBindingType> queriedServiceBindings,
     		CoreSessionInterface repoSession,
     		NuxeoRepositoryClientImpl repoClient) throws Exception {
-        
-        NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl)repoClient;
+
         // Get the service bindings for this tenant
         TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         // We need to get all the procedures, authorities, and objects.
@@ -231,8 +230,7 @@ public class ServiceGroupDocumentModelHandler
         // Now we have to issue the search
     	// The findDocs() method will build a QueryContext, which wants to see a docType for our context
     	ctx.setDocumentType(QueryManagerNuxeoImpl.NUXEO_DOCUMENT_TYPE);
-        DocumentWrapper<DocumentModelList> docListWrapper = 
-        		nuxeoRepoClient.findDocs(ctx, this, repoSession, docTypes );
+        DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx, this, repoSession, docTypes);
         // Now we gather the info for each document into the list and return
         DocumentModelList docList = docListWrapper.getWrappedObject();
     	
