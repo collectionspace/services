@@ -24,10 +24,13 @@
 package org.collectionspace.services.servicegroup.nuxeo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -199,18 +202,32 @@ public class ServiceGroupDocumentModelHandler
                     ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
             throw new CSWebApplicationException(response);
         }
-        
+
+		String tag = ctx.getQueryParams().getFirst(IQueryManager.TAG_QUERY_PARAM);
         servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
-        // Build the list of docTypes for allowed serviceBindings
+        // Build the list of docTypes for allowed serviceBindings filtered optionally on tags
         ArrayList<String> docTypes = new ArrayList<String>();
     	for(ServiceBindingType binding:servicebindings) {
-    		ServiceObjectType serviceObj = binding.getObject();
-    		if(serviceObj!=null) {
-                String docType = serviceObj.getName();
-        		docTypes.add(docType);
-                queriedServiceBindings.put(docType, binding);
-    		}
-    	}
+			String bindingTags = binding.getTags();
+			boolean acceptDocType = false;
+			if (tag == null) {
+				acceptDocType = true;
+			} else if (bindingTags != null) {
+				// can we get a set directly from the service binding type?
+				Set<String> acceptedTags = new HashSet<>();
+				Collections.addAll(acceptedTags, bindingTags.split(","));
+				acceptDocType = acceptedTags.contains(tag);
+			}
+
+            if (acceptDocType) {
+                ServiceObjectType serviceObj = binding.getObject();
+                if (serviceObj != null) {
+                    String docType = serviceObj.getName();
+                    docTypes.add(docType);
+                    queriedServiceBindings.put(docType, binding);
+                }
+            }
+        }
     	
     	// This should be type "Document" but CMIS is gagging on that right now.
     	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, QueryManagerNuxeoImpl.COLLECTIONSPACE_DOCUMENT_TYPE);
