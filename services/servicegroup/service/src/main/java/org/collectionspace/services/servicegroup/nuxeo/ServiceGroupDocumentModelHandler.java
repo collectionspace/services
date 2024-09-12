@@ -180,29 +180,29 @@ public class ServiceGroupDocumentModelHandler
 	}
 
 	private DocumentModelList getDocListForGroup(
-    		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-    		List<String> serviceGroupNames,
-    		Map<String, ServiceBindingType> queriedServiceBindings,
-    		CoreSessionInterface repoSession,
-    		NuxeoRepositoryClientImpl repoClient) throws Exception {
+		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+		List<String> serviceGroupNames,
+		Map<String, ServiceBindingType> queriedServiceBindings,
+		CoreSessionInterface repoSession,
+		NuxeoRepositoryClientImpl repoClient) throws Exception {
 
-        // Get the service bindings for this tenant
-        TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
-        // We need to get all the procedures, authorities, and objects.
-        List<ServiceBindingType> servicebindings = 
-        		tReader.getServiceBindingsByType(ctx.getTenantId(), serviceGroupNames);
-        if (servicebindings == null || servicebindings.isEmpty()) {
-            Response response = Response.status(Response.Status.NOT_FOUND).entity(
-                    ServiceMessages.READ_FAILED + 
-                    ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
-            throw new CSWebApplicationException(response);
-        }
+		// Get the service bindings for this tenant
+		TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+		// We need to get all the procedures, authorities, and objects.
+		List<ServiceBindingType> servicebindings =
+			tReader.getServiceBindingsByType(ctx.getTenantId(), serviceGroupNames);
+		if (servicebindings == null || servicebindings.isEmpty()) {
+			Response response = Response.status(Response.Status.NOT_FOUND).entity(
+				ServiceMessages.READ_FAILED +
+				ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
+			throw new CSWebApplicationException(response);
+		}
 
 		String tag = ctx.getQueryParams().getFirst(IQueryManager.TAG_QUERY_PARAM);
-        servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
-        // Build the list of docTypes for allowed serviceBindings filtered optionally on tags
-        ArrayList<String> docTypes = new ArrayList<String>();
-    	for(ServiceBindingType binding:servicebindings) {
+		servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
+		// Build the list of docTypes for allowed serviceBindings filtered optionally on tags
+		ArrayList<String> docTypes = new ArrayList<String>();
+		for (ServiceBindingType binding : servicebindings) {
 			boolean acceptDocType = false;
 			List<String> bindingTags = binding.getTags();
 			if (tag == null) {
@@ -211,29 +211,30 @@ public class ServiceGroupDocumentModelHandler
 				acceptDocType = bindingTags.contains(tag);
 			}
 
-            if (acceptDocType) {
-                ServiceObjectType serviceObj = binding.getObject();
-                if (serviceObj != null) {
-                    String docType = serviceObj.getName();
-                    docTypes.add(docType);
-                    queriedServiceBindings.put(docType, binding);
-                }
-            }
-        }
-    	
-    	// This should be type "Document" but CMIS is gagging on that right now.
-    	ctx.getQueryParams().add(IQueryManager.SELECT_DOC_TYPE_FIELD, QueryManagerNuxeoImpl.COLLECTIONSPACE_DOCUMENT_TYPE);
-        
-        // Now we have to issue the search
-    	// The findDocs() method will build a QueryContext, which wants to see a docType for our context
-    	ctx.setDocumentType(QueryManagerNuxeoImpl.NUXEO_DOCUMENT_TYPE);
-        DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx, this, repoSession, docTypes);
-        // Now we gather the info for each document into the list and return
-        DocumentModelList docList = docListWrapper.getWrappedObject();
-    	
-        return docList;
-    }
-    
+			if (acceptDocType) {
+				ServiceObjectType serviceObj = binding.getObject();
+				if (serviceObj != null) {
+					String docType = serviceObj.getName();
+					docTypes.add(docType);
+					queriedServiceBindings.put(docType, binding);
+				}
+			}
+		}
+
+		// This should be type "Document" but CMIS is gagging on that right now.
+		ctx.getQueryParams().add(
+			IQueryManager.SELECT_DOC_TYPE_FIELD,
+			QueryManagerNuxeoImpl.COLLECTIONSPACE_DOCUMENT_TYPE);
+
+		// Now we have to issue the search
+		// The findDocs() method will build a QueryContext, which wants to see a docType for our context
+		ctx.setDocumentType(QueryManagerNuxeoImpl.NUXEO_DOCUMENT_TYPE);
+		DocumentWrapper<DocumentModelList> docListWrapper = repoClient.findDocs(ctx, this, repoSession, docTypes);
+		// Now we gather the info for each document into the list and return
+		DocumentModelList docList = docListWrapper.getWrappedObject();
+		return docList;
+	}
+
     public AbstractCommonList getItemListForGroup(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		List<String> serviceGroupNames) throws Exception {
