@@ -203,15 +203,12 @@ public class ServiceGroupDocumentModelHandler
         // Build the list of docTypes for allowed serviceBindings filtered optionally on tags
         ArrayList<String> docTypes = new ArrayList<String>();
     	for(ServiceBindingType binding:servicebindings) {
-			String bindingTags = binding.getTags();
 			boolean acceptDocType = false;
+			List<String> bindingTags = binding.getTags();
 			if (tag == null) {
 				acceptDocType = true;
-			} else if (bindingTags != null) {
-				// can we get a set directly from the service binding type?
-				Set<String> acceptedTags = new HashSet<>();
-				Collections.addAll(acceptedTags, bindingTags.split(","));
-				acceptDocType = acceptedTags.contains(tag);
+			} else if (!bindingTags.isEmpty()) {
+				acceptDocType = bindingTags.contains(tag);
 			}
 
             if (acceptDocType) {
