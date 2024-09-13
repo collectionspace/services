@@ -1204,19 +1204,75 @@ public class RefNameServiceUtils {
      * @param parentcsid
      * @return
      */
-    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentcsid) {
+    public static String buildWhereForAuthItemByName(String authorityItemCommonSchemaName, String shortId, String parentCsid) {
     	String result = null;
 
         result = String.format("%s:%s='%s'", authorityItemCommonSchemaName, AuthorityItemJAXBSchema.SHORT_IDENTIFIER, shortId);
-        //
-        // Technically, we don't need the parent CSID since the short ID is unique so it can be null
-        //
-        if (parentcsid != null) {
-        	result = String.format("%s AND %s:%s='%s'",
-        			result, authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentcsid);
+        result = qualifyWhereForAuthItemByParentCsid(result, authorityItemCommonSchemaName, parentCsid);
+
+        return result;
+    }
+
+    public static String buildWhereForAuthItemByNameOrDisplayName(
+        String authorityItemCommonSchemaName,
+        String shortId,
+        String displayNameField,
+        String displayName,
+        String parentCsid
+    ) {
+        String result = null;
+        String nameClause = buildWhereForAuthItemByName(authorityItemCommonSchemaName, shortId, null);
+        String displayNameClause = buildWhereForAuthItemByDisplayName(displayNameField, displayName);
+
+        if (nameClause != null && displayNameClause != null) {
+            result = String.format("(%s OR %s)", nameClause, displayNameClause);
+        } else if (nameClause != null) {
+            result = nameClause;
+        } else if (displayNameClause != null) {
+            result = displayNameClause;
+        }
+
+        result = qualifyWhereForAuthItemByParentCsid(result, authorityItemCommonSchemaName, parentCsid);
+
+        return result;
+    }
+
+    public static String buildWhereForAuthItemByDisplayName(String displayNameField, String displayName) {
+        String result = null;
+
+        if (displayName != null) {
+            result = String.format("%s ILIKE '%s'", displayNameField, escapeNXQLLike(displayName));
         }
 
         return result;
+    }
+
+    public static String escapeNXQLLike(String value) {
+        String escaped = value;
+
+        escaped = escaped.replace("\\", "\\\\");
+        escaped = escaped.replace("'", "\\'");
+        escaped = escaped.replace("%", "\\%");
+        escaped = escaped.replace("_", "\\_");
+
+        return escaped;
+    }
+
+    public static String qualifyWhereForAuthItemByParentCsid(String where, String authorityItemCommonSchemaName, String parentCsid) {
+        if (parentCsid == null) {
+            return where;
+        }
+
+        String parentClause = String.format(
+            "%s:%s='%s'",
+            authorityItemCommonSchemaName, AuthorityItemJAXBSchema.IN_AUTHORITY, parentCsid
+        );
+
+        if (where == null) {
+           return parentClause;
+        }
+
+        return String.format("%s AND %s", where, parentClause);
     }
 
     /*

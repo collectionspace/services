@@ -23,6 +23,10 @@
  */
 package org.collectionspace.services.common.vocabulary;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +40,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -78,6 +83,7 @@ import org.collectionspace.services.common.document.DocumentReferenceException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.Hierarchy;
 import org.collectionspace.services.common.query.QueryManager;
+import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthorityItemSpecifier;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
@@ -97,6 +103,7 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentFilter;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
+import org.jboss.resteasy.specimpl.PathSegmentImpl;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
@@ -1289,6 +1296,28 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
 
         return result;
+    }
+
+    public boolean hasAuthorityItemWithShortNameOrDisplayName(String authorityIdentifier, String shortName, String displayName) throws Exception {
+        String as = RefNameServiceUtils.buildWhereForAuthItemByNameOrDisplayName(
+            authorityItemCommonSchemaName,
+            shortName,
+            getPartialTermMatchField(NULL_CONTEXT),
+            displayName,
+            null
+        );
+
+        UriInfo uriInfo = new UriInfoImpl(
+            new URI(""),
+            new URI(""),
+            "",
+            "pgSz=1&as=" + URLEncoder.encode(as, StandardCharsets.UTF_8.toString()),
+            Arrays.asList((PathSegment) new PathSegmentImpl("", false))
+        );
+
+        AbstractCommonList result = getAuthorityItemList(NULL_CONTEXT, authorityIdentifier, uriInfo);
+
+        return (result.getTotalItems() > 0);
     }
 
     /**
