@@ -35,6 +35,7 @@ import java.util.Set;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.services.config.service.Tags;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
@@ -204,20 +205,18 @@ public class ServiceGroupDocumentModelHandler
 		ArrayList<String> docTypes = new ArrayList<String>();
 		for (ServiceBindingType binding : servicebindings) {
 			boolean acceptDocType = false;
-			List<String> bindingTags = binding.getTags();
+			Tags tags = binding.getTags();
 			if (tag == null) {
 				acceptDocType = true;
-			} else if (!bindingTags.isEmpty()) {
-				acceptDocType = bindingTags.contains(tag);
+			} else if (tags != null && !tags.getTag().isEmpty()) {
+				acceptDocType = tags.getTag().contains(tag);
 			}
 
-			if (acceptDocType) {
-				ServiceObjectType serviceObj = binding.getObject();
-				if (serviceObj != null) {
-					String docType = serviceObj.getName();
-					docTypes.add(docType);
-					queriedServiceBindings.put(docType, binding);
-				}
+			ServiceObjectType serviceObj = binding.getObject();
+			if (acceptDocType && serviceObj != null) {
+				String docType = serviceObj.getName();
+				docTypes.add(docType);
+				queriedServiceBindings.put(docType, binding);
 			}
 		}
 
