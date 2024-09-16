@@ -178,6 +178,23 @@ public class ServiceGroupDocumentModelHandler
     	return result;
 	}
 
+	/**
+	 * Search for documents matching a query from the service context and return the ${@link DocumentModelList}
+	 * <p>
+	 * This relies on the ServiceContext in order to get the tag query parameter of the HTTP request. If no tag
+	 * parameter exists in the context, all document types are queried against. If a tag does exist, we check the
+	 * service bindings to see if they include said tag. If no service bindings match the tag, we throw a 400 as we
+	 * cannot query using an empty set.
+	 *
+	 * @param ctx
+	 * @param serviceGroupNames
+	 * @param queriedServiceBindings
+	 * @param repoSession
+	 * @param repoClient
+	 * @return the result of the query
+	 * @throws CSWebApplicationException (400) if the doc types set to query against is empty
+	 * @throws CSWebApplicationException (404) if the service bindings cannot be read
+	 */
 	private DocumentModelList getDocListForGroup(
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 		List<String> serviceGroupNames,
