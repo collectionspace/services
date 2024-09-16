@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -193,9 +194,10 @@ public class ServiceGroupDocumentModelHandler
 		List<ServiceBindingType> servicebindings =
 			tReader.getServiceBindingsByType(ctx.getTenantId(), serviceGroupNames);
 		if (servicebindings == null || servicebindings.isEmpty()) {
-			Response response = Response.status(Response.Status.NOT_FOUND).entity(
-				ServiceMessages.READ_FAILED +
-				ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ","))).type("text/plain").build();
+			Response response = Response.status(Response.Status.NOT_FOUND)
+				.entity(ServiceMessages.READ_FAILED +
+						ServiceMessages.resourceNotFoundMsg(implode(serviceGroupNames, ",")))
+				.type(MediaType.TEXT_PLAIN_TYPE).build();
 			throw new CSWebApplicationException(response);
 		}
 
@@ -218,6 +220,15 @@ public class ServiceGroupDocumentModelHandler
 				docTypes.add(docType);
 				queriedServiceBindings.put(docType, binding);
 			}
+		}
+
+		// we can't query if no doc types match, likely from a bad tag
+		if (docTypes.isEmpty()) {
+			Response response = Response.status(Response.Status.BAD_REQUEST)
+				.entity("Cannot query against no document types. Check that tag " + tag + " is correct.")
+				.type(MediaType.TEXT_PLAIN_TYPE)
+				.build();
+			throw new CSWebApplicationException(response);
 		}
 
 		// This should be type "Document" but CMIS is gagging on that right now.
