@@ -523,55 +523,48 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		initializeAuthorityInstanceTerms(authorityResource, client, authoritySpecifier, resourceMap, authorityInstance, serviceName, cspaceTenant);
 	}
 
-    private void initializeAuthorityInstanceTerms(
-    		AuthorityResource authorityResource,
-    		AuthorityClient client,
-    		String authoritySpecifier,
-    		ResourceMap resourceMap,
-    		AuthorityInstanceType authorityInstance,
-    		String serviceName,
-    		CSpaceTenant tenant) throws Exception {
+	private void initializeAuthorityInstanceTerms(
+			AuthorityResource authorityResource,
+			AuthorityClient client,
+			String authoritySpecifier,
+			ResourceMap resourceMap,
+			AuthorityInstanceType authorityInstance,
+			String serviceName,
+			CSpaceTenant tenant) throws Exception {
 
-    	int status = -1;
-    	Response response = null;
+		int status = -1;
+		Response response = null;
 
-    	TermList termListElement = authorityInstance.getTermList();
-    	if (termListElement == null) {
-    		return;
-    	}
+		TermList termListElement = authorityInstance.getTermList();
+		if (termListElement == null) {
+			return;
+		}
 
-    	for (Term term : termListElement.getTerm()) {
-    		//
-    		// Check to see if the term already exists
-    		//
-    		try {
-    			String termSpecifier = RefName.shortIdToPath(term.getId());
-    			authorityResource.getAuthorityItem(null, null, resourceMap, authoritySpecifier, termSpecifier);
-    			status = Response.Status.OK.getStatusCode();
-    		} catch (CSWebApplicationException e) {
-    			response = e.getResponse();  // If the authority doesn't exist, we expect a 404 error
-    			status = response.getStatus();
-    		}
+		for (Term term : termListElement.getTerm()) {
+			//
+			// Check to see if the term already exists
+			//
+			String termShortName = term.getId();
+			String termDisplayName = term.getContent().trim();
+			boolean exists = authorityResource.hasAuthorityItemWithShortNameOrDisplayName(authoritySpecifier, termShortName, termDisplayName);
 
-    		//
-    		// If the term doesn't exist, create it.
-    		//
-    		if (status != Response.Status.OK.getStatusCode()) {
-    			String termShortId = term.getId();
-    			String termDisplayName = term.getContent().trim();
-	    		String xmlPayload = client.createAuthorityItemInstance(termShortId, termDisplayName);
-	    		try {
-	    			authorityResource.createAuthorityItem(resourceMap, null, authoritySpecifier, xmlPayload);
-	    			logger.debug("Tenant:{}:Created a new term '{}:{}' in the authority of type '{}' with the short ID of '{}'.",
-	    					tenant.getName(), termDisplayName, termShortId, serviceName, authorityInstance.getTitleRef());
-	    		} catch (CSWebApplicationException e) {
-	    			response = e.getResponse();
-	    			status = response.getStatus();
-	    			if (status != Response.Status.CREATED.getStatusCode()) {
-	    				throw new CSWebApplicationException(response);
-	    			}
-	    		}
-    		}
-    	}
-    }
+			//
+			// If the term doesn't exist, create it.
+			//
+			if (!exists) {
+				String xmlPayload = client.createAuthorityItemInstance(termShortName, termDisplayName);
+				try {
+					authorityResource.createAuthorityItem(resourceMap, null, authoritySpecifier, xmlPayload);
+					logger.debug("Tenant:{}:Created a new term '{}:{}' in the authority of type '{}' with the short ID of '{}'.",
+							tenant.getName(), termDisplayName, termShortName, serviceName, authorityInstance.getTitleRef());
+				} catch (CSWebApplicationException e) {
+					response = e.getResponse();
+					status = response.getStatus();
+					if (status != Response.Status.CREATED.getStatusCode()) {
+						throw new CSWebApplicationException(response);
+					}
+				}
+			}
+		}
+	}
 }

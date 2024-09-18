@@ -79,17 +79,17 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.DatatypeConverter;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
-public class VocabularyResource extends 
+public class VocabularyResource extends
 	AuthorityResource<VocabulariesCommon, VocabularyItemDocumentModelHandler> {
 
 	private enum Method {
         POST, PUT;
     }
-	
+
     private final static String vocabularyServiceName = VocabularyClient.SERVICE_PATH_COMPONENT;
 
 	private final static String VOCABULARIES_COMMON = "vocabularies_common";
-    
+
     private final static String vocabularyItemServiceName = "vocabularyitems";
 	private final static String VOCABULARYITEMS_COMMON = "vocabularyitems_common";
 
@@ -118,10 +118,10 @@ public class VocabularyResource extends
 	            PoxPayloadIn input = new PoxPayloadIn(xmlPayload);
 	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(input);
 				RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient = this.getRepositoryClient(ctx);
-				
+
 				CoreSessionInterface repoSession = repoClient.getRepositorySession(ctx);
 				try {
-		            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);		            
+		            DocumentHandler<?, AbstractCommonList, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 		            String csid = repoClient.create(ctx, handler);
 		            //
 		            // Handle any supplied list of items/terms
@@ -142,7 +142,7 @@ public class VocabularyResource extends
 	        }
     	}
     }
-        
+
     @PUT
     @Path("{csid}")
     @Override
@@ -188,7 +188,7 @@ public class VocabularyResource extends
         }
         return result.getBytes();
     }
-    
+
     private void updateWithItemsPayload(
     		AbstractCommonList itemsList,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
@@ -196,7 +196,7 @@ public class VocabularyResource extends
     		ResourceMap resourceMap,
     		UriInfo uriInfo,
     		PoxPayloadIn input) throws Exception {
-    	
+
     	CoreSessionInterface repoSession = (CoreSessionInterface) existingCtx.getCurrentRepositorySession();
 		Set<String> shortIdsInPayload = getListOfShortIds(itemsList); // record the list of existing or new terms/items
 
@@ -276,13 +276,13 @@ public class VocabularyResource extends
 			}
 		}
 	}
-    
+
     private String getShortId(PoxPayloadIn itemXmlPayload) {
 		String result = null;
-		
+
 		VocabularyitemsCommon vocabularyItemsCommon = (VocabularyitemsCommon) itemXmlPayload.getPart(VOCABULARYITEMS_COMMON).getBody();
 		result = vocabularyItemsCommon.getShortIdentifier();
-		
+
 		return result;
 	}
 
@@ -291,35 +291,35 @@ public class VocabularyResource extends
     		AbstractCommonList abstractCommonList,
     		Set<String> shortIdsInPayload,
     		String parentIdentifier) throws Exception {
-    	
+
 		for (ListItem item : abstractCommonList.getListItem()) {
 			String shortId = getShortId(item);
 			if (shortIdsInPayload.contains(shortId) == false) {
 				deleteAuthorityItem(existingCtx, parentIdentifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
 			}
-		}    	
+		}
     }
-    
+
     private void sotfDeleteAuthorityItems(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
     		AbstractCommonList abstractCommonList,
     		Set<String> shortIdsInPayload,
     		String parentIdentifier) throws Exception {
-    	
+
 		for (ListItem item : abstractCommonList.getListItem()) {
 			String shortId = getShortId(item);
 			if (shortIdsInPayload.contains(shortId) == false) {
 				//deleteAuthorityItem(existingCtx, parentIdentifier, getCsid(item), AuthorityServiceUtils.UPDATE_REV);
-				this.updateItemWorkflowWithTransition(existingCtx, parentIdentifier, getCsid(item), 
+				this.updateItemWorkflowWithTransition(existingCtx, parentIdentifier, getCsid(item),
 						WorkflowClient.WORKFLOWTRANSITION_DELETE, AuthorityServiceUtils.UPDATE_REV);
 			}
-		}    	
+		}
     }
-        
+
     private boolean shouldDeleteOmittedItems(UriInfo uriInfo) throws DocumentException {
     	boolean result = false;
-    	
-		String omittedItemAction = getOmittedItemAction(uriInfo);		
+
+		String omittedItemAction = getOmittedItemAction(uriInfo);
 		if (Tools.isEmpty(omittedItemAction) == false) {
 			switch (omittedItemAction) {
 				case VocabularyClient.DELETE_OMITTED_ITEMS:
@@ -334,10 +334,10 @@ public class VocabularyResource extends
 					throw new DocumentException(msg);
 			}
 		}
-		
+
 		return result;
 	}
-    
+
     private String getOmittedItemAction(UriInfo uriInfo) {
 		MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
 		String omittedItemAction = queryParams.getFirst(VocabularyClient.OMITTED_ITEM_ACTION_QP);
@@ -349,24 +349,24 @@ public class VocabularyResource extends
      */
     private Set<String> getListOfShortIds(AbstractCommonList itemsList) {
 		HashSet<String> result = new HashSet<String>();
-		
+
 		for (ListItem item : itemsList.getListItem()) {
 			String shortId = getShortId(item);
 			if (Tools.isEmpty(shortId) == false) {
 				result.add(shortId);
 			}
 		}
-		
+
 		return result;
 	}
 
 	private void createWithItemsPayload(
 			AbstractCommonList itemsList,
-			ServiceContext<PoxPayloadIn, 
-			PoxPayloadOut> existingCtx, 
-			String parentIdentifier, 
+			ServiceContext<PoxPayloadIn,
+			PoxPayloadOut> existingCtx,
+			String parentIdentifier,
 			ResourceMap resourceMap,
-			UriInfo uriInfo, 
+			UriInfo uriInfo,
 			PoxPayloadIn input) throws Exception {
 
 		for (ListItem item : itemsList.getListItem()) {
@@ -388,8 +388,8 @@ public class VocabularyResource extends
 				throw new DocumentException(errMsg);
 			}
 		}
-	}   
-    
+	}
+
     private boolean handleItemsPayload(
     		Method method,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> existingCtx,
@@ -398,7 +398,7 @@ public class VocabularyResource extends
     		UriInfo uriInfo,
     		PoxPayloadIn input) throws Exception {
     	boolean result = false;
-    	
+
     	PayloadInputPart abstractCommonListPart  = input.getPart(PoxPayload.ABSTRACT_COMMON_LIST_ROOT_ELEMENT_LABEL);
     	if (abstractCommonListPart != null) {
     		AbstractCommonList itemsList = (AbstractCommonList) abstractCommonListPart.getBody();
@@ -408,17 +408,17 @@ public class VocabularyResource extends
         			break;
     			case PUT:
 		            updateWithItemsPayload(itemsList, existingCtx, parentIdentifier, resourceMap, uriInfo, input);
-        			break;	        			
+        			break;
 			}
 			result = true; // mark that we've handled an items-list payload
     	}
-    	
+
     	return result;
 	}
-    
+
     private String getFieldValue(ListItem item, String lookingFor) {
     	String result = null;
-    	
+
 		for (Element ele : item.getAny()) {
 			String fieldName = ele.getTagName();
 			String fieldValue = ele.getTextContent();
@@ -426,26 +426,26 @@ public class VocabularyResource extends
 				result = fieldValue;
 				break;
 			}
-		}    	
-    	
+		}
+
     	return result;
     }
-    
+
     public String getCsid(ListItem item) {
     	return getFieldValue(item, "csid");
     }
-    
+
     private String getShortId(ListItem item) {
     	return getFieldValue(item, "shortIdentifier");
     }
-    
+
     private String getDisplayName(ListItem item) {
     	return getFieldValue(item, "displayName");
     }
-    
+
     /**
      * We'll return null if we can create a specifier from the list item.
-     * 
+     *
      * @param item
      * @return
      */
@@ -454,7 +454,7 @@ public class VocabularyResource extends
 
 		String csid = result = getCsid(item);
 		if (csid == null) {
-			String shortId = getShortId(item);			
+			String shortId = getShortId(item);
 			if (shortId != null) {
 				result = Specifier.createShortIdURNValue(shortId);
 			}
@@ -466,10 +466,10 @@ public class VocabularyResource extends
 	/**
      * This is very brittle.  If the class VocabularyitemsCommon changed with new fields we'd have to
      * update this method.
-     * 
+     *
      * @param item
      * @return
-     * @throws DocumentException 
+     * @throws DocumentException
      */
 	private PoxPayloadIn getItemXmlPayload(ListItem item) throws DocumentException {
 		PoxPayloadIn result = null;
@@ -482,31 +482,31 @@ public class VocabularyResource extends
 				case "displayName":
 					vocabularyItem.setDisplayName(fieldValue);
 					break;
-					
+
 				case "shortIdentifier":
 					vocabularyItem.setShortIdentifier(fieldValue);
 					break;
-					
+
 				case "order":
 					vocabularyItem.setOrder(fieldValue);
 					break;
-					
+
 				case "source":
 					vocabularyItem.setSource(fieldValue);
 					break;
-					
+
 				case "sourcePage":
 					vocabularyItem.setSourcePage(fieldValue);
 					break;
-					
+
 				case "description":
 					vocabularyItem.setDescription(fieldValue);
 					break;
-					
+
 				case "csid":
 					vocabularyItem.setCsid(fieldValue);
 					break;
-					
+
 				case "termStatus":
 					vocabularyItem.setTermStatus(fieldValue);
 					break;
@@ -523,13 +523,13 @@ public class VocabularyResource extends
 			vocabularyItem.setShortIdentifier(AuthorityIdentifierUtils.generateShortIdentifierFromDisplayName(
 					vocabularyItem.getDisplayName() , null)); ;
 		}
-		
-		result = new PoxPayloadIn(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME, vocabularyItem, 
+
+		result = new PoxPayloadIn(VocabularyClient.SERVICE_ITEM_PAYLOAD_NAME, vocabularyItem,
     			VOCABULARYITEMS_COMMON);
 
-		return result; 
+		return result;
 	}
-    
+
 	private Response createAuthorityItem(
     		CoreSessionInterface repoSession,
     		ResourceMap resourceMap,
@@ -537,16 +537,16 @@ public class VocabularyResource extends
     		String parentIdentifier, // Either a CSID or a URN form -e.g., a8ad38ec-1d7d-4bf2-bd31 or urn:cspace:name(bugsbunny)
     		PoxPayloadIn input) throws Exception {
     	Response result = null;
-    	
+
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), input, resourceMap, uriInfo);
         ctx.setCurrentRepositorySession(repoSession);
-        
+
         result = createAuthorityItem(ctx, parentIdentifier, AuthorityServiceUtils.UPDATE_REV,
         		AuthorityServiceUtils.PROPOSED, AuthorityServiceUtils.NOT_SAS_ITEM);
 
         return result;
     }
-	
+
 	private PoxPayloadOut updateAuthorityItem(
     		CoreSessionInterface repoSession,
     		ResourceMap resourceMap,
@@ -555,10 +555,10 @@ public class VocabularyResource extends
     		String itemSpecifier, 	// Either a CSID or a URN form.
     		PoxPayloadIn theUpdate) throws Exception {
     	PoxPayloadOut result = null;
-    	
+
         ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), theUpdate, resourceMap, uriInfo);
         ctx.setCurrentRepositorySession(repoSession);
-        
+
         result = updateAuthorityItem(ctx, resourceMap, uriInfo, parentSpecifier, itemSpecifier, theUpdate,
         		AuthorityServiceUtils.UPDATE_REV,			// passing TRUE so rev num increases, passing
         		AuthorityServiceUtils.NO_CHANGE,	// don't change the state of the "proposed" field -we could be performing a sync or just a plain update
@@ -572,12 +572,12 @@ public class VocabularyResource extends
     @Override
     public Response get(
             @Context Request request,
-            @Context ResourceMap resourceMap, 
+            @Context ResourceMap resourceMap,
             @Context UriInfo uriInfo,
             @PathParam("csid") String specifier) {
     	Response result = null;
     	uriInfo = new UriInfoWrapper(uriInfo);
-        
+
         try {
         	MultivaluedMap<String,String> queryParams = uriInfo.getQueryParameters();
         	String showItemsValue = (String)queryParams.getFirst(VocabularyClient.SHOW_ITEMS_QP);
@@ -613,7 +613,7 @@ public class VocabularyResource extends
 
         return result;
     }
-    
+
     @Override
     public String getServiceName() {
         return vocabularyServiceName;
@@ -623,7 +623,7 @@ public class VocabularyResource extends
     public String getItemServiceName() {
         return vocabularyItemServiceName;
     }
-    
+
 	@Override
 	public Class<VocabulariesCommon> getCommonPartClass() {
 		return VocabulariesCommon.class;
@@ -638,16 +638,16 @@ public class VocabularyResource extends
     protected String getRefPropName() {
     	return ServiceBindingUtils.TERM_REF_PROP;
     }
-	
+
 	@Override
 	protected String getOrderByField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		String result = null;
 
-		result = ctx.getCommonPartLabel() + ":" + AuthorityItemJAXBSchema.DISPLAY_NAME;
+		result = authorityItemCommonSchemaName + ":" + AuthorityItemJAXBSchema.DISPLAY_NAME;
 
 		return result;
 	}
-	
+
 	@Override
 	protected String getPartialTermMatchField(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		return getOrderByField(ctx);
