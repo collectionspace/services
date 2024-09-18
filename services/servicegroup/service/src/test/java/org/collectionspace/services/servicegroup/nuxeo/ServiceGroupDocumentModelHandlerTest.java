@@ -2,8 +2,8 @@ package org.collectionspace.services.servicegroup.nuxeo;
 
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.Tags;
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Unit tests for ServiceGroupDocumentModelHandler
