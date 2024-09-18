@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Deaccession schema (XSD)
+
+    Entity  : Deaccession
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns="http://collectionspace.org/services/deaccession"
+  targetNamespace="http://collectionspace.org/services/deaccession"
+  version="0.1"
+>
+  <!--  Deaccession Information Group -->
+  <xs:element name="deaccessions_common">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="deaccessionNumber" type="xs:string" />
+        <xs:element name="deaccessionDate" type="xs:date" />
+        <xs:element name="deaccessionRationale" type="xs:string" />
+        <xs:element name="deaccessionNote" type="xs:string" />
+        <xs:element name="exitDate" type="xs:date" />
+
+        <xs:element name="deaccessionReasons" type="deaccessionReasons" />
+        <xs:element name="exitRecipients" type="exitRecipients" />
+        <xs:element name="exitMethods" type="exitMethods" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="deaccessionReasons">
+    <xs:sequence>
+      <xs:element name="deaccessionReason" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exitRecipients">
+    <xs:sequence>
+      <xs:element name="exitRecipient" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exitMethods">
+    <xs:sequence>
+      <xs:element name="exitMethod" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deaccessionApprovalGroupList">
+    <xs:sequence>
+      <xs:element name="deaccessionApprovalGroup" type="deaccessionApprovalGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="deaccessionApprovalGroup">
+    <xs:sequence>
+      <xs:element name="deaccessionApprovalGroup" type="xs:string" />
+      <xs:element name="deaccessionApprovalIndividual" type="xs:string" />
+      <xs:element name="deaccessionApprovalStatus" type="xs:string" />
+      <xs:element name="deaccessionApprovalDate" type="xs:date" />
+      <xs:element name="deaccessionApprovalNote" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
