@@ -215,14 +215,14 @@ public class ServiceGroupDocumentModelHandler
 			throw new CSWebApplicationException(response);
 		}
 
-		List<String> queryTags = ctx.getQueryParams().get(IQueryManager.TAG_QUERY_PARAM);
+		String queryTag = ctx.getQueryParams().getFirst(IQueryManager.TAG_QUERY_PARAM);
 		servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
 		// Build the list of docTypes for allowed serviceBindings filtered optionally on tags
 		ArrayList<String> docTypes = new ArrayList<String>();
 		for (ServiceBindingType binding : servicebindings) {
 			boolean acceptDocType = true;
-			if (queryTags != null && !queryTags.isEmpty()) {
-				acceptDocType = acceptServiceBinding(binding, queryTags);
+			if (queryTag != null && !queryTag.isEmpty()) {
+				acceptDocType = acceptServiceBinding(binding, queryTag);
 			}
 
 			ServiceObjectType serviceObj = binding.getObject();
@@ -257,31 +257,27 @@ public class ServiceGroupDocumentModelHandler
 	}
 
 	/**
-	 * Test if a service binding should be used in a query based on the tag query parameters passed in.
+	 * Test if a service binding should be included in a search based on the tag query parameter passed in.
 	 * <p>
 	 * If a tag starts with a "-", it is assumed this is intended to be a negation, and we check if the service binding
 	 * does not contain said tag.
 	 *
 	 * @param binding the ServiceBinding to check
-	 * @param queryTags the list of tag query parameters
+	 * @param queryTag tag query parameter
 	 * @return true if the ServiceBinding contains all query parameters, false otherwise
 	 */
-	public boolean acceptServiceBinding(ServiceBindingType binding, List<String> queryTags) {
+	public boolean acceptServiceBinding(ServiceBindingType binding, String queryTag) {
 		final Tags tags = binding.getTags();
 		if (tags == null || tags.getTag().isEmpty()) {
 			return false;
 		}
 
-		boolean accept = true;
-		// todo: what about empty strings? can they come through?
+		boolean accept;
 		final List<String> tagList = tags.getTag();
-		for (String query : queryTags) {
-			if (query.startsWith("-")) {
-				query = query.substring(1);
-				accept &= !tagList.contains(query);
-			} else {
-				accept &= tagList.contains(query);
-			}
+		if (queryTag.startsWith("-")) {
+			accept = !tagList.contains(queryTag.substring(1));
+		} else {
+			accept = tagList.contains(queryTag);
 		}
 
 		return accept;
