@@ -1278,7 +1278,7 @@ INSERT INTO id_generators
   SELECT
      '0b508d05-67df-4b63-b4ce-7319a3029baa',
      'Deaccession Number',
-     'Identifies a consultation document.',
+     'Identifies a deaccession document.',
      '9',
      '',
 '<org.collectionspace.services.id.SettableIDGenerator>
