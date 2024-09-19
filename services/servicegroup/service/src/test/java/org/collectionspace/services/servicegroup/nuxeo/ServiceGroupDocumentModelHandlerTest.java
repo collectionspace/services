@@ -28,6 +28,15 @@ public class ServiceGroupDocumentModelHandlerTest {
     }
 
     @Test
+    public void acceptServiceBindingNoTagWhenNegation() {
+        ServiceBindingType binding = new ServiceBindingType();
+        ServiceGroupDocumentModelHandler handler = new ServiceGroupDocumentModelHandler();
+
+        boolean accept = handler.acceptServiceBinding(binding, NEGATED_TAG);
+        Assert.assertTrue(accept);
+    }
+
+    @Test
     public void rejectServiceBinding() {
         ServiceGroupDocumentModelHandler handler = new ServiceGroupDocumentModelHandler();
 
@@ -73,4 +82,5 @@ public class ServiceGroupDocumentModelHandlerTest {
         boolean accept = handler.acceptServiceBinding(binding, NEGATED_TAG);
         Assert.assertFalse(accept);
     }
+
 }

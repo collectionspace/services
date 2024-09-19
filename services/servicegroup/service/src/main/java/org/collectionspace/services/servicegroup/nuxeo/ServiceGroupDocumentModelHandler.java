@@ -24,6 +24,7 @@
 package org.collectionspace.services.servicegroup.nuxeo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -268,12 +269,9 @@ public class ServiceGroupDocumentModelHandler
 	 */
 	public boolean acceptServiceBinding(ServiceBindingType binding, String queryTag) {
 		final Tags tags = binding.getTags();
-		if (tags == null || tags.getTag().isEmpty()) {
-			return false;
-		}
+		final List<String> tagList = tags == null ? Collections.<String>emptyList() : tags.getTag();
 
 		boolean accept;
-		final List<String> tagList = tags.getTag();
 		if (queryTag.startsWith("-")) {
 			accept = !tagList.contains(queryTag.substring(1));
 		} else {
