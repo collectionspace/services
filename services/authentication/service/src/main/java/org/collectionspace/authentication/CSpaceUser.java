@@ -35,6 +35,7 @@ public class CSpaceUser extends User {
     private Set<CSpaceTenant> tenants;
     private CSpaceTenant primaryTenant;
     private boolean requireSSO;
+    private String ssoId;
     private String salt;
 
     /**
@@ -47,6 +48,7 @@ public class CSpaceUser extends User {
      * @param authorities the authorities that have been granted to the user
      */
     public CSpaceUser(String username, String password, String salt,
+            String ssoId,
             boolean requireSSO,
             Set<CSpaceTenant> tenants,
             Set<? extends GrantedAuthority> authorities) {
@@ -59,6 +61,7 @@ public class CSpaceUser extends User {
                 authorities);
 
         this.tenants = tenants;
+        this.ssoId = ssoId;
         this.requireSSO = requireSSO;
         this.salt = salt;
 
@@ -91,6 +94,14 @@ public class CSpaceUser extends User {
      */
     public String getSalt() {
     	return salt != null ? salt : "";
+    }
+
+    /**
+     * Returns the ID from the user's SSO provider, if the user signed in via SSO
+     * @return
+     */
+    public String getSsoId() {
+        return ssoId;
     }
 
     /**

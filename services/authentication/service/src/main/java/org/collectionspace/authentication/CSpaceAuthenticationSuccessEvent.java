@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 
 public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    private static final String UPDATE_USER_SQL =
+    private static final String UPDATE_USER_LAST_LOGIN_SQL =
             "UPDATE users SET lastlogin = now() WHERE username = ?";
 
     private static final String DELETE_EXPIRED_AUTHORIZATIONS_SQL =
@@ -64,7 +64,7 @@ public class CSpaceAuthenticationSuccessEvent implements ApplicationListener<Aut
 
         try {
             conn = cspaceDbRealm.getConnection();
-            ps = conn.prepareStatement(UPDATE_USER_SQL);
+            ps = conn.prepareStatement(UPDATE_USER_LAST_LOGIN_SQL);
             ps.setString(1, username);
             int affected = ps.executeUpdate();
             if (affected < 1) {

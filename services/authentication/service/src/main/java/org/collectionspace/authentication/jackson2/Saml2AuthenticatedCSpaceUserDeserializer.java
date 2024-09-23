@@ -37,10 +37,11 @@ public class Saml2AuthenticatedCSpaceUserDeserializer extends JsonDeserializer<S
 		JsonNode passwordNode = readJsonNode(jsonNode, "password");
 		String username = readJsonNode(jsonNode, "username").asText();
 		String password = passwordNode.asText("");
+		String ssoId = readJsonNode(jsonNode, "ssoId").asText();
 		boolean requireSSO = readJsonNode(jsonNode, "requireSSO").asBoolean();
 		String salt = readJsonNode(jsonNode, "salt").asText();
 
-		Saml2AuthenticatedCSpaceUser result = new Saml2AuthenticatedCSpaceUser(principal, username, password, salt, requireSSO, tenants, authorities);
+		Saml2AuthenticatedCSpaceUser result = new Saml2AuthenticatedCSpaceUser(principal, username, password, salt, ssoId, requireSSO, tenants, authorities);
 
 		if (passwordNode.asText(null) == null) {
 			result.eraseCredentials();
