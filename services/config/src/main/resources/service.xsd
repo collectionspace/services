@@ -11,13 +11,13 @@
     Revision   : $LastChangedRevision$
     Created on : $LastChangedDate$
     Author     : $LastChangedBy: $
-    Description: ServiceBinding desribes how a possibly tenant-specific service is
+    Description: ServiceBinding describes how a possibly tenant-specific service is
                  bound to corresponding service framework at runtime
                  ServiceObjectType is used to describe the
                  structure of a CollectionSpace object - an entity or relation.
                  This is NOT used to encode or decode the stream in or out the
                  content over the wire or to the storage.
-                 Derived from Fedora Digtial Object Model and MIME Multipart
+                 Derived from Fedora Digital Object Model and MIME Multipart
 -->
 <xs:schema
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -38,6 +38,9 @@
         <xs:sequence>
             <!-- other URI paths using which this service binding could be accessed -->
             <xs:element name="uriPath" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+
+            <!-- tags to identify the service with -->
+            <xs:element name="tags" type="tags" />
 
             <!-- object representation served by the service -->
             <xs:element name="object" type="ServiceObjectType" minOccurs="1" maxOccurs="1"/>
@@ -104,6 +107,12 @@
             <xs:attribute name="id" use="required" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
+
+    <xs:complexType name="tags">
+        <xs:sequence minOccurs="0" maxOccurs="unbounded" >
+            <xs:element name="tag" type="xs:string" />
+        </xs:sequence>
+    </xs:complexType>
 
     <!--
         ServiceObjectType defines the manifest for a collectionspace
