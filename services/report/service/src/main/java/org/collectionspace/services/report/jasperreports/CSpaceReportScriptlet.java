@@ -1,6 +1,10 @@
 package org.collectionspace.services.report.jasperreports;
 
+import java.sql.Array;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
@@ -75,8 +79,14 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 					continue;
 				}
 
+				// kind of janky - we want the correct type in the jrxml (java.util.List), so we can't check the
+				// value class. Instead, get the value which should be a java.sql.Array.
+				if (field.getValue() instanceof Array) {
+					deurnArray(field);
+				}
+
 				if (!field.getValueClass().equals(String.class)) {
-					logger.warn("{}: deurn field is not a string: {}", getReportName(), fieldName);
+					logger.warn("{}: deurn field is not a string or array: {}", getReportName(), fieldName);
 
 					continue;
 				}
@@ -84,6 +94,30 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 				deurnField(field);
 			}
 		}
+	}
+
+	private void deurnArray(JRFillField field) {
+		Array array = (Array) field.getValue();
+		List<String> deurned = new ArrayList<String>();
+		try {
+			if (!array.getBaseTypeName().equals("varchar")) {
+				logger.warn("{}: array field is not a string: {}", getReportName(), field.getName());
+				return;
+			}
+
+			for (String value : (String[]) array.getArray()) {
+				try {
+					deurned.add(RefNameUtils.getDisplayName(value));
+				} catch (IllegalArgumentException ex) {
+					logger.debug("{}: skipping {}", getReportName(), value);
+					deurned.add(value);
+				}
+			}
+		} catch (SQLException e) {
+			logger.warn("{}: array could not be read for field: {}", getReportName(), field.getName(), e);
+		}
+
+		field.setValue(deurned);
 	}
 
 	private void deurnField(JRFillField field) {
