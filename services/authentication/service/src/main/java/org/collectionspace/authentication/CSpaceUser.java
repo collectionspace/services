@@ -104,6 +104,10 @@ public class CSpaceUser extends User {
         return ssoId;
     }
 
+    public void setSsoId(String ssoId) {
+        this.ssoId = ssoId;
+    }
+
     /**
      * Determines if the user is required to log in using single sign-on.
      * @return true if SSO is required, false otherwise

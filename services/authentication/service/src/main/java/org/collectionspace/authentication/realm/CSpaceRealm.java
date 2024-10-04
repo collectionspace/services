@@ -40,6 +40,14 @@ import org.collectionspace.authentication.CSpaceTenant;
 public interface CSpaceRealm {
 
 	/**
+	 * Retrieves the username of the user with the given SSO ID.
+	 * @param ssoId
+	 * @return
+	 * @throws AccountException
+	 */
+	public String getUsernameForSsoId(String ssoId) throws AccountException;
+
+	/**
 	 * Retrieves the "salt" used to encrypt the user's password
 	 * @param username
 	 * @return

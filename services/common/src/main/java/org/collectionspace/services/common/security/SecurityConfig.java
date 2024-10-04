@@ -530,7 +530,8 @@ public class SecurityConfig {
 			// TODO: Use OpenSaml4AuthenticationProvider (requires Java 11) instead of deprecated OpenSamlAuthenticationProvider.
 			final OpenSamlAuthenticationProvider samlAuthenticationProvider = new OpenSamlAuthenticationProvider();
 
-			samlAuthenticationProvider.setResponseAuthenticationConverter(new CSpaceSaml2ResponseAuthenticationConverter(userDetailsService));
+			samlAuthenticationProvider.setResponseAuthenticationConverter(
+				new CSpaceSaml2ResponseAuthenticationConverter((CSpaceUserDetailsService) userDetailsService));
 
 			http
 				.saml2Login(new Customizer<Saml2LoginConfigurer<HttpSecurity>>() {
@@ -910,6 +911,7 @@ public class SecurityConfig {
 		Map<String, Object> options = new HashMap<String, Object>();
 
 		options.put("dsJndiName", "CspaceDS");
+		options.put("usernameForSsoIdQuery", "select username from users where sso_id=?");
 		options.put("principalsQuery", "select passwd from users where username=?");
 		options.put("saltQuery", "select salt from users where username=?");
 		options.put("ssoIdQuery", "select sso_id from users where username=?");

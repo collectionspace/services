@@ -49,6 +49,20 @@ public class CSpaceUserDetailsService implements UserDetailsService {
         this.realm = realm;
     }
 
+    public UserDetails loadUserBySsoId(String ssoId) throws UsernameNotFoundException {
+        try {
+            String username = realm.getUsernameForSsoId(ssoId);
+
+            return loadUserByUsername(username);
+        }
+        catch (AccountNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage(), e);
+        }
+        catch (AccountException e) {
+            throw new AuthenticationServiceException(e.getMessage(), e);
+        }
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String password = null;

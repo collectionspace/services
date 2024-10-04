@@ -82,6 +82,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
     private Logger logger = LoggerFactory.getLogger(CSpaceDbRealm.class);
 
     private String datasourceName;
+    private String usernameForSsoIdQuery;
     private String principalsQuery;
     private String saltQuery;
     private String ssoIdQuery;
@@ -146,7 +147,11 @@ public class CSpaceDbRealm implements CSpaceRealm {
         if (datasourceName == null) {
             datasourceName = DEFAULT_DATASOURCE_NAME;
         }
-        Object tmp = options.get("principalsQuery");
+        Object tmp = options.get("usernameForSsoIdQuery");
+        if (tmp != null) {
+            usernameForSsoIdQuery = tmp.toString();
+        }
+        tmp = options.get("principalsQuery");
         if (tmp != null) {
             principalsQuery = tmp.toString();
         }
@@ -188,6 +193,66 @@ public class CSpaceDbRealm implements CSpaceRealm {
             logger.trace("rolesQuery=" + rolesQuery);
             logger.trace("suspendResume=" + suspendResume);
         }
+    }
+
+    @Override
+    public String getUsernameForSsoId(String ssoId) throws AccountException {
+        String username = null;
+        Connection conn = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            conn = getConnection();
+            // Get the username
+            if (logger.isDebugEnabled()) {
+                logger.debug("Executing query: " + usernameForSsoIdQuery + ", with sso id: " + ssoId);
+            }
+            ps = conn.prepareStatement(usernameForSsoIdQuery);
+            ps.setString(1, ssoId);
+            rs = ps.executeQuery();
+            if (rs.next() == false) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(usernameForSsoIdQuery + " returned no matches from db");
+                }
+                throw new AccountNotFoundException("No matching sso id found");
+            }
+
+            username = rs.getString(1);
+        } catch (SQLException ex) {
+            if (logger.isTraceEnabled() == true) {
+                logger.error("Could not open database to read AuthN tables.", ex);
+            }
+            AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());
+            ae.initCause(ex);
+            throw ae;
+        } catch (AccountNotFoundException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            AccountException ae = new AccountException("Unknown Exception");
+            ae.initCause(ex);
+            throw ae;
+        } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException e) {
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                }
+            }
+        }
+        return username;
     }
 
     @Override
@@ -586,6 +651,20 @@ public class CSpaceDbRealm implements CSpaceRealm {
      */
     public String getDataSourceName() {
         return datasourceName;
+    }
+
+    /**
+     * @return the usernameForSsoIdQuery
+     */
+    public String getUsernameForSsoIdQuery() {
+        return usernameForSsoIdQuery;
+    }
+
+    /**
+     * @param usernameForSsoIdQuery the usernameForSsoIdQuery to set
+     */
+    public void setUsernameForSsoIdQuery(String usernameForSsoIdQuery) {
+        this.usernameForSsoIdQuery = usernameForSsoIdQuery;
     }
 
     /**
