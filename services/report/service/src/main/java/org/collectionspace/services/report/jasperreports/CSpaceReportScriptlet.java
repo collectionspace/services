@@ -107,7 +107,9 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 
 			for (String value : (String[]) array.getArray()) {
 				try {
-					deurned.add(RefNameUtils.getDisplayName(value));
+					if (value != null) {
+						deurned.add(RefNameUtils.getDisplayName(value));
+					}
 				} catch (IllegalArgumentException ex) {
 					logger.debug("{}: skipping {}", getReportName(), value);
 					deurned.add(value);
