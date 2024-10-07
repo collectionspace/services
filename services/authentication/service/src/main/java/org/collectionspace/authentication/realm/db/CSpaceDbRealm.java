@@ -832,7 +832,7 @@ public class CSpaceDbRealm implements CSpaceRealm {
         } catch (SQLException ex) {
         	// Assuming PostgreSQL
             if (PSQLState.UNDEFINED_COLUMN.getState().equals(ex.getSQLState())) {
-            	String msg = "'USERS' table is missing 'sso_id' column.";
+            	String msg = "'users' table is missing 'sso_id' column.";
             	logger.warn(msg);
             } else {
                 AccountException ae = new AccountException("Authentication query failed: " + ex.getLocalizedMessage());

@@ -98,12 +98,15 @@ public class CSpaceUser extends User {
 
     /**
      * Returns the ID from the user's SSO provider, if the user signed in via SSO
-     * @return
+     * @return the SSO ID
      */
     public String getSsoId() {
         return ssoId;
     }
 
+    /**
+     * Sets the ID from the user's SSO provider.
+     */
     public void setSsoId(String ssoId) {
         this.ssoId = ssoId;
     }
