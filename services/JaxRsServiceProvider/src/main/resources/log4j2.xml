@@ -34,6 +34,7 @@
 		<Logger name="org.collectionspace.services.common.context.AbstractServiceContextImpl" level="ERROR" />
 		<Logger name="org.collectionspace.services.common.init" level="ERROR" />
 		<Logger name="org.collectionspace.services.common.security.SecurityInterceptor" level="ERROR" />
+		<Logger name="org.collectionspace.services.common.security.SecurityUtils" level="INFO" />
 		<Logger name="org.collectionspace.services.common.ServiceMain" level="INFO" />
 		<Logger name="org.collectionspace.services.common.storage.JDBCTools" level="ERROR" />
 		<Logger name="org.collectionspace.services.listener.*" level="ERROR" />

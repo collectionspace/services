@@ -454,4 +454,32 @@ public class SecurityUtils {
 
         return values;
     }
+
+    public static void logSamlAssertions(List<Assertion> assertions) {
+        logger.info("Received {} SAML assertion(s)", assertions.size());
+
+        for (Assertion assertion : assertions) {
+            String nameId = assertion.getSubject().getNameID().getValue();
+
+            logger.info("NameID: {}", nameId);
+
+            for (AttributeStatement statement : assertion.getAttributeStatements()) {
+                for (Attribute attribute : statement.getAttributes()) {
+                    String attributeName = attribute.getName();
+                    List<String> stringValues = new ArrayList<>();
+                    List<XMLObject> attributeValues = attribute.getAttributeValues();
+
+                    if (attributeValues != null) {
+                        for (XMLObject value : attributeValues) {
+                            if (value instanceof XSString) {
+                                stringValues.add(((XSString) value).getValue());
+                            }
+                        }
+                    }
+
+                    logger.info("Attribute: {}={}", attributeName, stringValues);
+                }
+            }
+        }
+    }
 }

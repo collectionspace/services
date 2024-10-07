@@ -69,8 +69,11 @@ public class CSpaceSaml2ResponseAuthenticationConverter implements Converter<Res
     );
 
     List<String> attemptedUsernames = new ArrayList<>();
+    List<Assertion> assertions = responseToken.getResponse().getAssertions();
 
-    for (Assertion assertion : responseToken.getResponse().getAssertions()) {
+    SecurityUtils.logSamlAssertions(assertions);
+
+    for (Assertion assertion : assertions) {
       CSpaceUser user = null;
       String ssoId = SecurityUtils.getSamlAssertionSsoId(assertion, assertionSsoIdProbes);
 
