@@ -35,10 +35,11 @@ public class CSpaceUserDeserializer extends JsonDeserializer<CSpaceUser> {
 		JsonNode passwordNode = readJsonNode(jsonNode, "password");
 		String username = readJsonNode(jsonNode, "username").asText();
 		String password = passwordNode.asText("");
+		String ssoId = readJsonNode(jsonNode, "ssoId").asText();
 		boolean requireSSO = readJsonNode(jsonNode, "requireSSO").asBoolean();
 		String salt = readJsonNode(jsonNode, "salt").asText();
 
-		CSpaceUser result = new CSpaceUser(username, password, salt, requireSSO, tenants,	authorities);
+		CSpaceUser result = new CSpaceUser(username, password, salt, ssoId, requireSSO, tenants,	authorities);
 
 		if (passwordNode.asText(null) == null) {
 			result.eraseCredentials();

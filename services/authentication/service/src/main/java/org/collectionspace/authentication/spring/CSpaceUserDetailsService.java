@@ -49,17 +49,33 @@ public class CSpaceUserDetailsService implements UserDetailsService {
         this.realm = realm;
     }
 
+    public UserDetails loadUserBySsoId(String ssoId) throws UsernameNotFoundException {
+        try {
+            String username = realm.getUsernameForSsoId(ssoId);
+
+            return loadUserByUsername(username);
+        }
+        catch (AccountNotFoundException e) {
+            throw new UsernameNotFoundException(e.getMessage(), e);
+        }
+        catch (AccountException e) {
+            throw new AuthenticationServiceException(e.getMessage(), e);
+        }
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String password = null;
         String salt = null;
+        String ssoId = null;
         Boolean requireSSO = null;
         Set<CSpaceTenant> tenants = null;
         Set<GrantedAuthority> grantedAuthorities = null;
-        
+
         try {
             password = realm.getPassword(username);
             salt = realm.getSalt(username);
+            ssoId = realm.getSsoId(username);
             requireSSO = realm.isRequireSSO(username);
             tenants = getTenants(username);
             if (tenants == null || tenants.isEmpty()) {
@@ -75,33 +91,34 @@ public class CSpaceUserDetailsService implements UserDetailsService {
         catch (AccountException e) {
             throw new AuthenticationServiceException(e.getMessage(), e);
         }
-        
-        CSpaceUser cspaceUser = 
+
+        CSpaceUser cspaceUser =
             new CSpaceUser(
                 username,
                 password,
                 salt,
+                ssoId,
                 requireSSO,
                 tenants,
                 grantedAuthorities);
-                
+
         return cspaceUser;
     }
-    
+
     protected Set<GrantedAuthority> getAuthorities(String username) throws AccountException {
         Set<String> roles = realm.getRoles(username);
         Set<GrantedAuthority> authorities = new LinkedHashSet<GrantedAuthority>(roles.size());
-        
+
         for (String role : roles) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
-        
+
         return authorities;
     }
-    
+
     protected Set<CSpaceTenant> getTenants(String username) throws AccountException {
         Set<CSpaceTenant> tenants = realm.getTenants(username);
-        
+
         return tenants;
     }
 }

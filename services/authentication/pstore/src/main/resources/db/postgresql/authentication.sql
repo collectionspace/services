@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   lastlogin TIMESTAMP,
   passwd VARCHAR(128) NOT NULL,
   salt VARCHAR(128),
+  sso_id VARCHAR(512),
   updated_at TIMESTAMP
 );
 
@@ -24,6 +25,10 @@ SET passwd = concat(
   passwd
 )
 WHERE left(passwd, 1) <> '{';
+
+-- Upgrade older users tables to 8.1
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS sso_id VARCHAR(512);
 
 -- Create tokens table required in 8.0
 

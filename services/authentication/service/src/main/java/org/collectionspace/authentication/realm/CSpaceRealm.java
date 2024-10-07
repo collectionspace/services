@@ -38,7 +38,15 @@ import org.collectionspace.authentication.CSpaceTenant;
  * Interface for the CollectionSpace realm.
  */
 public interface CSpaceRealm {
-	
+
+	/**
+	 * Retrieves the username of the user with the given SSO ID.
+	 * @param ssoId
+	 * @return
+	 * @throws AccountException
+	 */
+	public String getUsernameForSsoId(String ssoId) throws AccountException;
+
 	/**
 	 * Retrieves the "salt" used to encrypt the user's password
 	 * @param username
@@ -49,7 +57,7 @@ public interface CSpaceRealm {
 
     /**
      * Retrieves the hashed password used to authenticate a user.
-     * 
+     *
      * @param username
      * @return the password
      * @throws AccountNotFoundException if the user is not found
@@ -59,7 +67,7 @@ public interface CSpaceRealm {
 
     /**
      * Retrieves the roles for a user.
-     * 
+     *
      * @param username
      * @return a collection of roles
      * @throws AccountException if the roles could not be retrieved
@@ -68,7 +76,7 @@ public interface CSpaceRealm {
 
     /**
      * Retrieves the enabled tenants associated with a user.
-     * 
+     *
      * @param username
      * @return a collection of tenants
      * @throws AccountException if the tenants could not be retrieved
@@ -77,7 +85,7 @@ public interface CSpaceRealm {
 
     /**
      * Retrieves the tenants associated with a user, optionally including disabled tenants.
-     * 
+     *
      * @param username
      * @param includeDisabledTenants if true, include disabled tenants
      * @return a collection of tenants
@@ -86,8 +94,17 @@ public interface CSpaceRealm {
     public Set<CSpaceTenant> getTenants(String username, boolean includeDisabledTenants) throws AccountException;
 
     /**
+     * Retrieves the ID from the SSO provider, if the user is associated with one.
+     *
+     * @param username
+     * @return the ID from the SSO provider, or null
+     * @throws AccountException
+     */
+    public String getSsoId(String username) throws AccountException;
+
+    /**
      * Determines if the user is required to login using single sign-on.
-     * 
+     *
      * @param username
      * @return true if SSO is required, false otherwise
      * @throws AccountException

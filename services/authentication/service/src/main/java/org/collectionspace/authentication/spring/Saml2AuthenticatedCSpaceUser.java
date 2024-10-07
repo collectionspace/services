@@ -37,6 +37,7 @@ public class Saml2AuthenticatedCSpaceUser extends CSpaceUser implements Saml2Aut
 			user.getUsername(),
 			user.getPassword(),
 			user.getSalt(),
+			user.getSsoId(),
 			user.isRequireSSO(),
 			user.getTenants(),
 			(Set<GrantedAuthority>) user.getAuthorities()
@@ -48,11 +49,12 @@ public class Saml2AuthenticatedCSpaceUser extends CSpaceUser implements Saml2Aut
 		String username,
 		String password,
 		String salt,
+		String ssoId,
 		boolean requireSSO,
 		Set<CSpaceTenant> tenants,
 		Set<? extends GrantedAuthority> authorities
 	) {
-		super(username, password, salt, requireSSO, tenants, authorities);
+		super(username, password, salt, ssoId, requireSSO, tenants, authorities);
 
 		this.principal = principal;
 	}

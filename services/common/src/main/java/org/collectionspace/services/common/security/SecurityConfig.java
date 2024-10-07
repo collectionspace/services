@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.CSpaceUser;
 import org.collectionspace.authentication.spring.CSpaceDaoAuthenticationProvider;
 import org.collectionspace.authentication.spring.CSpaceJwtAuthenticationToken;
@@ -48,7 +47,6 @@ import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.config.AssertingPartyDetailsType;
-import org.collectionspace.services.config.AssertionProbesType;
 import org.collectionspace.services.config.OAuthAuthorizationGrantTypeEnum;
 import org.collectionspace.services.config.OAuthClientAuthenticationMethodEnum;
 import org.collectionspace.services.config.OAuthClientSettingsType;
@@ -63,7 +61,6 @@ import org.collectionspace.services.config.X509CertificateType;
 import org.collectionspace.services.config.X509CredentialType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.authentication.realm.db.CSpaceDbRealm;
-import org.opensaml.saml.saml2.core.Assertion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -116,7 +113,6 @@ import org.springframework.security.saml2.core.Saml2X509Credential;
 import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider;
 import org.springframework.security.saml2.provider.service.authentication.Saml2Authentication;
 import org.springframework.security.saml2.provider.service.authentication.logout.Saml2LogoutRequest;
-import org.springframework.security.saml2.provider.service.authentication.OpenSamlAuthenticationProvider.ResponseToken;
 import org.springframework.security.saml2.provider.service.metadata.OpenSamlMetadataResolver;
 import org.springframework.security.saml2.provider.service.registration.InMemoryRelyingPartyRegistrationRepository;
 import org.springframework.security.saml2.provider.service.registration.RelyingPartyRegistration;
@@ -133,7 +129,6 @@ import org.springframework.security.saml2.provider.service.web.authentication.lo
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
@@ -535,48 +530,8 @@ public class SecurityConfig {
 			// TODO: Use OpenSaml4AuthenticationProvider (requires Java 11) instead of deprecated OpenSamlAuthenticationProvider.
 			final OpenSamlAuthenticationProvider samlAuthenticationProvider = new OpenSamlAuthenticationProvider();
 
-			samlAuthenticationProvider.setResponseAuthenticationConverter(new Converter<ResponseToken, CSpaceSaml2Authentication>() {
-				@Override
-				public CSpaceSaml2Authentication convert(ResponseToken responseToken) {
-					Saml2Authentication authentication = OpenSamlAuthenticationProvider
-						.createDefaultResponseAuthenticationConverter()
-						.convert(responseToken);
-
-					String registrationId = responseToken.getToken().getRelyingPartyRegistration().getRegistrationId();
-					ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
-					SAMLRelyingPartyType registration = ConfigUtils.getSAMLRelyingPartyRegistration(serviceConfig, registrationId);
-
-					AssertionProbesType assertionProbes = (
-						registration != null
-							? registration.getAssertionUsernameProbes()
-							: null
-					);
-
-					List<String> attemptedUsernames = new ArrayList<>();
-
-					for (Assertion assertion : responseToken.getResponse().getAssertions()) {
-						Set<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(assertion, assertionProbes);
-
-						for (String candidateUsername : candidateUsernames) {
-							try {
-								CSpaceUser user = (CSpaceUser) userDetailsService.loadUserByUsername(candidateUsername);
-
-								return new CSpaceSaml2Authentication(user, authentication);
-							}
-							catch(UsernameNotFoundException e) {
-							}
-						}
-
-						attemptedUsernames.addAll(candidateUsernames);
-					}
-
-					String errorMessage = attemptedUsernames.size() == 0
-						? "The SAML assertion did not contain a CollectionSpace username."
-						: "No CollectionSpace account found for " + StringUtils.join(attemptedUsernames, " / ") + ".";
-
-					throw(new UsernameNotFoundException(errorMessage));
-				}
-			});
+			samlAuthenticationProvider.setResponseAuthenticationConverter(
+				new CSpaceSaml2ResponseAuthenticationConverter((CSpaceUserDetailsService) userDetailsService));
 
 			http
 				.saml2Login(new Customizer<Saml2LoginConfigurer<HttpSecurity>>() {
@@ -956,8 +911,10 @@ public class SecurityConfig {
 		Map<String, Object> options = new HashMap<String, Object>();
 
 		options.put("dsJndiName", "CspaceDS");
+		options.put("usernameForSsoIdQuery", "select username from users where sso_id=?");
 		options.put("principalsQuery", "select passwd from users where username=?");
 		options.put("saltQuery", "select salt from users where username=?");
+		options.put("ssoIdQuery", "select sso_id from users where username=?");
 		options.put("requireSSOQuery", "select require_sso from accounts_common where userid=?");
 		options.put("rolesQuery", "select r.rolename from roles as r, accounts_roles as ar where ar.user_id=? and ar.role_id=r.csid");
 		options.put("tenantsQueryWithDisabled", "select t.id, t.name from accounts_common as a, accounts_tenants as at, tenants as t where a.userid=? and a.csid = at.TENANTS_ACCOUNTS_COMMON_CSID and at.tenant_id = t.id order by t.id");
