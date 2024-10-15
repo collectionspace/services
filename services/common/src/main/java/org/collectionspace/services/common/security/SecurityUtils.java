@@ -77,7 +77,13 @@ public class SecurityUtils {
     private static final List<Object> DEFAULT_SAML_ASSERTION_USERNAME_PROBES = new ArrayList<>();
 
     static {
+        // Set up default probes for SSO ID in a SAML assertion.
+
         DEFAULT_SAML_ASSERTION_SSO_ID_PROBES.add(new AssertionNameIDProbeType());
+
+        // Set up default probes for CSpace username in a SAML assertion.
+
+        DEFAULT_SAML_ASSERTION_USERNAME_PROBES.add(new AssertionNameIDProbeType());
 
         String[] attributeNames = new String[]{
             "urn:oid:0.9.2342.19200300.100.1.3", // https://www.educause.edu/fidm/attributes
