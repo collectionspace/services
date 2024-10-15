@@ -119,7 +119,7 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 			logger.warn("{}: array could not be read for field: {}", getReportName(), field.getName(), e);
 		}
 
-		field.setValue(deurned);
+		field.setValue(new DeurnArray(deurned));
 	}
 
 	private void deurnField(JRFillField field) {
