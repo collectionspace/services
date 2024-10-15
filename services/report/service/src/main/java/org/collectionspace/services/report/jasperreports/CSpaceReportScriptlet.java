@@ -95,6 +95,10 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 		Array array = (Array) field.getValue();
 		List<String> deurned = new ArrayList<String>();
 		try {
+			if (array == null) {
+				return;
+			}
+
 			if (!array.getBaseTypeName().equals("varchar")) {
 				logger.warn("{}: array base type is not varchar: {}", getReportName(), field.getName());
 				return;
