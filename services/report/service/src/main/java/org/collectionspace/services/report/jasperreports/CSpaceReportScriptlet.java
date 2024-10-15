@@ -79,19 +79,14 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 					continue;
 				}
 
-				// kind of janky - we want the correct type in the jrxml (java.util.List), so we can't check the
-				// value class. Instead, get the value which should be a java.sql.Array.
-				if (field.getValue() instanceof Array) {
+				if (field.getValueClass().equals(String.class)) {
+					deurnField(field);
+				} else if (field.getValueClass().equals(Array.class)) {
 					deurnArray(field);
-				}
-
-				if (!field.getValueClass().equals(String.class)) {
+				} else {
 					logger.warn("{}: deurn field is not a string or array: {}", getReportName(), fieldName);
-
-					continue;
 				}
 
-				deurnField(field);
 			}
 		}
 	}
