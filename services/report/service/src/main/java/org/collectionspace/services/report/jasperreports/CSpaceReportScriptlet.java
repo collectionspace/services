@@ -1,6 +1,10 @@
 package org.collectionspace.services.report.jasperreports;
 
+import java.sql.Array;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.sf.jasperreports.engine.JRDefaultScriptlet;
@@ -75,15 +79,46 @@ public class CSpaceReportScriptlet extends JRDefaultScriptlet {
 					continue;
 				}
 
-				if (!field.getValueClass().equals(String.class)) {
-					logger.warn("{}: deurn field is not a string: {}", getReportName(), fieldName);
-
-					continue;
+				if (field.getValueClass().equals(String.class)) {
+					deurnField(field);
+				} else if (field.getValueClass().equals(Array.class)) {
+					deurnArray(field);
+				} else {
+					logger.warn("{}: deurn field is not a string or array: {}", getReportName(), fieldName);
 				}
 
-				deurnField(field);
 			}
 		}
+	}
+
+	private void deurnArray(JRFillField field) {
+		Array array = (Array) field.getValue();
+		List<String> deurned = new ArrayList<String>();
+		try {
+			if (array == null) {
+				return;
+			}
+
+			if (!array.getBaseTypeName().equals("varchar")) {
+				logger.warn("{}: array base type is not varchar: {}", getReportName(), field.getName());
+				return;
+			}
+
+			for (String value : (String[]) array.getArray()) {
+				try {
+					if (value != null) {
+						deurned.add(RefNameUtils.getDisplayName(value));
+					}
+				} catch (IllegalArgumentException ex) {
+					logger.debug("{}: skipping {}", getReportName(), value);
+					deurned.add(value);
+				}
+			}
+		} catch (SQLException e) {
+			logger.warn("{}: array could not be read for field: {}", getReportName(), field.getName(), e);
+		}
+
+		field.setValue(new DeurnArray(deurned));
 	}
 
 	private void deurnField(JRFillField field) {
