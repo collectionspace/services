@@ -40,7 +40,7 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
-import org.collectionspace.services.repatriationclaim.RepatriationClaimResource;
+import org.collectionspace.services.repatriationrequest.RepatriationRequestResource;
 import org.collectionspace.services.nagprainventory.NagpraInventoryResource;
 import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
 import org.collectionspace.services.transport.TransportResource;
@@ -165,7 +165,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         addResourceToMapAndSingletons(new PropagationResource());
         addResourceToMapAndSingletons(new PottagResource());
         addResourceToMapAndSingletons(new ClaimResource());
-        addResourceToMapAndSingletons(new RepatriationClaimResource());
+        addResourceToMapAndSingletons(new RepatriationRequestResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
         addResourceToMapAndSingletons(new TransportResource());
