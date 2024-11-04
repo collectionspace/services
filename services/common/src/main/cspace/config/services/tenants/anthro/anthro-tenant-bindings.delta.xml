@@ -8,6 +8,19 @@
 	<!-- value in cspace/config/services/tenants/anthro-tenant-bindings-proto.xml -->
 
 	<tenant:tenantBinding id="1500">
+		<tenant:serviceBindings merge:matcher="id" id="Reports">
+			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>notice_of_intent_to_repatriate</types:value>
+				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>notice_of_inventory_completion</types:value>
+				</types:item>
+			</service:properties>
+		</tenant:serviceBindings>
+
 		<tenant:elasticSearchDocumentWriter merge:action="replace">
 			org.collectionspace.services.nuxeo.elasticsearch.anthro.AnthroESDocumentWriter
 		</tenant:elasticSearchDocumentWriter>

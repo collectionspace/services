@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Notice of Intent to Repatriate</name>
+    <notes>first pass for notice of intent to repatriate</notes>
+    <forDocTypes>
+      <forDocType>SummaryDocumentation</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>true</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <filename>notice_of_intent_to_repatriate.jrxml</filename>
+    <outputMIME>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</outputMIME>
+  </ns2:reports_common>
+</document>

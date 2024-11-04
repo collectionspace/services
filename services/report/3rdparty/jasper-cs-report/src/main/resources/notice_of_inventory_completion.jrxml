@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notice_inventory_completion" language="groovy" pageWidth="2000" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7eeff167-a8e8-4d94-87ee-005f5467073e">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["notice_type,places,sites,collectors,category_determinations,object_category_units,object_functions,controlled_object_names,acquisition_methods,acquisition_sources"]]></defaultValueExpression>
+	</parameter>
+  <parameter name="csid" class="java.lang.String" isForPrompting="false" />
+	<parameter name="whereclause_cte" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA[$P{csid} != null ? "AND relation.subjectcsid = '" + $P{csid} + "'" : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+    <defaultValueExpression><![CDATA[$P{csid} != null ? "WHERE hierarchy.name = '" + $P{csid} + "'" : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH related_objects AS (
+  SELECT hierarchy.id AS object_id,
+    relation.objectcsid,
+    relation.subjectcsid
+  FROM relations_common relation
+    INNER JOIN misc ON misc.id = relation.id and misc.lifecyclestate != 'deleted'
+    INNER JOIN hierarchy ON hierarchy.name = relation.objectcsid
+  WHERE relation.objectdocumenttype = 'CollectionObject' AND relation.subjectdocumenttype = 'NagpraInventory' $P!{whereclause_cte}
+),
+related_acquisitions AS (
+  SELECT objs.objectcsid,
+    hierarchy.id AS acquisition_id,
+    relation.subjectcsid AS acquisitioncsid
+  FROM related_objects objs
+    INNER join relations_common relation ON relation.objectcsid = objs.objectcsid AND relation.subjectdocumenttype = 'Acquisition'
+    INNER JOIN misc ON misc.id = relation.id and misc.lifecyclestate != 'deleted'
+    INNER JOIN hierarchy ON hierarchy.name = relation.subjectcsid
+)
+SELECT nt.item AS notice_type,
+  obj.objectnumber,
+  bd.item AS brief_description,
+  nagpra_note.item AS nagpra_note,
+  field_collection_places.places,
+  field_collection_sites.sites,
+  field_collectors.collectors,
+  field_collection_dates.dates,
+  nagpra_category_determinations.category_determinations,
+  object_functions.object_functions,
+  -- max(count, 0)?
+  object_count_mni.object_count_mni,
+  object_count_afo.object_count_afo,
+  object_category.object_category_units,
+  object_category.object_category_counts,
+  object_names.object_names,
+  object_names.controlled_object_names,
+  acquisition_data.acquisition_numbers,
+  acquisition_data.acquisition_methods,
+  acquisition_sources.acquisition_sources,
+  acquisition_dates.acquisition_dates
+FROM hierarchy
+  INNER JOIN misc ON misc.id = hierarchy.id and misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core ON core.id = hierarchy.id AND core.tenantid = $P{tenantid}
+  INNER JOIN nagprainventories_common inventory ON inventory.id = hierarchy.id
+  INNER JOIN related_objects relation ON relation.subjectcsid = hierarchy.name
+  INNER JOIN collectionobjects_common obj ON obj.id = relation.object_id
+  LEFT JOIN nagprainventories_common_noticetypes nt ON nt.id = inventory.id AND nt.pos = 0
+  LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = relation.object_id AND bd.pos = 0
+  LEFT JOIN collectionobjects_nagpra_nagpranotes nagpra_note ON nagpra_note.id = relation.object_id AND nagpra_note.pos = 0
+  LEFT JOIN (
+    SELECT fcp.id,
+      array_agg(fcp.item) AS places
+    FROM collectionobjects_common_fieldcollectionplaces fcp
+    GROUP BY fcp.id
+  ) field_collection_places ON field_collection_places.id = relation.object_id
+  LEFT JOIN (
+    SELECT fcs.id,
+      array_agg(fcs.item) AS sites
+    FROM collectionobjects_common_fieldcollectionsites fcs
+    GROUP BY fcs.id
+  ) field_collection_sites ON field_collection_sites.id = relation.object_id
+  LEFT JOIN (
+    SELECT collectors.id,
+      array_agg(collectors.item) AS collectors
+    FROM collectionobjects_common_fieldcollectors collectors
+    GROUP BY collectors.id
+  ) field_collectors ON field_collectors.id = relation.object_id
+  LEFT JOIN (
+    SELECT categories.id,
+      array_agg(categories.item) AS category_determinations
+    FROM collectionobjects_nagpra_nagpracategories categories
+    GROUP BY categories.id
+  ) nagpra_category_determinations ON nagpra_category_determinations.id = relation.object_id
+  LEFT JOIN (
+    SELECT id,
+      array_agg(item) AS object_functions
+    FROM collectionobjects_anthro_ethnofilecodes
+    GROUP BY id
+  ) object_functions ON object_functions.id = relation.object_id
+  LEFT JOIN LATERAL (
+    SELECT collection_date_hierarchy.parentid,
+      array_agg(sdg.datedisplaydate) AS dates
+    FROM hierarchy collection_date_hierarchy
+      INNER JOIN structureddategroup sdg ON sdg.id = collection_date_hierarchy.id
+    WHERE collection_date_hierarchy.name = 'collectionobjects_common:fieldCollectionDateGroup'
+    GROUP BY collection_date_hierarchy.parentid
+  ) field_collection_dates ON field_collection_dates.parentid = relation.object_id
+  LEFT JOIN LATERAL (
+    SELECT ong_hierarchy.parentid,
+      array_agg(ong.objectname) AS object_names,
+      array_agg(ong.objectnamecontrolled) AS controlled_object_names
+    FROM hierarchy ong_hierarchy
+      INNER JOIN objectnamegroup ong ON ong.id = ong_hierarchy.id
+    WHERE ong_hierarchy.name = 'collectionobjects_common:objectNameList'
+    GROUP BY ong_hierarchy.parentid
+  ) object_names ON object_names.parentid = relation.object_id
+  LEFT JOIN LATERAL (
+    SELECT category_hierarchy.parentid,
+      array_agg(category.categorycountunit) AS object_category_units,
+      array_agg(category.categorycount) AS object_category_counts
+    FROM hierarchy category_hierarchy
+      INNER JOIN objectcategorygroup category ON category.id = category_hierarchy.id
+    WHERE category_hierarchy.name = 'collectionobjects_objectcategory_extension:objectCategoryGroupList'
+    GROUP BY category_hierarchy.parentid
+  ) object_category ON object_category.parentid = relation.object_id
+  -- Object Count MNI (related object > object count with type of minimum number of individuals)
+  LEFT JOIN LATERAL (
+    SELECT ocg_hierarchy.parentid,
+      sum(ocg.objectcount) AS object_count_mni
+    FROM hierarchy ocg_hierarchy
+      INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype LIKE '%minimum%'
+    WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
+    GROUP BY ocg_hierarchy.parentid
+  ) object_count_mni ON object_count_mni.parentid = relation.objectcsid
+  -- Object Count AFO (related object > object count with type of associated funerary objects)
+  LEFT JOIN LATERAL (
+    SELECT ocg_hierarchy.parentid,
+      sum(ocg.objectcount) AS object_count_afo
+    FROM hierarchy ocg_hierarchy
+      INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype LIKE '%associated%'
+    WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
+    GROUP BY ocg_hierarchy.parentid
+  ) object_count_afo ON object_count_afo.parentid = relation.objectcsid
+  LEFT JOIN (
+    SELECT related_acquisitions.objectcsid,
+      array_agg(acquisition.acquisitionreferencenumber) AS acquisition_numbers,
+      array_agg(acquisition.acquisitionmethod) AS acquisition_methods
+    FROM acquisitions_common acquisition
+      INNER JOIN related_acquisitions ON related_acquisitions.acquisition_id = acquisition.id
+    GROUP BY related_acquisitions.objectcsid
+  ) acquisition_data ON acquisition_data.objectcsid = relation.objectcsid
+  LEFT JOIN (
+    SELECT related_acquisitions.objectcsid,
+      array_agg(sources.item) AS acquisition_sources
+    FROM acquisitions_common_acquisitionsources sources
+      INNER JOIN related_acquisitions ON related_acquisitions.acquisition_id = sources.id
+    GROUP BY related_acquisitions.objectcsid
+  ) acquisition_sources ON acquisition_sources.objectcsid = relation.objectcsid
+  LEFT JOIN LATERAL (
+    SELECT related_acquisitions.objectcsid,
+      array_agg(sdg.datedisplaydate) AS acquisition_dates
+    FROM hierarchy acquisition_date_hierarchy
+      INNER JOIN related_acquisitions ON related_acquisitions.acquisition_id = acquisition_date_hierarchy.parentid
+      INNER JOIN structureddategroup sdg ON sdg.id = acquisition_date_hierarchy.id
+    WHERE acquisition_date_hierarchy.name = 'acquisitions_common:acquisitionDateGroup'
+    GROUP BY related_acquisitions.objectcsid
+  ) acquisition_dates ON acquisition_dates.objectcsid = relation.objectcsid
+$P!{whereclause}]]>
+	</queryString>
+	<field name="notice_type" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="notice_type"/>
+		<property name="com.jaspersoft.studio.field.label" value="notice_type"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="nagprainventories_common_noticetypes"/>
+	</field>
+	<field name="objectnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.label" value="objectnumber"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
+	</field>
+	<field name="brief_description" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="brief_description"/>
+		<property name="com.jaspersoft.studio.field.label" value="brief_description"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_briefdescriptions"/>
+	</field>
+	<field name="nagpra_note" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nagpra_note"/>
+		<property name="com.jaspersoft.studio.field.label" value="nagpra_note"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_nagpra_nagpranotes"/>
+	</field>
+	<field name="places" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="places"/>
+		<property name="com.jaspersoft.studio.field.label" value="places"/>
+	</field>
+	<field name="sites" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="sites"/>
+		<property name="com.jaspersoft.studio.field.label" value="sites"/>
+	</field>
+	<field name="collectors" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="collectors"/>
+		<property name="com.jaspersoft.studio.field.label" value="collectors"/>
+	</field>
+	<field name="dates" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="dates"/>
+		<property name="com.jaspersoft.studio.field.label" value="dates"/>
+	</field>
+	<field name="category_determinations" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="category_determinations"/>
+		<property name="com.jaspersoft.studio.field.label" value="category_determinations"/>
+	</field>
+	<field name="object_functions" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="object_functions"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_functions"/>
+	</field>
+	<field name="object_count_mni" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="object_count_mni"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_count_mni"/>
+	</field>
+	<field name="object_count_afo" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="object_count_afo"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_count_afo"/>
+	</field>
+	<field name="object_category_units" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="object_category_units"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_category_units"/>
+	</field>
+  <field name="object_category_counts" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="object_category_counts"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_category_counts"/>
+	</field>
+	<field name="controlled_object_names" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="controlled_object_names"/>
+		<property name="com.jaspersoft.studio.field.label" value="controlled_object_names"/>
+	</field>
+	<field name="object_names" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="object_names"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_names"/>
+	</field>
+	<field name="acquisition_numbers" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="acquisition_numbers"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisition_numbers"/>
+	</field>
+	<field name="acquisition_methods" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="acquisition_methods"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisition_methods"/>
+	</field>
+	<field name="acquisition_sources" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="acquisition_sources"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisition_sources"/>
+	</field>
+	<field name="acquisition_dates" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="acquisition_dates"/>
+		<property name="com.jaspersoft.studio.field.label" value="acquisition_dates"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+      <staticText>
+        <reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="bb98715b-d24c-462f-a2e2-8bae00e83119">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Museum Number]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="b44c9189-8289-42f2-a772-b647e079e76b">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Object Category Count]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="dc4d2045-e13b-438c-9dad-498cce42777b">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Object Function]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="2f03e865-66d3-4201-ba73-d73a1664af1c">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Object Name]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="be26da98-9e75-40a4-8c25-d1273edafe69">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Description]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="77fa8b68-32a2-4515-bdbe-f17d95728c27">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Accession Number]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="2c86853b-67b4-4d5b-bede-6d9368c382fc">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[NAGPRA Category Determination]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="5cd2a46d-0edf-4d08-a960-6acbe310e11c">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Notice NAGPRA Type]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="e35dabef-0dbc-4f08-a744-8894d2fe25be">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <text><![CDATA[MNI]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="b82d695d-276a-44e0-8a1f-40a125e32ca1">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[AFO]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="568843fe-0306-4803-8c67-672056ae406e">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Field Collection Site]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="6ae134e5-52fb-4baa-b32f-608953d9e133">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Field Collection Place]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="737e7f7a-5ec1-4b4c-a75b-e2c66e9727e2">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Field Collectors]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="caa967c4-5949-4506-92e4-edbec0b69ad3">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Field Collection Date]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="7eae6a07-37bf-4015-bfe0-2ec570b627ae">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Donor(s)]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="03c91c11-e3cd-4ad2-9460-5f6597f12369">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Acquisition Method]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="e6789277-ee49-4c0b-8c55-c267324bf5ea">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Acquisition Date]]></text>
+      </staticText>
+      <staticText>
+        <reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="df1a0c55-2558-4f3a-868b-bbde97d55ac8">
+          <property name="com.jaspersoft.studio.unit.width" value="px"/>
+        </reportElement>
+        <textElement markup="styled"/>
+        <text><![CDATA[Object NAGPRA Note]]></text>
+      </staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="257" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="2ed8e298-a95b-45a5-8d87-e9f3f66c3d40">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="e8e7f2ba-f8e9-42b4-8438-7726b0c932db">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <!-- create a list of tuples with transpose, then join each tuple and each list item-->
+        <textFieldExpression>
+          <![CDATA[[$F{object_category_counts}.getArray(), $F{object_category_units}.getArray()]
+            .transpose()*.sum()
+            .join('; ')]]>
+          </textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="d97ed749-9e8f-46f7-87f9-6d79aa150253">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{object_functions}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="0766d38a-2b21-4e20-93c1-88bcaee9e457">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <!-- grep filters out null values after combining the arrays-->
+        <textFieldExpression><![CDATA[($F{controlled_object_names}.getArray() + $F{object_names}.getArray())
+          .grep()
+          .join('; ')]]>
+        </textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="93aa0622-0149-432b-a1d4-bcdf723d33fe">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{brief_description}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="f3861000-8c6c-4976-9ebf-6afa0d183a31">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{acquisition_numbers}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="0b2b0d63-054e-4d33-8b77-e72988ae6f01">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{category_determinations}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="0b2b0d63-054e-4d33-8b77-e72988ae6f01">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{category_determinations}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="1e0332d0-ea77-4027-b0bb-d76908a04572">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{notice_type}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="7e25473b-97dc-46b9-b182-2bf19d56e23c">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{object_count_mni}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="010e641d-588d-4b8c-a5f1-df4de23faf4b">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{object_count_afo}]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="e037a4ad-5845-42df-9e38-435bd186eb06">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{sites}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="d658ee68-bcd3-4e4e-8f68-3ef2b628852c">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{places}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="405e81f0-2d98-4526-adcc-9e93c3e5f77a">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{collectors}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="b50de19c-620a-4bfb-8cb8-3da687d9dc48">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{dates}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="c96cfbe4-6096-4a8b-ac4b-3fb24a673c6a">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{acquisition_sources}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="5513f0d2-b9a4-42d6-84e9-acbb8c015777">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{acquisition_methods}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="f1ee275b-1559-4bb3-8056-dac6a3be96ab">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{acquisition_dates}.getArray().join('; ')]]></textFieldExpression>
+      </textField>
+      <textField textAdjust="StretchHeight" isBlankWhenNull="true">
+        <reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="a746027f-7e71-4277-95aa-75b96962a91a">
+          <property name="com.jaspersoft.studio.unit.y" value="px"/>
+        </reportElement>
+        <textFieldExpression><![CDATA[$F{nagpra_note}]]></textFieldExpression>
+      </textField>
+		</band>
+	</detail>
+</jasperReport>
