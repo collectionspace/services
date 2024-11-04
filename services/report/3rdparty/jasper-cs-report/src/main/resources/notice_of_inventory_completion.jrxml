@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["notice_type,places,sites,collectors,category_determinations,object_category_units,object_functions,controlled_object_names,acquisition_methods,acquisition_sources"]]></defaultValueExpression>
@@ -64,6 +64,7 @@ SELECT nt.item AS notice_type,
   acquisition_dates.acquisition_dates
 FROM hierarchy
   INNER JOIN misc ON misc.id = hierarchy.id and misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core ON core.id = hierarchy.id AND core.tenantid = $P{tenantid}
   INNER JOIN nagprainventories_common inventory ON inventory.id = hierarchy.id
   INNER JOIN related_objects relation ON relation.subjectcsid = hierarchy.name
   INNER JOIN collectionobjects_common obj ON obj.id = relation.object_id

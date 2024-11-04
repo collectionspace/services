@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["summary_type,status,culture,involved_party,tribeornation,places,sites,collectors,acquisition_sources,category_determinations,locations,acquisition_sources"]]></defaultValueExpression>
@@ -75,6 +75,7 @@ SELECT
   accession_dates.accession_dates
 FROM hierarchy summary_hierarchy
 	INNER JOIN misc ON misc.id = summary_hierarchy.id and misc.lifecyclestate != 'deleted'
+  INNER JOIN collectionspace_core core ON core.id = summary_hierarchy.id AND core.tenantid = $P{tenantid}
   INNER JOIN summarydocumentations_common summary on summary.id = summary_hierarchy.id
   LEFT JOIN summarydocumentations_common_types summary_type ON summary_type.id = summary.id AND summary_type.pos = 0
   LEFT JOIN summarydocumentations_common_consultationnotes consultation ON consultation.id = summary.id AND consultation.pos = 0
