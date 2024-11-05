@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Exit schema (XSD)
+
+    Entity  : Exit
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns:ns="http://collectionspace.org/services/exit"
+  xmlns="http://collectionspace.org/services/exit"
+  targetNamespace="http://collectionspace.org/services/exit"
+  version="0.1"
+>
+  <!--  Exit Information Group -->
+  <xs:element name="exits_common">
+    <xs:complexType>
+      <xs:sequence>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

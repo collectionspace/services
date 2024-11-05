@@ -30,6 +30,7 @@ import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.consultation.ConsultationResource;
 import org.collectionspace.services.deaccession.DeaccessionResource;
 import org.collectionspace.services.dutyofcare.DutyofcareResource;
+import org.collectionspace.services.exit.ExitResource;
 import org.collectionspace.services.heldintrust.HeldInTrustResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
@@ -176,6 +177,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         addResourceToMapAndSingletons(new HeldInTrustResource());
         addResourceToMapAndSingletons(new ConsultationResource());
         addResourceToMapAndSingletons(new DeaccessionResource());
+        addResourceToMapAndSingletons(new ExitResource());
 
         singletons.add(new IDResource());
 
