@@ -103,4 +103,17 @@
       <arg value="${mvn.opts}" />
     </exec>
   </target>
+
+  <target name="undeploy"
+    description="undeploy from ${jee.server.nuxeo}">
+    <delete>
+      <!-- Undeploy doctype and schema artifacts -->
+      <fileset dir="${jee.deploy.nuxeo.plugins}">
+        <include name="${nuxeo.exit.doctype.jars.all}" />
+      </fileset>
+      <fileset dir="${jee.deploy.nuxeo.plugins}">
+        <include name="${nuxeo.exit.schema.jars.all}" />
+      </fileset>
+    </delete>
+  </target>
 </project>
