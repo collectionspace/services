@@ -47,7 +47,6 @@ public class ExitValidatorHandler extends ValidatorHandlerImpl<PoxPayloadIn, Pox
             throw new InvalidDocumentException(COMMON_PART_MISSING);
         }
 
-        // todo: reference number
         final String exitNumber = common.getExitNumber();
         if (exitNumber == null || exitNumber.isEmpty()) {
             logger.error(REFERENCE_NUMBER_MISSING);
