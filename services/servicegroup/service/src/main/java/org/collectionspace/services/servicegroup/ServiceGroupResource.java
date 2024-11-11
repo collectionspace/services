@@ -205,6 +205,67 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         return result.getBytes();
     }
 
+    /**
+     * Get a list of the existing service tags for a give service type
+     * e.g. the procedure services might have nagpra and legacy
+     *
+     * @param ui the uri info
+     * @param serviceType the service type to retrieve the set of tags for
+     * @return the set of service tags, as an abstract-common-list
+     */
+    @GET
+    @Path("{csid}/tags")
+    public AbstractCommonList getTagsForType(@Context UriInfo ui, @PathParam("csid") String serviceType) {
+        Set<String> serviceObjects = new HashSet<>();
+        ensureCSID(serviceType, NuxeoBasedResource.READ);
+        try {
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+
+            List<ServiceBindingType> bindings = tReader.getServiceBindingsByType(ctx.getTenantId(), serviceType);
+            if (bindings == null || bindings.isEmpty()) {
+                // 404 if there are no mappings.
+                Response response = Response.status(Response.Status.NOT_FOUND)
+                        .entity(ServiceMessages.READ_FAILED + ServiceMessages.resourceNotFoundMsg(serviceType))
+                        .type("text/plain")
+                        .build();
+                throw new CSWebApplicationException(response);
+            }
+
+            for (ServiceBindingType binding : bindings) {
+                ServiceObjectType serviceObj = binding.getObject();
+                if (serviceObj != null) {
+                    if (binding.getTags() != null) {
+                        serviceObjects.addAll(binding.getTags().getTag());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw bigReThrow(e, ServiceMessages.READ_FAILED, serviceType);
+        }
+
+        try {
+            CommonList commonList = new CommonList();
+            commonList.setPageNum(0);
+            commonList.setPageSize(serviceObjects.size());
+            commonList.setItemsInPage(serviceObjects.size());
+            commonList.setTotalItems(serviceObjects.size());
+
+            String[] fields = new String[1];
+            fields[0] = ServiceGroupListItemJAXBSchema.NAME;
+            commonList.setFieldsReturned(fields);
+            HashMap<String, Object> item = new HashMap<String, Object>();
+            for (String service : serviceObjects) {
+                item.put(ServiceGroupListItemJAXBSchema.NAME, service);
+                commonList.addItem(item);
+                item.clear();
+            }
+            return commonList;
+        } catch (ParserConfigurationException e) {
+            throw bigReThrow(e, ServiceMessages.UNKNOWN_ERROR_MSG, serviceType);
+        }
+    }
+
     @GET
     @Path("{csid}/items")
     public AbstractCommonList getResourceItemList(
