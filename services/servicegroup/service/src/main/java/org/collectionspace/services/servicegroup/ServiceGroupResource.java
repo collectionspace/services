@@ -159,9 +159,9 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         PoxPayloadOut result = null;
         ensureCSID(groupname, NuxeoBasedResource.READ);
         try {
-	        ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
-            TenantBindingConfigReaderImpl tReader =
-                    ServiceMain.getInstance().getTenantBindingConfigReader();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler) createDocumentHandler(ctx);
+            TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
             // We need to get all the procedures, authorities, and objects.
 	        ArrayList<String> groupsList = null;  
 	        if("common".equalsIgnoreCase(groupname)) {
@@ -184,20 +184,23 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
             common.setUri(uri);
             result = new PoxPayloadOut(getServicePathComponent());
             result.addPart("ServicegroupsCommon", common);
-            
-        	ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
-        	if(wrapper==null) {
-        		wrapper = new ServicegroupsCommon.HasDocTypes();
-        		common.setHasDocTypes(wrapper);
-        	}
-        	List<String> hasDocTypes = wrapper.getHasDocType();
-        	for(ServiceBindingType binding:servicebindings) {
-        		ServiceObjectType serviceObj = binding.getObject();
-        		if(serviceObj!=null) {
-	                String docType = serviceObj.getName();
-	                hasDocTypes.add(docType);
-        		}
-        	}
+
+            String queryTag = ctx.getQueryParams().getFirst(IQueryManager.TAG_QUERY_PARAM);
+            ServicegroupsCommon.HasDocTypes wrapper = common.getHasDocTypes();
+            if (wrapper == null) {
+                wrapper = new ServicegroupsCommon.HasDocTypes();
+                common.setHasDocTypes(wrapper);
+            }
+            List<String> hasDocTypes = wrapper.getHasDocType();
+            for (ServiceBindingType binding : bindings) {
+                boolean includeDocType = handler.acceptServiceBinding(binding, queryTag);
+
+                ServiceObjectType serviceObj = binding.getObject();
+                if (includeDocType && serviceObj != null) {
+                    String docType = serviceObj.getName();
+                    hasDocTypes.add(docType);
+                }
+            }
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.READ_FAILED, groupname);
         }
