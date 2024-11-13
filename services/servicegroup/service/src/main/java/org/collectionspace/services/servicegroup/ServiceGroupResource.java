@@ -151,7 +151,7 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
         PoxPayloadOut result = null;
         ensureCSID(groupname, NuxeoBasedResource.READ);
         try {
-            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(ui);
             ServiceGroupDocumentModelHandler handler = (ServiceGroupDocumentModelHandler) createDocumentHandler(ctx);
             TenantBindingConfigReaderImpl tReader = ServiceMain.getInstance().getTenantBindingConfigReader();
             // We need to get all the procedures, authorities, and objects.
