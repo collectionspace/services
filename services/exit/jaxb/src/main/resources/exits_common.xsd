@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Exit schema (XSD)
+
+    Entity  : (Object) Exit
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns:ns="http://collectionspace.org/services/exit"
+  xmlns="http://collectionspace.org/services/exit"
+  targetNamespace="http://collectionspace.org/services/exit"
+  version="0.1"
+>
+  <!--  Exit Information Group -->
+  <xs:element name="exits_common">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="exitNumber" type="xs:string" />
+        <xs:element name="exitCountNote" type="xs:string" />
+        <xs:element name="exitDate" type="xs:date" />
+        <xs:element name="reason" type="xs:string" />
+        <xs:element name="saleCurrency" type="xs:string" />
+        <xs:element name="saleValue" type="xs:string" />
+        <!-- This should be a structured date
+        <xs:element name="saleDate" type="" />
+        -->
+        <xs:element name="saleNumber" type="xs:string" />
+        <xs:element name="saleLot" type="xs:string" />
+        <xs:element name="saleNote" type="xs:string" />
+
+        <xs:element name="owners" type="owners"/>
+        <xs:element name="methods" type="methods"/>
+        <xs:element name="exitAgentGroupList" type="exitAgentGroupList"/>
+        <xs:element name="approvalStatusGroupList" type="approvalStatusGroupList"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="owners">
+    <xs:sequence>
+      <xs:element name="owner" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="methods">
+    <xs:sequence>
+      <xs:element name="method" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exitAgentGroupList">
+    <xs:sequence>
+      <xs:element name="exitAgentGroup" type="exitAgentGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exitAgentGroup">
+    <xs:sequence>
+      <xs:element name="agent" type="xs:string"/>
+      <xs:element name="role" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="approvalStatusGroupList">
+    <xs:sequence>
+      <xs:element name="approvalStatusGroup" type="approvalStatusGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="approvalStatusGroup">
+    <xs:sequence>
+      <xs:element name="group" type="xs:string"/>
+      <xs:element name="individual" type="xs:string"/>
+      <xs:element name="status" type="xs:string"/>
+      <xs:element name="date" type="xs:date"/>
+      <xs:element name="approvalStatusNotes" type="approvalStatusNotes"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="approvalStatusNotes">
+    <xs:sequence>
+      <xs:element name="approavlStatusNote" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
