@@ -11,34 +11,31 @@
     $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
   jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/servicegroup"
   xmlns="http://collectionspace.org/services/servicegroup"
   targetNamespace="http://collectionspace.org/services/servicegroup"
   version="0.1"
 >
 
-    <!-- servicegroup -->
-    <xs:element name="servicegroups_common">
-        <xs:complexType>
+  <!-- servicegroup -->
+  <xs:element name="servicegroups_common">
+    <xs:complexType>
+      <xs:sequence>
+        <!--  ServiceGroup Information Group -->
+        <xs:element name="name" type="xs:string" />
+        <xs:element name="uri" type="xs:string" />
+        <xs:element name="hasDocTypes">
+          <xs:complexType>
             <xs:sequence>
-                <!--  ServiceGroup Information Group -->
-                <xs:element name="name" type="xs:string"/>
-                <xs:element name="uri" type="xs:string"/>
-				<xs:element name="hasDocTypes">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="hasDocType" type="xs:string"
-								minOccurs="1" maxOccurs="unbounded" />
-						</xs:sequence>
-					</xs:complexType>
-				</xs:element>
+              <xs:element name="hasDocType" type="xs:string" minOccurs="1" maxOccurs="unbounded" />
             </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-    
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
 
