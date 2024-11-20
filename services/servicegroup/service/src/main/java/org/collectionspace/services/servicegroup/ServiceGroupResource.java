@@ -93,10 +93,9 @@ public class ServiceGroupResource extends AbstractCollectionSpaceResourceImpl<Po
     }
 
     @Override
-    // public Class<ServicegroupsCommon> getCommonPartClass() {
     public Class<?> getCommonPartClass() {
         try {
-            return Class.forName("org.collectionspace.services.servicegroup.ServicegroupsCommon"); // .class;
+            return Class.forName("org.collectionspace.services.servicegroup.ServicegroupsCommon");
         } catch (ClassNotFoundException e) {
             return null;
         }
