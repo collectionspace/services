@@ -87,7 +87,7 @@ FROM hierarchy summary_hierarchy
       email.email
     FROM hierarchy
       INNER JOIN partiesinvolvedgroup party ON party.id = hierarchy.id AND
-        party.involvedrole LIKE '%lineal_descendant%' OR party.involvedrole LIKE '%tribal_rep%'
+        (party.involvedrole LIKE '%lineal_descendant%' OR party.involvedrole LIKE '%tribal_rep%')
       INNER JOIN persons_common person ON person.shortidentifier = substring(party.involvedparty FROM '^urn:.*item:name\(([^)]+)\)')
       INNER JOIN hierarchy person_hierarchy ON person_hierarchy.id = person.id
       INNER JOIN hierarchy ptg_hierarchy ON ptg_hierarchy.parentid = person.id AND ptg_hierarchy.pos = 0
