@@ -141,7 +141,7 @@ FROM hierarchy
     SELECT ocg_hierarchy.parentid,
       sum(ocg.objectcount) AS object_count_afo
     FROM hierarchy ocg_hierarchy
-      INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype LIKE '%associated%'
+      INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype ~ '\yassociated'
     WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
     GROUP BY ocg_hierarchy.parentid
   ) object_count_afo ON object_count_afo.parentid = relation.objectcsid
