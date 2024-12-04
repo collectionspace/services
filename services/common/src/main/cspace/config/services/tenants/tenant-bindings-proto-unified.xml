@@ -728,6 +728,22 @@
 					<types:key>report</types:key>
 					<types:value>borrowing_receipt</types:value>
 				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>exhibition_checklist</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>inventory_consultation</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>repatriation_request_consultation</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>summary_documentation_consultation</types:value>
+				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">
