@@ -30,6 +30,7 @@ import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.consultation.ConsultationResource;
 import org.collectionspace.services.deaccession.DeaccessionResource;
 import org.collectionspace.services.dutyofcare.DutyofcareResource;
+import org.collectionspace.services.exit.ExitResource;
 import org.collectionspace.services.heldintrust.HeldInTrustResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
@@ -40,7 +41,7 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
-import org.collectionspace.services.repatriationclaim.RepatriationClaimResource;
+import org.collectionspace.services.repatriationrequest.RepatriationRequestResource;
 import org.collectionspace.services.nagprainventory.NagpraInventoryResource;
 import org.collectionspace.services.restrictedmedia.RestrictedMediaResource;
 import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
@@ -166,7 +167,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         addResourceToMapAndSingletons(new PropagationResource());
         addResourceToMapAndSingletons(new PottagResource());
         addResourceToMapAndSingletons(new ClaimResource());
-        addResourceToMapAndSingletons(new RepatriationClaimResource());
+        addResourceToMapAndSingletons(new RepatriationRequestResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
         addResourceToMapAndSingletons(new TransportResource());
@@ -177,6 +178,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         addResourceToMapAndSingletons(new HeldInTrustResource());
         addResourceToMapAndSingletons(new ConsultationResource());
         addResourceToMapAndSingletons(new DeaccessionResource());
+        addResourceToMapAndSingletons(new ExitResource());
         addResourceToMapAndSingletons(new RestrictedMediaResource());
 
         singletons.add(new IDResource());

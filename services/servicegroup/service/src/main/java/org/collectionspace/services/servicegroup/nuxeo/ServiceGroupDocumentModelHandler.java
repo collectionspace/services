@@ -268,6 +268,10 @@ public class ServiceGroupDocumentModelHandler
 	 * @return true if the ServiceBinding contains all query parameters, false otherwise
 	 */
 	public boolean acceptServiceBinding(ServiceBindingType binding, String queryTag) {
+		if (queryTag == null || queryTag.isEmpty()) {
+			return true;
+		}
+
 		final Tags tags = binding.getTags();
 		final List<String> tagList = tags == null ? Collections.<String>emptyList() : tags.getTag();
 

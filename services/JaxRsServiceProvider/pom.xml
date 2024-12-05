@@ -243,7 +243,7 @@
       <!-- new claim as of 8.1.0 -->
       <dependency>
         <groupId>org.collectionspace.services</groupId>
-        <artifactId>org.collectionspace.services.repatriationclaim.service</artifactId>
+        <artifactId>org.collectionspace.services.repatriationrequest.service</artifactId>
         <version>${project.version}</version>
       </dependency>
         <dependency>
@@ -454,6 +454,11 @@
         <dependency>
           <groupId>org.collectionspace.services</groupId>
           <artifactId>org.collectionspace.services.deaccession.service</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.collectionspace.services</groupId>
+          <artifactId>org.collectionspace.services.exit.service</artifactId>
           <version>${project.version}</version>
         </dependency>
         <dependency>

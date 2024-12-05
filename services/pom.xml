@@ -77,6 +77,8 @@
 		<module>dutyofcare</module>
 		<module>valuationcontrol</module>
 		<module>objectexit</module>
+		<!-- new object exit -->
+		<module>exit</module>
 		<module>propagation</module>
 		<module>pottag</module>
 		<module>batch</module>
@@ -99,7 +101,7 @@
 		<module>publicitem</module>
 		<module>iterationreport</module>
 		<module>chronology</module>
-		<module>repatriationclaim</module>
+		<module>repatriationrequest</module>
 		<module>nagprainventory</module>
 		<module>summarydocumentation</module>
 		<module>heldintrust</module>
