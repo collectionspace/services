@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summary_documentation_consultation" language="javascript" pageWidth="1500" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="e9c71592-7651-43d3-b4ac-6eea5e049ac0">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo" />
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193" />
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800" />
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625" />
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361" />
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true" />
+	<style name="Detail" fontName="SansSerif" fontSize="12" />
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["onbehalfof,cultures,summary_types,sites,exit_owners,status"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false" />
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replace(/,/g, "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause_relation" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "AND relation.subjectcsid IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE summary_hierarchy.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH related_objects AS (
+	SELECT hierarchy.id as object_id,
+		relation.objectcsid,
+		relation.subjectcsid as repatriation_csid
+	FROM relations_common relation
+		INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
+    INNER JOIN misc ON misc.id = relation.id
+    AND misc.lifecyclestate != 'deleted'
+	WHERE relation.objectdocumenttype = 'CollectionObject'
+		AND relation.subjectdocumenttype = 'SummaryDocumentation'
+		$P!{whereclause_relation}
+),
+related_exits AS (
+	SELECT DISTINCT ON (objs.repatriation_csid, hierarchy.id) objs.objectcsid,
+		objs.repatriation_csid,
+		hierarchy.id as exit_id,
+		relation.subjectcsid as exit_csid
+	FROM related_objects objs
+		INNER join relations_common relation on relation.objectcsid = objs.objectcsid
+		AND relation.subjectdocumenttype = 'Exit'
+		INNER JOIN hierarchy on hierarchy.name = relation.subjectcsid
+    INNER JOIN misc ON misc.id = relation.id
+    AND misc.lifecyclestate != 'deleted'
+)
+SELECT summary.documentationnumber,
+  summary.originationdate,
+  coalesce(titles.titles, '{}') AS titles,
+  coalesce(summarytypes.summary_types, '{}') AS summary_types,
+  coalesce(partiesinvolved.onbehalfof, '{}') AS onbehalfof,
+  coalesce(culturalgroup.cultures, '{}') AS cultures,
+  summary_status.status,
+  summary_status.statusdate,
+  coalesce(object_count.sacred_object_count, 0) AS sacred_object_count,
+  coalesce(object_count.ufo_count, 0) AS ufo_count,
+  coalesce(object_count.cultural_patrimony_count, 0) AS cultural_patrimony_count,
+  coalesce(object_count.lineal_descendent_count, 0) AS lineal_descendent_count,
+  coalesce(archaeological_sites.sites, '{}') AS sites,
+  coalesce(consultations.log_total, 0) AS log_total,
+  coalesce(exits.exit_owners, '{}') AS exit_owners,
+  coalesce(exits.exit_dates, '{}') AS exit_dates
+FROM hierarchy summary_hierarchy
+	INNER JOIN misc ON misc.id = summary_hierarchy.id
+	AND misc.lifecyclestate != 'deleted'
+	INNER JOIN summarydocumentations_common summary ON summary.id = summary_hierarchy.id
+	LEFT JOIN (
+		-- Summary title
+		SELECT title.id AS summary_id,
+			array_agg(title.item) AS titles
+		FROM summarydocumentations_common_titles title
+		GROUP BY title.id
+	) titles ON titles.summary_id = summary_hierarchy.id
+	LEFT JOIN (
+		-- Summary types
+		SELECT summarytype.id AS summary_id,
+			array_agg(summarytype.item) AS summary_types
+		FROM summarydocumentations_common_types summarytype
+		GROUP BY summarytype.id
+	) summarytypes ON summarytypes.summary_id = summary_hierarchy.id
+	LEFT JOIN (
+		-- Organizations pulled from on behalf field on Summary record
+		SELECT hierarchy.parentid,
+			array_agg(party.involvedonbehalfof) as onbehalfof
+		FROM hierarchy
+			INNER JOIN partiesinvolvedgroup party ON party.id = hierarchy.id
+		WHERE hierarchy.name = 'summarydocumentations_common:partiesInvolvedGroupList'
+		GROUP BY hierarchy.parentid
+	) partiesinvolved ON partiesinvolved.parentid = summary_hierarchy.id
+	LEFT JOIN (
+		SELECT hierarchy.parentid,
+			array_agg(culturalgroup.culture) AS cultures
+		FROM hierarchy
+			INNER JOIN culturalgroup ON culturalgroup.id = hierarchy.id
+			AND hierarchy.name = 'summarydocumentations_common:culturalGroupList'
+		GROUP BY hierarchy.parentid
+	) culturalgroup ON culturalgroup.parentid = summary.id
+	LEFT JOIN (
+		-- Related archaeological sites
+		SELECT hierarchy.parentid,
+			array_agg(asg.archaeologicalsite) AS sites
+		FROM hierarchy
+			INNER JOIN archaeologicalsitegroup asg ON asg.id = hierarchy.id
+		WHERE hierarchy.name = 'summarydocumentations_common:archaeologicalSiteGroupList'
+		GROUP BY hierarchy.parentid
+	) archaeological_sites ON archaeological_sites.parentid = summary.id
+	LEFT JOIN (
+		-- Current Status: most recent
+		SELECT DISTINCT ON (hierarchy.parentid) hierarchy.parentid,
+			status_group.status,
+			status_group.statusdate
+		FROM hierarchy
+			INNER JOIN statusgroup status_group ON status_group.id = hierarchy.id
+		WHERE hierarchy.name = 'summarydocumentations_common:statusGroupList'
+		ORDER BY hierarchy.parentid,
+			status_group.statusdate DESC NULLS LAST
+	) summary_status ON summary_status.parentid = summary_hierarchy.id
+	LEFT JOIN LATERAL (
+		-- Related Object - Object Count
+		-- type is sacred object, cultural partrimony, UFO and lineal descent
+		-- Use regex matching because the refnames can contain subsets of the others,
+		-- so occasionally do things like use a word boundary (\y) to avoid overlaps
+		SELECT objs.repatriation_csid,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ 'sacred_object' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS sacred_object_count,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ 'unassociated_funerary' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS ufo_count,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ 'cultural_patrimony' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS cultural_patrimony_count,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ 'lineal_descendent' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS lineal_descendent_count
+		FROM hierarchy ocg_hierarchy
+			INNER JOIN related_objects objs ON objs.object_id = ocg_hierarchy.parentid
+			INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id
+		WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
+		GROUP BY objs.repatriation_csid
+	) object_count ON object_count.repatriation_csid = summary_hierarchy.name
+	LEFT JOIN (
+		-- Related Consultations (Summary -> Consultation)
+		-- Number of Consultation Log Entries. Consultations related to the Summary record, pull a count of how many entries are in the log.
+		SELECT relation.subjectcsid,
+			count(cl_hierarchy.pos) AS log_total
+		FROM relations_common relation
+			INNER JOIN misc ON misc.id = relation.id
+			AND misc.lifecyclestate != 'deleted'
+			INNER JOIN hierarchy consultation_hierarchy ON consultation_hierarchy.name = relation.objectcsid
+			INNER JOIN hierarchy cl_hierarchy ON cl_hierarchy.parentid = consultation_hierarchy.id
+			AND cl_hierarchy.name = 'consultations_common:consultationLogGroupList'
+		WHERE relation.objectdocumenttype = 'Consultation'
+			AND relation.subjectdocumenttype = 'SummaryDocumentation'
+			$P!{whereclause_relation}
+		GROUP BY relation.subjectcsid
+	) consultations ON consultations.subjectcsid = summary_hierarchy.name
+	LEFT JOIN (
+		-- Related Object Exits (Object -> ObjectExit (New))
+		-- Current owner with exit date: If there is an object exit related to the related objects, pull the current owner. Concatenate and separate by ;
+		--   (Format example: The United Band of Humbolt People, 2024-08-02; The Dog River People, 2024-09-05).
+		-- Allows NULL values to aggregate so we don't lose track of pairs
+		SELECT related_exits.repatriation_csid,
+			array_agg(exit.exitdate) as exit_dates,
+			array_agg(owners.item) AS exit_owners
+		FROM exits_common exit
+			INNER JOIN related_exits on related_exits.exit_id = exit.id
+			LEFT JOIN exits_common_owners owners on owners.id = exit.id AND owners.pos = 0
+		GROUP BY related_exits.repatriation_csid
+	) exits ON exits.repatriation_csid = summary_hierarchy.name
+	$P!{whereclause}]]>
+	</queryString>
+	<field name="documentationnumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="documentationnumber" />
+		<property name="com.jaspersoft.studio.field.label" value="documentationnumber" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="summarydocumentations_common" />
+	</field>
+	<field name="originationdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="originationdate" />
+		<property name="com.jaspersoft.studio.field.label" value="originationdate" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="summarydocumentations_common" />
+	</field>
+	<field name="titles" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="titles" />
+		<property name="com.jaspersoft.studio.field.label" value="titles" />
+	</field>
+	<field name="summary_types" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="summary_types" />
+		<property name="com.jaspersoft.studio.field.label" value="summary_types" />
+	</field>
+	<field name="onbehalfof" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="onbehalfof" />
+		<property name="com.jaspersoft.studio.field.label" value="onbehalfof" />
+	</field>
+	<field name="cultures" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="cultures" />
+		<property name="com.jaspersoft.studio.field.label" value="cultures" />
+	</field>
+	<field name="status" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="status" />
+		<property name="com.jaspersoft.studio.field.label" value="status" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="statusgroup" />
+	</field>
+	<field name="statusdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="statusdate" />
+		<property name="com.jaspersoft.studio.field.label" value="statusdate" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="statusgroup" />
+	</field>
+	<field name="sacred_object_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="sacred_object_count" />
+		<property name="com.jaspersoft.studio.field.label" value="sacred_object_count" />
+	</field>
+	<field name="ufo_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ufo_count" />
+		<property name="com.jaspersoft.studio.field.label" value="ufo_count" />
+	</field>
+	<field name="cultural_patrimony_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="cultural_patrimony_count" />
+		<property name="com.jaspersoft.studio.field.label" value="cultural_patrimony_count" />
+	</field>
+	<field name="lineal_descendent_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="lineal_descendent_count" />
+		<property name="com.jaspersoft.studio.field.label" value="lineal_descendent_count" />
+	</field>
+	<field name="sites" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="sites" />
+		<property name="com.jaspersoft.studio.field.label" value="sites" />
+	</field>
+	<field name="log_total" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="log_total" />
+		<property name="com.jaspersoft.studio.field.label" value="log_total" />
+	</field>
+	<field name="exit_owners" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="exit_owners" />
+		<property name="com.jaspersoft.studio.field.label" value="exit_owners" />
+	</field>
+	<field name="exit_dates" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="exit_dates" />
+		<property name="com.jaspersoft.studio.field.label" value="exit_dates" />
+	</field>
+	<background>
+		<band splitType="Stretch" />
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout" />
+			<property name="com.jaspersoft.studio.unit.height" value="px" />
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="b8cd41b4-34e5-455f-81fc-97800f4ae9b7">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Organization(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="539fd511-8c4c-4f20-ac0f-1b71fdc26939">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Summary Documentation Origination Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="9741cf97-9acc-45aa-bab2-90a03cf29e83">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Summary Documentation Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="65b98683-6871-48ec-a4c4-553e41f1b26b">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Summary Documentation Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="02898623-0732-4b3d-abe6-948350332361">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Summary Documentation - Summary Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="a0f54698-7f5f-4d08-8286-f86c412fa876">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[UFO Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="9afbf556-a4f6-4041-97a9-ac9f106aa75e">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Objects of Cultural Patrimony Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="679eb6c6-e454-47d1-8320-1a723dabf0a1">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Sacred Object Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="f9a1fb86-9c78-48ba-942e-e35417916eeb">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Lineal Descendent Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="c2e6ccf4-0900-400d-a6f4-4ea0fc9bb95a">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[NAGPRA Category Type(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="52cec6c0-596a-47f6-877a-fa0a4227e55d">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Site(s) Related to Summary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="c361bc9c-e677-4a74-a59e-695ba9eddbaa">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Culture(s) Related to Summary]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="f6441c8d-82a9-4908-94c0-b57be2d22746">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="17fc9356-5a96-4aa4-915a-cf18a83bc614">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Exit Record Current Owner with Exit Date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px" />
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="b387bbaf-4760-45af-a84c-62681a678e61">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{onbehalfof}.getArray().join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="e3b59f6b-c027-4527-8f95-453c97a250f5">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{originationdate} !== null ? java.lang.String.format("%tF", $F{originationdate}) : '']]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="0138ed1b-1e54-4d27-92f4-1e42769adbcb">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{documentationnumber}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="99fcf86b-ed71-413a-a65f-dcbb51d096eb">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{titles}.getArray().join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="637dac22-c0a3-4c77-b323-f15f65b5bdf7">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression>
+					<![CDATA[
+						var status = $F{status} !== null ? $F{status} : '';
+						var date = $F{statusdate} !== null ? java.lang.String.format("(%tF)", $F{statusdate}) : '';
+						status + " " + date;
+					]]>
+				</textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="9bada286-6f81-4548-bc77-669a0973da26">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{ufo_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="6619c361-ae3e-4f49-9f9e-492cc307ca30">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cultural_patrimony_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="bebdb2bf-297a-477b-a03b-88e5e15fb0f6">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{sacred_object_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="6619e1e3-2761-4c6b-8e4a-3be5d8e4b956">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{lineal_descendent_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="0beee49d-f49d-4e17-8f78-bb5c3184aaa1">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{summary_types}.getArray().join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="bd6c6806-b6d2-495c-917f-ae879e740992">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{sites}.getArray().join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="6d4f8b23-ea8c-4a38-9acc-4ca7eff30219">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cultures}.getArray().join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="54b06775-91a6-4b74-a747-a7977e5943fb">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{log_total}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="04107479-6227-4b31-b0b5-50316e4d3426">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression>
+					<![CDATA[
+						var dates = $F{exit_dates}.getArray();
+						$F{exit_owners}.getArray().map(function(owner, index) {
+							if (!owner) {
+								return null;
+							}
+							return dates[index] === null ? owner : java.lang.String.format("%s (%tF)", owner, dates[index]);
+						}).filter(owner => !!owner).join('; ')
+					]]>
+				</textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

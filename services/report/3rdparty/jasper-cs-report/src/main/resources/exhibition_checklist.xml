@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Exhibition Checklist</name>
+    <notes>Catalog info for objects related to a exhibition record. Runs on a single record only.</notes>
+    <forDocTypes>
+      <forDocType>Exhibition</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>false</supportsNoContext>
+    <outputMIME>application/pdf</outputMIME>
+    <filename>exhibition_checklist.jrxml</filename>
+  </ns2:reports_common>
+</document>

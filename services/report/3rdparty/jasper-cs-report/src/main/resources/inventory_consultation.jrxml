@@ -1,0 +1,358 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="inventory_consultation" language="javascript" pageWidth="1100" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="2c34875b-77e8-4ad9-931f-69ff838403ae">
+	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo" />
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193" />
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800" />
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625" />
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361" />
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true" />
+	<style name="Detail" fontName="SansSerif" fontSize="12" />
+	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["onbehalfof,inventorystatus,sites,exit_owners"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false" />
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replace(/,/g, "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause_cte" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "AND relation.subjectcsid IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csids} != "NOVALUE" ? ( "WHERE inv_hierarchy.name IN (" + $P{csids} + ")" ) : ""]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[-- Get relations first so that we can aggregate on the repatriation request
+WITH related_objects AS (
+	SELECT hierarchy.id as object_id,
+		relation.objectcsid,
+		relation.subjectcsid as repatriation_csid
+	FROM relations_common relation
+		INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
+	WHERE relation.objectdocumenttype = 'CollectionObject'
+		AND relation.subjectdocumenttype = 'NagpraInventory'
+		$P!{whereclause_cte}
+),
+related_exits AS (
+	SELECT DISTINCT ON (objs.repatriation_csid, hierarchy.id) objs.objectcsid,
+		objs.repatriation_csid,
+		hierarchy.id as exit_id,
+		relation.subjectcsid as exit_csid
+	FROM related_objects objs
+		INNER join relations_common relation on relation.objectcsid = objs.objectcsid
+		AND relation.subjectdocumenttype = 'Exit'
+		INNER JOIN hierarchy on hierarchy.name = relation.subjectcsid
+)
+SELECT inventory.inventorynumber,
+  inventory.originationdate,
+  coalesce(titles.titles, '{}') AS titles,
+  coalesce(partiesinvolved.onbehalfof, '{}') AS onbehalfof,
+  inventory_status.inventorystatus,
+  inventory_status.inventorydate,
+  coalesce(object_count.mni_count, 0) AS mni_count,
+  coalesce(object_count.afo_count, 0) AS afo_count,
+  coalesce(field_collection_sites.sites, '{}') AS sites,
+  coalesce(consultations.log_total, 0) AS log_total,
+  coalesce(exits.exit_owners, '{}') AS exit_owners,
+  coalesce(exits.exit_dates, '{}') AS exit_dates
+FROM hierarchy inv_hierarchy
+	INNER JOIN misc ON misc.id = inv_hierarchy.id AND misc.lifecyclestate != 'deleted'
+	INNER JOIN nagprainventories_common inventory ON inventory.id = inv_hierarchy.id
+	LEFT JOIN (
+		SELECT title.id AS inventory_id,
+			array_agg(title.item) AS titles
+		FROM nagprainventories_common_titles title
+		GROUP BY title.id
+	) titles ON titles.inventory_id = inv_hierarchy.id
+	LEFT JOIN (
+		-- Organizations pulled from on behalf field on Inventory record
+		SELECT hierarchy.parentid,
+			array_agg(party.involvedonbehalfof) as onbehalfof
+		FROM hierarchy
+			INNER JOIN partiesinvolvedgroup party ON party.id = hierarchy.id
+		WHERE hierarchy.name = 'nagprainventories_common:partiesInvolvedGroupList'
+		GROUP BY hierarchy.parentid
+	) partiesinvolved ON partiesinvolved.parentid = inv_hierarchy.id
+	LEFT JOIN (
+		-- Current Status: Pull most recent Status from inventory status with the date.
+		SELECT DISTINCT ON (hierarchy.parentid) hierarchy.parentid,
+			status_group.inventorystatus,
+			status_group.inventorydate
+		FROM hierarchy
+			INNER JOIN inventorystatusgroup status_group ON status_group.id = hierarchy.id
+		WHERE hierarchy.name = 'nagprainventories_common:inventoryStatusGroupList'
+		ORDER BY hierarchy.parentid,
+			status_group.inventorydate DESC NULLS LAST
+	) inventory_status ON inventory_status.parentid = inv_hierarchy.id
+	LEFT JOIN LATERAL (
+		-- Related Object - Object count
+		-- Use regex matching because the refnames can contain subsets of the others
+		-- a word boundary (\y) allows us to match start/ends of refnames easily
+		SELECT objs.repatriation_csid,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ 'minimum' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS mni_count,
+			sum(
+				CASE
+					WHEN ocg.objectcounttype ~ '\yassociated' THEN ocg.objectcount
+					ELSE 0
+				END
+			) AS afo_count
+		FROM hierarchy ocg_hierarchy
+			INNER JOIN related_objects objs ON objs.object_id = ocg_hierarchy.parentid
+			INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id
+		WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
+		GROUP BY objs.repatriation_csid
+	) object_count ON object_count.repatriation_csid = inv_hierarchy.name
+	LEFT JOIN (
+		-- Related Object - Field Collection Sites
+		SELECT objs.repatriation_csid,
+			array_agg(fcs.item) AS sites
+		FROM collectionobjects_common_fieldcollectionsites fcs
+			INNER JOIN related_objects objs ON objs.object_id = fcs.id
+		GROUP BY objs.repatriation_csid
+	) field_collection_sites ON field_collection_sites.repatriation_csid = inv_hierarchy.name
+	LEFT JOIN (
+		-- Related Consultations (Inventory -> Consultation)
+		-- Number of Consultation Log Entries
+		SELECT relation.subjectcsid,
+			count(cl_hierarchy.pos) AS log_total
+		FROM relations_common relation
+			INNER JOIN misc ON misc.id = relation.id
+			AND misc.lifecyclestate != 'deleted'
+			INNER JOIN hierarchy consultation_hierarchy ON consultation_hierarchy.name = relation.objectcsid
+			INNER JOIN hierarchy cl_hierarchy ON cl_hierarchy.parentid = consultation_hierarchy.id
+			AND cl_hierarchy.name = 'consultations_common:consultationLogGroupList'
+		WHERE relation.objectdocumenttype = 'Consultation'
+			AND relation.subjectdocumenttype = 'NagpraInventory'
+		GROUP BY relation.subjectcsid
+	) consultations ON consultations.subjectcsid = inv_hierarchy.name
+	LEFT JOIN (
+		-- Related Object Exits (Object -> ObjectExit (New))
+		-- Current owner with exit date
+		-- Allows NULL values to aggregate so we don't lose track of pairs
+		SELECT related_exits.repatriation_csid,
+			array_agg(exit.exitdate) as exit_dates,
+			array_agg(owners.item) AS exit_owners
+		FROM exits_common exit
+			INNER JOIN related_exits on related_exits.exit_id = exit.id
+			LEFT JOIN exits_common_owners owners on owners.id = exit.id AND owners.pos = 0
+		GROUP BY related_exits.repatriation_csid
+	) exits ON exits.repatriation_csid = inv_hierarchy.name
+$P!{whereclause}]]>
+	</queryString>
+	<field name="inventorynumber" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="inventorynumber" />
+		<property name="com.jaspersoft.studio.field.label" value="inventorynumber" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="nagprainventories_common" />
+	</field>
+	<field name="originationdate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="originationdate" />
+		<property name="com.jaspersoft.studio.field.label" value="originationdate" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="nagprainventories_common" />
+	</field>
+	<field name="titles" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="titles" />
+		<property name="com.jaspersoft.studio.field.label" value="titles" />
+	</field>
+	<field name="onbehalfof" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="onbehalfof" />
+		<property name="com.jaspersoft.studio.field.label" value="onbehalfof" />
+	</field>
+	<field name="inventorystatus" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="inventorystatus" />
+		<property name="com.jaspersoft.studio.field.label" value="inventorystatus" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="inventorystatusgroup" />
+	</field>
+	<field name="inventorydate" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="inventorydate" />
+		<property name="com.jaspersoft.studio.field.label" value="inventorydate" />
+		<property name="com.jaspersoft.studio.field.tree.path" value="inventorystatusgroup" />
+	</field>
+	<field name="mni_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="mni_count" />
+		<property name="com.jaspersoft.studio.field.label" value="mni_count" />
+	</field>
+	<field name="afo_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="afo_count" />
+		<property name="com.jaspersoft.studio.field.label" value="afo_count" />
+	</field>
+	<field name="sites" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="sites" />
+		<property name="com.jaspersoft.studio.field.label" value="sites" />
+	</field>
+	<field name="log_total" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="log_total" />
+		<property name="com.jaspersoft.studio.field.label" value="log_total" />
+	</field>
+	<field name="exit_owners" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="exit_owners" />
+		<property name="com.jaspersoft.studio.field.label" value="exit_owners" />
+	</field>
+	<field name="exit_dates" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="exit_dates" />
+		<property name="com.jaspersoft.studio.field.label" value="exit_dates" />
+	</field>
+	<background>
+		<band splitType="Stretch" />
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout" />
+			<property name="com.jaspersoft.studio.unit.height" value="px" />
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="581e80a8-aa61-4dda-b9f5-7f2155efb0c9">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Organization(s)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="6b5ebc64-5ae1-45c2-a327-0aeff2b2dbf5">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[NAGPRA Inventory Origination Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="24339136-4f9e-47d7-93f2-c16421e86c3d">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Inventory/Documentation Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="8413cd45-695a-4b51-8cab-df5cf012e78e">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Inventory Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="b279c2bd-3ba8-42e1-ab37-e39960f788d0">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[NAGPRA Inventory - Inventory Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="fe192ec5-2760-4e5f-80bf-6babeb8e2516">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[MNI Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="2fb0a6b9-bb96-44a8-9575-cb34cee53de2">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[AFO Lot Count]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="c3bc7e35-43d8-4446-acba-f7ef559a54b2">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Archaeological Sites Related to NAGPRA Inventory]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="77fe4cfa-6cd6-406e-9125-dd513caf64db">
+					<property name="com.jaspersoft.studio.unit.width" value="px" />
+				</reportElement>
+				<textElement markup="styled" />
+				<text><![CDATA[Exit Record - Current Owner with Exit Date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px" />
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="72e8433f-f64f-4829-b195-eb6d49865b94">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{onbehalfof}.getArray().filter((org) => !!org).join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="13555a23-15e0-4ef0-8b3e-7bac8ff73f22">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression>
+					<![CDATA[$F{originationdate} !== null ? java.lang.String.format("%tF", $F{originationdate}) : '']]>
+				</textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="32d4d113-7eb7-4aed-bfbb-8f9645af3161">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{inventorynumber}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="e6ad763b-46fe-47db-a304-009f5230d7b2">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{titles}.getArray().filter((title) => !!title).join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="09a21589-e9f4-4b31-8dcd-d989540c1b77">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{inventorystatus}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="c2c43e42-0fc1-4fad-b5bb-d8c62b534524">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{afo_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="411e6813-d586-4190-b721-7a22c00691ea">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{mni_count}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="659569aa-1ff0-4aa9-beaa-294337bd8315">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{sites}.getArray().filter((site) => !!site).join('; ')]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="8077c24c-13a9-4809-817e-a299c052bb2b">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{log_total}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="0599f20f-f792-45b0-b0a1-c4c9ddc133e3">
+					<property name="com.jaspersoft.studio.unit.y" value="px" />
+				</reportElement>
+				<textFieldExpression>
+					<![CDATA[var dates = $F{exit_dates}.getArray();
+						$F{exit_owners}.getArray().map(function(owner, index) {
+							if (!owner) {
+								return null;
+							}
+							return dates[index] === null ? owner : java.lang.String.format("%s (%tF)", owner, dates[index]);
+						}).filter(owner => !!owner).join('; ')
+					]]>
+				</textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
