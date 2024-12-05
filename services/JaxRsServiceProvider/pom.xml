@@ -461,7 +461,11 @@
           <artifactId>org.collectionspace.services.exit.service</artifactId>
           <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.restrictedmedia.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
       <!--dependency>
           <groupId>org.collectionspace.services</groupId>

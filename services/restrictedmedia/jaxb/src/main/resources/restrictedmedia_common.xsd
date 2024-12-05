@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    RestrictedMedia schema (XSD)
+
+    Entity  : RestrictedMedia
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns="http://collectionspace.org/services/restrictedmedia"
+  targetNamespace="http://collectionspace.org/services/restrictedmedia"
+  version="0.1"
+>
+  <!--  RestrictedMedia Information Group -->
+  <xs:element name="restrictedmedia_common">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="RestrictedMediaCommon" />
+      </xs:appinfo>
+    </xs:annotation>
+
+    <xs:complexType>
+      <xs:sequence>
+        <!--  Media Information Group -->
+        <xs:element name="contributor" type="xs:string"/>
+        <xs:element name="copyrightStatement" type="xs:string"/>
+        <xs:element name="coverage" type="xs:string"/>
+        <xs:element name="creator" type="xs:string"/>
+        <xs:element name="dateGroupList" type="dateGroupList"/>
+        <xs:element name="dateCreated" type="xs:string"/>
+        <xs:element name="dateModified" type="xs:string"/>
+        <xs:element name="description" type="xs:string"/>
+        <xs:element name="measuredPartGroupList" type="measuredPartGroupList"/>
+        <xs:element name="filename" type="xs:string"/>
+        <xs:element name="format" type="xs:string"/>
+        <xs:element name="identificationNumber" type="xs:string"/>
+        <xs:element name="languageList" type="languageList"/>
+        <xs:element name="location" type="xs:string"/>
+        <xs:element name="publisher" type="xs:string"/>
+        <xs:element name="relationList" type="relationList"/>
+        <xs:element name="rightsHolder" type="xs:string"/>
+        <xs:element name="source" type="xs:string"/>
+        <xs:element name="sourceUrl" type="xs:string"/>
+        <xs:element name="subjectList" type="subjectList"/>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="typeList" type="typeList"/>
+        <xs:element name="uri" type="xs:string" />
+        <xs:element name="blobCsid" type="xs:string" />
+        <xs:element name="externalUrl" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="dateGroupList">
+    <xs:sequence>
+      <xs:element name="dateGroup" type="dateGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateGroup">
+    <xs:sequence>
+      <xs:element name="dateDisplayDate" type="xs:string"/>
+      <xs:element name="dateAssociation" type="xs:string"/>
+      <xs:element name="dateEarliestSingleYear" type="xs:integer"/>
+      <xs:element name="dateEarliestSingleMonth" type="xs:integer"/>
+      <xs:element name="dateEarliestSingleDay" type="xs:integer"/>
+      <xs:element name="dateEarliestSingleEra" type="xs:string"/>
+      <xs:element name="dateEarliestSingleCertainty" type="xs:string"/>
+      <xs:element name="dateEarliestSingleQualifier" type="xs:string"/>
+      <xs:element name="dateEarliestSingleQualifierValue" type="xs:integer"/>
+      <xs:element name="dateEarliestSingleQualifierUnit" type="xs:string"/>
+      <xs:element name="dateLatestYear" type="xs:integer"/>
+      <xs:element name="dateLatestMonth" type="xs:integer"/>
+      <xs:element name="dateLatestDay" type="xs:integer"/>
+      <xs:element name="dateLatestEra" type="xs:string"/>
+      <xs:element name="dateLatestCertainty" type="xs:string"/>
+      <xs:element name="dateLatestQualifier" type="xs:string"/>
+      <xs:element name="dateLatestQualifierValue" type="xs:integer"/>
+      <xs:element name="dateLatestQualifierUnit" type="xs:string"/>
+      <xs:element name="datePeriod" type="xs:string"/>
+      <xs:element name="dateNote" type="xs:string"/>
+      <xs:element name="dateEarliestScalarValue" type="xs:date"/>
+      <xs:element name="dateLatestScalarValue" type="xs:date"/>
+      <xs:element name="scalarValuesComputed" type="xs:boolean"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="dateList">
+    <xs:sequence>
+      <xs:element name="date" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="measuredPartGroupList">
+    <xs:sequence>
+      <xs:element name="measuredPartGroup" type="measuredPartGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="measuredPartGroup">
+    <xs:sequence>
+      <xs:element name="measuredPart" type="xs:string"/>
+      <xs:element name="dimensionSummary" type="xs:string"/>
+      <xs:element name="dimensionSubGroupList" type="dimensionSubGroupList"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dimensionSubGroupList">
+    <xs:sequence>
+      <xs:element name="dimensionSubGroup" type="dimensionSubGroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dimensionSubGroup">
+    <xs:sequence>
+      <xs:element name="dimension" type="xs:string"/>
+      <xs:element name="measuredBy" type="xs:string"/>
+      <xs:element name="measurementUnit" type="xs:string"/>
+      <xs:element name="measurementMethod" type="xs:string"/>
+      <xs:element name="value" type="xs:decimal"/>
+      <xs:element name="valueDate" type="xs:string"/>
+      <xs:element name="valueQualifier" type="xs:string"/>
+      <xs:element name="dimensionNote" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="languageList">
+    <xs:sequence>
+      <xs:element name="language" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="relationList">
+    <xs:sequence>
+      <xs:element name="relation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="subjectList">
+    <xs:sequence>
+      <xs:element name="subject" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="typeList">
+    <xs:sequence>
+      <xs:element name="type" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
