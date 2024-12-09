@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notice_of_intent_to_repatriate" language="groovy" pageWidth="3000" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7e3e38d5-26e7-4687-8da3-050c10b4bffe">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notice_of_intent_to_repatriate" language="groovy" pageWidth="2400" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7e3e38d5-26e7-4687-8da3-050c10b4bffe">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -492,7 +492,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<text><![CDATA[Current Location]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="7e9f890a-4ccf-4b8e-b53b-f27ddafc6a7c">
+				<reportElement style="Column header" x="2225" y="0" width="100" height="44" uuid="7e9f890a-4ccf-4b8e-b53b-f27ddafc6a7c">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
@@ -641,7 +641,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<textFieldExpression><![CDATA[$F{locations}.getArray().join("; ")]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="de4f3b4d-920e-4674-bc73-2eb39e3fc758">
+				<reportElement style="Detail" x="2225" y="0" width="100" height="30" uuid="de4f3b4d-920e-4674-bc73-2eb39e3fc758">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
