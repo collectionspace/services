@@ -39,8 +39,7 @@
   INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
   WHERE relation.objectdocumenttype = 'CollectionObject' AND relation.subjectdocumenttype = 'SummaryDocumentation' $P!{whereclause_cte}
 ), related_acquisitions AS (
-  SELECT
-    objs.objectcsid,
+  SELECT DISTINCT ON (objs.summarycsid, hierarchy.id) objs.objectcsid,
     objs.summarycsid,
     hierarchy.id as acquisition_id,
     relation.subjectcsid as acquisitioncsid
