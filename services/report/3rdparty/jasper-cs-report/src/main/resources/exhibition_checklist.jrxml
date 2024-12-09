@@ -36,6 +36,7 @@
 	coalesce(production_date.production_dates, '{}') AS production_dates,
 	coalesce(material.materials, '{}') AS materials,
 	coalesce(material.controlled_materials, '{}') AS controlled_materials,
+	coalesce(dimension.dimension_parts, '{}') AS dimension_parts,
 	coalesce(dimension.dimension_summaries, '{}') AS dimension_summaries,
 	coalesce(acquisition.acquisition_credit_lines, '{}') AS acquisition_credit_lines,
 	coalesce(loanin.loan_credit_lines, '{}') AS loan_credit_lines,
@@ -119,6 +120,7 @@ FROM hierarchy
 	) material ON material.parentid = hierarchy.id
 	LEFT JOIN (
 		SELECT hierarchy.parentid,
+      array_agg(dimension.measuredpart) AS dimension_parts,
 			array_agg(dimension.dimensionsummary) AS dimension_summaries
 		FROM hierarchy
 			INNER JOIN measuredpartgroup dimension ON dimension.id = hierarchy.id
@@ -220,6 +222,10 @@ FROM hierarchy
 	<field name="controlled_materials" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="controlled_materials" />
 		<property name="com.jaspersoft.studio.field.label" value="controlled_materials" />
+	</field>
+	<field name="dimension_parts" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="dimension_parts" />
+		<property name="com.jaspersoft.studio.field.label" value="dimension_parts" />
 	</field>
 	<field name="dimension_summaries" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="dimension_summaries" />
@@ -428,7 +434,14 @@ FROM hierarchy
 				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="4bbdd48e-6d13-49ff-a214-e5093c2c5692">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{dimension_summaries}.getArray().join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[var parts = $F{dimension_parts}.getArray();
+				$F{dimension_summaries}.getArray().map(function(summary, index) {
+					if (!summary) {
+						return;
+					}
+
+					return parts[index] === null ? summary : summary + ' (' + parts[index] + ')'
+				}).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="626e6753-e71a-43da-8b29-5626569dec21">
