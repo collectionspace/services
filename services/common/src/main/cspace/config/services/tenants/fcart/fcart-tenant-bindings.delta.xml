@@ -53,6 +53,7 @@
 							"collectionobjects_common:objectStatusList",
 							"collectionobjects_common:otherNumberList",
 							"collectionobjects_common:ownersContributionNote",
+							"collectionobjects_common:publishedRelatedLinkGroupList",
 							"collectionobjects_common:publishToList",
 							"collectionobjects_common:responsibleDepartments",
 							"collectionobjects_common:rightsGroupList.rightStatement",
