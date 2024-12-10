@@ -135,7 +135,7 @@ FROM hierarchy
       INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype LIKE '%minimum%'
     WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
     GROUP BY ocg_hierarchy.parentid
-  ) object_count_mni ON object_count_mni.parentid = relation.objectcsid
+  ) object_count_mni ON object_count_mni.parentid = relation.object_id
   -- Object Count AFO (related object > object count with type of associated funerary objects)
   LEFT JOIN LATERAL (
     SELECT ocg_hierarchy.parentid,
@@ -144,7 +144,7 @@ FROM hierarchy
       INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id AND ocg.objectcounttype ~ '\yassociated'
     WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
     GROUP BY ocg_hierarchy.parentid
-  ) object_count_afo ON object_count_afo.parentid = relation.objectcsid
+  ) object_count_afo ON object_count_afo.parentid = relation.object_id
   LEFT JOIN (
     SELECT related_acquisitions.objectcsid,
       array_agg(acquisition.acquisitionreferencenumber) AS acquisition_numbers,
