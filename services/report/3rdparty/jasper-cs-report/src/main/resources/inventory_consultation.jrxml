@@ -204,74 +204,74 @@ $P!{whereclause}]]>
 		<band splitType="Stretch" />
 	</background>
 	<columnHeader>
-		<band height="44" splitType="Stretch">
+		<band height="60" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout" />
 			<property name="com.jaspersoft.studio.unit.height" value="px" />
 			<staticText>
-				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="581e80a8-aa61-4dda-b9f5-7f2155efb0c9">
+				<reportElement style="Column header" x="0" y="0" width="100" height="60" uuid="581e80a8-aa61-4dda-b9f5-7f2155efb0c9">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Organization(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="6b5ebc64-5ae1-45c2-a327-0aeff2b2dbf5">
+				<reportElement style="Column header" x="100" y="0" width="100" height="60" uuid="6b5ebc64-5ae1-45c2-a327-0aeff2b2dbf5">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[NAGPRA Inventory Origination Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="24339136-4f9e-47d7-93f2-c16421e86c3d">
+				<reportElement style="Column header" x="200" y="0" width="100" height="60" uuid="24339136-4f9e-47d7-93f2-c16421e86c3d">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Inventory/Documentation Number]]></text>
+				<text><![CDATA[Inventory / Documentation Number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="8413cd45-695a-4b51-8cab-df5cf012e78e">
+				<reportElement style="Column header" x="300" y="0" width="100" height="60" uuid="8413cd45-695a-4b51-8cab-df5cf012e78e">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Inventory Title]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="b279c2bd-3ba8-42e1-ab37-e39960f788d0">
+				<reportElement style="Column header" x="400" y="0" width="100" height="60" uuid="b279c2bd-3ba8-42e1-ab37-e39960f788d0">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[NAGPRA Inventory - Inventory Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="fe192ec5-2760-4e5f-80bf-6babeb8e2516">
+				<reportElement style="Column header" x="500" y="0" width="100" height="60" uuid="fe192ec5-2760-4e5f-80bf-6babeb8e2516">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[MNI Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="2fb0a6b9-bb96-44a8-9575-cb34cee53de2">
+				<reportElement style="Column header" x="600" y="0" width="100" height="60" uuid="2fb0a6b9-bb96-44a8-9575-cb34cee53de2">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[AFO Lot Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="c3bc7e35-43d8-4446-acba-f7ef559a54b2">
+				<reportElement style="Column header" x="700" y="0" width="100" height="60" uuid="c3bc7e35-43d8-4446-acba-f7ef559a54b2">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Archaeological Sites Related to NAGPRA Inventory]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
+				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="77fe4cfa-6cd6-406e-9125-dd513caf64db">
+				<reportElement style="Column header" x="900" y="0" width="100" height="60" uuid="77fe4cfa-6cd6-406e-9125-dd513caf64db">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
