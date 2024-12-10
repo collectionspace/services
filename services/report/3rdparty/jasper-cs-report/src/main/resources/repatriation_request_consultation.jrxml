@@ -247,102 +247,102 @@ FROM hierarchy rr_hierarchy
 		<band splitType="Stretch" />
 	</background>
 	<columnHeader>
-		<band height="44" splitType="Stretch">
+		<band height="60" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout" />
 			<property name="com.jaspersoft.studio.unit.height" value="px" />
 			<staticText>
-				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="8b729164-1e04-4ea5-8f0e-6be11fcd24a9">
+				<reportElement style="Column header" x="0" y="0" width="100" height="60" uuid="8b729164-1e04-4ea5-8f0e-6be11fcd24a9">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Organization(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="888a4b38-9b27-457e-91e1-ffa1882b659a">
+				<reportElement style="Column header" x="100" y="0" width="100" height="60" uuid="888a4b38-9b27-457e-91e1-ffa1882b659a">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Repatriation Request Origination Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="fef83b09-5b96-45cc-8a9a-2e59fc3baf60">
+				<reportElement style="Column header" x="200" y="0" width="100" height="60" uuid="fef83b09-5b96-45cc-8a9a-2e59fc3baf60">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Repatriation Request Number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="f3636866-52a2-49ac-b609-2a58bcc53047">
+				<reportElement style="Column header" x="300" y="0" width="100" height="60" uuid="f3636866-52a2-49ac-b609-2a58bcc53047">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Repatriation Request Name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="0efc36d1-4e40-46e9-b650-71afe6d73692">
+				<reportElement style="Column header" x="400" y="0" width="100" height="60" uuid="0efc36d1-4e40-46e9-b650-71afe6d73692">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[MNI Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="edfbd25f-31aa-49c9-aa15-3834efc57ac1">
+				<reportElement style="Column header" x="500" y="0" width="100" height="60" uuid="edfbd25f-31aa-49c9-aa15-3834efc57ac1">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[AFO Lot Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="906e84f6-068d-4e6b-bb09-99c6aae85fbc">
+				<reportElement style="Column header" x="600" y="0" width="100" height="60" uuid="906e84f6-068d-4e6b-bb09-99c6aae85fbc">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[UFO Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="2daa4c02-9105-4701-ad08-c28a0830725a">
+				<reportElement style="Column header" x="700" y="0" width="100" height="60" uuid="2daa4c02-9105-4701-ad08-c28a0830725a">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Ethnographic Belongings Repatriation Request]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="a672b0d8-60c7-4ad6-a47e-abe724790fe8">
+				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="a672b0d8-60c7-4ad6-a47e-abe724790fe8">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Culture(s) Related to Repatriation Request]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="8d8d804b-e4f2-4cb7-84a1-0fc343babd25">
+				<reportElement style="Column header" x="900" y="0" width="100" height="60" uuid="8d8d804b-e4f2-4cb7-84a1-0fc343babd25">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Number of Associated NAGPRA Inventory Record(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
+				<reportElement style="Column header" x="1000" y="0" width="100" height="60" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Title of NAGPRA Inventory Record(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="dd4ef24d-c3fd-4f1c-ac95-bbe21171030a">
+				<reportElement style="Column header" x="1100" y="0" width="100" height="60" uuid="dd4ef24d-c3fd-4f1c-ac95-bbe21171030a">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Number of Associated Summary Documentation Records]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="711eac26-05f5-4868-bbab-9a77bfb223d0">
+				<reportElement style="Column header" x="1200" y="0" width="100" height="60" uuid="711eac26-05f5-4868-bbab-9a77bfb223d0">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation Title]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="3806b552-a19e-4535-b2f5-cee59f3410b4">
+				<reportElement style="Column header" x="1300" y="0" width="100" height="60" uuid="3806b552-a19e-4535-b2f5-cee59f3410b4">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
