@@ -376,7 +376,7 @@ FROM hierarchy summary_hierarchy
 				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="e3b59f6b-c027-4527-8f95-453c97a250f5">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{originationdate} !== null ? java.lang.String.format("%tF", $F{originationdate}) : '']]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{originationdate} !== null ? $F{originationdate}.toLocalDateTime().toLocalDate() : '']]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="0138ed1b-1e54-4d27-92f4-1e42769adbcb">
@@ -397,7 +397,7 @@ FROM hierarchy summary_hierarchy
 				<textFieldExpression>
 					<![CDATA[
 						var status = $F{status} !== null ? $F{status} : '';
-						var date = $F{statusdate} !== null ? java.lang.String.format("(%tF)", $F{statusdate}) : '';
+						var date = $F{statusdate} !== null ? '(' + $F{statusdate}.toLocalDateTime().toLocalDate() + ')' : '';
 						status + " " + date;
 					]]>
 				</textFieldExpression>
@@ -461,7 +461,7 @@ FROM hierarchy summary_hierarchy
 							if (!owner) {
 								return null;
 							}
-							return dates[index] === null ? owner : java.lang.String.format("%s (%tF)", owner, dates[index]);
+							return dates[index] === null ? owner : owner + ' (' + dates[index].toLocalDateTime().toLocalDate() + ')';
 						}).filter(owner => !!owner).join('; ')
 					]]>
 				</textFieldExpression>
