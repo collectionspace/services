@@ -293,7 +293,7 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
 				<textFieldExpression>
-					<![CDATA[$F{originationdate} !== null ? java.lang.String.format("%tF", $F{originationdate}) : '']]>
+					<![CDATA[$F{originationdate} !== null ? $F{originationdate}.toLocalDateTime().toLocalDate() : '']]>
 				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
@@ -348,7 +348,7 @@ $P!{whereclause}]]>
 							if (!owner) {
 								return null;
 							}
-							return dates[index] === null ? owner : java.lang.String.format("%s (%tF)", owner, dates[index]);
+							return dates[index] === null ? owner : owner + ' (' + dates[index].toLocalDateTime().toLocalDate() + ')';
 						}).filter(owner => !!owner).join('; ')
 					]]>
 				</textFieldExpression>
