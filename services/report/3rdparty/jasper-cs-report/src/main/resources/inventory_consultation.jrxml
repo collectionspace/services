@@ -312,7 +312,10 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="09a21589-e9f4-4b31-8dcd-d989540c1b77">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{inventorystatus}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[
+					var date = $F{inventorydate} !== null ? '(' + $F{inventorydate}.toLocalDateTime().toLocalDate() + ')' : '';
+					$F{inventorystatus} !== null ? $F{inventorystatus} + ' ' + date : date]]>
+				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="c2c43e42-0fc1-4fad-b5bb-d8c62b534524">
