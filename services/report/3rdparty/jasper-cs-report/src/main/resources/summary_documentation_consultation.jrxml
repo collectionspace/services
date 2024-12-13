@@ -29,7 +29,7 @@
 		<![CDATA[WITH related_objects AS (
 	SELECT hierarchy.id as object_id,
 		relation.objectcsid,
-		relation.subjectcsid as repatriation_csid
+		relation.subjectcsid as summary_csid
 	FROM relations_common relation
 		INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
 		INNER JOIN misc ON misc.id = relation.id
@@ -39,8 +39,8 @@
 		$P!{whereclause_relation}
 ),
 related_exits AS (
-	SELECT DISTINCT ON (objs.repatriation_csid, hierarchy.id) objs.objectcsid,
-		objs.repatriation_csid,
+	SELECT DISTINCT ON (objs.summary_csid, hierarchy.id) objs.objectcsid,
+		objs.summary_csid,
 		hierarchy.id as exit_id,
 		relation.subjectcsid as exit_csid
 	FROM related_objects objs
@@ -124,7 +124,7 @@ FROM hierarchy summary_hierarchy
 		-- type is sacred object, cultural partrimony, UFO and lineal descent
 		-- Use regex matching because the refnames can contain subsets of the others,
 		-- so occasionally do things like use a word boundary (\y) to avoid overlaps
-		SELECT objs.repatriation_csid,
+		SELECT objs.summary_csid,
 			sum(
 				CASE
 					WHEN ocg.objectcounttype ~ 'sacred_object' THEN ocg.objectcount
@@ -153,8 +153,8 @@ FROM hierarchy summary_hierarchy
 			INNER JOIN related_objects objs ON objs.object_id = ocg_hierarchy.parentid
 			INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id
 		WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
-		GROUP BY objs.repatriation_csid
-	) object_count ON object_count.repatriation_csid = summary_hierarchy.name
+		GROUP BY objs.summary_csid
+	) object_count ON object_count.summary_csid = summary_hierarchy.name
 	LEFT JOIN (
 		-- Related Consultations (Summary -> Consultation)
 		-- Number of Consultation Log Entries. Consultations related to the Summary record, pull a count of how many entries are in the log.
@@ -176,14 +176,14 @@ FROM hierarchy summary_hierarchy
 		-- Current owner with exit date: If there is an object exit related to the related objects, pull the current owner. Concatenate and separate by ;
 		--   (Format example: The United Band of Humbolt People, 2024-08-02; The Dog River People, 2024-09-05).
 		-- Allows NULL values to aggregate so we don't lose track of pairs
-		SELECT related_exits.repatriation_csid,
+		SELECT related_exits.summary_csid,
 			array_agg(exit.exitdate) as exit_dates,
 			array_agg(owners.item) AS exit_owners
 		FROM exits_common exit
 			INNER JOIN related_exits on related_exits.exit_id = exit.id
 			LEFT JOIN exits_common_owners owners on owners.id = exit.id AND owners.pos = 0
-		GROUP BY related_exits.repatriation_csid
-	) exits ON exits.repatriation_csid = summary_hierarchy.name
+		GROUP BY related_exits.summary_csid
+	) exits ON exits.summary_csid = summary_hierarchy.name
 	$P!{whereclause}]]>
 	</queryString>
 	<field name="documentationnumber" class="java.lang.String">
