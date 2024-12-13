@@ -30,7 +30,7 @@
 WITH related_objects AS (
 	SELECT hierarchy.id as object_id,
 		relation.objectcsid,
-		relation.subjectcsid as repatriation_csid
+		relation.subjectcsid as inventory_csid
 	FROM relations_common relation
 		INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
 	WHERE relation.objectdocumenttype = 'CollectionObject'
@@ -38,8 +38,8 @@ WITH related_objects AS (
 		$P!{whereclause_cte}
 ),
 related_exits AS (
-	SELECT DISTINCT ON (objs.repatriation_csid, hierarchy.id) objs.objectcsid,
-		objs.repatriation_csid,
+	SELECT DISTINCT ON (objs.inventory_csid, hierarchy.id) objs.objectcsid,
+		objs.inventory_csid,
 		hierarchy.id as exit_id,
 		relation.subjectcsid as exit_csid
 	FROM related_objects objs
@@ -92,7 +92,7 @@ FROM hierarchy inv_hierarchy
 		-- Related Object - Object count
 		-- Use regex matching because the refnames can contain subsets of the others
 		-- a word boundary (\y) allows us to match start/ends of refnames easily
-		SELECT objs.repatriation_csid,
+		SELECT objs.inventory_csid,
 			sum(
 				CASE
 					WHEN ocg.objectcounttype ~ 'minimum' THEN ocg.objectcount
@@ -109,16 +109,16 @@ FROM hierarchy inv_hierarchy
 			INNER JOIN related_objects objs ON objs.object_id = ocg_hierarchy.parentid
 			INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id
 		WHERE ocg_hierarchy.name = 'collectionobjects_common:objectCountGroupList'
-		GROUP BY objs.repatriation_csid
-	) object_count ON object_count.repatriation_csid = inv_hierarchy.name
+		GROUP BY objs.inventory_csid
+	) object_count ON object_count.inventory_csid = inv_hierarchy.name
 	LEFT JOIN (
 		-- Related Object - Field Collection Sites
-		SELECT objs.repatriation_csid,
+		SELECT objs.inventory_csid,
 			array_agg(fcs.item) AS sites
 		FROM collectionobjects_common_fieldcollectionsites fcs
 			INNER JOIN related_objects objs ON objs.object_id = fcs.id
-		GROUP BY objs.repatriation_csid
-	) field_collection_sites ON field_collection_sites.repatriation_csid = inv_hierarchy.name
+		GROUP BY objs.inventory_csid
+	) field_collection_sites ON field_collection_sites.inventory_csid = inv_hierarchy.name
 	LEFT JOIN (
 		-- Related Consultations (Inventory -> Consultation)
 		-- Number of Consultation Log Entries
@@ -138,14 +138,14 @@ FROM hierarchy inv_hierarchy
 		-- Related Object Exits (Object -> ObjectExit (New))
 		-- Current owner with exit date
 		-- Allows NULL values to aggregate so we don't lose track of pairs
-		SELECT related_exits.repatriation_csid,
+		SELECT related_exits.inventory_csid,
 			array_agg(exit.exitdate) as exit_dates,
 			array_agg(owners.item) AS exit_owners
 		FROM exits_common exit
 			INNER JOIN related_exits on related_exits.exit_id = exit.id
 			LEFT JOIN exits_common_owners owners on owners.id = exit.id AND owners.pos = 0
-		GROUP BY related_exits.repatriation_csid
-	) exits ON exits.repatriation_csid = inv_hierarchy.name
+		GROUP BY related_exits.inventory_csid
+	) exits ON exits.inventory_csid = inv_hierarchy.name
 $P!{whereclause}]]>
 	</queryString>
 	<field name="inventorynumber" class="java.lang.String">
