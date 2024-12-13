@@ -408,7 +408,7 @@ $P!{whereclause}]]>
 								return null;
 							}
 
-							return units[index] === null ? value : value + ' ' + units[index]);
+							return units[index] === null ? value : value + ' ' + units[index];
 						}).filter((value) => !!value).join('; ')
 					]]>
 				</textFieldExpression>
@@ -518,11 +518,11 @@ $P!{whereclause}]]>
 	<noData>
 		<band height="50">
 			<staticText>
-				<reportElement style="Column header" x="0" y="22" width="375" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" />
+				<reportElement style="Column header" x="0" y="22" width="500" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" />
 				<textElement>
 					<font size="14"/>
 				</textElement>
-				<text><![CDATA[No related objects found for this NAGPRA Inventory.]]></text>
+				<text><![CDATA[No related objects found for this NAGPRA Inventory]]></text>
 			</staticText>
 		</band>
 	</noData>
