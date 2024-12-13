@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="exhibition_checklist" language="javascript" pageWidth="1400" pageHeight="500" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d717b180-0109-4b56-8860-a1d417f932a3">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="exhibition_checklist" language="javascript" whenNoDataType="NoDataSection" pageWidth="1400" pageHeight="500" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d717b180-0109-4b56-8860-a1d417f932a3">
 	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo" />
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193" />
@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true" />
 	<style name="Detail" fontName="SansSerif" fontSize="12" />
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["controlled_object_names,persons,peoples,orgs,controlled_materials"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["controlled_object_names,persons,peoples,orgs,controlled_materials,computedcurrentlocation"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
@@ -36,6 +36,7 @@
 	coalesce(production_date.production_dates, '{}') AS production_dates,
 	coalesce(material.materials, '{}') AS materials,
 	coalesce(material.controlled_materials, '{}') AS controlled_materials,
+	coalesce(dimension.dimension_parts, '{}') AS dimension_parts,
 	coalesce(dimension.dimension_summaries, '{}') AS dimension_summaries,
 	coalesce(acquisition.acquisition_credit_lines, '{}') AS acquisition_credit_lines,
 	coalesce(loanin.loan_credit_lines, '{}') AS loan_credit_lines,
@@ -119,6 +120,7 @@ FROM hierarchy
 	) material ON material.parentid = hierarchy.id
 	LEFT JOIN (
 		SELECT hierarchy.parentid,
+      array_agg(dimension.measuredpart) AS dimension_parts,
 			array_agg(dimension.dimensionsummary) AS dimension_summaries
 		FROM hierarchy
 			INNER JOIN measuredpartgroup dimension ON dimension.id = hierarchy.id
@@ -220,6 +222,10 @@ FROM hierarchy
 	<field name="controlled_materials" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="controlled_materials" />
 		<property name="com.jaspersoft.studio.field.label" value="controlled_materials" />
+	</field>
+	<field name="dimension_parts" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="dimension_parts" />
+		<property name="com.jaspersoft.studio.field.label" value="dimension_parts" />
 	</field>
 	<field name="dimension_summaries" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="dimension_summaries" />
@@ -370,7 +376,7 @@ FROM hierarchy
 							}
 
 							return numTypes[index] === null ? value : java.lang.String.format("%s %s", value, numTypes[index]);
-						}).filter(value => !!value).join('; ')
+						}).filter((value) => !!value).join('; ')
 					]]>
 				</textFieldExpression>
 			</textField>
@@ -386,7 +392,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{controlled_object_names}.getArray().concat($F{object_names}.getArray())
-					.filter(name => !!name)
+					.filter((name) => !!name)
 					.join('; ')]]>
 				</textFieldExpression>
 			</textField>
@@ -420,7 +426,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{controlled_materials}.getArray().concat($F{materials}.getArray())
-						.filter(material => !!material)
+						.filter((material) => !!material)
 						.join('; ')]]>
 				</textFieldExpression>
 			</textField>
@@ -428,7 +434,14 @@ FROM hierarchy
 				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="4bbdd48e-6d13-49ff-a214-e5093c2c5692">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{dimension_summaries}.getArray().join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[var parts = $F{dimension_parts}.getArray();
+				$F{dimension_summaries}.getArray().map(function(summary, index) {
+					if (!summary) {
+						return;
+					}
+
+					return parts[index] === null ? summary : summary + ' (' + parts[index] + ')'
+				}).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="626e6753-e71a-43da-8b29-5626569dec21">
@@ -436,7 +449,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{acquisition_credit_lines}.getArray().concat($F{loan_credit_lines}.getArray())
-						.filter(line => !!line)
+						.filter((line) => !!line)
 						.join('; ')
 					]]>
 				</textFieldExpression>
@@ -451,8 +464,19 @@ FROM hierarchy
 				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="3a602a43-faa9-425d-b5b7-fbf47559df1e">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{responsible_departments}.getArray().join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{responsible_departments}.getArray().filter((department) => !!department).join('; ')]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement style="Column header" x="0" y="10" width="375" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" />
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this Exhibition.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
