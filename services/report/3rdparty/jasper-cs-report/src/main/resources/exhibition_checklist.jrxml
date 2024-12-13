@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="exhibition_checklist" language="javascript" pageWidth="1400" pageHeight="500" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d717b180-0109-4b56-8860-a1d417f932a3">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="exhibition_checklist" language="javascript" whenNoDataType="NoDataSection" pageWidth="1400" pageHeight="500" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="d717b180-0109-4b56-8860-a1d417f932a3">
 	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo" />
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193" />
@@ -468,4 +468,15 @@ FROM hierarchy
 			</textField>
 		</band>
 	</detail>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement style="Column header" x="0" y="10" width="375" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" />
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this Exhibition.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
