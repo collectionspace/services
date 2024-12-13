@@ -32,8 +32,8 @@
 		relation.subjectcsid as repatriation_csid
 	FROM relations_common relation
 		INNER JOIN hierarchy on hierarchy.name = relation.objectcsid
-    INNER JOIN misc ON misc.id = relation.id
-    AND misc.lifecyclestate != 'deleted'
+		INNER JOIN misc ON misc.id = relation.id
+		AND misc.lifecyclestate != 'deleted'
 	WHERE relation.objectdocumenttype = 'CollectionObject'
 		AND relation.subjectdocumenttype = 'SummaryDocumentation'
 		$P!{whereclause_relation}
@@ -47,25 +47,25 @@ related_exits AS (
 		INNER join relations_common relation on relation.objectcsid = objs.objectcsid
 		AND relation.subjectdocumenttype = 'Exit'
 		INNER JOIN hierarchy on hierarchy.name = relation.subjectcsid
-    INNER JOIN misc ON misc.id = relation.id
-    AND misc.lifecyclestate != 'deleted'
+		INNER JOIN misc ON misc.id = relation.id
+		AND misc.lifecyclestate != 'deleted'
 )
 SELECT summary.documentationnumber,
-  summary.originationdate,
-  coalesce(titles.titles, '{}') AS titles,
-  coalesce(summarytypes.summary_types, '{}') AS summary_types,
-  coalesce(partiesinvolved.onbehalfof, '{}') AS onbehalfof,
-  coalesce(culturalgroup.cultures, '{}') AS cultures,
-  summary_status.status,
-  summary_status.statusdate,
-  coalesce(object_count.sacred_object_count, 0) AS sacred_object_count,
-  coalesce(object_count.ufo_count, 0) AS ufo_count,
-  coalesce(object_count.cultural_patrimony_count, 0) AS cultural_patrimony_count,
-  coalesce(object_count.lineal_descendent_count, 0) AS lineal_descendent_count,
-  coalesce(archaeological_sites.sites, '{}') AS sites,
-  coalesce(consultations.log_total, 0) AS log_total,
-  coalesce(exits.exit_owners, '{}') AS exit_owners,
-  coalesce(exits.exit_dates, '{}') AS exit_dates
+	summary.originationdate,
+	coalesce(titles.titles, '{}') AS titles,
+	coalesce(summarytypes.summary_types, '{}') AS summary_types,
+	coalesce(partiesinvolved.onbehalfof, '{}') AS onbehalfof,
+	coalesce(culturalgroup.cultures, '{}') AS cultures,
+	summary_status.status,
+	summary_status.statusdate,
+	coalesce(object_count.sacred_object_count, 0) AS sacred_object_count,
+	coalesce(object_count.ufo_count, 0) AS ufo_count,
+	coalesce(object_count.cultural_patrimony_count, 0) AS cultural_patrimony_count,
+	coalesce(object_count.lineal_descendent_count, 0) AS lineal_descendent_count,
+	coalesce(archaeological_sites.sites, '{}') AS sites,
+	coalesce(consultations.log_total, 0) AS log_total,
+	coalesce(exits.exit_owners, '{}') AS exit_owners,
+	coalesce(exits.exit_dates, '{}') AS exit_dates
 FROM hierarchy summary_hierarchy
 	INNER JOIN misc ON misc.id = summary_hierarchy.id
 	AND misc.lifecyclestate != 'deleted'
