@@ -519,10 +519,10 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="a302ba1e-a55e-4607-b992-689cd1ca123c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[var archObjects = $F{object_names}.getArray().filter(name => !!name).join('; ');
-					var donors = $F{acquisition_sources}.getArray().filter(donor => !!donor).join('; ');
-					var removalDates = $F{dates}.getArray().filter(date => !!date).join('; ');
-					var accessDates = $F{accession_dates}.getArray().filter(date => !!date).join('; ');
+				<textFieldExpression><![CDATA[var archObjects = $F{object_names}.getArray().filter((name) => !!name).join('; ');
+					var donors = $F{acquisition_sources}.getArray().filter((donor) => !!donor).join('; ');
+					var removalDates = $F{dates}.getArray().filter((date) => !!date).join('; ');
+					var accessDates = $F{accession_dates}.getArray().filter((date) => !!date).join('; ');
 
 					var objString = 'Archaeological objects including: ' + archObjects + '\n\n';
 					var donorString = 'Collector Names: ' + donors + '\n\n';
@@ -535,19 +535,19 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="c2724df8-49a1-4295-bbc7-c1dd3ac18693">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{category_determinations}.getArray().filter(category => !!category).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{category_determinations}.getArray().filter((category) => !!category).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="3265ff89-e1ab-47b0-b208-5953a9fe8a85">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{places}.getArray().filter(place => !!place).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{places}.getArray().filter((place) => !!place).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="3c41d185-fe69-4a59-8b88-a24f74ea93aa">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{sites}.getArray().filter(site => !!site).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sites}.getArray().filter((site) => !!site).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="de7772f9-941e-4ea0-99a9-fde09c202b7b">
@@ -559,37 +559,37 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="f7719c13-3128-4fce-8c06-6f945f4fb048">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{acquisition_methods}.getArray().filter(method => !!method).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{acquisition_methods}.getArray().filter((method) => !!method).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="91e50c91-02e9-4c87-8aca-be766d90c275">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{acquisition_sources}.getArray().filter(source => !!source).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{acquisition_sources}.getArray().filter((source) => !!source).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="a6962e53-1fef-4c0f-874e-288bacadbfbf">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{collectors}.getArray().filter(collector => !!collector).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{collectors}.getArray().filter((collector) => !!collector).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="54b99dbd-2ab0-4346-8ece-742090d43f06">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{dates}.getArray().filter(date => !!date).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{dates}.getArray().filter((date) => !!date).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="6f8be875-8f2e-45fd-aff7-e78419fa59eb">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{acquisition_numbers}.getArray().filter(number => !!number).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{acquisition_numbers}.getArray().filter((number) => !!number).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="56dd730c-03b6-450c-b6c2-588b2e569527">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{accession_dates}.getArray().filter(date => !!date).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{accession_dates}.getArray().filter((date) => !!date).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="0161fdd0-193f-450e-aab5-c89ca637f64f">
@@ -601,7 +601,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="3dfb8ac6-f597-4870-ae48-4a6b4cc5f277">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{tribeornation}.getArray().filter(ton => !!ton).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{tribeornation}.getArray().filter((ton) => !!ton).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="32da7077-6251-4dc8-a82c-6e2502623988">
@@ -613,7 +613,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="1835843c-cb0a-41b2-b575-07788e3edce6">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{culture}.getArray().filter(culture => !!culture).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{culture}.getArray().filter((culture) => !!culture).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="6d4be802-5a25-43e9-892a-571c2a4f50af">
@@ -643,7 +643,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="f406adee-b418-401d-9797-526656e2bdca">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{locations}.getArray().filter(location => !!location).join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{locations}.getArray().filter((location) => !!location).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2225" y="0" width="100" height="30" uuid="de4f3b4d-920e-4674-bc73-2eb39e3fc758">
