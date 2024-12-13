@@ -102,14 +102,12 @@ FROM hierarchy summary_hierarchy
 		GROUP BY hierarchy.parentid
 	) culturalgroup ON culturalgroup.parentid = summary.id
 	LEFT JOIN (
-		-- Related archaeological sites
-		SELECT hierarchy.parentid,
-			array_agg(asg.archaeologicalsite) AS sites
-		FROM hierarchy
-			INNER JOIN archaeologicalsitegroup asg ON asg.id = hierarchy.id
-		WHERE hierarchy.name = 'summarydocumentations_common:archaeologicalSiteGroupList'
-		GROUP BY hierarchy.parentid
-	) archaeological_sites ON archaeological_sites.parentid = summary.id
+		SELECT related_objects.summary_csid,
+			array_agg(fcs.item) as sites
+		FROM collectionobjects_common_fieldcollectionsites fcs
+			INNER JOIN related_objects on related_objects.object_id = fcs.id
+		GROUP BY related_objects.summary_csid
+	) archaeological_sites ON archaeological_sites.summary_csid = summary_hierarchy.name
 	LEFT JOIN (
 		-- Current Status: most recent
 		SELECT DISTINCT ON (hierarchy.parentid) hierarchy.parentid,
