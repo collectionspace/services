@@ -376,7 +376,7 @@ FROM hierarchy
 							}
 
 							return numTypes[index] === null ? value : java.lang.String.format("%s %s", value, numTypes[index]);
-						}).filter(value => !!value).join('; ')
+						}).filter((value) => !!value).join('; ')
 					]]>
 				</textFieldExpression>
 			</textField>
@@ -392,7 +392,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{controlled_object_names}.getArray().concat($F{object_names}.getArray())
-					.filter(name => !!name)
+					.filter((name) => !!name)
 					.join('; ')]]>
 				</textFieldExpression>
 			</textField>
@@ -426,7 +426,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{controlled_materials}.getArray().concat($F{materials}.getArray())
-						.filter(material => !!material)
+						.filter((material) => !!material)
 						.join('; ')]]>
 				</textFieldExpression>
 			</textField>
@@ -449,7 +449,7 @@ FROM hierarchy
 				</reportElement>
 				<textFieldExpression>
 					<![CDATA[$F{acquisition_credit_lines}.getArray().concat($F{loan_credit_lines}.getArray())
-						.filter(line => !!line)
+						.filter((line) => !!line)
 						.join('; ')
 					]]>
 				</textFieldExpression>
@@ -464,7 +464,7 @@ FROM hierarchy
 				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="3a602a43-faa9-425d-b5b7-fbf47559df1e">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{responsible_departments}.getArray().join('; ')]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{responsible_departments}.getArray().filter((department) => !!department).join('; ')]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
