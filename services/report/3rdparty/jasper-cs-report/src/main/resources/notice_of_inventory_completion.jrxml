@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notice_inventory_completion" language="javascript" pageWidth="1850" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7eeff167-a8e8-4d94-87ee-005f5467073e">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="notice_inventory_completion" language="javascript" whenNoDataType="NoDataSection" pageWidth="1850" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="7eeff167-a8e8-4d94-87ee-005f5467073e">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -515,4 +515,15 @@ $P!{whereclause}]]>
 			</textField>
 		</band>
 	</detail>
+	<noData>
+		<band height="50">
+			<staticText>
+				<reportElement style="Column header" x="0" y="22" width="375" height="28" uuid="f449dbd9-0782-4ffc-9296-1c09a978c94b" />
+				<textElement>
+					<font size="14"/>
+				</textElement>
+				<text><![CDATA[No related objects found for this NAGPRA Inventory.]]></text>
+			</staticText>
+		</band>
+	</noData>
 </jasperReport>
