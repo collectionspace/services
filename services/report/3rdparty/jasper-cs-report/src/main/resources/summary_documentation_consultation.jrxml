@@ -61,7 +61,7 @@ SELECT summary.documentationnumber,
 	coalesce(object_count.sacred_object_count, 0) AS sacred_object_count,
 	coalesce(object_count.ufo_count, 0) AS ufo_count,
 	coalesce(object_count.cultural_patrimony_count, 0) AS cultural_patrimony_count,
-	coalesce(object_count.lineal_descendent_count, 0) AS lineal_descendent_count,
+	coalesce(object_count.lineal_descendant_count, 0) AS lineal_descendent_count,
 	coalesce(archaeological_sites.sites, '{}') AS sites,
 	coalesce(consultations.log_total, 0) AS log_total,
 	coalesce(exits.exit_owners, '{}') AS exit_owners,
@@ -145,10 +145,10 @@ FROM hierarchy summary_hierarchy
 			) AS cultural_patrimony_count,
 			sum(
 				CASE
-					WHEN ocg.objectcounttype ~ 'lineal_descendent' THEN ocg.objectcount
+					WHEN ocg.objectcounttype ~ 'lineal_descendant' THEN ocg.objectcount
 					ELSE 0
 				END
-			) AS lineal_descendent_count
+			) AS lineal_descendant_count
 		FROM hierarchy ocg_hierarchy
 			INNER JOIN related_objects objs ON objs.object_id = ocg_hierarchy.parentid
 			INNER JOIN objectcountgroup ocg ON ocg.id = ocg_hierarchy.id
@@ -234,9 +234,9 @@ FROM hierarchy summary_hierarchy
 		<property name="com.jaspersoft.studio.field.name" value="cultural_patrimony_count" />
 		<property name="com.jaspersoft.studio.field.label" value="cultural_patrimony_count" />
 	</field>
-	<field name="lineal_descendent_count" class="java.math.BigDecimal">
-		<property name="com.jaspersoft.studio.field.name" value="lineal_descendent_count" />
-		<property name="com.jaspersoft.studio.field.label" value="lineal_descendent_count" />
+	<field name="lineal_descendant_count" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="lineal_descendant_count" />
+		<property name="com.jaspersoft.studio.field.label" value="lineal_descendant_count" />
 	</field>
 	<field name="sites" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="sites" />
@@ -422,7 +422,7 @@ FROM hierarchy summary_hierarchy
 				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="6619e1e3-2761-4c6b-8e4a-3be5d8e4b956">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{lineal_descendent_count}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{lineal_descendant_count}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="0beee49d-f49d-4e17-8f78-bb5c3184aaa1">
