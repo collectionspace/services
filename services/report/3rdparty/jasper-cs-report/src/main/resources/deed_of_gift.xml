@@ -2,7 +2,7 @@
 <document name="report">
   <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
     <name>Deed of Gift</name>
-    <notes>Deed of Gift</notes>
+    <notes>This intake report includes fields for generating a deed of gift statement or letter.</notes>
     <forDocTypes>
       <forDocType>Intake</forDocType>
     </forDocTypes>

@@ -2,7 +2,7 @@
 <document name="report">
   <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
     <name>Deaccessions</name>
-    <notes>Deaccession</notes>
+    <notes>This deaccession report includes fields documenting deaccession workflows.</notes>
     <forDocTypes>
       <forDocType>ObjectExit</forDocType>
     </forDocTypes>
