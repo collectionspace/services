@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="repatriation_request_consultation" language="javascript" pageWidth="1600" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="6a52b090-4ec9-4176-a09a-8af53b7323f0">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="repatriation_request_consultation" language="javascript" pageWidth="1700" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="6a52b090-4ec9-4176-a09a-8af53b7323f0">
 	<property name="com.jaspersoft.studio.data.sql.tables" value="" />
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo" />
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193" />
@@ -333,35 +333,35 @@ FROM hierarchy rr_hierarchy
 				<text><![CDATA[Site(s) Related to Repatriation Request]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1000" y="0" width="100" height="60" uuid="8d8d804b-e4f2-4cb7-84a1-0fc343babd25">
+				<reportElement style="Column header" x="1000" y="0" width="150" height="60" uuid="8d8d804b-e4f2-4cb7-84a1-0fc343babd25">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Number of Associated NAGPRA Inventory Record(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1100" y="0" width="100" height="60" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
+				<reportElement style="Column header" x="1150" y="0" width="100" height="60" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Title of NAGPRA Inventory Record(s)]]></text>
+				<text><![CDATA[Title of NAGPRA Inventory Records]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="60" uuid="dd4ef24d-c3fd-4f1c-ac95-bbe21171030a">
+				<reportElement style="Column header" x="1250" y="0" width="150" height="60" uuid="dd4ef24d-c3fd-4f1c-ac95-bbe21171030a">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Number of Associated Summary Documentation Records]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="60" uuid="711eac26-05f5-4868-bbab-9a77bfb223d0">
+				<reportElement style="Column header" x="1400" y="0" width="100" height="60" uuid="711eac26-05f5-4868-bbab-9a77bfb223d0">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation Title]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1400" y="0" width="100" height="60" uuid="3806b552-a19e-4535-b2f5-cee59f3410b4">
+				<reportElement style="Column header" x="1500" y="0" width="150" height="60" uuid="3806b552-a19e-4535-b2f5-cee59f3410b4">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
@@ -439,25 +439,25 @@ FROM hierarchy rr_hierarchy
 				<textFieldExpression><![CDATA[$F{inventory_count}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="a8f2a24f-31fc-46e8-a52d-175e372223a8">
+				<reportElement style="Detail" x="1150" y="0" width="100" height="30" uuid="a8f2a24f-31fc-46e8-a52d-175e372223a8">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{inventory_titles}.getArray().filter(val => !!val).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="a84fbf28-7959-412f-b391-d7a1a222c9d0">
+				<reportElement style="Detail" x="1250" y="0" width="100" height="30" uuid="a84fbf28-7959-412f-b391-d7a1a222c9d0">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{summary_count}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="38c63f53-35bf-4b7b-8e17-11287df5e98c">
+				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="38c63f53-35bf-4b7b-8e17-11287df5e98c">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{summary_titles}.getArray().filter((val) => !!val).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="c39e0311-64b2-425e-a63d-31279c0eeb07">
+				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="c39e0311-64b2-425e-a63d-31279c0eeb07">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{log_total}]]></textFieldExpression>
