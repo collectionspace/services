@@ -336,28 +336,28 @@ FROM hierarchy summary_hierarchy
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Site(s) Related to Summary]]></text>
+				<text><![CDATA[Site(s) Related to Related Objects]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="c361bc9c-e677-4a74-a59e-695ba9eddbaa">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Culture(s) Related to Summary]]></text>
+				<text><![CDATA[Culture(s) Related to Related Objects]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="f6441c8d-82a9-4908-94c0-b57be2d22746">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+				<text><![CDATA[Number of Related Consultation Log Entries]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="17fc9356-5a96-4aa4-915a-cf18a83bc614">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Exit Record Current Owner with Exit Date]]></text>
+				<text><![CDATA[Exit Owner with Date]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
