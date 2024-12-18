@@ -89,13 +89,14 @@ FROM hierarchy rr_hierarchy
 		GROUP BY hierarchy.parentid
 	) partiesinvolved ON partiesinvolved.parentid = rr_hierarchy.id
 	LEFT JOIN (
-		SELECT hierarchy.parentid,
-		 array_agg(culturalgroup.culture) AS cultures
+		SELECT related_objects.repatriation_csid,
+			array_agg(people.objectproductionpeople) AS cultures
 		FROM hierarchy
-			INNER JOIN culturalgroup ON culturalgroup.id = hierarchy.id
-			AND hierarchy.name = 'repatriationrequests_common:culturalGroupList'
-		GROUP BY hierarchy.parentid
-	) culturalgroup ON culturalgroup.parentid = rr_hierarchy.id --LEFT JOIN LATERAL (
+			INNER JOIN related_objects on related_objects.object_id = hierarchy.parentid
+			INNER JOIN objectproductionpeoplegroup people ON people.id = hierarchy.id
+		WHERE hierarchy.name = 'collectionobjects_common:objectProductionPeopleGroupList'
+		GROUP BY related_objects.repatriation_csid
+	) culturalgroup ON culturalgroup.repatriation_csid = rr_hierarchy.name
 	LEFT JOIN LATERAL (
 		-- Related Object data
 		-- Use regex matching because the refnames can contain subsets of the others,
