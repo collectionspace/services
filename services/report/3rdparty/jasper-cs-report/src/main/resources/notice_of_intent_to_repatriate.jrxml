@@ -80,10 +80,10 @@ FROM hierarchy summary_hierarchy
   LEFT JOIN summarydocumentations_common_consultationnotes consultation ON consultation.id = summary.id AND consultation.pos = 0
   LEFT JOIN summarydocumentations_common_treatmentnotes treatment ON treatment.id = summary.id AND treatment.pos = 0
   LEFT JOIN LATERAL (
-    SELECT DISTINCT ON (hierarchy.parentid) hierarchy.parentid,
-      party.involvedparty,
-      ptg.title,
-      email.email
+    SELECT hierarchy.parentid,
+      array_agg(party.involvedparty) as involvedparty,
+      array_agg(ptg.title) as title,
+      array_agg(email.email) as email
     FROM hierarchy
       INNER JOIN partiesinvolvedgroup party ON party.id = hierarchy.id AND
         (party.involvedrole LIKE '%lineal_descendant%' OR party.involvedrole LIKE '%tribal_rep%')
@@ -93,10 +93,9 @@ FROM hierarchy summary_hierarchy
       INNER JOIN persontermgroup ptg on ptg.id = ptg_hierarchy.id
       LEFT JOIN contacts_common contact ON contact.initem = person_hierarchy.name
       LEFT JOIN hierarchy email_hier ON email_hier.parentid = contact.id AND email_hier.name = 'contacts_common:emailGroupList' AND email_hier.pos = 0
-      INNER JOIN emailgroup email ON email.id = email_hier.id
+      LEFT JOIN emailgroup email ON email.id = email_hier.id
     WHERE hierarchy.name = 'summarydocumentations_common:partiesInvolvedGroupList' AND hierarchy.parentid = summary.id
-    ORDER BY hierarchy.parentid,
-      hierarchy.pos
+    GROUP BY hierarchy.parentid
   ) partiesinvolved ON partiesinvolved.parentid = summary.id -- affiliation
   LEFT JOIN LATERAL (
     SELECT hierarchy.parentid,
@@ -259,20 +258,17 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.name" value="culture"/>
 		<property name="com.jaspersoft.studio.field.label" value="culture"/>
 	</field>
-	<field name="involved_party" class="java.lang.String">
+	<field name="involved_party" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="involved_party"/>
 		<property name="com.jaspersoft.studio.field.label" value="involved_party"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="partiesinvolvedgroup"/>
 	</field>
-	<field name="involved_party_title" class="java.lang.String">
+	<field name="involved_party_title" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="involved_party_title"/>
 		<property name="com.jaspersoft.studio.field.label" value="involved_party_title"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
 	</field>
-	<field name="involved_party_email" class="java.lang.String">
+	<field name="involved_party_email" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="involved_party_email"/>
 		<property name="com.jaspersoft.studio.field.label" value="involved_party_email"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="emailgroup"/>
 	</field>
 	<field name="status" class="java.lang.String">
 		<property name="com.jaspersoft.studio.field.name" value="status"/>
@@ -472,7 +468,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Contact First Name]]></text>
+				<text><![CDATA[Contact Name]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="2000" y="0" width="100" height="60" uuid="db276d0d-15d2-4af3-b76c-f959370d7755">
@@ -480,7 +476,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.x" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Contact email]]></text>
+				<text><![CDATA[Contact Email]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="2100" y="0" width="100" height="60" uuid="c455fd38-e37e-4572-a29b-342c208349a6">
@@ -520,15 +516,17 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[var archObjects = $F{object_names}.getArray().filter((name) => !!name).join('; ');
+					var collectors = $F{collectors}.getArray().filter((collector) => !!collector).join('; ');
 					var donors = $F{acquisition_sources}.getArray().filter((donor) => !!donor).join('; ');
 					var removalDates = $F{dates}.getArray().filter((date) => !!date).join('; ');
 					var accessDates = $F{accession_dates}.getArray().filter((date) => !!date).join('; ');
 
 					var objString = 'Archaeological objects including: ' + archObjects + '\n\n';
-					var donorString = 'Collector Names: ' + donors + '\n\n';
+					var collectorString = 'Collector Names: ' + collectors + '\n\n';
+					var donorString = 'Donor Names: ' + donors + '\n\n';
 					var dateString = 'Date(s) Removed From Sites: ' + removalDates + '\n\n';
 					var accessString = 'Accession Date(s): ' + accessDates;
-					objString + donorString + dateString + accessString]]>
+					objString + collectorString + donorString + dateString + accessString]]>
 				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
@@ -625,19 +623,19 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="72d91ad9-c47f-4836-a213-b8b1f141c671">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{involved_party_title}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{involved_party_title}.getArray().filter((title) => !!title).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="48b5bc79-166f-484b-bad7-cc6a81046cd2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{involved_party}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{involved_party}.getArray().filter((party) => !!party).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="18cf7052-4d5c-4c1d-bf37-c19cd4f0f9c7">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{involved_party_email}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{involved_party_email}.getArray().filter((email) => !!email).join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="f406adee-b418-401d-9797-526656e2bdca">

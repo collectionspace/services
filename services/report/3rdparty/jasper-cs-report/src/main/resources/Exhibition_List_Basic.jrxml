@@ -13,7 +13,7 @@
 	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["objectname,objectproductionorganizationrole,objectproductionpersonrole,computedcurrentlocation"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["objectname,objectproductionorganizationrole,objectproductionpersonrole,objectproductionpeople,computedcurrentlocation"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["101"]]></defaultValueExpression>

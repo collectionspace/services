@@ -321,14 +321,14 @@ $P!{whereclause}]]>
 				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="e35dabef-0dbc-4f08-a744-8894d2fe25be">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
-				<text><![CDATA[MNI]]></text>
+				<text><![CDATA[MNI Count]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="b82d695d-276a-44e0-8a1f-40a125e32ca1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[AFO]]></text>
+				<text><![CDATA[AFO Count]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="568843fe-0306-4803-8c67-672056ae406e">
