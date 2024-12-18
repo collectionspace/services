@@ -94,13 +94,14 @@ FROM hierarchy summary_hierarchy
 		GROUP BY hierarchy.parentid
 	) partiesinvolved ON partiesinvolved.parentid = summary_hierarchy.id
 	LEFT JOIN (
-		SELECT hierarchy.parentid,
-			array_agg(culturalgroup.culture) AS cultures
+		SELECT related_objects.summary_csid,
+			array_agg(people.objectproductionpeople) AS cultures
 		FROM hierarchy
-			INNER JOIN culturalgroup ON culturalgroup.id = hierarchy.id
-			AND hierarchy.name = 'summarydocumentations_common:culturalGroupList'
-		GROUP BY hierarchy.parentid
-	) culturalgroup ON culturalgroup.parentid = summary.id
+			INNER JOIN related_objects on related_objects.object_id = hierarchy.parentid
+			INNER JOIN objectproductionpeoplegroup people ON people.id = hierarchy.id
+		WHERE hierarchy.name = 'collectionobjects_common:objectProductionPeopleGroupList'
+		GROUP BY related_objects.summary_csid
+	) culturalgroup ON culturalgroup.summary_csid = summary.name
 	LEFT JOIN (
 		SELECT related_objects.summary_csid,
 			array_agg(fcs.item) as sites
