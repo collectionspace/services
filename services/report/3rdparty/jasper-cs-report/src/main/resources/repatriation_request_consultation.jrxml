@@ -317,28 +317,28 @@ FROM hierarchy rr_hierarchy
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Ethnographic Belongings Repatriation Request]]></text>
+				<text><![CDATA[Ethnographic Count]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="840" y="0" width="100" height="60" uuid="a672b0d8-60c7-4ad6-a47e-abe724790fe8">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Culture(s) Related to Repatriation Request]]></text>
+				<text><![CDATA[Culture(s) Related to Requested Objects]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="945" y="0" width="100" height="60" uuid="4db40578-bd05-4689-935f-4c6c00dc6f2a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Site(s) Related to Repatriation Request]]></text>
+				<text><![CDATA[Site(s) Related to Requested Objects]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1050" y="0" width="150" height="60" uuid="8d8d804b-e4f2-4cb7-84a1-0fc343babd25">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated NAGPRA Inventory Record(s)]]></text>
+				<text><![CDATA[Number of Related NAGPRA Inventory Record(s)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1205" y="0" width="100" height="60" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
@@ -352,7 +352,7 @@ FROM hierarchy rr_hierarchy
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Summary Documentation Records]]></text>
+				<text><![CDATA[Number of Related Summary Documentation Records]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1465" y="0" width="100" height="60" uuid="711eac26-05f5-4868-bbab-9a77bfb223d0">
@@ -366,7 +366,7 @@ FROM hierarchy rr_hierarchy
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+				<text><![CDATA[Number of Consultation Log Entries]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
