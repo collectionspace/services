@@ -94,6 +94,7 @@ FROM hierarchy summary_hierarchy
 		GROUP BY hierarchy.parentid
 	) partiesinvolved ON partiesinvolved.parentid = summary_hierarchy.id
 	LEFT JOIN (
+		-- Production People is overridden on anthro to use ethculture and archculture
 		SELECT related_objects.summary_csid,
 			array_agg(people.objectproductionpeople) AS cultures
 		FROM hierarchy
