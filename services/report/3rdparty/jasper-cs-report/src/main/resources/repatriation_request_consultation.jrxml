@@ -339,7 +339,7 @@ FROM hierarchy rr_hierarchy
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Related NAGPRA Inventory Record(s)]]></text>
+				<text><![CDATA[Number of Related NAGPRA Inventory Records]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1205" y="0" width="100" height="60" uuid="9ba161bf-860a-4d46-9914-34ccd4072209">
