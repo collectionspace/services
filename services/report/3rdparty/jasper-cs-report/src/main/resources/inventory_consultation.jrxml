@@ -261,21 +261,21 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Archaeological Sites Related to NAGPRA Inventory]]></text>
+				<text><![CDATA[Site(s) Related to Requested Objects]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+				<text><![CDATA[Number of Related Consultation Log Entries]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="900" y="0" width="100" height="60" uuid="77fe4cfa-6cd6-406e-9125-dd513caf64db">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Exit Record - Current Owner with Exit Date]]></text>
+				<text><![CDATA[Exit Owner with Date]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
