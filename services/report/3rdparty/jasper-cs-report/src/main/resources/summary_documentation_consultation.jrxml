@@ -94,13 +94,15 @@ FROM hierarchy summary_hierarchy
 		GROUP BY hierarchy.parentid
 	) partiesinvolved ON partiesinvolved.parentid = summary_hierarchy.id
 	LEFT JOIN (
-		SELECT hierarchy.parentid,
-			array_agg(culturalgroup.culture) AS cultures
+		-- Production People is overridden on anthro to use ethculture and archculture
+		SELECT related_objects.summary_csid,
+			array_agg(people.objectproductionpeople) AS cultures
 		FROM hierarchy
-			INNER JOIN culturalgroup ON culturalgroup.id = hierarchy.id
-			AND hierarchy.name = 'summarydocumentations_common:culturalGroupList'
-		GROUP BY hierarchy.parentid
-	) culturalgroup ON culturalgroup.parentid = summary.id
+			INNER JOIN related_objects on related_objects.object_id = hierarchy.parentid
+			INNER JOIN objectproductionpeoplegroup people ON people.id = hierarchy.id
+		WHERE hierarchy.name = 'collectionobjects_common:objectProductionPeopleGroupList'
+		GROUP BY related_objects.summary_csid
+	) culturalgroup ON culturalgroup.summary_csid = summary_hierarchy.name
 	LEFT JOIN (
 		SELECT related_objects.summary_csid,
 			array_agg(fcs.item) as sites
@@ -258,106 +260,106 @@ FROM hierarchy summary_hierarchy
 		<band splitType="Stretch" />
 	</background>
 	<columnHeader>
-		<band height="44" splitType="Stretch">
+		<band height="60" splitType="Stretch">
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout" />
 			<property name="com.jaspersoft.studio.unit.height" value="px" />
 			<staticText>
-				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="b8cd41b4-34e5-455f-81fc-97800f4ae9b7">
+				<reportElement style="Column header" x="0" y="0" width="100" height="60" uuid="b8cd41b4-34e5-455f-81fc-97800f4ae9b7">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Organization(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="539fd511-8c4c-4f20-ac0f-1b71fdc26939">
+				<reportElement style="Column header" x="100" y="0" width="100" height="60" uuid="539fd511-8c4c-4f20-ac0f-1b71fdc26939">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation Origination Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="9741cf97-9acc-45aa-bab2-90a03cf29e83">
+				<reportElement style="Column header" x="200" y="0" width="100" height="60" uuid="9741cf97-9acc-45aa-bab2-90a03cf29e83">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation Number]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="65b98683-6871-48ec-a4c4-553e41f1b26b">
+				<reportElement style="Column header" x="300" y="0" width="100" height="60" uuid="65b98683-6871-48ec-a4c4-553e41f1b26b">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation Title]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="02898623-0732-4b3d-abe6-948350332361">
+				<reportElement style="Column header" x="400" y="0" width="95" height="60" uuid="02898623-0732-4b3d-abe6-948350332361">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Summary Documentation - Summary Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="a0f54698-7f5f-4d08-8286-f86c412fa876">
+				<reportElement style="Column header" x="500" y="0" width="100" height="60" uuid="a0f54698-7f5f-4d08-8286-f86c412fa876">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[UFO Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="9afbf556-a4f6-4041-97a9-ac9f106aa75e">
+				<reportElement style="Column header" x="600" y="0" width="95" height="60" uuid="9afbf556-a4f6-4041-97a9-ac9f106aa75e">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Objects of Cultural Patrimony Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="679eb6c6-e454-47d1-8320-1a723dabf0a1">
+				<reportElement style="Column header" x="700" y="0" width="100" height="60" uuid="679eb6c6-e454-47d1-8320-1a723dabf0a1">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Sacred Object Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="f9a1fb86-9c78-48ba-942e-e35417916eeb">
+				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="f9a1fb86-9c78-48ba-942e-e35417916eeb">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[Lineal Descendent Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="c2e6ccf4-0900-400d-a6f4-4ea0fc9bb95a">
+				<reportElement style="Column header" x="900" y="0" width="95" height="60" uuid="c2e6ccf4-0900-400d-a6f4-4ea0fc9bb95a">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
 				<text><![CDATA[NAGPRA Category Type(s)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="52cec6c0-596a-47f6-877a-fa0a4227e55d">
+				<reportElement style="Column header" x="1000" y="0" width="95" height="60" uuid="52cec6c0-596a-47f6-877a-fa0a4227e55d">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Site(s) Related to Summary]]></text>
+				<text><![CDATA[Site(s) Related to Related Objects]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="c361bc9c-e677-4a74-a59e-695ba9eddbaa">
+				<reportElement style="Column header" x="1100" y="0" width="100" height="60" uuid="c361bc9c-e677-4a74-a59e-695ba9eddbaa">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Culture(s) Related to Summary]]></text>
+				<text><![CDATA[Culture(s) Related to Related Objects]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="f6441c8d-82a9-4908-94c0-b57be2d22746">
+				<reportElement style="Column header" x="1200" y="0" width="95" height="60" uuid="f6441c8d-82a9-4908-94c0-b57be2d22746">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+				<text><![CDATA[Number of Related Consultation Log Entries]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="17fc9356-5a96-4aa4-915a-cf18a83bc614">
+				<reportElement style="Column header" x="1300" y="0" width="100" height="60" uuid="17fc9356-5a96-4aa4-915a-cf18a83bc614">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Exit Record Current Owner with Exit Date]]></text>
+				<text><![CDATA[Exit Owner with Date]]></text>
 			</staticText>
 		</band>
 	</columnHeader>

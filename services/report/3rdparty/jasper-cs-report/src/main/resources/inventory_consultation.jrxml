@@ -257,25 +257,25 @@ $P!{whereclause}]]>
 				<text><![CDATA[AFO Count]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="60" uuid="c3bc7e35-43d8-4446-acba-f7ef559a54b2">
+				<reportElement style="Column header" x="700" y="0" width="95" height="60" uuid="c3bc7e35-43d8-4446-acba-f7ef559a54b2">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Archaeological Sites Related to NAGPRA Inventory]]></text>
+				<text><![CDATA[Site(s) Related to Requested Objects]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="60" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
+				<reportElement style="Column header" x="800" y="0" width="95" height="60" uuid="1ccb6b44-add8-4be3-8b1e-6babd829939c">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Number of Associated Consultation Log Entries]]></text>
+				<text><![CDATA[Number of Related Consultation Log Entries]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="900" y="0" width="100" height="60" uuid="77fe4cfa-6cd6-406e-9125-dd513caf64db">
 					<property name="com.jaspersoft.studio.unit.width" value="px" />
 				</reportElement>
 				<textElement markup="styled" />
-				<text><![CDATA[Exit Record - Current Owner with Exit Date]]></text>
+				<text><![CDATA[Exit Owner with Date]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -321,13 +321,13 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="c2c43e42-0fc1-4fad-b5bb-d8c62b534524">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{afo_count}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{mni_count}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="411e6813-d586-4190-b721-7a22c00691ea">
 					<property name="com.jaspersoft.studio.unit.y" value="px" />
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{mni_count}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{afo_count}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="659569aa-1ff0-4aa9-beaa-294337bd8315">

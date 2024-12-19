@@ -2,7 +2,7 @@
 <document name="report">
   <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
     <name>Notice of Inventory Completion</name>
-    <notes>First pass notice of inventory completion</notes>
+    <notes>This report includes the fields for creating a Notice of Inventory Completion report to comply with NAGPRA.</notes>
     <forDocTypes>
       <forDocType>NagpraInventory</forDocType>
     </forDocTypes>
