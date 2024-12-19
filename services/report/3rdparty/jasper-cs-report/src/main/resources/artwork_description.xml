@@ -2,7 +2,7 @@
 <document name="report">
   <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
     <name>Artwork Description</name>
-    <notes>Artwork Description</notes>
+    <notes>This object description report for art collections includes tombstone description details.</notes>
     <forDocTypes>
       <forDocType>CollectionObject</forDocType>
     </forDocTypes>
