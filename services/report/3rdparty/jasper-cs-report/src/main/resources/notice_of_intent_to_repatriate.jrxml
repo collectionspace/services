@@ -13,7 +13,7 @@
 		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["summary_type,status,culture,involved_party,tribeornation,places,sites,collectors,acquisition_sources,category_determinations,locations,acquisition_sources"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["controlled_object_names,summary_type,status,culture,involved_party,tribeornation,places,sites,collectors,acquisition_sources,category_determinations,locations,acquisition_sources"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
   <parameter name="csid" class="java.lang.String" isForPrompting="false" />
@@ -56,9 +56,9 @@ SELECT
   coalesce(affiliation.tribeornation, '{}') AS tribeornation,
   affiliation.basisofdetermination,
   coalesce(culturalgroup.culture, '{}') AS culture,
-  partiesinvolved.involvedparty as involved_party,
-  partiesinvolved.title as involved_party_title,
-  partiesinvolved.email as involved_party_email,
+  coalesce(partiesinvolved.involvedparty, '{}') as involved_party,
+  coalesce(partiesinvolved.title, '{}') as involved_party_title,
+  coalesce(partiesinvolved.email, '{}') as involved_party_email,
   statusgroup.status,
   coalesce(field_collection_places.places, '{}') AS places,
   coalesce(field_collection_sites.sites, '{}') AS sites,
@@ -67,6 +67,7 @@ SELECT
   coalesce(nagpra_category_determinations.category_determinations, '{}') AS category_determinations,
   coalesce(object_data.locations, '{}') AS locations,
   object_count.object_count,
+  coalesce(object_name.controlled_object_names, '{}') AS controlled_object_names,
   coalesce(object_name.object_names, '{}') AS object_names,
   coalesce(acquisition_data.acquisition_numbers, '{}') AS acquisition_numbers,
   coalesce(acquisition_data.acquisition_methods, '{}') AS acquisition_methods,
@@ -151,6 +152,7 @@ FROM hierarchy summary_hierarchy
   ) object_count ON object_count.summarycsid = summary_hierarchy.name
   LEFT JOIN LATERAL (
     SELECT related_objects.summarycsid,
+      array_agg(ong.objectnamecontrolled) as controlled_object_names,
       array_agg(ong.objectname) as object_names
     FROM hierarchy ong_hierarchy
     INNER JOIN related_objects on related_objects.object_id = ong_hierarchy.parentid
@@ -298,6 +300,10 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 	<field name="locations" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="locations"/>
 		<property name="com.jaspersoft.studio.field.label" value="locations"/>
+	</field>
+	<field name="controlled_object_names" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="controlled_object_names"/>
+		<property name="com.jaspersoft.studio.field.label" value="controlled_object_names"/>
 	</field>
 	<field name="object_names" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="object_names"/>
@@ -515,7 +521,7 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="a302ba1e-a55e-4607-b992-689cd1ca123c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[var archObjects = $F{object_names}.getArray().filter((name) => !!name).join('; ');
+				<textFieldExpression><![CDATA[var archObjects = $F{controlled_object_names}.getArray().concat($F{object_names}.getArray()).filter((name) => !!name).join('; ');
 					var collectors = $F{collectors}.getArray().filter((collector) => !!collector).join('; ');
 					var donors = $F{acquisition_sources}.getArray().filter((donor) => !!donor).join('; ');
 					var removalDates = $F{dates}.getArray().filter((date) => !!date).join('; ');
