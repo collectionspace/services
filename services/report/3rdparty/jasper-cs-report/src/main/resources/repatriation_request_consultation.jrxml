@@ -89,13 +89,13 @@ FROM hierarchy rr_hierarchy
 		GROUP BY hierarchy.parentid
 	) partiesinvolved ON partiesinvolved.parentid = rr_hierarchy.id
 	LEFT JOIN (
-		-- Production People is overridden on anthro to use ethculture and archculture
+		-- Pull from the NAGPRA extension to get the cultural determination
 		SELECT related_objects.repatriation_csid,
-			array_agg(people.objectproductionpeople) AS cultures
+			array_agg(ndg.nagpradetermculture) AS cultures
 		FROM hierarchy
 			INNER JOIN related_objects on related_objects.object_id = hierarchy.parentid
-			INNER JOIN objectproductionpeoplegroup people ON people.id = hierarchy.id
-		WHERE hierarchy.name = 'collectionobjects_common:objectProductionPeopleGroupList'
+			INNER JOIN nagpradetermgroup ndg ON ndg.id = hierarchy.id
+		WHERE hierarchy.name = 'collectionobjects_nagpra:nagpraDetermGroupList'
 		GROUP BY related_objects.repatriation_csid
 	) culturalgroup ON culturalgroup.repatriation_csid = rr_hierarchy.name
 	LEFT JOIN LATERAL (
