@@ -2,7 +2,7 @@
 <document name="report">
   <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
     <name>Full Object with Place Details</name>
-    <notes>Full Object with Place Details</notes>
+    <notes>This object report exclusive to the Public Art profile includes descriptive object record fields combined with current place details.</notes>
     <forDocTypes>
       <forDocType>CollectionObject</forDocType>
     </forDocTypes>
