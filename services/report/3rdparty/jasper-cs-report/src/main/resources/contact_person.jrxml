@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contact_person" pageWidth="1700" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="49b29b35-57c3-422f-8699-01975b0a33f9">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contact_person" pageWidth="1900" pageHeight="800" orientation="Landscape" columnWidth="1860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="49b29b35-57c3-422f-8699-01975b0a33f9">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -259,14 +259,14 @@ FROM personbase pb
 				<text><![CDATA[Surname]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="98a593e1-90ab-4b97-8091-b41085d0169b">
+				<reportElement style="Column header" x="500" y="0" width="110" height="44" uuid="98a593e1-90ab-4b97-8091-b41085d0169b">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Name Additions]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="6a963a27-f7ad-4f03-a45d-f64bbe0f75b8">
+				<reportElement style="Column header" x="610" y="0" width="90" height="44" uuid="6a963a27-f7ad-4f03-a45d-f64bbe0f75b8">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
@@ -280,14 +280,14 @@ FROM personbase pb
 				<text><![CDATA[Occupation]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="3a757ac1-10c0-415d-b530-6dba933e438d">
+				<reportElement style="Column header" x="800" y="0" width="90" height="44" uuid="3a757ac1-10c0-415d-b530-6dba933e438d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Email]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="681edaa6-0477-45be-a820-138f6b510c06">
+				<reportElement style="Column header" x="900" y="0" width="90" height="44" uuid="681edaa6-0477-45be-a820-138f6b510c06">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
@@ -308,35 +308,35 @@ FROM personbase pb
 				<text><![CDATA[Address: Line 2]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="343fb9dc-cab0-46ae-9c44-5d6df8fd3bc4">
+				<reportElement style="Column header" x="1210" y="0" width="140" height="44" uuid="343fb9dc-cab0-46ae-9c44-5d6df8fd3bc4">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Address: Municipality]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="51fc01b9-23c1-440b-95fa-6afe6aed7562">
+				<reportElement style="Column header" x="1360" y="0" width="100" height="44" uuid="51fc01b9-23c1-440b-95fa-6afe6aed7562">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Address: State]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="299b5aeb-9cce-46ff-99a8-ee3762103eb2">
+				<reportElement style="Column header" x="1470" y="0" width="140" height="44" uuid="299b5aeb-9cce-46ff-99a8-ee3762103eb2">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Address: Postal Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="383708e2-c638-48e8-a77e-bd080eca6739">
+				<reportElement style="Column header" x="1620" y="0" width="100" height="44" uuid="383708e2-c638-48e8-a77e-bd080eca6739">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Address: County]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="f8851966-3c83-43f6-9998-ac72352e9643">
+				<reportElement style="Column header" x="1730" y="0" width="140" height="44" uuid="f8851966-3c83-43f6-9998-ac72352e9643">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
@@ -378,13 +378,13 @@ FROM personbase pb
 				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="0b900818-a7db-4de1-9ff6-9ec6b971c543">
+				<reportElement style="Detail" x="500" y="0" width="110" height="30" uuid="0b900818-a7db-4de1-9ff6-9ec6b971c543">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{nameadditions}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="47be4fe7-9aa8-44f6-9d00-2073cdf5b0ec">
+				<reportElement style="Detail" x="610" y="0" width="90" height="30" uuid="47be4fe7-9aa8-44f6-9d00-2073cdf5b0ec">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{initials}]]></textFieldExpression>
@@ -396,13 +396,13 @@ FROM personbase pb
 				<textFieldExpression><![CDATA[$F{occupation}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="7524352c-bc87-4ba7-9d5b-12c0c74e420d">
+				<reportElement style="Detail" x="800" y="0" width="90" height="30" uuid="7524352c-bc87-4ba7-9d5b-12c0c74e420d">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="8d3aac60-18a9-40de-8ae4-87060221c2b2">
+				<reportElement style="Detail" x="900" y="0" width="90" height="30" uuid="8d3aac60-18a9-40de-8ae4-87060221c2b2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
@@ -420,31 +420,31 @@ FROM personbase pb
 				<textFieldExpression><![CDATA[$F{address2}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="b2a4a67c-3a3a-49ba-b87a-3a806a8cb5fd">
+				<reportElement style="Detail" x="1210" y="0" width="140" height="30" uuid="b2a4a67c-3a3a-49ba-b87a-3a806a8cb5fd">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{municipality}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="daffd94e-201e-4aa7-b54f-71097b631859">
+				<reportElement style="Detail" x="1360" y="0" width="100" height="30" uuid="daffd94e-201e-4aa7-b54f-71097b631859">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{stateorprovince}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="e0c9ee96-89bb-408c-942a-4ba962fd8a16">
+				<reportElement style="Detail" x="1470" y="0" width="140" height="30" uuid="e0c9ee96-89bb-408c-942a-4ba962fd8a16">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{postcode}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="68c4efc2-8c05-413c-bccb-c9fc1486d913">
+				<reportElement style="Detail" x="1620" y="0" width="100" height="30" uuid="68c4efc2-8c05-413c-bccb-c9fc1486d913">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="b80d8687-db0b-44a3-af91-39c22630475f">
+				<reportElement style="Detail" x="1730" y="0" width="140" height="30" uuid="b80d8687-db0b-44a3-af91-39c22630475f">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{personauthoritytype}]]></textFieldExpression>
