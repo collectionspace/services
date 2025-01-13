@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="contact_person" pageWidth="1900" pageHeight="800" orientation="Landscape" columnWidth="1860" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="49b29b35-57c3-422f-8699-01975b0a33f9">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="800"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w1" value="625"/>
+	<property name="com.jaspersoft.studio.property.dataset.dialog.DatasetDialog.sash.w2" value="361"/>
+	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="SansSerif" fontSize="12"/>
+	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="csids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ? "WHERE phier.name = '" + $P{csid} + "'"
+		: $P{csids} != "NOVALUE" ? ( "WHERE phier.name IN (" + $P{csids} + ")" )
+			: "WHERE phier.name = 'NOVALUE'"]]></defaultValueExpression>
+	</parameter>
+	<queryString language="SQL">
+		<![CDATA[WITH personbase AS (
+	SELECT per.id,
+		ptg.termdisplayname,
+		ptg.title,
+		ptg.forename,
+		ptg.middlename,
+		ptg.surname,
+		ptg.nameadditions,
+		ptg.initials,
+		pa.displayname AS personType,
+		phier.name AS personcsid
+	FROM persons_common per
+		INNER JOIN misc ON misc.id = per.id
+		AND misc.lifecyclestate != 'deleted'
+		INNER JOIN HIERARCHY termhier ON per.id = termhier.parentid
+		AND termhier.primarytype = 'personTermGroup'
+		AND termhier.pos = 0
+		INNER JOIN HIERARCHY phier ON per.id = phier.id
+		INNER JOIN persontermgroup ptg ON termhier.id = ptg.id
+		INNER JOIN HIERARCHY authhier ON per.inauthority = authhier.name
+		INNER JOIN personauthorities_common pa ON authhier.id = pa.id
+	$P!{whereclause}
+),
+occs AS (
+	SELECT pb.id,
+		string_agg(
+			occ.item,
+			'; '
+			ORDER BY occ.pos
+		) AS occupation
+	FROM personbase pb
+		INNER JOIN persons_common_occupations occ ON occ.id = pb.id
+	GROUP BY pb.id
+),
+person_contacts AS (
+	SELECT pb.id AS personid,
+		cc.id AS contactid
+	FROM personbase pb
+		INNER JOIN contacts_common cc ON cc.initem = pb.personcsid
+		INNER JOIN misc ON misc.id = cc.id
+		AND misc.lifecyclestate != 'deleted'
+),
+email AS (
+	SELECT pc.personid,
+		STRING_AGG(
+			CONCAT_WS(
+				' ',
+				email.email,
+				CASE
+					email.emailtype
+					WHEN NULL THEN NULL
+					ELSE '(' || email.emailtype || ')'
+				END
+			),
+			'|'
+			ORDER BY hier.pos ASC
+		) AS email
+	FROM person_contacts pc
+		INNER JOIN HIERARCHY hier ON pc.contactid = hier.parentid
+		AND hier.primarytype = 'emailGroup'
+		INNER JOIN emailgroup email ON email.id = hier.id
+	GROUP BY pc.personid
+),
+phone AS (
+	SELECT pc.personid,
+		STRING_AGG(
+			CONCAT_WS(
+				' ',
+				phone.telephonenumber,
+				CASE
+					phone.telephonenumbertype
+					WHEN NULL THEN NULL
+					ELSE '(' || phone.telephonenumbertype || ')'
+				END
+			),
+			'|'
+			ORDER BY hier.pos ASC
+		) AS phone
+	FROM person_contacts pc
+		INNER JOIN HIERARCHY hier ON pc.contactid = hier.parentid
+		AND hier.primarytype = 'telephoneNumberGroup'
+		INNER JOIN telephonenumbergroup phone ON phone.id = hier.id
+	GROUP BY pc.personid
+)
+SELECT pb.termdisplayname AS displayname,
+	pb.title,
+	pb.forename,
+	pb.middlename,
+	pb.surname,
+	pb.nameadditions,
+	pb.initials,
+	occs.occupation,
+	email.email,
+	phone.phone,
+	addr.addressplace1 AS address1,
+	addr.addressplace2 AS address2,
+	addr.addressmunicipality AS municipality,
+	addr.addressstateorprovince AS stateorprovince,
+	addr.addresspostcode AS postcode,
+	addr.addresscountry AS country,
+	pb.persontype AS personauthoritytype
+FROM personbase pb
+	LEFT OUTER JOIN person_contacts pc ON pb.id = pc.personid
+	LEFT OUTER JOIN HIERARCHY pchier ON pc.contactid = pchier.parentid
+	AND pchier.primarytype = 'addressGroup'
+	AND pchier.pos = 0
+	LEFT OUTER JOIN addressgroup addr ON pchier.id = addr.id
+	LEFT OUTER JOIN occs ON pb.id = occs.id
+	LEFT OUTER JOIN email ON pb.id = email.personid
+	LEFT OUTER JOIN phone ON pb.id = phone.personid]]>
+	</queryString>
+	<field name="displayname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="displayname"/>
+		<property name="com.jaspersoft.studio.field.label" value="displayname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="title" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="title"/>
+		<property name="com.jaspersoft.studio.field.label" value="title"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="forename" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="forename"/>
+		<property name="com.jaspersoft.studio.field.label" value="forename"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="middlename" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="middlename"/>
+		<property name="com.jaspersoft.studio.field.label" value="middlename"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="surname" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="surname"/>
+		<property name="com.jaspersoft.studio.field.label" value="surname"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="nameadditions" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="nameadditions"/>
+		<property name="com.jaspersoft.studio.field.label" value="nameadditions"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="initials" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="initials"/>
+		<property name="com.jaspersoft.studio.field.label" value="initials"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="persontermgroup"/>
+	</field>
+	<field name="occupation" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="occupation"/>
+		<property name="com.jaspersoft.studio.field.label" value="occupation"/>
+	</field>
+	<field name="email" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="email"/>
+		<property name="com.jaspersoft.studio.field.label" value="email"/>
+	</field>
+	<field name="phone" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="phone"/>
+		<property name="com.jaspersoft.studio.field.label" value="phone"/>
+	</field>
+	<field name="address1" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="address1"/>
+		<property name="com.jaspersoft.studio.field.label" value="address1"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="address2" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="address2"/>
+		<property name="com.jaspersoft.studio.field.label" value="address2"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="municipality" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="municipality"/>
+		<property name="com.jaspersoft.studio.field.label" value="municipality"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="stateorprovince" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="stateorprovince"/>
+		<property name="com.jaspersoft.studio.field.label" value="stateorprovince"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="postcode" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="postcode"/>
+		<property name="com.jaspersoft.studio.field.label" value="postcode"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="country" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="country"/>
+		<property name="com.jaspersoft.studio.field.label" value="country"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="addressgroup"/>
+	</field>
+	<field name="personauthoritytype" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="personauthoritytype"/>
+		<property name="com.jaspersoft.studio.field.label" value="personauthoritytype"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="personauthorities_common"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="44" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<staticText>
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="f85b8df8-5c11-4adc-93f9-0cfbbbf0d521">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Display Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="75c1de4e-dbfc-433f-babf-256ae7e1b29c">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Title]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="b945f0d8-0689-424a-90c8-2457208c8945">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Forename]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="dd3a32bf-aaa0-423b-92d9-6fb147ea7b65">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Middle Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="574a2b56-ce98-43e2-8992-3d7032cb354e">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Surname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="500" y="0" width="110" height="44" uuid="98a593e1-90ab-4b97-8091-b41085d0169b">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Name Additions]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="610" y="0" width="90" height="44" uuid="6a963a27-f7ad-4f03-a45d-f64bbe0f75b8">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Initials]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="831bbd67-fac0-46d6-b640-8ccc61469cca">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Occupation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="800" y="0" width="90" height="44" uuid="3a757ac1-10c0-415d-b530-6dba933e438d">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Email]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="900" y="0" width="90" height="44" uuid="681edaa6-0477-45be-a820-138f6b510c06">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Phone]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="f1b19bf9-3163-4da5-af84-aabc13ad4979">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: Line 1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="01070f89-9711-43e7-9c69-3a14c096f695">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: Line 2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1210" y="0" width="140" height="44" uuid="343fb9dc-cab0-46ae-9c44-5d6df8fd3bc4">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: Municipality]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1360" y="0" width="100" height="44" uuid="51fc01b9-23c1-440b-95fa-6afe6aed7562">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: State]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1470" y="0" width="140" height="44" uuid="299b5aeb-9cce-46ff-99a8-ee3762103eb2">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: Postal Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1620" y="0" width="100" height="44" uuid="383708e2-c638-48e8-a77e-bd080eca6739">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Address: County]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="1730" y="0" width="140" height="44" uuid="f8851966-3c83-43f6-9998-ac72352e9643">
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+				<textElement markup="styled"/>
+				<text><![CDATA[Person Authority Type]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="66" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="b79f49f1-f844-4020-bb3f-a1c93a7e9048">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{displayname}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="fa0dd313-e16f-4e73-b0a8-0ac838ecb04b">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="157f1bfd-148d-48f7-bee6-8d6bdda97c87">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{forename}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="f3e465c4-ed38-45c6-a9d9-b5387154e7a2">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{middlename}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="ff4559d3-ec42-4620-8840-8970d29f82b4">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{surname}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="500" y="0" width="110" height="30" uuid="0b900818-a7db-4de1-9ff6-9ec6b971c543">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{nameadditions}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="610" y="0" width="90" height="30" uuid="47be4fe7-9aa8-44f6-9d00-2073cdf5b0ec">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{initials}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="0b374619-7513-4631-9cae-0f12a8534edf">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{occupation}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="800" y="0" width="90" height="30" uuid="7524352c-bc87-4ba7-9d5b-12c0c74e420d">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="900" y="0" width="90" height="30" uuid="8d3aac60-18a9-40de-8ae4-87060221c2b2">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="f517adcf-0664-4602-8fde-76a195d17878">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{address1}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="f64fbb9f-528c-4ab6-bfc8-fbbd32d130bb">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{address2}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1210" y="0" width="140" height="30" uuid="b2a4a67c-3a3a-49ba-b87a-3a806a8cb5fd">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{municipality}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1360" y="0" width="100" height="30" uuid="daffd94e-201e-4aa7-b54f-71097b631859">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{stateorprovince}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1470" y="0" width="140" height="30" uuid="e0c9ee96-89bb-408c-942a-4ba962fd8a16">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{postcode}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1620" y="0" width="100" height="30" uuid="68c4efc2-8c05-413c-bccb-c9fc1486d913">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{country}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="Detail" x="1730" y="0" width="140" height="30" uuid="b80d8687-db0b-44a3-af91-39c22630475f">
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{personauthoritytype}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

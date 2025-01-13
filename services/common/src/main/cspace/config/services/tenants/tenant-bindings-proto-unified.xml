@@ -744,6 +744,14 @@
 					<types:key>report</types:key>
 					<types:value>summary_documentation_consultation</types:value>
 				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>contact_person</types:value>
+				</types:item>
+				<types:item>
+					<types:key>report</types:key>
+					<types:value>contact_org</types:value>
+				</types:item>
 			</service:properties>
 			<service:object xmlns:service="http://collectionspace.org/services/config/service" name="Report"
 				version="1.0">
