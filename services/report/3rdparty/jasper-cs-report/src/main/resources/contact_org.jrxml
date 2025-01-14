@@ -15,9 +15,7 @@
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["1"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="csid" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["4a236626-06cc-4ce6-8e11"]]></defaultValueExpression>
-	</parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false" />
 	<parameter name="csidlist" class="java.lang.String" isForPrompting="false" />
 	<parameter name="csids" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "NOVALUE"]]></defaultValueExpression>
