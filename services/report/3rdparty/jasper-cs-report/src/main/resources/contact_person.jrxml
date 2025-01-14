@@ -19,8 +19,8 @@
 	</parameter>
 	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[$P{csid} != null ? "WHERE phier.name = '" + $P{csid} + "'"
-		: $P{csids} != "NOVALUE" ? ( "WHERE phier.name IN (" + $P{csids} + ")" )
-			: "WHERE phier.name = 'NOVALUE'"]]></defaultValueExpression>
+		: $P{csids} != "NOVALUE" ? ( "WHERE phier.name IN (" + $P{csids} + ")" ) : ""]]>
+		</defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
 		<![CDATA[WITH personbase AS (
