@@ -82,11 +82,11 @@ LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and materia
 LEFT JOIN materialgroup material on material.id = material_hier.id
 LEFT JOIN (
 	SELECT
-		id as parentid,
+		id AS obj_id,
 		array_agg(item) AS collections
 	FROM collectionobjects_publicart_publicartcollections
-	GROUP BY id
-) publicart_collections on publicart_collections.parentid = obj.id
+	GROUP BY obj_id
+) publicart_collections on publicart_collections.obj_id = obj.id
 LEFT JOIN collectionobjects_common_owners owners ON owners.id = obj.id AND owners.pos = 0
 LEFT JOIN hierarchy count_hier ON obj.id = count_hier.parentid AND count_hier.primarytype='objectCountGroup' AND count_hier.pos=0
 LEFT JOIN objectcountgroup objectCountGroup ON count_hier.id = objectCountGroup.id
