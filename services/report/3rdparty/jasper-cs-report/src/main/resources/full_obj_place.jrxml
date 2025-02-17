@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="obj_full_place" pageWidth="3900" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f6c7eb78-afcd-4bd5-9a53-61ee9a1f43f8">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="obj_full_place" language="javascript" pageWidth="3900" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f6c7eb78-afcd-4bd5-9a53-61ee9a1f43f8">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["publicartproductiondatetype,publicartproductionperson,publicartproductionpersonrole,responsibledepartment,publishto,installationtype,worktype,material,collection,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["publicartproductiondatetype,publicartproductionperson,publicartproductionpersonrole,responsibledepartment,publishto,installationtype,worktype,material,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -36,7 +36,7 @@
 	material.material, -- deurn
 	bd.item AS briefdescription,
 	comment.item AS comment,
-	collections.item AS collection,
+	publicart_collections.collections,
 	owners.item AS owner,
 	dimension.dimension,
 	obj.computedcurrentlocation,
@@ -80,7 +80,13 @@ LEFT JOIN hierarchy work_hier on work_hier.parentid = obj.id and work_hier.prima
 LEFT JOIN objectnamegroup worktype on worktype.id = work_hier.id
 LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup' and material_hier.pos = 0
 LEFT JOIN materialgroup material on material.id = material_hier.id
-LEFT JOIN collectionobjects_publicart_publicartcollections collections ON collections.id = obj.id AND collections.pos = 0
+LEFT JOIN (
+	SELECT
+		id AS obj_id,
+		array_agg(item) AS collections
+	FROM collectionobjects_publicart_publicartcollections
+	GROUP BY obj_id
+) publicart_collections on publicart_collections.obj_id = obj.id
 LEFT JOIN collectionobjects_common_owners owners ON owners.id = obj.id AND owners.pos = 0
 LEFT JOIN hierarchy count_hier ON obj.id = count_hier.parentid AND count_hier.primarytype='objectCountGroup' AND count_hier.pos=0
 LEFT JOIN objectcountgroup objectCountGroup ON count_hier.id = objectCountGroup.id
@@ -199,9 +205,9 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="comment"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common_comments"/>
 	</field>
-	<field name="collection" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="collection"/>
-		<property name="com.jaspersoft.studio.field.label" value="collection"/>
+	<field name="collections" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="collections"/>
+		<property name="com.jaspersoft.studio.field.label" value="collections"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_publicart_publicartcollections"/>
 	</field>
 	<field name="owner" class="java.lang.String">
@@ -685,7 +691,7 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="de9184ff-9c09-43b7-899d-349eea573fbf">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{collection}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{collections}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="05d7d996-03ef-49f8-b43a-226864d2b9e9">
