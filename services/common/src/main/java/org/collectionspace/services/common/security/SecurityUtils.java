@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.jboss.resteasy.spi.HttpRequest;
 import org.opensaml.core.xml.XMLObject;
+import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -444,6 +445,14 @@ public class SecurityUtils {
 
                     if (attributeValues != null) {
                         for (XMLObject value : attributeValues) {
+                        	/*
+                        	 	NOTE: SAML 2.0 attribute values will either be sent explicitly 
+                        	 	as a string and typed XSString by OpenSAML, or it will be sent untyped and
+                        	 	typed XSAny. Which it is depends on a configuration setting on the
+                        	 	identity provider side, and either is acceptable according to
+                        	 	the SAML 2.0 spec (https://docs.oasis-open.org/security/saml/v2.0/saml-core-2.0-os.pdf
+                        	 	Section 2.7.3.1.1 Element <AttributeValue>, line 1236) 
+                        	 */
                             if (value instanceof XSString) {
                                 XSString stringValue = (XSString) value;
                                 String candidateValue = stringValue.getValue();
@@ -451,6 +460,16 @@ public class SecurityUtils {
                                 if (candidateValue != null) {
                                     values.add(candidateValue);
                                 }
+                            }
+                            else if(value instanceof XSAny) {
+                            	String candidateValue = ((XSAny) value).getTextContent();
+                            	
+                            	if (candidateValue != null) {
+                                    values.add(candidateValue);
+                                }
+                            }
+                            else {
+                            	logger.warn(attributeName);
                             }
                         }
                     }
@@ -479,6 +498,9 @@ public class SecurityUtils {
                         for (XMLObject value : attributeValues) {
                             if (value instanceof XSString) {
                                 stringValues.add(((XSString) value).getValue());
+                            }
+                            else if (value instanceof XSAny) {
+                            	stringValues.add(((XSAny)value).getTextContent());
                             }
                         }
                     }
