@@ -12,6 +12,18 @@
 			<service:properties xmlns:service="http://collectionspace.org/services/config/service" xmlns:types="http://collectionspace.org/services/config/types">
 				<types:item merge:matcher="skip" merge:action="insert">
 					<types:key>report</types:key>
+					<types:value>inventory_consultation</types:value>
+				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>repatriation_request_consultation</types:value>
+				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
+					<types:value>summary_documentation_consultation</types:value>
+				</types:item>
+				<types:item merge:matcher="skip" merge:action="insert">
+					<types:key>report</types:key>
 					<types:value>notice_of_intent_to_repatriate</types:value>
 				</types:item>
 				<types:item merge:matcher="skip" merge:action="insert">
