@@ -732,18 +732,7 @@
 					<types:key>report</types:key>
 					<types:value>exhibition_checklist</types:value>
 				</types:item>
-				<types:item>
-					<types:key>report</types:key>
-					<types:value>inventory_consultation</types:value>
-				</types:item>
-				<types:item>
-					<types:key>report</types:key>
-					<types:value>repatriation_request_consultation</types:value>
-				</types:item>
-				<types:item>
-					<types:key>report</types:key>
-					<types:value>summary_documentation_consultation</types:value>
-				</types:item>
+
 				<types:item>
 					<types:key>report</types:key>
 					<types:value>contact_person</types:value>
