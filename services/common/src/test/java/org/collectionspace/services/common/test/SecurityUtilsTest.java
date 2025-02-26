@@ -48,13 +48,13 @@ public class SecurityUtilsTest {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityUtilsTest.class);
 	private static String BANNER = "-------------------------------------------------------";
 	private static String FRIENDLY_ATTR_NAME = "mail";
-	private static String ATTR_NAME = "urn:oid:0.9.2342.19200300.100.1.3";
+	private static String ATTR_NAME = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
 	private static String ATTR_NAME_FORMAT = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri";
 	private static String EMAIL_ADDRESS = "example@example.org";
 	private void testBanner(String msg) {      
         logger.info("\r" + BANNER + "\r\n" + this.getClass().getName() + "\r\n" + msg + "\r\n" + BANNER);
     }
-	/*
+	
 	private String xml2String(XMLObject xmlObject) {
 		Element element = null;
 		String xmlString = "<uninitialized>";
@@ -85,7 +85,7 @@ public class SecurityUtilsTest {
         
         return xmlString;
 	}
-	*/
+	
 	private <T extends SAMLObject> T createNewSAMLObject(Class<T> clazz) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
     	XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
     	QName defaultElementName = (QName) clazz.getDeclaredField("DEFAULT_ELEMENT_NAME").get(null);
@@ -191,6 +191,8 @@ public class SecurityUtilsTest {
 			logger.error("Could not create test assertion with untyped attribute values: " + e.getLocalizedMessage(), e);
 			throw e;
 		}
+		System.out.println(xml2String(testAssertionTypedAttributeValues));
+		System.out.println(xml2String(testAssertionUntypedAttributeValues));
     }
     
     @Test
@@ -218,5 +220,21 @@ public class SecurityUtilsTest {
 		Assert.assertNotNull(candidateUsernames);
 		if(null != candidateUsernames)
 			Assert.assertFalse(candidateUsernames.isEmpty());
+    }
+    @Test(dependsOnMethods = {"assertionWithUntypedAttributeValuesIsNotNull"})
+    public void candidateUsernamesUntypedIsCorrect() {
+    	testBanner("findSamlAssertionCandidateUsernames finds candidate usernames when they are not typed");
+    	Set<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(testAssertionUntypedAttributeValues, null);
+		Assert.assertNotNull(candidateUsernames);
+		if(null != candidateUsernames)
+			Assert.assertEquals(candidateUsernames.iterator().next(),EMAIL_ADDRESS);
+    }
+    @Test(dependsOnMethods = {"assertionWithTypedAttributeValuesIsNotNull"})
+    public void candidateUsernamesTypedIsCorrect() {
+    	testBanner("findSamlAssertionCandidateUsernames finds candidate usernames when they are typed as string");
+    	Set<String> candidateUsernames = SecurityUtils.findSamlAssertionCandidateUsernames(testAssertionTypedAttributeValues, null);
+		Assert.assertNotNull(candidateUsernames);
+		if(null != candidateUsernames)
+			Assert.assertEquals(candidateUsernames.iterator().next(),EMAIL_ADDRESS);
     }
 }
