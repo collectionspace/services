@@ -51,20 +51,6 @@ public class ServicesConfigReaderImplTest {
 	private void testBanner(String msg) {      
         logger.info("\r" + BANNER + "\r\n" + this.getClass().getName() + "\r\n" + msg + "\r\n" + BANNER);
     }
-	
-	// the tests are below
-	private ServiceConfig serviceConfig = null;
-	@BeforeSuite
-	public void setup() throws JAXBException {
-		ServicesConfigReaderImpl rdr = new ServicesConfigReaderImpl(MOCK_ROOT_DIR);
-		ByteArrayInputStream in = new ByteArrayInputStream(SSO_CONFIG_STRING.getBytes());
-		try {
-			serviceConfig = (ServiceConfig) rdr.parse(in, ServiceConfig.class);
-		} catch (JAXBException e) {
-			logger.warn("Could not create test service config: " + e.getLocalizedMessage());
-			throw e;
-		}
-	}
 	private List<AssertionAttributeProbeType> getUserNameProbesFromConfig() {
 		return getUserNameProbesFromConfig(serviceConfig);
 	}
@@ -98,6 +84,19 @@ public class ServicesConfigReaderImplTest {
 		}
 		
 		return up;
+	}
+	// the tests are below
+	private ServiceConfig serviceConfig = null;
+	@BeforeSuite
+	public void setup() throws JAXBException {
+		ServicesConfigReaderImpl rdr = new ServicesConfigReaderImpl(MOCK_ROOT_DIR);
+		ByteArrayInputStream in = new ByteArrayInputStream(SSO_CONFIG_STRING.getBytes());
+		try {
+			serviceConfig = (ServiceConfig) rdr.parse(in, ServiceConfig.class);
+		} catch (JAXBException e) {
+			logger.warn("Could not create test service config: " + e.getLocalizedMessage());
+			throw e;
+		}
 	}
 	@Test
 	public void usernameProbesNotNullOrEmpty() {
