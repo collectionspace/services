@@ -50,38 +50,6 @@ public class SecurityUtilsTest {
 	private void testBanner(String msg) {      
         logger.info("\r" + BANNER + "\r\n" + this.getClass().getName() + "\r\n" + msg + "\r\n" + BANNER);
     }
-	
-	private String xml2String(XMLObject xmlObject) {
-		Element element = null;
-		String xmlString = "<uninitialized>";
-        try {
-            Marshaller out = XMLObjectProviderRegistrySupport.getMarshallerFactory().getMarshaller(xmlObject);
-            out.marshall(xmlObject);
-            element = xmlObject.getDOM();
-
-        } catch (MarshallingException e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
-        }
-
-        try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            StreamResult result = new StreamResult(new java.io.StringWriter());
-            
-            transformer.transform(new DOMSource(element), result);
-            xmlString = result.getWriter().toString();
-        } catch (TransformerConfigurationException e) {
-        	logger.error("Transformer configuration exception: " + e.getLocalizedMessage());
-            e.printStackTrace();
-        } catch (TransformerException e) {
-        	logger.error("Exception in transformer: " + e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-        
-        return xmlString;
-	}
-	
 	private <T extends SAMLObject> T createNewSAMLObject(Class<T> clazz) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
     	XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
     	QName defaultElementName = (QName) clazz.getDeclaredField("DEFAULT_ELEMENT_NAME").get(null);
@@ -187,8 +155,6 @@ public class SecurityUtilsTest {
 			logger.error("Could not create test assertion with untyped attribute values: " + e.getLocalizedMessage(), e);
 			throw e;
 		}
-		System.out.println(xml2String(testAssertionTypedAttributeValues));
-		System.out.println(xml2String(testAssertionUntypedAttributeValues));
     }
     
     @Test
