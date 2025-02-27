@@ -3,26 +3,16 @@ package org.collectionspace.services.common.test;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.joda.time.DateTime;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
-import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.XMLObjectBuilder;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistry;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
-import org.opensaml.core.xml.io.Marshaller;
-import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.common.SAMLObject;
@@ -38,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-import org.w3c.dom.Element;
 
 public class SecurityUtilsTest {
 	private static final Logger logger = LoggerFactory.getLogger(SecurityUtilsTest.class);
