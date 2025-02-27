@@ -71,11 +71,15 @@ public class AbstractSecurityTestBase {
 		
     	return testAssertion;
     }
-	protected Attribute createAttribute(boolean hasTypedAttributeValues) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	protected Attribute createAttribute(
+			boolean hasTypedAttributeValues,
+			String attributeName,
+			String attributeNameFormat
+		) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 		Attribute attr = createNewSAMLObject(Attribute.class);
 		attr.setFriendlyName(FRIENDLY_ATTR_NAME);
-		attr.setName(ATTR_NAME);
-		attr.setNameFormat(ATTR_NAME_FORMAT);
+		attr.setName(attributeName);
+		attr.setNameFormat(attributeNameFormat);
 		if(hasTypedAttributeValues) {
 			XSString attrValue = createNewXSString(EMAIL_ADDRESS);
 			attr.getAttributeValues().add(attrValue);
@@ -86,32 +90,28 @@ public class AbstractSecurityTestBase {
 		}
 		
 		return attr;
+	}
+	protected Attribute createDefaultAttribute(boolean hasTypedAttributeValues) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+		return createAttribute(hasTypedAttributeValues, ATTR_NAME, ATTR_NAME_FORMAT);
     }
-	protected Assertion createTestAssertionTypedAttributeValues() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+	protected Assertion createTestAssertion(Attribute attribute) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 		Assertion testAssertion = createTestAssertionNoAttributes();
-
-		Attribute attr = createAttribute(true);
 		
 		AttributeStatement attrStmt = createNewSAMLObject(AttributeStatement.class);
-		attrStmt.getAttributes().add(attr);
+		attrStmt.getAttributes().add(attribute);
 		testAssertion.getAttributeStatements().add(attrStmt);
     	
 		return testAssertion;
+	}
+	protected Assertion createTestAssertionTypedAttributeValues() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+		return createTestAssertion(createDefaultAttribute(true));
     }
 	protected Assertion createTestAssertionUntypedAttributeValues() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		Assertion testAssertion = createTestAssertionNoAttributes();
-
-		Attribute attr = createAttribute(false);
-		
-		AttributeStatement attrStmt = createNewSAMLObject(AttributeStatement.class);
-		attrStmt.getAttributes().add(attr);
-		testAssertion.getAttributeStatements().add(attrStmt);
-    	
-		return testAssertion;
+		return createTestAssertion(createDefaultAttribute(false));
     }
+	
     protected Assertion testAssertionTypedAttributeValues = null;
     protected Assertion testAssertionUntypedAttributeValues = null;
-	
     @BeforeSuite
     private void setup() throws InitializationException,NoSuchFieldException,IllegalAccessException {
     	// try to set up openSAML
