@@ -1,7 +1,12 @@
 package org.collectionspace.services.common.test;
 
+import java.io.ByteArrayInputStream;
+
+import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
+import org.collectionspace.services.config.ServiceConfig;
 import org.joda.time.DateTime;
 import org.opensaml.core.config.ConfigurationService;
 import org.opensaml.core.config.InitializationException;
@@ -31,7 +36,55 @@ public class AbstractSecurityTestBase {
 	protected static String ATTR_NAME = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
 	protected static String ATTR_NAME_FORMAT = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri";
 	protected static String EMAIL_ADDRESS = "example@example.org";
-
+	protected static final String USERNAME_ATTRIBUTE = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
+	protected static final String SSOID_ATTRIBUTE = "http://schemas.auth0.com/identifier";
+	protected static final String SSO_CONFIG_STRING = createDefaultTestConfig();
+	protected static String createDefaultTestConfig() {
+		return createTestConfig(USERNAME_ATTRIBUTE, SSOID_ATTRIBUTE);
+	}
+	protected static String createTestConfig(String usernameAttribute, String ssoAttribute) {
+		return new StringBuilder()
+				.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+				.append("<svc:service-config xmlns:svc='http://collectionspace.org/services/config'>")
+				.append("<security>")
+				.append("<sso>")
+				.append("<saml>")
+				.append("<single-logout />")
+				.append("<relying-party-registrations>")
+				.append("<relying-party id=\"auth0\">")
+				.append("<name>Auth0 - Scenario 11</name>")
+				.append("<icon location=\"https://cdn.auth0.com/manhattan/versions/1.4478.0/assets/badge.png\" />")
+				.append("<metadata location=\"https://dev-cf0ltyyfory6gtqm.us.auth0.com/samlp/metadata/ZXtZfEN0mj96GP8LCmEUWcpuDO0OtqKY\" />")
+				.append("<assertion-username-probes>")
+				.append("<attribute name=\"" + usernameAttribute + "\" />")
+				.append("</assertion-username-probes>")
+				.append("<assertion-sso-id-probes>")
+				.append("<attribute name=\"" + ssoAttribute + "\" />")
+				.append("</assertion-sso-id-probes>")
+				.append("</relying-party>")
+				.append("</relying-party-registrations>")
+				.append("</saml>")
+				.append("</sso>\n")
+				.append("</security>")
+				.append("</svc:service-config>")
+				.toString();
+	}
+	protected static final String MOCK_ROOT_DIR = "./";
+    protected ServiceConfig parseServiceConfigString() throws JAXBException {
+    	return parseServiceConfigString(MOCK_ROOT_DIR, SSO_CONFIG_STRING);
+    }
+	protected ServiceConfig parseServiceConfigString(String mockRootDir, String seviceConfigString) throws JAXBException {
+		ServicesConfigReaderImpl rdr = new ServicesConfigReaderImpl(mockRootDir);
+		ByteArrayInputStream in = new ByteArrayInputStream(seviceConfigString.getBytes());
+		try {
+			serviceConfig = (ServiceConfig) rdr.parse(in, ServiceConfig.class);
+		} catch (JAXBException e) {
+			logger.warn("Could not create test service config: " + e.getLocalizedMessage());
+			throw e;
+		}
+		return serviceConfig;
+	}
+	
 	/* for mocking useful SAML objects */
 	protected <T extends SAMLObject> T createNewSAMLObject(Class<T> clazz) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
     	XMLObjectBuilderFactory builderFactory = XMLObjectProviderRegistrySupport.getBuilderFactory();
@@ -71,7 +124,7 @@ public class AbstractSecurityTestBase {
 		
     	return testAssertion;
     }
-	protected Attribute createAttribute(
+	protected Attribute createTestAttribute(
 			boolean hasTypedAttributeValues,
 			String attributeName,
 			String attributeNameFormat
@@ -91,8 +144,8 @@ public class AbstractSecurityTestBase {
 		
 		return attr;
 	}
-	protected Attribute createDefaultAttribute(boolean hasTypedAttributeValues) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		return createAttribute(hasTypedAttributeValues, ATTR_NAME, ATTR_NAME_FORMAT);
+	protected Attribute createDefaultTestAttribute(boolean hasTypedAttributeValues) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
+		return createTestAttribute(hasTypedAttributeValues, ATTR_NAME, ATTR_NAME_FORMAT);
     }
 	protected Assertion createTestAssertion(Attribute attribute) throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 		Assertion testAssertion = createTestAssertionNoAttributes();
@@ -104,17 +157,19 @@ public class AbstractSecurityTestBase {
 		return testAssertion;
 	}
 	protected Assertion createTestAssertionTypedAttributeValues() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		return createTestAssertion(createDefaultAttribute(true));
+		return createTestAssertion(createDefaultTestAttribute(true));
     }
 	protected Assertion createTestAssertionUntypedAttributeValues() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
-		return createTestAssertion(createDefaultAttribute(false));
+		return createTestAssertion(createDefaultTestAttribute(false));
     }
 	
+	/* test suite setup below */
     protected Assertion testAssertionTypedAttributeValues = null;
     protected Assertion testAssertionUntypedAttributeValues = null;
+    protected ServiceConfig serviceConfig = null;
     @BeforeSuite
-    private void setup() throws InitializationException,NoSuchFieldException,IllegalAccessException {
-    	// try to set up openSAML
+    protected void setup() throws InitializationException,NoSuchFieldException,IllegalAccessException, JAXBException {
+    	/* try to set up openSAML */
 		XMLObjectProviderRegistry registry = new XMLObjectProviderRegistry();
 		ConfigurationService.register(XMLObjectProviderRegistry.class, registry);
 		try {
@@ -137,5 +192,8 @@ public class AbstractSecurityTestBase {
 			logger.error("Could not create test assertion with untyped attribute values: " + e.getLocalizedMessage(), e);
 			throw e;
 		}
+		
+		/* try to set up mock config */
+		serviceConfig = parseServiceConfigString();
     }
 }
