@@ -873,6 +873,27 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>pl.project13.maven</groupId>
+				<artifactId>git-commit-id-plugin</artifactId>
+				<version>4.9.10</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>revision</goal>
+						</goals>
+						<phase>initialize</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<generateGitPropertiesFile>true</generateGitPropertiesFile>
+					<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
+					<includeOnlyProperties>
+							<includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>
+						</includeOnlyProperties>
+						<commitIdGenerationMode>full</commitIdGenerationMode>
+					</configuration>
+				</plugin>
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
