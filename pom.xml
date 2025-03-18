@@ -385,6 +385,7 @@
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version> <!-- Most recent version is 3.0.0 -->
+				<inherited>false</inherited>
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
