@@ -121,7 +121,7 @@ public abstract class AbstractConfigReaderImpl<T> implements ConfigReader<T> {
 		return getFileChildren(rootDir, true);
 	}
 
-	protected Object parse(File configFile, Class<?> clazz)
+	public Object parse(File configFile, Class<?> clazz)
 			throws FileNotFoundException, JAXBException {
 		Object result = null;
 
@@ -144,7 +144,7 @@ public abstract class AbstractConfigReaderImpl<T> implements ConfigReader<T> {
 	 * @throws JAXBException
 	 * @throws Exception
 	 */
-	protected Object parse(InputStream configFileStream, Class<?> clazz)
+	public Object parse(InputStream configFileStream, Class<?> clazz)
 			throws JAXBException {
 		Object result = null;
 

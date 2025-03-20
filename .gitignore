@@ -24,3 +24,4 @@ bin
 *.diff
 logged_schemas
 logs
+.mvn
