@@ -52,6 +52,7 @@
 	<modules>
 		<module>3rdparty</module>
 		<module>services</module>
+		<module>common-lib</module>
 	</modules>
 
 	<repositories>

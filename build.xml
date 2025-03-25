@@ -301,8 +301,9 @@
 			<fileset dir="${src}/main/resources/scripts/" />
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false" />
+		<ant antfile="common-lib/build.xml" target="deploy" inheritAll="false" />
 		<ant antfile="services/build.xml" target="deploy" inheritAll="false" />
-	    <ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
+		<ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
 	</target>
 
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
