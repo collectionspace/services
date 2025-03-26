@@ -1,0 +1,17 @@
+<project name="common" default="package" basedir=".">
+    <description>Collectionspace Services common libraries</description>
+    <property environment="env" />
+
+    <target name="deploy">
+        <fail unless="env.CSPACE_JEESERVER_HOME" message="CSPACE_JEESERVER_HOME is not set" />
+        <property name="tomcat.lib" value="${env.CSPACE_JEESERVER_HOME}/lib" />
+
+        <exec executable="mvn" failonerror="true">
+            <arg value="dependency:copy-dependencies" />
+            <arg value="-DoutputDirectory=${tomcat.lib}" />
+            <arg value="-DexcludeTransitive=true" />
+            <arg value="-DincludeScope=compile" />
+        </exec>
+    </target>
+
+</project>

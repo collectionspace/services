@@ -35,6 +35,7 @@
 	<modules>
 		<module>config</module>
 		<module>common-api</module>
+		<module>common-lib</module>
 		<module>authentication</module>
 		<module>authorization-common</module>
 		<module>authorization</module>
