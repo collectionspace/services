@@ -187,24 +187,26 @@
             description="deploy common elements in ${jee.server.cspace}">
         <copy file="${basedir}/target/${common.jar}" todir="${jee.server.cspace}/lib"/>
 
+<!--
         <antcall target="deploy_nuxeo" />
         <antcall target="deploy_aspectj" />
         <antcall target="deploy_gateway" />
         <antcall target="deploy_spring" />
         <antcall target="deploy_slf4j" />
         <antcall target="deploy_xmlmerge" />
+-->
         <antcall target="deploy_tenantconfig" />
     </target>
 
     <target name="undeploy"
             description="undeploy common elements from ${jee.server.cspace}">
+		<!--
         <antcall target="undeploy_nuxeo" />
         <antcall target="undeploy_aspectj" />
         <antcall target="undeploy_gateway" />
         <antcall target="undeploy_spring" />
 		<antcall target="undeploy_slf4j" />
 		<antcall target="undeploy_xmlmerge" />
-		<!--
         <copy tofile="${jee.server.cspace}/conf/jboss-log4j.xml"
               file="${jee.server.cspace}/conf/jboss-log4j.xml.org"
               overwrite="true" failonerror="false" />
