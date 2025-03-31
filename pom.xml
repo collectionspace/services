@@ -708,7 +708,7 @@
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>stax2-api</artifactId>
-				<version>4.0.0</version>
+				<version>3.1.4</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.santuario</groupId>
