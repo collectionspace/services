@@ -14,4 +14,30 @@
         </exec>
     </target>
 
+    <target name="undeploy">
+        <fail unless="env.CSPACE_JEESERVER_HOME" message="CSPACE_JEESERVER_HOME is not set" />
+        <property name="tomcat.lib" value="${env.CSPACE_JEESERVER_HOME}/lib" />
+
+        <!-- Not the prettiest way to do this, but we want to clear out all of our deployed
+             dependencies from the tomcat/lib. So create an exclusion set of the base tomcat lib. -->
+        <patternset id="tomcat-base-files">
+            <exclude name="annotations-api.jar" />
+            <exclude name="el-api.jar" />
+            <exclude name="jaspic-api.jar" />
+            <exclude name="jsp-api.jar" />
+            <exclude name="servlet-api.jar" />
+            <exclude name="websocket-api.jar" />
+            <exclude name="catalina*.jar" />
+            <exclude name="ecj-*.jar" />
+            <exclude name="jasper*jar" />
+            <exclude name="tomcat-*.jar" />
+        </patternset>
+
+        <delete>
+            <fileset dir="${tomcat.lib}">
+                <include name="*.jar" />
+                <patternset refid="tomcat-base-files" />
+            </fileset>
+        </delete>
+    </target>
 </project>
