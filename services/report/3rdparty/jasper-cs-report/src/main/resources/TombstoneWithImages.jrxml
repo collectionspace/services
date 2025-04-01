@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.17.0.final using JasperReports Library version 6.17.0-6d93193241dd8cc42629e188b94f9e0bc5722efd  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="GroupWithImages" pageWidth="612" pageHeight="792" columnWidth="540" leftMargin="36" rightMargin="36" topMargin="0" bottomMargin="18" uuid="6ff7d5f1-1ce4-458e-bc9c-a91b39731abf">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Tunnel to CSpace Prod"/>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Object CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="groupcsid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Group CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Group CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="objcsids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "'NOVALUE'"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  cc.objectnumber AS idNumber,
+  tg.title AS title,
+  ng.objectname AS objectName,
+  regexp_replace(pp.objectproductionperson, '^.*\)''(.*)''$', '\1') AS prodPerson,
+  regexp_replace(po.objectproductionorganization, '^.*\)''(.*)''$', '\1') AS prodOrg,
+  pd.datedisplaydate AS prodDate,
+  mpg.dimensionsummary AS dimensionsSum,
+  cc.editionnumber AS editionNum,
+  regexp_replace(nc.item, '^.*\)''(.*)''$', '\1') AS namedCollection,
+  regexp_replace(cc.computedcurrentlocation, '^.*\)''(.*)''$', '\1') AS compCurrLocation,
+  (SELECT 'https://core-dev.cspace.berkeley.edu/cspace-services/blobs/' || mc.blobcsid || '/derivatives/Small/content'
+    FROM relations_common rcmc
+    LEFT OUTER JOIN hierarchy hmc ON (hmc.name = rcmc.subjectcsid)
+    LEFT OUTER JOIN media_common mc ON (hmc.id = mc.id)
+    LEFT OUTER JOIN misc mmc ON (mmc.id = mc.id)
+    LEFT OUTER JOIN collectionspace_core csc ON (mc.id = csc.id)
+    WHERE hcc.name = rcmc.objectcsid
+    AND rcmc.subjectdocumenttype = 'Media'
+    AND mmc.lifecyclestate <> 'deleted'
+    ORDER BY csc.updatedat DESC LIMIT 1) AS imageFilepath
+
+FROM collectionobjects_common cc
+
+JOIN hierarchy hcc on (cc.id = hcc.id)
+
+LEFT OUTER JOIN collectionobjects_common_namedcollections nc on (cc.id = nc.id and nc.pos = 0)
+
+LEFT OUTER JOIN hierarchy htg on (
+    cc.id = htg.parentid AND htg.primarytype = 'titleGroup' AND htg.pos = 0)
+LEFT OUTER JOIN titlegroup tg ON (htg.id = tg.id)
+
+LEFT OUTER JOIN hierarchy hng ON (
+    cc.id = hng.parentid AND hng.primarytype = 'objectNameGroup' AND hng.pos = 0)
+LEFT OUTER JOIN objectnamegroup ng ON (hng.id = ng.id)
+
+LEFT OUTER JOIN hierarchy hpp on (
+    cc.id = hpp.parentid AND hpp.primarytype = 'objectProductionPersonGroup' AND hpp.pos = 0)
+LEFT OUTER JOIN objectproductionpersongroup pp ON (hpp.id = pp.id)
+
+LEFT OUTER JOIN hierarchy hpo on (
+    cc.id = hpo.parentid AND hpo.primarytype = 'objectProductionOrganizationGroup' AND hpo.pos = 0)
+LEFT OUTER JOIN objectproductionorganizationgroup po ON (hpo.id = po.id)
+
+LEFT OUTER JOIN hierarchy hpd on (
+    cc.id = hpd.parentid AND hpd.name = 'collectionobjects_common:objectProductionDateGroupList' AND hpd.pos = 0)
+LEFT OUTER JOIN structureddategroup pd ON (hpd.id = pd.id)
+
+LEFT OUTER JOIN hierarchy hmpg on (
+    cc.id = hmpg.parentid AND hmpg.primarytype = 'measuredPartGroup' AND hmpg.pos = 0)
+LEFT OUTER JOIN measuredpartgroup mpg ON (hmpg.id = mpg.id)
+
+WHERE hcc.name = $P{csid}
+   OR hcc.name IN (SELECT objectcsid
+   		FROM relations_common
+		WHERE subjectdocumenttype = 'Group' and objectdocumenttype = 'CollectionObject'
+		AND subjectcsid = $P{groupcsid})
+   OR hcc.name in ($P!{objcsids})]]>
+	</queryString>
+	<field name="idNumber" class="java.lang.String"/>
+	<field name="title" class="java.lang.String"/>
+	<field name="objectName" class="java.lang.String"/>
+	<field name="prodPerson" class="java.lang.String"/>
+	<field name="prodOrg" class="java.lang.String"/>
+	<field name="prodDate" class="java.lang.String"/>
+	<field name="dimensionsSum" class="java.lang.String"/>
+	<field name="editionNum" class="java.lang.String"/>
+	<field name="namedCollection" class="java.lang.String"/>
+	<field name="compCurrLocation" class="java.lang.String"/>
+	<field name="imageFilepath" class="java.lang.String"/>
+	<pageHeader>
+		<band height="72" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="px"/>
+			<image hAlign="Right" vAlign="Middle" onErrorType="Icon">
+				<reportElement x="321" y="0" width="219" height="65" uuid="be38b8c5-e686-4e23-b82e-c46cfff991ea">
+					<property name="com.jaspersoft.studio.unit.width" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+				</reportElement>
+				<imageExpression><![CDATA["	https://www.lyrasis.org/programs/PublishingImages/collectionspace.png"]]></imageExpression>
+			</image>
+			<line>
+				<reportElement x="0" y="66" width="540" height="1" uuid="02e15f4a-ceaf-4553-9bce-cb52fa8ed3b1">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+			</line>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement x="0" y="0" width="197" height="65" uuid="c343be38-0fff-4456-83ba-9b2ed792d8ce">
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.height" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="215" splitType="Stretch">
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="2" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="dadbac2c-d86c-4c7c-9d00-ca6826875833">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Identification number:</b> " + $F{idNumber}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="22" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="3be0d646-c491-4848-9e6e-f06b806384bd">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Title:</b> " + $F{title}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="42" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="9faf4137-1862-4d3f-af5a-d7c7c5e3741a">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Object name:</b> " + $F{objectName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="62" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="df2eb990-29fa-4e5c-8273-c3bd829e4e03">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Object production person:</b> " + $F{prodPerson}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="82" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="b86de703-e2cb-4c16-85f5-17e4791e9d24">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Object production organization:</b> " + $F{prodOrg}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="102" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="51daf6fb-dade-428e-ba0b-895a32df87a3">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Object production date:</b> " + $F{prodDate}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="122" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="983983fb-6bf1-49c8-b4db-4b47c6389b05">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Dimensions summary:</b> " + $F{dimensionsSum}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="142" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="bdac1bc8-cffd-4233-8999-f527d47ae8e7">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Edition:</b> " + $F{editionNum}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="162" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="451895fa-4af9-4f5a-9e41-0f29728c6199">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Named collection:</b> " + $F{namedCollection}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement positionType="Float" x="0" y="182" width="340" height="20" isPrintWhenDetailOverflows="true" uuid="6f5c5bb0-b57c-44ae-8061-9b55bc38c0f2">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<textElement verticalAlignment="Middle" markup="html">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["<b>Computed current location:</b> " + $F{compCurrLocation}]]></textFieldExpression>
+			</textField>
+			<image hAlign="Center" vAlign="Middle" onErrorType="Icon">
+				<reportElement x="345" y="2" width="190" height="200" uuid="b47b794e-de72-4495-9b9b-b2fe2f5e48ba">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="px"/>
+				</reportElement>
+				<imageExpression><![CDATA[$F{imageFilepath}]]></imageExpression>
+			</image>
+			<line>
+				<reportElement positionType="Float" x="0" y="208" width="540" height="1" uuid="99d03057-e261-4ada-a2d6-ad2ffa9ee4a7">
+					<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.x" value="px"/>
+					<property name="com.jaspersoft.studio.unit.width" value="px"/>
+				</reportElement>
+			</line>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="17" splitType="Stretch">
+			<property name="com.jaspersoft.studio.unit.height" value="pixel"/>
+			<textField>
+				<reportElement x="201" y="5" width="80" height="12" uuid="dcfee607-094d-4d60-9ca6-392754b9647e"/>
+				<textElement textAlignment="Right">
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="281" y="5" width="40" height="12" uuid="02265e31-5016-457f-bf48-d00965fe2f0c">
+					<property name="com.jaspersoft.studio.unit.x" value="pixel"/>
+					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
