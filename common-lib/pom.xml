@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>common-lib</artifactId>
+  <packaging>pom</packaging>
 
   <dependencies>
     <!-- Nuxeo Runtime -->
