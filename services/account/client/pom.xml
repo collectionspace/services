@@ -42,11 +42,6 @@
         <!-- Needed if/when client test framework files are moved into -->
         <!-- /services/client/src/test from /services/client/src/main -->
 
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <scope>test</scope>
-        </dependency>
 				<dependency>
 						<groupId>org.postgresql</groupId>
 						<artifactId>postgresql</artifactId>
