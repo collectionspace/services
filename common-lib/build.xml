@@ -1,4 +1,4 @@
-<project name="common-lib" default="package" basedir=".">
+<project name="common-lib" default="deploy" basedir=".">
     <description>Collectionspace Services common libraries</description>
     <property environment="env" />
 
