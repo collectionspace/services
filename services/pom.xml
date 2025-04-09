@@ -17,6 +17,7 @@
 		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
+		<jaxb.codegen.phase>generate-sources</jaxb.codegen.phase>
 	</properties>
 
 	<!--
@@ -210,6 +211,8 @@
 					<version>${maven-jaxb2-plugin.version}</version>
 					<executions>
 						<execution>
+							<id>jaxb-codegen</id>
+							<phase>${jaxb.codegen.phase}</phase>
 							<goals>
 								<goal>generate</goal>
 							</goals>
