@@ -36,7 +36,7 @@
 	material.material, -- deurn
 	bd.item AS briefdescription,
 	comment.item AS comment,
-	publicart_collections.collections,
+	coalesce(publicart_collections.collections, '{}') as collections,
 	owners.item AS owner,
 	dimension.dimension,
 	obj.computedcurrentlocation,
