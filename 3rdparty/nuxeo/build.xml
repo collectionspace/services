@@ -115,6 +115,8 @@
                 <exclude name="**/config/proto-*-extension.xml"/>
             </fileset>
         </copy>
+        <ant antfile="nuxeo-server/build.xml" target="deploy" inheritall="false" />
+
         <echo message="Copying Nuxeo prototype repo config file ..."/>
         <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
             <fileset file="${basedir}/nuxeo-server/${nuxeo.release}/config/proto-repo-config.xml"/>
