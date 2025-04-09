@@ -10,7 +10,7 @@
 	<name>services</name>
 
 	<properties>
-		<revision>8.1.1</revision>
+		<revision>8.2.0-SNAPSHOT</revision>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>${revision}</cspace.services.version>
 		<cspace.services.client.version>${revision}</cspace.services.client.version>
@@ -227,29 +227,6 @@
 						</archive>
 					</configuration>
 				</plugin>
-
-				<plugin>
-					<groupId>pl.project13.maven</groupId>
-					<artifactId>git-commit-id-plugin</artifactId>
-					<version>4.9.10</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>revision</goal>
-							</goals>
-							<phase>initialize</phase>
-						</execution>
-					</executions>
-					<configuration>
-						<generateGitPropertiesFile>true</generateGitPropertiesFile>
-						<generateGitPropertiesFilename>${project.build.outputDirectory}/git.properties</generateGitPropertiesFilename>
-						<includeOnlyProperties>
-							<includeOnlyProperty>^git.commit.id.abbrev$</includeOnlyProperty>
-						</includeOnlyProperties>
-						<commitIdGenerationMode>full</commitIdGenerationMode>
-					</configuration>
-				</plugin>
-
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
@@ -385,6 +362,7 @@
 			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<version>1.8</version> <!-- Most recent version is 3.0.0 -->
+				<inherited>false</inherited>
 				<executions>
 					<execution>
 						<id>check-environment-vars</id>
@@ -437,11 +415,6 @@
                     </files>
                 </configuration>
             </plugin>
-
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-			</plugin>
 		</plugins>
 	</build>
 
