@@ -133,18 +133,6 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.core</groupId>
-        <artifactId>nuxeo-core-redis</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.core</groupId>
-        <artifactId>nuxeo-core-mongodb</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.core</groupId>
         <artifactId>nuxeo-core-storage</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -162,26 +150,8 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo.lib.core</groupId>
-        <artifactId>nuxeo-core-storage-sql-extensions</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.nuxeo.ecm.core</groupId>
         <artifactId>nuxeo-core-storage-dbs</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.core</groupId>
-        <artifactId>nuxeo-core-storage-mongodb</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.core</groupId>
-        <artifactId>nuxeo-core-storage-mem</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -254,85 +224,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-audit-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-audit-io</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-audit-ws</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.localconf</groupId>
-        <artifactId>nuxeo-localconf-simple</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-audit-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-audit-mongodb</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-commandline-executor</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-types-contrib</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-ldap</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-sql</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-multi</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-directory-mongodb</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -374,19 +266,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-web-common</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-login-token</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-login-token-rest</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -404,42 +284,6 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-relations-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-relations-default-config</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-relations-core-listener</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-relations-io</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-usermanager-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-usermanager-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-versioning-api</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -447,12 +291,6 @@
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-versioning-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-content-template-manager</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -470,12 +308,6 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-rendering</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-lang</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -483,12 +315,6 @@
       <dependency>
         <groupId>org.nuxeo</groupId>
         <artifactId>nuxeo-platform-lang-ext</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-preview-core</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -502,18 +328,6 @@
       <dependency>
         <groupId>org.nuxeo.ecm.automation</groupId>
         <artifactId>nuxeo-automation-io</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.automation</groupId>
-        <artifactId>nuxeo-automation-scripting</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-ws</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -537,98 +351,8 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo.elasticsearch</groupId>
-        <artifactId>nuxeo-elasticsearch-audit</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.elasticsearch</groupId>
-        <artifactId>nuxeo-elasticsearch-automation</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.elasticsearch</groupId>
-        <artifactId>nuxeo-elasticsearch-http-read-only</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.elasticsearch</groupId>
-        <artifactId>nuxeo-elasticsearch-seqgen</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-invite</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-permissions</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-collections-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-comment-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-comment</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-comment-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-comment-workflow</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-forms-layout-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-forms-layout-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-forms-layout-io</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-forms-layout-io-plugins</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-forms-layout-export</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -641,30 +365,6 @@
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-oauth</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-publisher-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-publisher-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-publisher-core-contrib</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-publisher-task</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -689,18 +389,6 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-rendition-publisher</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-suggestbox-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-tag-api</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -720,24 +408,6 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-task-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-task-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-task-automation</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-url-api</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -745,108 +415,6 @@
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-url-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-userworkspace-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-userworkspace-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-userworkspace-types</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-webapp-types</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.routing</groupId>
-        <artifactId>nuxeo-routing-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.routing</groupId>
-        <artifactId>nuxeo-routing-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.routing</groupId>
-        <artifactId>nuxeo-routing-rest-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.routing</groupId>
-        <artifactId>nuxeo-routing-default</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-thumbnail</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-user-profile</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-web-resources-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-web-resources-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-web-resources-wro</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-web-resources-rest</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.webengine</groupId>
-        <artifactId>nuxeo-webengine-invite</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-search-rest-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-admin-center-core</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -861,55 +429,6 @@
       <dependency>
         <groupId>org.nuxeo.ecm.core</groupId>
         <artifactId>nuxeo-opencmis-bindings</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <!-- WebDAV -->
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-webdav</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-pdf-utils</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-rest-api-io</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-rest-api-server</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-connect-update</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-connect-client-wrapper</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.connect.tools</groupId>
-        <artifactId>nuxeo-connect-tools-report-core</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -946,8 +465,8 @@
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-importer-stream</artifactId>
-          <version>${nuxeo.general.release}</version>
-          <scope>runtime</scope>
+        <version>${nuxeo.general.release}</version>
+        <scope>runtime</scope>
       </dependency>
 
       <dependency>
