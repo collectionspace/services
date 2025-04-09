@@ -109,6 +109,7 @@
 
     <target name="deploy" depends="package"
         description="deploy nuxeo server libs to ${jee.server.cspace}">
+        <ant antfile="nuxeo-server/build.xml" target="deploy" inheritall="false" />
         <copy todir="${jee.server.cspace}/nuxeo-server">
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
                 <exclude name="**/config/proto-*-config.xml"/>
@@ -117,7 +118,6 @@
                 <exclude name="**/lib/*.jar"/>
             </fileset>
         </copy>
-        <ant antfile="nuxeo-server/build.xml" target="deploy" inheritall="false" />
 
         <echo message="Copying Nuxeo prototype repo config file ..."/>
         <copy todir="${jee.server.cspace}/cspace/config/services" overwrite="true">
