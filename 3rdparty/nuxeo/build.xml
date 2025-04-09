@@ -113,6 +113,8 @@
             <fileset dir="${basedir}/nuxeo-server/${nuxeo.release}">
                 <exclude name="**/config/proto-*-config.xml"/>
                 <exclude name="**/config/proto-*-extension.xml"/>
+                <exclude name="**/bundles/*.jar"/>
+                <exclude name="**/lib/*.jar"/>
             </fileset>
         </copy>
         <ant antfile="nuxeo-server/build.xml" target="deploy" inheritall="false" />
