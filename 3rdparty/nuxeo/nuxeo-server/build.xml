@@ -11,6 +11,7 @@
     <target name="deploy-bundles" depends="check-env">
         <property name="nuxeo.bundles" value="${env.CSPACE_JEESERVER_HOME}/nuxeo-server/bundles" />
 
+        <!-- use includeGroupIds in order to only deploy nuxeo dependencies -->
         <exec executable="mvn" failonerror="true">
             <arg value="dependency:copy-dependencies" />
             <arg value="-DoutputDirectory=${nuxeo.bundles}" />
@@ -22,11 +23,12 @@
     <target name="deploy-libs" depends="check-env">
         <property name="nuxeo.lib" value="${env.CSPACE_JEESERVER_HOME}/nuxeo-server/lib" />
 
+        <!-- use excludeGroupIds in order ignore nuxeo, logging, and other misc dependencies -->
         <exec executable="mvn" failonerror="true">
             <arg value="dependency:copy-dependencies" />
             <arg value="-DoutputDirectory=${nuxeo.lib}" />
             <arg value="-DincludeScope=runtime" />
-            <arg value="-DexcludeGroupIds=org.nuxeo,org.sl4j,junit,log4j,org.apache.logging.log4j,javax.el" />
+            <arg value="-DexcludeGroupIds=org.nuxeo,org.sl4j,junit,log4j,org.apache.logging.log4j" />
         </exec>
     </target>
 </project>
