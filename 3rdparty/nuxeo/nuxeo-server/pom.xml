@@ -528,6 +528,13 @@
         <artifactId>nuxeo-binary-metadata</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
+        <!-- el-api is provided by Tomcat -->
+        <exclusions>
+          <exclusion>
+            <groupId>javax.el</groupId>
+            <artifactId>el-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.nuxeo.elasticsearch</groupId>
