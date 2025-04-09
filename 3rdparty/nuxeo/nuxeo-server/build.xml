@@ -1,11 +1,15 @@
-<project name="common-lib" default="package" basedir=".">
+<project name="nuxeo-server" default="deploy" basedir=".">
     <description>Collectionspace Services - Nuxeo Server</description>
     <property environment="env" />
 
-    <target name="deploy">
+    <target name="deploy" depends="deploy-bundles,deploy-libs" />
+
+    <target name="check-env">
         <fail unless="env.CSPACE_JEESERVER_HOME" message="CSPACE_JEESERVER_HOME is not set" />
+    </target>
+
+    <target name="deploy-bundles" depends="check-env">
         <property name="nuxeo.bundles" value="${env.CSPACE_JEESERVER_HOME}/nuxeo-server/bundles" />
-        <property name="nuxeo.lib" value="${env.CSPACE_JEESERVER_HOME}/nuxeo-server/lib" />
 
         <exec executable="mvn" failonerror="true">
             <arg value="dependency:copy-dependencies" />
@@ -13,8 +17,11 @@
             <arg value="-DincludeScope=runtime" />
             <arg value="-DincludeGroupIds=org.nuxeo" />
         </exec>
+    </target>
 
-        <!-- TODO: jackson-core needs to be excluded either here or in the pom -->
+    <target name="deploy-libs" depends="check-env">
+        <property name="nuxeo.lib" value="${env.CSPACE_JEESERVER_HOME}/nuxeo-server/lib" />
+
         <exec executable="mvn" failonerror="true">
             <arg value="dependency:copy-dependencies" />
             <arg value="-DoutputDirectory=${nuxeo.lib}" />
