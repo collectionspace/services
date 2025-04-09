@@ -21,12 +21,4 @@
         <module>nuxeo-server</module>
     </modules>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.core</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-    </dependencies>
-
 </project>
