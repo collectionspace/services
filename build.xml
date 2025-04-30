@@ -216,10 +216,12 @@
 
 	<!--
 		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
+		and creates some database utility functions
 	-->
 	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
+		<antcall target="create_update_userid_db_function" />
 	</target>
 
 	<!--
@@ -271,6 +273,15 @@
 	<target name="drop_cspace_db" if="${create_db.recreate}" description="drop cspace database">
 		<echo>Dropping the cspace database with user ${db.csadmin.user}</echo>
 		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/drop_cspace_db.sql">
+			<classpath>
+				<pathelement path="${db.driver.jar}" />
+			</classpath>
+		</sql>
+	</target>
+
+	<target name="create_update_userid_db_function" description="create the update_userid function in postgres">
+		<echo>Creating the update_userid function in postgres</echo>
+		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.csadmin.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/update_userid_function.sql">
 			<classpath>
 				<pathelement path="${db.driver.jar}" />
 			</classpath>
