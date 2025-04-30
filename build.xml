@@ -309,7 +309,7 @@
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
 		<mkdir dir="${jee.server.cspace}/cspace/services/db/postgresql"/>
 		<copy todir="${jee.server.cspace}/cspace/services/db/postgresql">
-			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="drop_cspace_db.sql, init_cspace_db.sql, drop_nuxeo_db.sql">
+			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="drop_cspace_db.sql, init_cspace_db.sql, drop_nuxeo_db.sql, update_userid_function.sql">
 				<present targetdir="${src}/main/resources/db/postgresql" />
 			</fileset>
 			<globmapper from="*" to="*.bak" />
