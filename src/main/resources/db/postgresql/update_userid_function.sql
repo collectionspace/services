@@ -1,0 +1,1 @@
+CREATE OR REPLACE FUNCTION update_userid(old_userid VARCHAR, new_userid VARCHAR) RETURNS VOID AS $BODY$ BEGIN UPDATE accounts_common SET userid = new_userid WHERE userid = old_userid; UPDATE users SET username = new_userid WHERE username = old_userid; UPDATE accounts_roles SET user_id = new_userid WHERE user_id = old_userid; END $BODY$ LANGUAGE plpgsql;
