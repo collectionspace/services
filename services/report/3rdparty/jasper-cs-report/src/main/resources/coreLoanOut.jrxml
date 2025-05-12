@@ -28,7 +28,7 @@ loc.loanReturnDate loanReturnDate,
 loc.loanOutNote loanOutNote,
 h1.name AS "csid",
 co.objectnumber AS "objectnumber",
-co.fieldcollectionplace AS site,
+fieldcollectionplace.item AS site,
 ong.objectName AS "objectname",
 bd.item AS description,
 oppp.objectproductionpeople as productionpeople
@@ -40,6 +40,7 @@ LEFT OUTER JOIN collectionobjects_common co ON (h2.id=co.id)
 LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
 LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
 LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
+LEFT OUTER JOIN collectionobjects_common_fieldcollectionplaces fieldcollectionplace ON (fieldcollectionplace.id = co.id AND fieldcollectionplace.pos = 0)
 left outer join hierarchy h4 on (co.id=h4.parentid and h4.pos=0 and h4.name='collectionobjects_common:objectProductionPeopleGroupList')
 left outer join objectproductionpeoplegroup oppp on (oppp.id=h4.id)
 LEFT OUTER JOIN misc m ON (m.id = co.id)
