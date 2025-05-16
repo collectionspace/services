@@ -75,6 +75,10 @@
 						<service:key>sqlScriptName</service:key>
 						<service:value>unaccent_text_search_configuration.sql</service:value>
 					</service:property>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>deurn_function.sql</service:value>
+					</service:property>
 				</service:params>
 			</service:initHandler>
 		</tenant:serviceBindings>
