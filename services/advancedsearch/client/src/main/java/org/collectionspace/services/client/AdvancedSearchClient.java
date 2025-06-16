@@ -14,12 +14,12 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.consultation.ConsultationsCommon;
+import org.collectionspace.services.advancedsearch.AdvancedsearchCommon;
 
 /**
  * ConsultationClient.java
  */
-public class AdvancedSearchClient extends AbstractCommonListPoxServiceClientImpl<AdvancedSearchProxy, ConsultationsCommon> {
+public class AdvancedSearchClient extends AbstractCommonListPoxServiceClientImpl<AdvancedSearchProxy, AdvancedsearchCommon> {
 
     public static final String SERVICE_NAME = "advancedsearch";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
@@ -45,7 +45,7 @@ public class AdvancedSearchClient extends AbstractCommonListPoxServiceClientImpl
     }
 
     @Override
-    public Class<ConsultationProxy> getProxyClass() {
-        return ConsultationProxy.class;
+    public Class<AdvancedSearchProxy> getProxyClass() {
+        return AdvancedSearchProxy.class;
     }
 }

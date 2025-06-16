@@ -108,6 +108,7 @@
 		<module>security</module>
 		<module>login</module>
 		<module>logout</module>
+		<module>advancedsearch</module>
 		<module>JaxRsServiceProvider</module>
 	</modules>
 
