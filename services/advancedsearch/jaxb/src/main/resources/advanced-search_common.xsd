@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    AdvancedSearch schema (XSD)
+
+    Entity  : AdvancedSearch
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0" elementFormDefault="unqualified"
+  xmlns="http://collectionspace.org/services/advancedsearch"
+  targetNamespace="http://collectionspace.org/services/advancedsearch"
+  version="0.1"
+>
+
+  <xs:element name="advancedsearch_common">
+    <xs:element name="consultationNumber" type="xs:string" />
+  </xs:element>
+</xs:schema>
