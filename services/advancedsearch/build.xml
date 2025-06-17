@@ -103,4 +103,14 @@
       <arg value="${mvn.opts}" />
     </exec>
   </target>
+	
+	<target name="deploy" depends="install"
+	description="deploy advancedsearch in ${jee.server.nuxeo}">
+	    <!-- This target is obsolete -->
+	</target>
+
+    <target name="undeploy"
+    description="undeploy advancedsearch from ${jee.server.nuxeo}">
+        <!-- This target is obsolete --> 
+    </target>
 </project>
