@@ -25,9 +25,14 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.advancedsearch.client</artifactId>
-      <version>${project.version}</version>
+		<groupId>org.collectionspace.services</groupId>
+		<artifactId>org.collectionspace.services.advancedsearch.client</artifactId>
+		<version>${project.version}</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.collectionspace.services</groupId>
+    	<artifactId>org.collectionspace.services.collectionobject.service</artifactId>
+    	<version>${project.version}</version>
     </dependency>
 
     <!-- External dependencies -->
