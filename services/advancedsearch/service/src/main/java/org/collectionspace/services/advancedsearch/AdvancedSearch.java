@@ -10,13 +10,15 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.client.AdvancedSearchClient;
 //import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
+import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class AdvancedSearch {
+public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,String> {
 	private CollectionObjectResource cor = new CollectionObjectResource();
 	
 	@GET
@@ -26,6 +28,28 @@ public class AdvancedSearch {
 		AbstractCommonList foo = cor.getList(uriInfo);
 		
 		return results;
+	}
+
+	@Override
+	public Class<?> getCommonPartClass() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ServiceContextFactory<Integer, String> getServiceContextFactory() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getServiceName() {
+		return AdvancedSearchClient.SERVICE_NAME;
+	}
+
+	@Override
+	protected String getVersionString() {
+		return "0.01";
 	}
 	
 }
