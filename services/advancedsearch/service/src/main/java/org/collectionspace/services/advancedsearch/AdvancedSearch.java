@@ -11,6 +11,7 @@ import org.collectionspace.services.client.AdvancedSearchClient;
 //import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 
@@ -38,8 +39,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 
 	@Override
 	public ServiceContextFactory<Integer, String> getServiceContextFactory() {
-		// TODO Auto-generated method stub
-		return null;
+		return (ServiceContextFactory<Integer, String>) RemoteServiceContextFactory.get();
 	}
 
 	@Override
