@@ -1,5 +1,7 @@
 package org.collectionspace.services.advancedsearch; 
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -24,17 +26,14 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
-		AbstractCommonList results = null;
-		
+		AbstractCommonList results = new AbstractCommonList();
 		AbstractCommonList foo = cor.getList(uriInfo);
-		
 		return results;
 	}
 
 	@Override
 	public Class<?> getCommonPartClass() {
-		// TODO Auto-generated method stub
-		return null;
+		return AdvancedsearchCommon.class;
 	}
 
 	@Override

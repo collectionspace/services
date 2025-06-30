@@ -17,11 +17,45 @@
   version="0.1"
 >
 
-  <xs:element name="advancedsearch_common">
-    <xs:complexType>
-       <xs:sequence>
-       	<xs:element name="advancedSearchNumber" type="xs:string" />
-       </xs:sequence>
-    </xs:complexType>
-  </xs:element>
+  	<xs:complexType name="abstractCommonList">
+    	<xs:annotation>
+        	<xs:appinfo>
+            	<jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+        	</xs:appinfo>
+    	</xs:annotation>
+	</xs:complexType>
+  
+  	<xs:complexType name="responsibleDepartmentsList">
+  		<xs:sequence>
+            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
+            <xs:element name="csid" type="xs:string" minOccurs="1"/>
+            <xs:element name="refName" type="xs:string" minOccurs="1"/>
+            <xs:element name="name" type="xs:string" minOccurs="1"/>
+  		</xs:sequence>
+  	</xs:complexType>
+  
+    <xs:element name="advancedsearch-common-list">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="abstractCommonList">                    
+                    <xs:sequence>
+                         <xs:element name="advancedsearch-list-item" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                	<xs:element name="uri" type="xs:anyURI" minOccurs="1" />
+                                	<xs:element name="csid" type="xs:string" minOccurs="1" />
+                                	<xs:element name="objectId" type="xs:string" minOccurs="1" />
+                                	<xs:element name="objectName" type="xs:string" minOccurs="1" />
+                                	<xs:element name="objectTitle" type="xs:string" minOccurs="1" />
+                                	<xs:element name="computedCurrentLocation" type="xs:string" minOccurs="1" />
+                                	<xs:element name="responsibleDepartments" type="responsibleDepartmentsList" minOccurs="1" />
+                                	<xs:element name="briefDescription" type="xs:string" minOccurs="1" />
+                                </xs:sequence>
+                            </xs:complexType>
+                         </xs:element>
+                    </xs:sequence>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>
