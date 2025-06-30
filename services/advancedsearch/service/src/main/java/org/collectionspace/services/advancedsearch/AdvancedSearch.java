@@ -7,10 +7,12 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
+import org.collectionspace.services.client.IQueryManager;
 //import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
@@ -34,9 +36,21 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	 */
 	
 	@GET
-	public AbstractCommonList getList(@Context UriInfo uriInfo) {
-		logger.info("advancedsearch called with only uriInfo: {}", uriInfo);
+	public AdvancedsearchCommonList getList(@Context UriInfo uriInfo) {
+		logger.info("advancedsearch called with uriInfo: {}", uriInfo);
 		
+		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
+		/*
+		 *  extract whatever else is needed from query params to fulfill request
+		 *  in many cases we'll probably just call another service and pass uriInfo to
+		 *  it so we may not need to do stuff like this; it's here for now to logging/testing
+		 *  purposes
+		 */
+		logger.info("advancedsearch called with keywords: {}", keywords);
+		
+		// Build a mock list to return. We will eventually populate this with real
+		// data retrieved from other services and/or the database
 		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
 		List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
 		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
