@@ -30,7 +30,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	/*
 	 * // Here's a pattern for retrieving objects from another service:
 	 * private CollectionObjectResource cor = new CollectionObjectResource();
-	 * AbstractCommonList foo = cor.getList(uriInfo);
+	 * AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
 	 */
 	
 	@GET
@@ -39,7 +39,6 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 		
 		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
 		List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
-
 		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
 		mockItem.setBriefDescription("This is a mock brief description from advanced search");
 		mockItem.setComputedCurrentLocation("Mock location");
