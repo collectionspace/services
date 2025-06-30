@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
 //import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
@@ -16,28 +17,51 @@ import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,String> {
-	private CollectionObjectResource cor = new CollectionObjectResource();
+	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
+	
+	/*
+	 * // Here's a pattern for retrieving objects from another service:
+	 * private CollectionObjectResource cor = new CollectionObjectResource();
+	 * AbstractCommonList foo = cor.getList(uriInfo);
+	 */
 	
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
-		AbstractCommonList results = new AbstractCommonList();
-		AbstractCommonList foo = cor.getList(uriInfo);
-		return results;
+		logger.info("advancedsearch called with only uriInfo: {}", uriInfo);
+		
+		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
+		List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
+
+		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
+		mockItem.setBriefDescription("This is a mock brief description from advanced search");
+		mockItem.setComputedCurrentLocation("Mock location");
+		mockItem.setCsid("mockcsid");
+		mockItem.setObjectId("mock Object Id");
+		mockItem.setObjectName("mock Object Name");
+		mockItem.setObjectTitle("mock Object Title");
+		mockItem.setUri("http://mock.uri/uri");
+		results.add(mockItem);
+		
+		return resultsList;
 	}
 
 	@Override
 	public Class<?> getCommonPartClass() {
-		return AdvancedsearchCommon.class;
+		// NOTE: not used?
+		return null;
 	}
 
 	@Override
 	public ServiceContextFactory<Integer, String> getServiceContextFactory() {
+		// NOTE: not used?
 		return (ServiceContextFactory<Integer, String>) RemoteServiceContextFactory.get();
 	}
 
