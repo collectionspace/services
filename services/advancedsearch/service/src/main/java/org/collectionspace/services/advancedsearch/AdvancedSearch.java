@@ -13,10 +13,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.IQueryManager;
-//import org.collectionspace.services.client.IClientQueryParams;
-import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
@@ -36,7 +33,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	 */
 	
 	@GET
-	public AdvancedsearchCommonList getList(@Context UriInfo uriInfo) {
+	public AbstractCommonList getList(@Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with uriInfo: {}", uriInfo);
 		
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
@@ -63,19 +60,27 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 		mockItem.setUri("http://mock.uri/uri");
 		results.add(mockItem);
 		
+		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
+		AbstractCommonList abstractList = (AbstractCommonList)results;
+		abstractList.setItemsInPage(1);
+		abstractList.setPageNum(0);
+		abstractList.setPageSize(100);
+		abstractList.setTotalItems(1);
+		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
+		
 		return resultsList;
 	}
 
 	@Override
-	public Class<?> getCommonPartClass() {
-		// NOTE: not used?
-		return null;
+	public Class<AdvancedsearchListItem> getCommonPartClass() {
+		// TODO I don't know if this is correct
+		return AdvancedsearchListItem.class;
 	}
 
 	@Override
 	public ServiceContextFactory<Integer, String> getServiceContextFactory() {
-		// NOTE: not used?
-		return (ServiceContextFactory<Integer, String>) RemoteServiceContextFactory.get();
+		// TODO not used?
+		return null;
 	}
 
 	@Override
@@ -87,5 +92,4 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	protected String getVersionString() {
 		return "0.01";
 	}
-	
 }

@@ -14,12 +14,12 @@
  */
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.advancedsearch.AdvancedsearchCommon;
+import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 
 /**
  * ConsultationClient.java
  */
-public class AdvancedSearchClient extends AbstractCommonListPoxServiceClientImpl<AdvancedSearchProxy, AdvancedsearchCommon> {
+public class AdvancedSearchClient extends AbstractCommonListPoxServiceClientImpl<AdvancedSearchProxy, AdvancedsearchListItem> {
 
     public static final String SERVICE_NAME = "advancedsearch";
     public static final String SERVICE_PATH_COMPONENT = SERVICE_NAME;
