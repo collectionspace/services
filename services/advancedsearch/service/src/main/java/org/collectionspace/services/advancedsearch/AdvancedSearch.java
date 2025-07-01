@@ -67,9 +67,16 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		mockResponsibleDepartment.setName("mock responsible department name");
 		mockResponsibleDepartment.setRefName("mock responsible department refname");
 		mockResponsibleDepartment.setUri("http://mock.url/responsibleDepartment");
-		mockItem.setResponsibleDepartments(mockResponsibleDepartmentsList);
-		mockResponsibleDepartmentsList.getResponsibleDepartments().add(mockResponsibleDepartment);
+		mockResponsibleDepartmentsList.getResponsibleDepartment().add(mockResponsibleDepartment);
 		
+		ResponsibleDepartment mockResponsibleDepartment2 = new ResponsibleDepartment();
+		mockResponsibleDepartment2.setCsid("mock responsible department csid");
+		mockResponsibleDepartment2.setName("mock responsible department name");
+		mockResponsibleDepartment2.setRefName("mock responsible department refname");
+		mockResponsibleDepartment2.setUri("http://mock.url/responsibleDepartment");
+		mockResponsibleDepartmentsList.getResponsibleDepartment().add(mockResponsibleDepartment2);
+		
+		mockItem.setResponsibleDepartments(mockResponsibleDepartmentsList);
 		resultsList.getAdvancedsearchListItem().add(mockItem);
 		
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
