@@ -66,7 +66,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		resultsList.advancedsearchListItem = results;
 		
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
-		AbstractCommonList abstractList = (AbstractCommonList)results;
+		AbstractCommonList abstractList = (AbstractCommonList)resultsList;
 		abstractList.setItemsInPage(1);
 		abstractList.setPageNum(0);
 		abstractList.setPageSize(100);
