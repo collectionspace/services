@@ -51,9 +51,6 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// Build a mock list to return. We will eventually populate this with real
 		// data retrieved from other services and/or the database
 		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
-		//List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
-		List<AdvancedsearchListItem> results = new ArrayList<AdvancedsearchListItem>();
-		resultsList.advancedsearchListItem = results;
 		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
 		mockItem.setBriefDescription("This is a mock brief description from advanced search");
 		mockItem.setComputedCurrentLocation("Mock location");
@@ -62,8 +59,16 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		mockItem.setObjectName("mock Object Name");
 		mockItem.setObjectTitle("mock Object Title");
 		mockItem.setUri("http://mock.uri/uri");
-		results.add(mockItem);
-		resultsList.advancedsearchListItem = results;
+		
+		// mock responsible department
+		ResponsibleDepartment mockResponsibleDepartment = new ResponsibleDepartment();
+		mockResponsibleDepartment.setCsid("mock responsible department csid");
+		mockResponsibleDepartment.setName("mock responsible department name");
+		mockResponsibleDepartment.setRefName("mock responsible department refname");
+		mockResponsibleDepartment.setUri("http://mock.url/responsibleDepartment");
+		mockItem.getResponsibleDepartments().getResponsibleDepartments().add(mockResponsibleDepartment);
+		
+		resultsList.getAdvancedsearchListItem().add(mockItem);
 		
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
 		AbstractCommonList abstractList = (AbstractCommonList)resultsList;

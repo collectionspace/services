@@ -25,12 +25,17 @@
     	</xs:annotation>
 	</xs:complexType>
   
-  	<xs:complexType name="responsibleDepartmentsList">
-  		<xs:sequence>
+  	<xs:complexType name="responsibleDepartment">
+ 		<xs:sequence>
             <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
             <xs:element name="csid" type="xs:string" minOccurs="1"/>
             <xs:element name="refName" type="xs:string" minOccurs="1"/>
             <xs:element name="name" type="xs:string" minOccurs="1"/>
+  		</xs:sequence>
+  	</xs:complexType>
+  	<xs:complexType name="responsibleDepartmentsList">
+  		<xs:sequence>
+            <xs:element name="responsibleDepartments" type="responsibleDepartment" minOccurs="1" maxOccurs="unbounded" />
   		</xs:sequence>
   	</xs:complexType>
   
