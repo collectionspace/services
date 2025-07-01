@@ -1,5 +1,6 @@
 package org.collectionspace.services.advancedsearch; 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -50,7 +51,9 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// Build a mock list to return. We will eventually populate this with real
 		// data retrieved from other services and/or the database
 		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
-		List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
+		//List<AdvancedsearchListItem> results = resultsList.advancedsearchListItem;
+		List<AdvancedsearchListItem> results = new ArrayList<AdvancedsearchListItem>();
+		resultsList.advancedsearchListItem = results;
 		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
 		mockItem.setBriefDescription("This is a mock brief description from advanced search");
 		mockItem.setComputedCurrentLocation("Mock location");
@@ -60,6 +63,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		mockItem.setObjectTitle("mock Object Title");
 		mockItem.setUri("http://mock.uri/uri");
 		results.add(mockItem);
+		resultsList.advancedsearchListItem = results;
 		
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
 		AbstractCommonList abstractList = (AbstractCommonList)results;
