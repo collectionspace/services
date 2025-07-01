@@ -61,12 +61,14 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		mockItem.setUri("http://mock.uri/uri");
 		
 		// mock responsible department
+		ResponsibleDepartmentsList mockResponsibleDepartmentsList = new ResponsibleDepartmentsList();
 		ResponsibleDepartment mockResponsibleDepartment = new ResponsibleDepartment();
 		mockResponsibleDepartment.setCsid("mock responsible department csid");
 		mockResponsibleDepartment.setName("mock responsible department name");
 		mockResponsibleDepartment.setRefName("mock responsible department refname");
 		mockResponsibleDepartment.setUri("http://mock.url/responsibleDepartment");
-		mockItem.getResponsibleDepartments().getResponsibleDepartments().add(mockResponsibleDepartment);
+		mockItem.setResponsibleDepartments(mockResponsibleDepartmentsList);
+		mockResponsibleDepartmentsList.getResponsibleDepartments().add(mockResponsibleDepartment);
 		
 		resultsList.getAdvancedsearchListItem().add(mockItem);
 		
