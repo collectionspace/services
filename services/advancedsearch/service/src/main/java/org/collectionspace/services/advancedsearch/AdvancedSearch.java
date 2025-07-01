@@ -14,6 +14,7 @@ import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.Adva
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ import org.slf4j.LoggerFactory;
 @Path(AdvancedSearchClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
-public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,String> {
+public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem,AdvancedsearchListItem> {
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	
 	/*
@@ -72,15 +73,14 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Integer,
 	}
 
 	@Override
-	public Class<AdvancedsearchListItem> getCommonPartClass() {
-		// TODO I don't know if this is correct
-		return AdvancedsearchListItem.class;
+	public Class<?> getCommonPartClass() {
+		return null;
 	}
 
 	@Override
-	public ServiceContextFactory<Integer, String> getServiceContextFactory() {
+	public ServiceContextFactory<AdvancedsearchListItem, AdvancedsearchListItem> getServiceContextFactory() {
 		// TODO not used?
-		return null;
+		return (ServiceContextFactory<AdvancedsearchListItem, AdvancedsearchListItem>) RemoteServiceContextFactory.get();
 	}
 
 	@Override
