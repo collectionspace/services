@@ -78,6 +78,7 @@
                     "collectionobjects_common:objectHistoryNote",
                     "collectionobjects_common:objectNumber",
                     "collectionobjects_common:objectStatusList",
+                    "collectionobjects_common:publishedRelatedLinkGroupList",
                     "collectionobjects_common:publishToList",
                     "collectionobjects_common:materialGroupList",
                     "collectionobjects_common:otherNumberList",

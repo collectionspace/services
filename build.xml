@@ -216,10 +216,12 @@
 
 	<!--
 		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
+		and creates some database utility functions
 	-->
 	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
+		<antcall target="create_update_userid_db_function" />
 	</target>
 
 	<!--
@@ -277,6 +279,15 @@
 		</sql>
 	</target>
 
+	<target name="create_update_userid_db_function" description="create the update_userid function in postgres">
+		<echo>Creating the update_userid function in postgres</echo>
+		<sql driver="${db.jdbc.driver.class}" url="${db.jdbc.cspace.url}" userid="${db.csadmin.user}" password="${db.csadmin.user.password}" autocommit="true" src="${db.script.dir}/update_userid_function.sql">
+			<classpath>
+				<pathelement path="${db.driver.jar}" />
+			</classpath>
+		</sql>
+	</target>
+
 	<target name="create_cspace_db" depends="drop_cspace_db">
 		<echo>Creating the cspace database with user ${db.csadmin.user}</echo>
 		<!--
@@ -309,7 +320,7 @@
 	<target name="setup_initdb.sql" description="copy init_db scripts, replacing keywords">
 		<mkdir dir="${jee.server.cspace}/cspace/services/db/postgresql"/>
 		<copy todir="${jee.server.cspace}/cspace/services/db/postgresql">
-			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="drop_cspace_db.sql, init_cspace_db.sql, drop_nuxeo_db.sql">
+			<fileset dir="${jee.server.cspace}/cspace/services/db/postgresql" includes="drop_cspace_db.sql, init_cspace_db.sql, drop_nuxeo_db.sql, update_userid_function.sql">
 				<present targetdir="${src}/main/resources/db/postgresql" />
 			</fileset>
 			<globmapper from="*" to="*.bak" />
