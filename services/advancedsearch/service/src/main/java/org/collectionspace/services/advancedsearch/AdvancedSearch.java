@@ -14,6 +14,7 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -36,7 +37,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 	
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
-		logger.info("advancedsearch called with uriInfo: {}", uriInfo);
+		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
+		logger.info("advancedsearch called with query params: {}", uriInfo.getQueryParameters(true));
 		
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
@@ -86,6 +88,14 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		abstractList.setPageSize(100);
 		abstractList.setTotalItems(1);
 		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
+		
+		// an experiment
+		CollectionObjectResource cor = new CollectionObjectResource();
+		AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
+		long totalItems = collectionObjectsList.getTotalItems();
+		String fields = collectionObjectsList.getFieldsReturned();
+		logger.info("advancedsearch called collectionobjects, found total items: {}", totalItems);
+		logger.info("advancedsearch called collectionobjects, found fields: {}", fields);
 		
 		return resultsList;
 	}
