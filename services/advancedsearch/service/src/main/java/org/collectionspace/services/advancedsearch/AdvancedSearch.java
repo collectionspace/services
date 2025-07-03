@@ -33,6 +33,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
@@ -109,9 +110,20 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		for(ListItem item: listItems) {
 			List<Element> els = item.getAny();
 			for(Element el: els) {
-				String nodeValue = el.getNodeValue();
 				String tagName = el.getTagName();
-				logger.info("advanced search: tagname {}, nodvalue {}",tagName,nodeValue);
+				Node node = el.getFirstChild();
+				String elementTextContent = el.getTextContent();
+				String nodeName = node.getNodeName();
+				String localName = node.getLocalName();
+				String nodeValue = node.getNodeValue();
+				String nodeTextContent = node.getTextContent();
+				
+				logger.info("advancedsearch: tagname: {}",tagName);
+				logger.info("advancedsearch: element text: {}",elementTextContent);
+				logger.info("advancedsearch: node name: {}",nodeName);
+				logger.info("advancedsearch: local name: {}",localName);
+				logger.info("advancedsearch: node value: {}",nodeValue);
+				logger.info("advancedsearch: node text content: {}",nodeTextContent);
 			}
 		}
 		/*
