@@ -1,7 +1,9 @@
 package org.collectionspace.services.advancedsearch; 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -9,12 +11,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
@@ -29,6 +33,7 @@ import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.dom4j.DocumentException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +46,7 @@ import org.w3c.dom.Node;
 @Produces("application/xml")
 public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem,AdvancedsearchListItem> {
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
-	
-	/*
-	 * // Here's a pattern for retrieving objects from another service:
-	 * private CollectionObjectResource cor = new CollectionObjectResource();
-	 * AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
-	 */
-	
+
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
@@ -107,25 +106,55 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		CollectionObjectResource cor = new CollectionObjectResource();
 		AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
 		List<ListItem> listItems = collectionObjectsList.getListItem();
+		CollectionObjectClient client = null;
+		try {
+			client = new CollectionObjectClient();
+		} catch (Exception e) {
+			// FIXME need better handling
+			logger.error("advancedsearch: could not create CollectionObjectClient",e);
+			return resultsList;
+		}
 		for(ListItem item: listItems) {
 			List<Element> els = item.getAny();
+			String csid = "";
 			for(Element el: els) {
-				String tagName = el.getTagName();
-				Node node = el.getFirstChild();
-				String elementTextContent = el.getTextContent();
-				String nodeName = node.getNodeName();
-				String localName = node.getLocalName();
-				String nodeValue = node.getNodeValue();
-				String nodeTextContent = node.getTextContent();
-				
-				logger.info("advancedsearch: tagname: {}",tagName);
-				logger.info("advancedsearch: element text: {}",elementTextContent);
-				logger.info("advancedsearch: node name: {}",nodeName);
-				logger.info("advancedsearch: local name: {}",localName);
-				logger.info("advancedsearch: node value: {}",nodeValue);
-				logger.info("advancedsearch: node text content: {}",nodeTextContent);
+				String elementName = el.getTagName();
+				String elementText = el.getTextContent();
+				if(elementName.equals("csid")) {
+					// FIXME need better logic
+					csid = elementText;
+					break;
+				}
+			}
+			/*
+			 * NOTE code below is derived from CollectionObjectServiceTest.readCollectionObjectCommonPart and AbstractPoxServiceTestImpl
+			 */
+	        Response res = client.read(csid);
+	        CollectionobjectsCommon collectionObject = null;
+			PoxPayloadIn input = null;
+			try {
+				input = new PoxPayloadIn((String)res.readEntity(String.class));
+			} catch (DocumentException e) {
+				// FIXME need better handling
+				logger.error("advancedsearch: could not create PoxPayloadIn",e);
+				continue;
+			}
+			if(null != input) {
+	            PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+				if (null != payloadInputPart) {
+					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
+				}				
+			}
+			if(null != collectionObject) {
+				logger.info("advancedsearch: found CollectionobjectsCommon associated with csid {}",csid);
+				logger.info("advancedsearch: computed current location:",collectionObject.getComputedCurrentLocation());
+			}
+			else {
+				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}",csid);
 			}
 		}
+
+		
 		/*
 		 * Class<CollectionobjectsCommon> commonPartClass = cor.getCommonPartClass();
 		 * ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx; try { ctx =
