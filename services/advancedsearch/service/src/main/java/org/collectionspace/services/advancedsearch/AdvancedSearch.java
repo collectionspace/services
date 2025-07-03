@@ -133,7 +133,10 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 	        CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
-				input = new PoxPayloadIn((String)res.readEntity(String.class));
+				logger.info("advancedsearch: entity in response: {}",res.getEntity());
+				String responseXml = res.readEntity(String.class);
+				logger.info("advancedsearch: response XML: {}",responseXml);
+				input = new PoxPayloadIn(responseXml);
 			} catch (DocumentException e) {
 				// FIXME need better handling
 				logger.error("advancedsearch: could not create PoxPayloadIn",e);
