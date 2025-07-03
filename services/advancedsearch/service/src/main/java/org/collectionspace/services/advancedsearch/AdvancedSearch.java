@@ -13,14 +13,26 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
+import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
+import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.document.DocumentWrapper;
+import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
@@ -89,13 +101,31 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		abstractList.setTotalItems(1);
 		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
 		
-		// an experiment
+		// an experiment: this works fine; you can send e.g. ?kw=note and it'll return the correct collectionobjects
+		// fields=csid|uri|refName|updatedAt|workflowState|objectNumber|objectName|title|responsibleDepartment
 		CollectionObjectResource cor = new CollectionObjectResource();
 		AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
-		long totalItems = collectionObjectsList.getTotalItems();
-		String fields = collectionObjectsList.getFieldsReturned();
-		logger.info("advancedsearch called collectionobjects, found total items: {}", totalItems);
-		logger.info("advancedsearch called collectionobjects, found fields: {}", fields);
+		List<ListItem> listItems = collectionObjectsList.getListItem();
+		for(ListItem item: listItems) {
+			List<Element> els = item.getAny();
+			for(Element el: els) {
+				String nodeValue = el.getNodeValue();
+				String tagName = el.getTagName();
+				logger.info("advanced search: tagname {}, nodvalue {}",tagName,nodeValue);
+			}
+		}
+		/*
+		 * Class<CollectionobjectsCommon> commonPartClass = cor.getCommonPartClass();
+		 * ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx; try { ctx =
+		 * cor.getServiceContextFactory().createServiceContext(cor.getServiceName(),
+		 * uriInfo); } catch (Exception e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); } RepositoryClient<PoxPayloadIn, PoxPayloadOut>
+		 * repoClient = cor.getRepositoryClient(ctx);
+		 * CollectionObjectDocumentModelHandler codmh =
+		 * (CollectionObjectDocumentModelHandler) cor.createDocumentHandler(ctx);
+		 * codmh.setCommonPartList(collectionObjectsList);
+		 */
+
 		
 		return resultsList;
 	}

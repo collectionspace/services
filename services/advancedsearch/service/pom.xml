@@ -86,6 +86,13 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+    	<groupId>org.collectionspace.services</groupId>
+    	<artifactId>
+    		org.collectionspace.services.collectionobject.client
+    	</artifactId>
+    	<version>8.2.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
