@@ -109,7 +109,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = cor.getServiceContextFactory().createServiceContext(CollectionObjectClient.SERVICE_NAME, uriInfo);		
 			client = (CollectionObjectClient) ctx.getClient();
 			String partName = client.getCommonPartName();
-			logger.info,partName("advancedsearch: client common part name = {}");
+			logger.info("advancedsearch: client common part name = {}",partName);
 		} catch (Exception e) {
 			// FIXME need better handling
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
