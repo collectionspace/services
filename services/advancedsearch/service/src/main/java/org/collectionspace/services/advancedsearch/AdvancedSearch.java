@@ -1,5 +1,6 @@
 package org.collectionspace.services.advancedsearch; 
 
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -48,96 +49,46 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
-		logger.info("advancedsearch called with query params: {}", uriInfo.getQueryParameters(true));
+		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(true);
+		logger.info("advancedsearch called with query params: {}", queryParams);
 		
-		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-		String keywords = queryParams.getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-		/*
-		 *  extract whatever else is needed from query params to fulfill request
-		 *  in many cases we'll probably just call another service and pass uriInfo to
-		 *  it so we may not need to do stuff like this; it's here for now to logging/testing
-		 *  purposes
-		 */
-		logger.info("advancedsearch called with keywords: {}", keywords);
+		// the list to return
+		ObjectFactory objectFactory = new ObjectFactory();
+		AdvancedsearchCommonList resultsList = objectFactory.createAdvancedsearchCommonList();
 		
-		// Build a mock list to return. We will eventually populate this with real
-		// data retrieved from other services and/or the database
-		AdvancedsearchCommonList resultsList = new AdvancedsearchCommonList();
-		AdvancedsearchListItem mockItem = new AdvancedsearchListItem();
-		mockItem.setBriefDescription("This is a mock brief description from advanced search");
-		mockItem.setComputedCurrentLocation("Mock location");
-		mockItem.setCsid("mockcsid");
-		mockItem.setObjectId("mock Object Id");
-		mockItem.setObjectName("mock Object Name");
-		mockItem.setObjectTitle("mock Object Title");
-		mockItem.setUri("http://mock.uri/uri");
-		
-		// mock responsible department
-		ResponsibleDepartmentsList mockResponsibleDepartmentsList = new ResponsibleDepartmentsList();
-		ResponsibleDepartment mockResponsibleDepartment = new ResponsibleDepartment();
-		mockResponsibleDepartment.setCsid("mock responsible department csid");
-		mockResponsibleDepartment.setName("mock responsible department name");
-		mockResponsibleDepartment.setRefName("mock responsible department refname");
-		mockResponsibleDepartment.setUri("http://mock.url/responsibleDepartment");
-		mockResponsibleDepartmentsList.getResponsibleDepartment().add(mockResponsibleDepartment);
-		
-		ResponsibleDepartment mockResponsibleDepartment2 = new ResponsibleDepartment();
-		mockResponsibleDepartment2.setCsid("mock responsible department2 csid");
-		mockResponsibleDepartment2.setName("mock responsible department2 name");
-		mockResponsibleDepartment2.setRefName("mock responsible department2 refname");
-		mockResponsibleDepartment2.setUri("http://mock.url/responsibleDepartment2");
-		mockResponsibleDepartmentsList.getResponsibleDepartment().add(mockResponsibleDepartment2);
-		
-		mockItem.setResponsibleDepartments(mockResponsibleDepartmentsList);
-		resultsList.getAdvancedsearchListItem().add(mockItem);
-		
-		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
-		AbstractCommonList abstractList = (AbstractCommonList)resultsList;
-		abstractList.setItemsInPage(1);
-		abstractList.setPageNum(0);
-		abstractList.setPageSize(100);
-		abstractList.setTotalItems(1);
-		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
-		
-		// an experiment: this works fine; you can send e.g. ?kw=note and it'll return the correct collectionobjects
-		// fields=csid|uri|refName|updatedAt|workflowState|objectNumber|objectName|title|responsibleDepartment
+		// the logic here is to use CollectionObjectResource to perform the search, then use
+		// CollectionObjectClient to retrieve corresponding CollectionobjectsCommon objects, which have more fields
 		CollectionObjectResource cor = new CollectionObjectResource();
-		AbstractCommonList collectionObjectsList = cor.getList(uriInfo);
-		List<ListItem> listItems = collectionObjectsList.getListItem();
+		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
+		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
 		CollectionObjectClient client = null;
 		try {		
 			client = new CollectionObjectClient();
 		} catch (Exception e) {
-			// FIXME need better handling
+			// FIXME need better error handling
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
 			return resultsList;
 		}
-		for(ListItem item: listItems) {
+		HashMap<String, String> collectionObjectValuesMap = new HashMap<String,String>();
+		for(ListItem item: collectionObjectListItems) {
 			List<Element> els = item.getAny();
-			String csid = "";
 			for(Element el: els) {
-				String elementName = el.getTagName();
-				String elementText = el.getTextContent();
-				if(elementName.equals("csid")) {
-					// FIXME need better logic
-					csid = elementText;
-					break;
-				}
+		        String elementName = el.getTagName();
+		        String elementText = el.getTextContent();
+		        collectionObjectValuesMap.put(elementName, elementText);
 			}
+			String csid = collectionObjectValuesMap.get("csid");
 			/*
 			 * NOTE code below is derived from CollectionObjectServiceTest.readCollectionObjectCommonPart and AbstractPoxServiceTestImpl
 			 */
-			// FIXME: currently getting an authorization error on this call; how to fix that?
 	        Response res = client.read(csid);
 	        CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
-				logger.info("advancedsearch: entity in response: {}",res.getEntity());
 				String responseXml = res.readEntity(String.class);
-				logger.info("advancedsearch: response XML: {}",responseXml);
 				input = new PoxPayloadIn(responseXml);
 			} catch (DocumentException e) {
-				// FIXME need better handling
+				// FIXME need better error handling
 				logger.error("advancedsearch: could not create PoxPayloadIn",e);
 				continue;
 			}
@@ -148,15 +99,37 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				}				
 			}
 			if(null != collectionObject) {
-				logger.info("advancedsearch: found CollectionobjectsCommon associated with csid {}",csid);
-				logger.info("advancedsearch: computed current location: {}",collectionObject.getComputedCurrentLocation());
-				logger.info("advancedsearch: object number: {}",collectionObject.getObjectNumber());
+				// FIXME: virtually everything below could blow up!
+				// FIXME: implement the correct logic that Jessi wrote up here: https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
+				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
+				listItem.setBriefDescription(collectionObject.getBriefDescriptions().getBriefDescription().get(0));
+				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
+				listItem.setCsid(collectionObjectValuesMap.get("csid"));
+				listItem.setObjectId(collectionObjectValuesMap.get("objectId"));
+				listItem.setObjectName(collectionObject.getObjectNameList().getObjectNameGroup().get(0).getObjectName());
+				listItem.setObjectTitle(collectionObject.getTitleGroupList().getTitleGroup().get(0).getTitle());
+				listItem.setUri(collectionObjectValuesMap.get("uri"));
+				
+				// TODO populate responsibleDepartment
+				
+				// add the populated item to the results
+				resultsList.advancedsearchListItem.add(listItem);
 			}
 			else {
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}",csid);
 			}
 			res.close();
 		}
+		
+		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
+		// FIXME: need better values for all these hardcoded numbers and fields
+		// FIXME: we've not implemented anything that'd allow paging
+		AbstractCommonList abstractList = (AbstractCommonList)resultsList;
+		abstractList.setItemsInPage(collectionObjectListItems.size());
+		abstractList.setPageNum(0);
+		abstractList.setPageSize(collectionObjectListItems.size());
+		abstractList.setTotalItems(collectionObjectListItems.size());
+		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
 		
 		return resultsList;
 	}
