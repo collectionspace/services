@@ -1,9 +1,6 @@
 package org.collectionspace.services.advancedsearch; 
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -17,6 +14,8 @@ import javax.ws.rs.core.UriInfo;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionObjectProxy;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -28,17 +27,13 @@ import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.document.DocumentHandler;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.dom4j.DocumentException;
-import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
@@ -108,7 +103,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		List<ListItem> listItems = collectionObjectsList.getListItem();
 		CollectionObjectClient client = null;
 		try {
-			client = new CollectionObjectClient();
+			ServiceContext<AdvancedsearchListItem, AdvancedsearchListItem> ctx = getServiceContextFactory().createServiceContext(getServiceName(), uriInfo);
+			client = (CollectionObjectClient) ctx.getClient();
 		} catch (Exception e) {
 			// FIXME need better handling
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
@@ -129,6 +125,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			/*
 			 * NOTE code below is derived from CollectionObjectServiceTest.readCollectionObjectCommonPart and AbstractPoxServiceTestImpl
 			 */
+			// FIXME: currently getting an authorization error on this call; how to fix that?
 	        Response res = client.read(csid);
 	        CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
@@ -150,26 +147,14 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			}
 			if(null != collectionObject) {
 				logger.info("advancedsearch: found CollectionobjectsCommon associated with csid {}",csid);
-				logger.info("advancedsearch: computed current location:",collectionObject.getComputedCurrentLocation());
+				logger.info("advancedsearch: computed current location: {}",collectionObject.getComputedCurrentLocation());
+				logger.info("advancedsearch: object number: {}",collectionObject.getObjectNumber());
 			}
 			else {
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}",csid);
 			}
+			res.close();
 		}
-
-		
-		/*
-		 * Class<CollectionobjectsCommon> commonPartClass = cor.getCommonPartClass();
-		 * ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx; try { ctx =
-		 * cor.getServiceContextFactory().createServiceContext(cor.getServiceName(),
-		 * uriInfo); } catch (Exception e) { // TODO Auto-generated catch block
-		 * e.printStackTrace(); } RepositoryClient<PoxPayloadIn, PoxPayloadOut>
-		 * repoClient = cor.getRepositoryClient(ctx);
-		 * CollectionObjectDocumentModelHandler codmh =
-		 * (CollectionObjectDocumentModelHandler) cor.createDocumentHandler(ctx);
-		 * codmh.setCommonPartList(collectionObjectsList);
-		 */
-
 		
 		return resultsList;
 	}
