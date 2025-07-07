@@ -1,5 +1,6 @@
 package org.collectionspace.services.advancedsearch; 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,6 +56,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// the list to return
 		ObjectFactory objectFactory = new ObjectFactory();
 		AdvancedsearchCommonList resultsList = objectFactory.createAdvancedsearchCommonList();
+		// FIXME: this shouldn't be necessary?
+		resultsList.advancedsearchListItem = new ArrayList<AdvancedsearchListItem>();
 		
 		// the logic here is to use CollectionObjectResource to perform the search, then use
 		// CollectionObjectClient to retrieve corresponding CollectionobjectsCommon objects, which have more fields
