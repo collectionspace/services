@@ -28,6 +28,8 @@ import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
+import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.dom4j.DocumentException;
@@ -103,7 +105,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		List<ListItem> listItems = collectionObjectsList.getListItem();
 		CollectionObjectClient client = null;
 		try {
-			ServiceContext<AdvancedsearchListItem, AdvancedsearchListItem> ctx = getServiceContextFactory().createServiceContext(getServiceName(), uriInfo);
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = cor.getServiceContextFactory().createServiceContext(CollectionObjectClient.SERVICE_NAME, uriInfo);
 			client = (CollectionObjectClient) ctx.getClient();
 		} catch (Exception e) {
 			// FIXME need better handling
@@ -166,7 +168,6 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 
 	@Override
 	public ServiceContextFactory<AdvancedsearchListItem, AdvancedsearchListItem> getServiceContextFactory() {
-		// TODO not used?
 		return (ServiceContextFactory<AdvancedsearchListItem, AdvancedsearchListItem>) RemoteServiceContextFactory.get();
 	}
 
