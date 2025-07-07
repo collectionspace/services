@@ -106,27 +106,10 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		List<ListItem> listItems = collectionObjectsList.getListItem();
 		CollectionObjectClient client = null;
 		try {
-			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = cor.getServiceContextFactory().createServiceContext(CollectionObjectClient.SERVICE_NAME, uriInfo);
-			ServiceBindingType sb = ctx.getServiceBinding();
-			String clientHandler = sb.getClientHandler();
-			if(null != clientHandler) {
-				logger.info("advancedsearch: clientHandler = {}",clientHandler);
-			}
-			else {
-				logger.info("advancedsearch: clientHandler not found");
-			}
-		
-			ServiceContext<AdvancedsearchListItem, AdvancedsearchListItem> ctx2 = getServiceContextFactory().createServiceContext(AdvancedSearchClient.SERVICE_NAME,uriInfo);
-			ServiceBindingType sb2 = ctx2.getServiceBinding();
-			String cliendHandler2 = sb2.getClientHandler();
-			if(null != cliendHandler2) {
-				logger.info("advancedsearch: clientHandler2 = {}",cliendHandler2);
-			}
-			else {
-				logger.info("advancedsearch: clientHandler2 not found");
-			}
-			
+			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = cor.getServiceContextFactory().createServiceContext(CollectionObjectClient.SERVICE_NAME, uriInfo);		
 			client = (CollectionObjectClient) ctx.getClient();
+			String partName = client.getCommonPartName();
+			logger.info,partName("advancedsearch: client common part name = {}");
 		} catch (Exception e) {
 			// FIXME need better handling
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
