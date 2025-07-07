@@ -28,6 +28,7 @@ import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.jaxb.AbstractCommonList;
@@ -106,6 +107,25 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		CollectionObjectClient client = null;
 		try {
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = cor.getServiceContextFactory().createServiceContext(CollectionObjectClient.SERVICE_NAME, uriInfo);
+			ServiceBindingType sb = ctx.getServiceBinding();
+			String clientHandler = sb.getClientHandler();
+			if(null != clientHandler) {
+				logger.info("advancedsearch: clientHandler = {}",clientHandler);
+			}
+			else {
+				logger.info("advancedsearch: clientHandler not found");
+			}
+		
+			ServiceContext<AdvancedsearchListItem, AdvancedsearchListItem> ctx2 = getServiceContextFactory().createServiceContext(AdvancedSearchClient.SERVICE_NAME,uriInfo);
+			ServiceBindingType sb2 = ctx2.getServiceBinding();
+			String cliendHandler2 = sb2.getClientHandler();
+			if(null != cliendHandler2) {
+				logger.info("advancedsearch: clientHandler2 = {}",cliendHandler2);
+			}
+			else {
+				logger.info("advancedsearch: clientHandler2 not found");
+			}
+			
 			client = (CollectionObjectClient) ctx.getClient();
 		} catch (Exception e) {
 			// FIXME need better handling
