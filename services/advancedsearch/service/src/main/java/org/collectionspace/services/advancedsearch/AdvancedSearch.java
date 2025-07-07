@@ -110,7 +110,16 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				listItem.setObjectTitle(collectionObject.getTitleGroupList().getTitleGroup().get(0).getTitle());
 				listItem.setUri(collectionObjectValuesMap.get("uri"));
 				
-				// TODO populate responsibleDepartment
+				// populate responsibleDepartments list
+				ResponsibleDepartmentsList responsibleDepartmentList = objectFactory.createResponsibleDepartmentsList();
+				// FIXME: where are the other fields?
+				List<String> responsibleDepartmentNames = collectionObject.getResponsibleDepartments().getResponsibleDepartment();
+				for(String responsibleDepartmentName : responsibleDepartmentNames) {
+					ResponsibleDepartment responsibleDepartment = objectFactory.createResponsibleDepartment();
+					responsibleDepartment.setName(responsibleDepartmentName);
+					responsibleDepartmentList.getResponsibleDepartment().add(responsibleDepartment);
+				}
+				listItem.setResponsibleDepartments(responsibleDepartmentList);
 				
 				// add the populated item to the results
 				resultsList.advancedsearchListItem.add(listItem);
