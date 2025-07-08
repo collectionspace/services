@@ -14,25 +14,19 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
+import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
+import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
+import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
+import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.CollectionObjectProxy;
-import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.nuxeo.CollectionObjectDocumentModelHandler;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.config.tenant.RemoteClientConfig;
-import org.collectionspace.services.config.tenant.RemoteClientConfigurations;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.dom4j.DocumentException;
@@ -105,27 +99,19 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				// FIXME: virtually everything below could blow up!
 				// FIXME: implement the correct logic that Jessi wrote up here: https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
-				listItem.setBriefDescription(collectionObject.getBriefDescriptions().getBriefDescription().get(0));
+				listItem.setBriefDescription(BriefDescriptionListModel.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
 				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
+				listItem.setObjectName(ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
+				listItem.setObjectTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
+				listItem.setResponsibleDepartments(ResponsibleDepartmentsListModel.responsibleDepartmentListToResponsibleDepartmentsList(collectionObject.getResponsibleDepartments()));
+
+				// from collectionobject
 				listItem.setCsid(collectionObjectValuesMap.get("csid"));
 				listItem.setObjectId(collectionObjectValuesMap.get("objectId"));
-				listItem.setObjectName(collectionObject.getObjectNameList().getObjectNameGroup().get(0).getObjectName());
-				listItem.setObjectTitle(collectionObject.getTitleGroupList().getTitleGroup().get(0).getTitle());
 				listItem.setUri(collectionObjectValuesMap.get("uri"));
 				
-				// populate responsibleDepartments list
-				ResponsibleDepartmentsList responsibleDepartmentList = objectFactory.createResponsibleDepartmentsList();
-				// FIXME: where are the other fields?
-				List<String> responsibleDepartmentNames = collectionObject.getResponsibleDepartments().getResponsibleDepartment();
-				for(String responsibleDepartmentName : responsibleDepartmentNames) {
-					ResponsibleDepartment responsibleDepartment = objectFactory.createResponsibleDepartment();
-					responsibleDepartment.setName(responsibleDepartmentName);
-					responsibleDepartmentList.getResponsibleDepartment().add(responsibleDepartment);
-				}
-				listItem.setResponsibleDepartments(responsibleDepartmentList);
-				
 				// add the populated item to the results
-				resultsList.advancedsearchListItem.add(listItem);
+				resultsList.getAdvancedsearchListItem().add(listItem);
 			}
 			else {
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}",csid);
@@ -136,7 +122,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
 		// FIXME: need better values for all these hardcoded numbers and fields
 		// FIXME: we've not implemented anything that'd allow paging
-		AbstractCommonList abstractList = (AbstractCommonList)resultsList;
+		AbstractCommonList abstractList = (AbstractCommonList) resultsList;
 		abstractList.setItemsInPage(collectionObjectListItems.size());
 		abstractList.setPageNum(0);
 		abstractList.setPageSize(collectionObjectListItems.size());
