@@ -49,6 +49,7 @@
                                 <xs:sequence>
                                 	<xs:element name="uri" type="xs:anyURI" minOccurs="1" />
                                 	<xs:element name="csid" type="xs:string" minOccurs="1" />
+                                	<xs:element name="updatedAt" type="xs:dateTime" minOccurs="1" />
                                 	<xs:element name="objectId" type="xs:string" minOccurs="1" />
                                 	<xs:element name="objectName" type="xs:string" minOccurs="1" />
                                 	<xs:element name="objectTitle" type="xs:string" minOccurs="1" />

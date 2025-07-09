@@ -12,6 +12,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
@@ -93,7 +96,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 	            PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
 				if (null != payloadInputPart) {
 					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
-				}				
+				}
 			}
 			if(null != collectionObject) {
 				// FIXME: virtually everything below could blow up!
@@ -104,11 +107,19 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				listItem.setObjectName(ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
 				listItem.setObjectTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
 				listItem.setResponsibleDepartments(ResponsibleDepartmentsListModel.responsibleDepartmentListToResponsibleDepartmentsList(collectionObject.getResponsibleDepartments()));
-
+				
 				// from collectionobject
 				listItem.setCsid(collectionObjectValuesMap.get("csid"));
 				listItem.setObjectId(collectionObjectValuesMap.get("objectId"));
 				listItem.setUri(collectionObjectValuesMap.get("uri"));
+				try {
+					XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(collectionObjectValuesMap.get("updatedAt"));
+					listItem.setUpdatedAt(date);
+				} catch (DatatypeConfigurationException e) {
+					// FIXME need better error handling
+					logger.error("advancedsearch: could not create XMLGregorianCalendar for updatedAt ",e);
+					logger.error("advancedsearch: updatedAt = ",collectionObjectValuesMap.get("updatedAt"));
+				}
 				
 				// add the populated item to the results
 				resultsList.getAdvancedsearchListItem().add(listItem);
