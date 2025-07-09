@@ -138,7 +138,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		abstractList.setPageNum(0);
 		abstractList.setPageSize(collectionObjectListItems.size());
 		abstractList.setTotalItems(collectionObjectListItems.size());
-		abstractList.setFieldsReturned("uri|csid|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
+		abstractList.setFieldsReturned("uri|csid|updatedAt|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
 		
 		return resultsList;
 	}
