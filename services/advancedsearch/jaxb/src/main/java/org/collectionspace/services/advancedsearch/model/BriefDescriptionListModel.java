@@ -12,7 +12,11 @@ public class BriefDescriptionListModel {
 		if(null != bds) {
 			if(!bds.isEmpty()) {
 				// get the 1st 55 characters of the 1st defined brief description if there is one
-				returnString = bds.get(0).substring(0, DESCRIPTION_LENGTH);
+				if(null != bds.get(0)) {
+					int length = bds.get(0).length();
+					returnString = bds.get(0).substring(0, (length >= DESCRIPTION_LENGTH) ? DESCRIPTION_LENGTH : length);
+				}
+				
 			}
 		}
 		return returnString;
