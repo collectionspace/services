@@ -58,6 +58,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		
 		// the logic here is to use CollectionObjectResource to perform the search, then use
 		// CollectionObjectClient to retrieve corresponding CollectionobjectsCommon objects, which have more fields
+		// TODO the resource and client are both singletons, are they not? If so we should create them once rather than at each call to getList
 		CollectionObjectResource cor = new CollectionObjectResource();
 		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
@@ -134,10 +135,10 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// FIXME: need better values for all these hardcoded numbers and fields
 		// FIXME: we've not implemented anything that'd allow paging
 		AbstractCommonList abstractList = (AbstractCommonList) resultsList;
-		abstractList.setItemsInPage(collectionObjectListItems.size());
-		abstractList.setPageNum(0);
-		abstractList.setPageSize(collectionObjectListItems.size());
-		abstractList.setTotalItems(collectionObjectListItems.size());
+		abstractList.setItemsInPage(collectionObjectList.getItemsInPage());
+		abstractList.setPageNum(collectionObjectList.getPageNum());
+		abstractList.setPageSize(collectionObjectList.getPageSize());
+		abstractList.setTotalItems(collectionObjectList.getTotalItems());
 		abstractList.setFieldsReturned("uri|csid|updatedAt|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
 		
 		return resultsList;
