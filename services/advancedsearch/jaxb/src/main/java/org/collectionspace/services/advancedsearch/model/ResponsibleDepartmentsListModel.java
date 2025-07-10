@@ -11,7 +11,7 @@ public class ResponsibleDepartmentsListModel {
 	private static ObjectFactory objectFactory = new ObjectFactory();
 	public static ResponsibleDepartmentsList responsibleDepartmentListToResponsibleDepartmentsList(ResponsibleDepartmentList rdList) {
 		ResponsibleDepartmentsList responsibleDepartmentList = objectFactory.createResponsibleDepartmentsList();
-		// FIXME: where are the other fields?
+		// FIXME: where are the other fields? why did I think there are other fields?
 		List<String> responsibleDepartmentNames = rdList.getResponsibleDepartment();
 		if(null != responsibleDepartmentNames) {
 			for(String responsibleDepartmentName : responsibleDepartmentNames) {

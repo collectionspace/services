@@ -100,7 +100,6 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				}
 			}
 			if(null != collectionObject) {
-				// FIXME: virtually everything below could blow up!
 				// FIXME: implement the correct logic that Jessi wrote up here: https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
 				listItem.setBriefDescription(BriefDescriptionListModel.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
@@ -132,8 +131,6 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		}
 		
 		// NOTE: I think this is necessary for the front end to know what to do with what's returned (?)
-		// FIXME: need better values for all these hardcoded numbers and fields
-		// FIXME: we've not implemented anything that'd allow paging
 		AbstractCommonList abstractList = (AbstractCommonList) resultsList;
 		abstractList.setItemsInPage(collectionObjectList.getItemsInPage());
 		abstractList.setPageNum(collectionObjectList.getPageNum());
