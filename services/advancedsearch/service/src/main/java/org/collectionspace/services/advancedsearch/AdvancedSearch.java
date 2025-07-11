@@ -100,21 +100,20 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				}
 			}
 			if(null != collectionObject) {
-				// FIXME: implement the correct logic that Jessi wrote up here: https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
 				listItem.setBriefDescription(BriefDescriptionListModel.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
-				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
+				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation()); // "Computed Current Location: Display full string" from https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				listItem.setObjectName(ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
 				listItem.setObjectTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
 				listItem.setResponsibleDepartments(ResponsibleDepartmentsListModel.responsibleDepartmentListToResponsibleDepartmentsList(collectionObject.getResponsibleDepartments()));
 				
 				// from collectionobject
 				listItem.setCsid(collectionObjectValuesMap.get("csid"));
-				listItem.setObjectId(collectionObjectValuesMap.get("objectId"));
+				listItem.setObjectId(collectionObjectValuesMap.get("objectId")); // "Identification Number: Display full string" from https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				listItem.setUri(collectionObjectValuesMap.get("uri"));
 				try {
 					XMLGregorianCalendar date = DatatypeFactory.newInstance().newXMLGregorianCalendar(collectionObjectValuesMap.get("updatedAt"));
-					listItem.setUpdatedAt(date);
+					listItem.setUpdatedAt(date); // "Last Updated Date: Display Date, if updated same day can we display x number of hours ago" from https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				} catch (DatatypeConfigurationException e) {
 					// FIXME need better error handling
 					logger.error("advancedsearch: could not create XMLGregorianCalendar for updatedAt ",e);

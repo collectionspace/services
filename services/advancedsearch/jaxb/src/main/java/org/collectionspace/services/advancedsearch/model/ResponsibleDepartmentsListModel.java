@@ -11,7 +11,7 @@ public class ResponsibleDepartmentsListModel {
 	private static ObjectFactory objectFactory = new ObjectFactory();
 	public static ResponsibleDepartmentsList responsibleDepartmentListToResponsibleDepartmentsList(ResponsibleDepartmentList rdList) {
 		ResponsibleDepartmentsList responsibleDepartmentList = objectFactory.createResponsibleDepartmentsList();
-		// FIXME: where are the other fields? why did I think there are other fields?
+		// NOTE "Display all values separated by comma", from https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 		List<String> responsibleDepartmentNames = rdList.getResponsibleDepartment();
 		if(null != responsibleDepartmentNames) {
 			for(String responsibleDepartmentName : responsibleDepartmentNames) {
