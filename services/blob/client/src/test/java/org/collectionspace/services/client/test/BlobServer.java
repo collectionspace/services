@@ -2,7 +2,6 @@ package org.collectionspace.services.client.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.nio.file.Files;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,6 @@ public class BlobServer {
     private int port;
 
     public void start() throws Exception {
-        ServerSocket
         port = Integer.parseInt(System.getProperty("blob.test.port"));
         logger.info("Starting server on port {}", port);
         server = new Server(port);
