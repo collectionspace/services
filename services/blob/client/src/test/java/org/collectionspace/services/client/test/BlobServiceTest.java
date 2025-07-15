@@ -40,9 +40,7 @@ import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,14 +71,12 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
 
     @BeforeClass
     public void startBlobServer() throws Exception {
-        System.out.println("STARTING BLOB SERVER - BLOBSERVICETEST");
         server = new BlobServer();
         server.start();
     }
 
     @AfterClass
     public void stopBlobServer() throws Exception {
-        System.out.println("STOPPING BLOB SERVER - BLOBSERVICETEST");
         server.stop();
     }
 
@@ -189,7 +185,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     /*
      * For a known image file, make sure we're getting back the correct metadata about it.
      */
-    @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"}, groups = {"blob.crud"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"})
     public void testImageDimensions(String testName) throws Exception {
         setupCreate();
 
@@ -249,25 +245,25 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
+    		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURI(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, null);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
+    		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL1(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, server.getBirdUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
+    		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL2(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, server.getDeckUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"createBlobWithURI"}, groups = {"blob.crud"})
+    		dependsOnMethods = {"createBlobWithURI"})
     public void createBlobWithPost(String testName) throws Exception {
     	createBlob(testName, false /*with POST*/, null);
     }
@@ -310,7 +306,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     @Override
     @Test(dataProvider = "testName",
     		dependsOnMethods = {
-        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"}, groups = {"blob.crud"})
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }

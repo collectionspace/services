@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
@@ -43,14 +42,12 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
 	@BeforeClass
 	public void startBlobServer() throws Exception {
-		System.out.println("STARTING BLOB SERVER - BLOBSCALETEST");
 		blobServer = new BlobServer();
 		blobServer.start();
 	}
 
 	@AfterClass
 	public void stopBlobServer() throws Exception {
-		System.out.println("STOPPING BLOB SERVER - BLOBSCALETEST");
 		blobServer.stop();
 	}
 
@@ -93,7 +90,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         return result;
 	}
 
-	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"}, dependsOnGroups = "blob.crud")
+	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
 	public void scaleGETTest(String testName) throws Exception {
 		this.setupRead();
         BlobClient client = new BlobClient();
@@ -114,7 +111,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         }
 	}
 
-	@Test(dataProvider = "testName", dependsOnGroups = "blob.crud")
+	@Test(dataProvider = "testName")
 	public void scaleTest(String testName) throws Exception {
 		this.createDirectory(GENERATED_IMAGES);
 		setupCreate();
