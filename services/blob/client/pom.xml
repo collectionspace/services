@@ -120,6 +120,9 @@
           <systemPropertyVariables>
             <blob.test.port>${blob.test.port}</blob.test.port>
           </systemPropertyVariables>
+          <suiteXmlFiles>
+            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+          </suiteXmlFiles>
         </configuration>
       </plugin>
     </plugins>
