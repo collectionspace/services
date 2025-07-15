@@ -6,11 +6,10 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
@@ -21,6 +20,8 @@ import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("rawtypes")
@@ -34,11 +35,24 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static final int MAX_FONTSIZE = 60;
 	private static final String IMAGES_TO_CREATE_PROP = "imagesToCreate";
 	private static final int DEFAULT_IMAGES_TO_CREATE = 3; // Override this value by setting a system property named 'imagesToCreate' -i.e., mvn test -DimagesToCreate=30
-	private static final int DEFAULT_IMAGES_TO_GET = DEFAULT_IMAGES_TO_CREATE;
     private static final String GENERATED_IMAGES = "target/generated_images";
     private List<String> allGeneratedImages = new ArrayList<String>();
 
 	private static Random generator = new Random(System.currentTimeMillis());
+	private BlobServer blobServer;
+
+	@BeforeClass
+	public void startBlobServer() throws Exception {
+		System.out.println("STARTING BLOB SERVER - BLOBSCALETEST");
+		blobServer = new BlobServer();
+		blobServer.start();
+	}
+
+	@AfterClass
+	public void stopBlobServer() throws Exception {
+		System.out.println("STOPPING BLOB SERVER - BLOBSCALETEST");
+		blobServer.stop();
+	}
 
 	@Override
 	protected CollectionSpaceClient getClientInstance() throws Exception {
@@ -79,7 +93,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         return result;
 	}
 
-	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"})
+	@Test(dataProvider = "testName", dependsOnMethods = {"scaleTest"}, dependsOnGroups = "blob.crud")
 	public void scaleGETTest(String testName) throws Exception {
 		this.setupRead();
         BlobClient client = new BlobClient();
@@ -100,7 +114,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         }
 	}
 
-	@Test(dataProvider = "testName")
+	@Test(dataProvider = "testName", dependsOnGroups = "blob.crud")
 	public void scaleTest(String testName) throws Exception {
 		this.createDirectory(GENERATED_IMAGES);
 		setupCreate();
@@ -110,10 +124,9 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
         for (int i = 0; i < imagesToCreate; i++, profiler.reset()) {
 			File jpegFile = createJpeg(GENERATED_IMAGES);
-			URL url = jpegFile.toURI().toURL();
 
-	    	profiler.start();
-			Response res = client.createBlobFromURI("https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
+            profiler.start();
+			Response res = client.createBlobFromURI(blobServer.getBirdUrl());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);

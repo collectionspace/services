@@ -39,6 +39,10 @@ import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +68,21 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
     private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
 
-    private final static String PUBLIC_URL_BIRD = "https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg";
-    private final static String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
-
-
+    private BlobServer server;
     private boolean blobCleanup = true;
+
+    @BeforeClass
+    public void startBlobServer() throws Exception {
+        System.out.println("STARTING BLOB SERVER - BLOBSERVICETEST");
+        server = new BlobServer();
+        server.start();
+    }
+
+    @AfterClass
+    public void stopBlobServer() throws Exception {
+        System.out.println("STOPPING BLOB SERVER - BLOBSERVICETEST");
+        server.stop();
+    }
 
     @Override
 	public String getServicePathComponent() {
@@ -175,7 +189,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     /*
      * For a known image file, make sure we're getting back the correct metadata about it.
      */
-    @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"})
+    @Test(dataProvider = "testName", dependsOnMethods = {"createBlobWithURI"}, groups = {"blob.crud"})
     public void testImageDimensions(String testName) throws Exception {
         setupCreate();
 
@@ -235,25 +249,25 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"})
+    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
     public void createBlobWithURI(String testName) throws Exception {
     	createBlob(testName, true /*with URI*/, null);
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"})
+    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
     public void createBlobWithURL1(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, PUBLIC_URL_BIRD);
+    	createBlob(testName, true /*with URI*/, server.getBirdUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"CRUDTests"})
+    		dependsOnMethods = {"CRUDTests"}, groups = {"blob.crud"})
     public void createBlobWithURL2(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, PUBLIC_URL_DECK);
+    	createBlob(testName, true /*with URI*/, server.getDeckUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
-    		dependsOnMethods = {"createBlobWithURI"})
+    		dependsOnMethods = {"createBlobWithURI"}, groups = {"blob.crud"})
     public void createBlobWithPost(String testName) throws Exception {
     	createBlob(testName, false /*with POST*/, null);
     }
@@ -296,7 +310,7 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     @Override
     @Test(dataProvider = "testName",
     		dependsOnMethods = {
-        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"})
+        		"org.collectionspace.services.client.test.AbstractServiceTestImpl.baseCRUDTests"}, groups = {"blob.crud"})
     public void CRUDTests(String testName) {
     	// Do nothing.  Simply here to for a TestNG execution order for our tests
     }
