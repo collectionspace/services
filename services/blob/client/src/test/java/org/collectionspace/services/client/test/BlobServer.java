@@ -43,8 +43,8 @@ public class BlobServer {
     }
 
     public enum Image {
-        BIRD("blobs/birb.jpg"),
-        DECK("blobs/deck.jpg");
+        BIRD("static/bird.jpg"),
+        DECK("static/deck.jpg");
 
         private final String path;
 
