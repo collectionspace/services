@@ -13,25 +13,7 @@
   <name>services.blob.client</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.nuxeo.ecm.core</groupId>
-      <artifactId>nuxeo-core-storage-sql-management</artifactId>
-      <version>${nuxeo.general.release}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-log4j12</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- CollectionSpace dependencies -->
-    <dependency>
-      <groupId>org.collectionspace.services</groupId>
-      <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
-      <optional>true</optional>
-      <version>${project.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.collectionspace.services</groupId>
       <artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -46,29 +28,19 @@
       <groupId>org.collectionspace.services</groupId>
       <artifactId>org.collectionspace.services.person.client</artifactId>
       <version>${project.version}</version>
+      <scope>test</scope>
     </dependency>
     <!-- External dependencies -->
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxb-provider</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-multipart-provider</artifactId>
     </dependency>
-    <dependency>
-      <groupId>commons-httpclient</groupId>
-      <artifactId>commons-httpclient</artifactId>
-    </dependency>
 
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- We need Jetty 9.4 because of our reliance on Java 8. Once we update we can use a newer version. -->
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -117,12 +89,71 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.5.3</version>
         <configuration>
-          <systemPropertyVariables>
-            <blob.test.port>${blob.test.port}</blob.test.port>
-          </systemPropertyVariables>
-          <suiteXmlFiles>
-            <suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
-          </suiteXmlFiles>
+          <excludes>
+            <exclude>**/*IT.class</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.57.v20241219</version>
+        <configuration>
+          <httpConnector>
+            <port>8999</port>
+          </httpConnector>
+          <contextHandlers>
+            <contextHandler implementation="org.eclipse.jetty.server.handler.ContextHandler">
+              <contextPath>/static</contextPath>
+              <resourceBase>src/test/resources/static</resourceBase>
+              <handler implementation="org.eclipse.jetty.server.handler.ResourceHandler" />
+            </contextHandler>
+          </contextHandlers>
+          <stopKey>quit</stopKey>
+          <stopPort>9000</stopPort>
+          <supportedPackagings>jar</supportedPackagings>
+        </configuration>
+        <executions>
+          <execution>
+            <id>start-jetty</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop-jetty</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>3.5.3</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includes>
+            <include>**/*IT.class</include>
+          </includes>
         </configuration>
       </plugin>
     </plugins>

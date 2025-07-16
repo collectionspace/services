@@ -53,9 +53,9 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
  * $LastChangedDate:  $
  */
 @SuppressWarnings("rawtypes")
-public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
+public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
 
-    private final String CLASS_NAME = BlobServiceTest.class.getName();
+    private final String CLASS_NAME = BlobServiceIT.class.getName();
     private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
 
     private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
@@ -72,12 +72,12 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     @BeforeClass
     public void startBlobServer() throws Exception {
         server = new BlobServer();
-        server.start();
+        // server.start();
     }
 
     @AfterClass
     public void stopBlobServer() throws Exception {
-        server.stop();
+        // server.stop();
     }
 
     @Override

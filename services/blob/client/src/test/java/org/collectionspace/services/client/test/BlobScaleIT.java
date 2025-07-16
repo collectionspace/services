@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
@@ -24,9 +25,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("rawtypes")
-public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
+public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
 
-    private final Logger logger = LoggerFactory.getLogger(BlobScaleTest.class);
+    private final Logger logger = LoggerFactory.getLogger(BlobScaleIT.class);
 
 	private static final int IMAGE_SIZE = 1000;
 	private static final int IMAGE_EDGE = -15;
@@ -43,12 +44,12 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	@BeforeClass
 	public void startBlobServer() throws Exception {
 		blobServer = new BlobServer();
-		blobServer.start();
+		//blobServer.start();
 	}
 
 	@AfterClass
 	public void stopBlobServer() throws Exception {
-		blobServer.stop();
+		//blobServer.stop();
 	}
 
 	@Override
