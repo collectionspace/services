@@ -128,44 +128,44 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
         String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
         File blobsDir = new File(blobsDirPath);
         if (blobsDir != null && blobsDir.exists()) {
-	        File[] children = blobsDir.listFiles();
-	        if (children != null && children.length > 0) {
-	        	for (File child : children) {
-	        		if (isBlobbable(child) == true) {
-	        			Response res = null;
-		        		String mimeType = this.getMimeType(child);
-		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
-		        		logger.debug("MIME type is: " + mimeType);
-		        		if (fromUri == true) {
-		        			if (uri != null) {
-			        			res = client.createBlobFromURI(uri);
-			        			//break;
-		        			} else {
-			        			URL childUrl = child.toURI().toURL();
-			        			res = client.createBlobFromURI(childUrl.toString());
-		        			}
-		        		} else {
-				            MultipartFormDataOutput form = new MultipartFormDataOutput();
-				            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
-				            res = client.createBlobFromFormData(form);
-		        		}
-		        		try {
-				            assertStatusCode(res, testName);
-				            if (isBlobCleanup() == true) {
-				            	allResourceIdsCreated.add(extractId(res));
-				            }
-		        		} finally {
-		        			if (res != null) {
-		                        res.close();
-		                    }
-		        		}
-	        		}
-	        	}
-	        } else {
-	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
-	        }
+            File[] children = blobsDir.listFiles();
+            if (children != null && children.length > 0) {
+                for (File child : children) {
+                    if (isBlobbable(child)) {
+                        Response res = null;
+                        String mimeType = this.getMimeType(child);
+                        logger.debug("Processing file URI: {}", child.getAbsolutePath());
+                        logger.debug("MIME type is: {}", mimeType);
+                        if (fromUri) {
+                            if (uri != null) {
+                                res = client.createBlobFromURI(uri);
+                                // break;
+                            } else {
+                                URL childUrl = child.toURI().toURL();
+                                res = client.createBlobFromURI(childUrl.toString());
+                            }
+                        } else {
+                            MultipartFormDataOutput form = new MultipartFormDataOutput();
+                            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
+                            res = client.createBlobFromFormData(form);
+                        }
+                        try {
+                            assertStatusCode(res, testName);
+                            if (isBlobCleanup()) {
+                                allResourceIdsCreated.add(extractId(res));
+                            }
+                        } finally {
+                            if (res != null) {
+                                res.close();
+                            }
+                        }
+                    }
+                }
+            } else {
+                logger.debug("Directory: {} is empty or cannot be read.", blobsDirPath);
+            }
         } else {
-        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+            logger.debug("Directory: {} is missing or cannot be read.", blobsDirPath);
         }
     }
 
@@ -186,17 +186,17 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
         // Create the blob
         //
         BlobClient client = new BlobClient();
-		Response res = null;
-		res = client.createBlobFromURI(uri);
-		String blobCsid = null;
-		try {
-	        assertStatusCode(res, testName);
-	        blobCsid = extractId(res);
-	        if (isBlobCleanup() == true) {
-	        	allResourceIdsCreated.add(blobCsid);
-	        }
-		} finally {
-			if (res != null) {
+        Response res = null;
+        res = client.createBlobFromURI(uri);
+        String blobCsid = null;
+        try {
+            assertStatusCode(res, testName);
+            blobCsid = extractId(res);
+            if (isBlobCleanup()) {
+                allResourceIdsCreated.add(blobCsid);
+            }
+        } finally {
+            if (res != null) {
                 res.close();
             }
 		}
@@ -272,10 +272,8 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
         PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(client.getCommonPartName(), blob);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, blob common");
-            logger.debug(objectAsXmlString(blob, BlobsCommon.class));
-        }
+        logger.debug("to be created, blob common");
+        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
 
         return multipart;
     }
