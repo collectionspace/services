@@ -30,6 +30,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -39,8 +40,6 @@ import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,19 +65,7 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
     private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
     private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
 
-    private BlobServer server;
     private boolean blobCleanup = true;
-
-    @BeforeClass
-    public void startBlobServer() throws Exception {
-        server = new BlobServer();
-        // server.start();
-    }
-
-    @AfterClass
-    public void stopBlobServer() throws Exception {
-        // server.stop();
-    }
 
     @Override
 	public String getServicePathComponent() {
@@ -253,13 +240,13 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL1(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, server.getBirdUrl());
+    	createBlob(testName, true /*with URI*/, StaticImage.BIRD.getUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL2(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, server.getDeckUrl());
+    	createBlob(testName, true /*with URI*/, StaticImage.DECK.getUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,

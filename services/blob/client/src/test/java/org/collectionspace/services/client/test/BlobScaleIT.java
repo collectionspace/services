@@ -9,19 +9,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("rawtypes")
@@ -39,18 +37,6 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
     private List<String> allGeneratedImages = new ArrayList<String>();
 
 	private static Random generator = new Random(System.currentTimeMillis());
-	private BlobServer blobServer;
-
-	@BeforeClass
-	public void startBlobServer() throws Exception {
-		blobServer = new BlobServer();
-		//blobServer.start();
-	}
-
-	@AfterClass
-	public void stopBlobServer() throws Exception {
-		//blobServer.stop();
-	}
 
 	@Override
 	protected CollectionSpaceClient getClientInstance() throws Exception {
@@ -124,7 +110,7 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
 			File jpegFile = createJpeg(GENERATED_IMAGES);
 
             profiler.start();
-			Response res = client.createBlobFromURI(blobServer.getBirdUrl());
+			Response res = client.createBlobFromURI(StaticImage.BIRD.getUrl());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);

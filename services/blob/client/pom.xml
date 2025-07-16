@@ -30,6 +30,12 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.collectionspace.services.blob</groupId>
+      <artifactId>blob-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- External dependencies -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -82,7 +88,8 @@
         <version>3.6.0</version>
         <configuration>
           <portNames>
-            <portName>blob.test.port</portName>
+            <portName>jetty.port</portName>
+            <portName>jetty.stop.port</portName>
           </portNames>
           <fileSet/>
           <name/>
@@ -115,11 +122,32 @@
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
+        <configuration>
+          <httpConnector>
+            <port>${jetty.port}</port>
+          </httpConnector>
+          <stopKey>quit</stopKey>
+          <stopPort>${jetty.stop.port}</stopPort>
+          <contextHandlers>
+            <contextHandler implementation="org.eclipse.jetty.server.handler.ContextHandler">
+              <contextPath>/static</contextPath>
+              <resourceBase>${project.build.directory}/maven-shared-archive-resources</resourceBase>
+              <handler implementation="org.eclipse.jetty.server.handler.ResourceHandler" />
+            </contextHandler>
+          </contextHandlers>
+          <stopKey>quit</stopKey>
+          <supportedPackagings>jar</supportedPackagings>
+        </configuration>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <jetty.port>${jetty.port}</jetty.port>
+          </systemPropertyVariables>
+        </configuration>
       </plugin>
     </plugins>
   </build>
