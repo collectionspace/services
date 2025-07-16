@@ -61,9 +61,9 @@ public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList
     private final static int WIDTH_DIMENSION_INDEX = 0;
     private final static int HEIGHT_DIMENSION_INDEX = 1;
 
-    private final static String KNOWN_IMAGE_SIZE = "56261";
-    private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
-    private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
+    private static final String KNOWN_IMAGE_SIZE = "56261";
+    private static final BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal("640.0");
+    private static final BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal("480.0");
 
     private boolean blobCleanup = true;
 
