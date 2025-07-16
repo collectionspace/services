@@ -31,11 +31,11 @@ public class BlobServer {
     }
 
     public String getBirdUrl() {
-        return "http://localhost:" + port + "/images?image=bird";
+        return "http://localhost:" + 8999 + "/static/bird.jpg";
     }
 
     public String getDeckUrl() {
-        return "http://localhost:" + port + "/images?image=deck";
+        return "http://localhost:" + 8999 + "/static/deck.jpg";
     }
 
     public void stop() throws Exception {
