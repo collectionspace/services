@@ -69,9 +69,7 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
         			+ IMAGES_TO_CREATE_PROP
         			+ "' was defined, so we'll use the default instead.");
         } finally {
-        	logger.info("Testing blob scaling by creating "
-        			+ result
-        			+ " images.");
+            logger.info("Testing blob scaling by creating {} images.", result);
         }
 
         return result;
@@ -87,14 +85,14 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
         Thread.sleep(3000); // sleep for 3 seconds
 
         for (int i = 0; i < allGeneratedImages.size(); i++) {
-	        Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
-	        try {
-		        assertStatusCode(res, testName);
-		        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.",
-		        		allGeneratedImages.get(i)));
-	        } finally {
-	        	res.close();
-	        }
+            Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
+            try {
+                assertStatusCode(res, testName);
+                logger.debug("Performed GET operation on Thumbnail derivative of image blob ID = '{}'.",
+                             allGeneratedImages.get(i));
+            } finally {
+                res.close();
+            }
         }
 	}
 
@@ -115,13 +113,8 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
 				profiler.stop();
 		        assertStatusCode(res, testName);
 
-		        logger.debug(
-						i + ": Uploaded image to Nuxeo in "
-						+ profiler.getCumulativeTime()
-						+ " milleseconds "
-						+ " - "
-						+ " : "
-						+ jpegFile.getAbsolutePath());
+                logger.debug("{}: Uploaded image to Nuxeo in {} milleseconds  -  : {}", i, profiler.getCumulativeTime(),
+                             jpegFile.getAbsolutePath());
 
 		        String csid = extractId(res);
 		        this.knownResourceId = csid;
@@ -135,14 +128,12 @@ public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
         }
 	}
 
-	private void createDirectory(String dirName) {
-		boolean success = (
-				new File(dirName)).mkdir();
-		if (success) {
-			logger.debug("Directory: "
-					+ dirName + " created");
-		}
-	}
+    private void createDirectory(String dirName) {
+        boolean success = (new File(dirName)).mkdir();
+        if (success) {
+            logger.debug("Directory: {} created", dirName);
+        }
+    }
 
 	public File createJpeg(String destDir) {
 		File result = null;
