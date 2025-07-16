@@ -8,7 +8,7 @@ package org.collectionspace.serivces.blob;
  */
 public enum StaticImage {
     BIRD("bird.jpg"),
-    DECK("bird.jpg");
+    DECK("deck.jpg");
 
     private final String path;
 
