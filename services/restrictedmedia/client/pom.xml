@@ -143,6 +143,7 @@
           </httpConnector>
           <stopKey>quit</stopKey>
           <stopPort>${jetty.stop.port}</stopPort>
+          <stopWait>10</stopWait>
           <contextHandlers>
             <contextHandler implementation="org.eclipse.jetty.server.handler.ContextHandler">
               <contextPath>/static</contextPath>
@@ -150,7 +151,6 @@
               <handler implementation="org.eclipse.jetty.server.handler.ResourceHandler" />
             </contextHandler>
           </contextHandlers>
-          <stopKey>quit</stopKey>
           <supportedPackagings>jar</supportedPackagings>
         </configuration>
       </plugin>
