@@ -47,19 +47,6 @@
       <artifactId>testng</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- We need Jetty 9.4 because of our reliance on Java 8. Once we update we can use a newer version. -->
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>9.4.57.v20241219</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>9.4.57.v20241219</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <build>
