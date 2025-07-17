@@ -54,8 +54,7 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
 @SuppressWarnings("rawtypes")
 public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
 
-    private final String CLASS_NAME = BlobServiceIT.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger logger = LoggerFactory.getLogger(BlobServiceIT.class);
 
     private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
     private final static int WIDTH_DIMENSION_INDEX = 0;
