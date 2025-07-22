@@ -34,6 +34,18 @@
       <artifactId>org.collectionspace.services.restrictedmedia.jaxb</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.collectionspace.services</groupId>
+      <artifactId>org.collectionspace.services.person.client</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.collectionspace.services.blob</groupId>
+      <artifactId>blob-test-utils</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
 
     <!-- External dependencies -->
     <dependency>
@@ -66,5 +78,92 @@
 
   <build>
     <finalName>collectionspace-services-restrictedmedia-client</finalName>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <configuration>
+          <resourceBundles>
+            <resourceBundle>org.collectionspace.services.blob:blob-test-utils:${project.version}</resourceBundle>
+          </resourceBundles>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.6.0</version>
+        <configuration>
+          <portNames>
+            <portName>jetty.port</portName>
+            <portName>jetty.stop.port</portName>
+          </portNames>
+          <fileSet/>
+          <name/>
+          <regex/>
+          <source/>
+          <value/>
+        </configuration>
+        <executions>
+          <execution>
+            <id>reserve-port</id>
+            <phase>test-compile</phase>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.3</version>
+        <configuration>
+          <excludes>
+            <exclude>**/*IT.class</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <configuration>
+          <httpConnector>
+            <port>${jetty.port}</port>
+          </httpConnector>
+          <stopKey>quit</stopKey>
+          <stopPort>${jetty.stop.port}</stopPort>
+          <stopWait>10</stopWait>
+          <contextHandlers>
+            <contextHandler implementation="org.eclipse.jetty.server.handler.ContextHandler">
+              <contextPath>/static</contextPath>
+              <resourceBase>${project.build.directory}/maven-shared-archive-resources</resourceBase>
+              <handler implementation="org.eclipse.jetty.server.handler.ResourceHandler" />
+            </contextHandler>
+          </contextHandlers>
+          <supportedPackagings>jar</supportedPackagings>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <jetty.port>${jetty.port}</jetty.port>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>

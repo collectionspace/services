@@ -13,6 +13,7 @@
     <url>http://www.collectionspace.org</url>
     
     <modules>
+        <module>blob-test-utils</module>
         <module>client</module>
         <module>3rdparty</module>
         <module>service</module>

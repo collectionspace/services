@@ -29,6 +29,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.MediaClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -49,11 +50,9 @@ import org.slf4j.LoggerFactory;
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
  */
-public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, MediaCommon> {
+public class MediaServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList, MediaCommon> {
 
-    private final String CLASS_NAME = MediaServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(MediaServiceTest.class);
-    private final static String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
+    private final Logger logger = LoggerFactory.getLogger(MediaServiceIT.class);
 
     private boolean mediaCleanup = true;
 
@@ -77,7 +76,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     }
 
 
-    @Override
+	@Override
 	public String getServicePathComponent() {
 		return MediaClient.SERVICE_PATH_COMPONENT;
 	}
@@ -206,7 +205,7 @@ public class MediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonL
     public void createMediaAndBlobWithUri(String testName) throws Exception {
 		MediaClient client = new MediaClient();
 		PoxPayloadOut multipart = createMediaInstance(createIdentifier());
-		Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true); // purge the original
+		Response mediaRes = client.createMediaAndBlobWithUri(multipart, StaticImage.DECK.getUrl(), true); // purge the original
 		String mediaCsid = null;
 		try {
 			assertStatusCode(mediaRes, testName);

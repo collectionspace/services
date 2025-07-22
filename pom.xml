@@ -318,6 +318,63 @@
 						</execution>
 					</executions>
 				</plugin>
+
+				<!-- Integration Test plugins: jetty, failsafe, and remote-resources -->
+				<plugin>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-maven-plugin</artifactId>
+					<version>9.4.57.v20241219</version>
+					<executions>
+						<execution>
+							<id>start-jetty</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>start</goal>
+							</goals>
+							<configuration>
+								<skip>${skipTests}</skip>
+							</configuration>
+						</execution>
+						<execution>
+							<id>stop-jetty</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>stop</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>3.5.3</version>
+					<executions>
+						<execution>
+							<id>integration-test</id>
+							<goals>
+								<goal>integration-test</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>verify</id>
+							<goals>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<includes>
+							<include>**/*IT.class</include>
+						</includes>
+					</configuration>
+				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-remote-resources-plugin</artifactId>
+					<version>3.3.0</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 

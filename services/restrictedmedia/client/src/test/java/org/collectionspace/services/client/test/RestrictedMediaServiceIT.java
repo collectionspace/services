@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.UUID;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
@@ -45,10 +47,9 @@ import org.testng.annotations.Test;
 /**
  * RestrictedMediaServiceTest, carries out tests against a deployed and running Restricted Media Service.
  */
-public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, RestrictedMediaCommon> {
+public class RestrictedMediaServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList, RestrictedMediaCommon> {
 
-    private final Logger logger = LoggerFactory.getLogger(RestrictedMediaServiceTest.class);
-    private static final String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
+    private final Logger logger = LoggerFactory.getLogger(RestrictedMediaServiceIT.class);
 
     private boolean mediaCleanup = true;
 
@@ -199,7 +200,7 @@ public class RestrictedMediaServiceTest extends AbstractPoxServiceTestImpl<Abstr
         PoxPayloadOut multipart = createMediaInstance(createIdentifier());
 
         // purge the original
-        Response mediaRes = client.createMediaAndBlobWithUri(multipart, PUBLIC_URL_DECK, true);
+        Response mediaRes = client.createMediaAndBlobWithUri(multipart, StaticImage.DECK.getUrl(), true);
         String mediaCsid = null;
         try {
             assertStatusCode(mediaRes, testName);

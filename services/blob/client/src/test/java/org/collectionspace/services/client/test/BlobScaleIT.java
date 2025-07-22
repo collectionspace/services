@@ -6,8 +6,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -15,6 +13,7 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.Profiler;
@@ -24,9 +23,9 @@ import org.slf4j.LoggerFactory;
 import org.testng.annotations.Test;
 
 @SuppressWarnings("rawtypes")
-public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
+public class BlobScaleIT extends BaseServiceTest<AbstractCommonList> {
 
-    private final Logger logger = LoggerFactory.getLogger(BlobScaleTest.class);
+    private final Logger logger = LoggerFactory.getLogger(BlobScaleIT.class);
 
 	private static final int IMAGE_SIZE = 1000;
 	private static final int IMAGE_EDGE = -15;
@@ -34,7 +33,6 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 	private static final int MAX_FONTSIZE = 60;
 	private static final String IMAGES_TO_CREATE_PROP = "imagesToCreate";
 	private static final int DEFAULT_IMAGES_TO_CREATE = 3; // Override this value by setting a system property named 'imagesToCreate' -i.e., mvn test -DimagesToCreate=30
-	private static final int DEFAULT_IMAGES_TO_GET = DEFAULT_IMAGES_TO_CREATE;
     private static final String GENERATED_IMAGES = "target/generated_images";
     private List<String> allGeneratedImages = new ArrayList<String>();
 
@@ -71,9 +69,7 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         			+ IMAGES_TO_CREATE_PROP
         			+ "' was defined, so we'll use the default instead.");
         } finally {
-        	logger.info("Testing blob scaling by creating "
-        			+ result
-        			+ " images.");
+            logger.info("Testing blob scaling by creating {} images.", result);
         }
 
         return result;
@@ -89,14 +85,14 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         Thread.sleep(3000); // sleep for 3 seconds
 
         for (int i = 0; i < allGeneratedImages.size(); i++) {
-	        Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
-	        try {
-		        assertStatusCode(res, testName);
-		        logger.debug(String.format("Performed GET operation on Thumbnail derivative of image blob ID = '%s'.",
-		        		allGeneratedImages.get(i)));
-	        } finally {
-	        	res.close();
-	        }
+            Response res = client.getDerivativeContent(allGeneratedImages.get(i), "Thumbnail");
+            try {
+                assertStatusCode(res, testName);
+                logger.debug("Performed GET operation on Thumbnail derivative of image blob ID = '{}'.",
+                             allGeneratedImages.get(i));
+            } finally {
+                res.close();
+            }
         }
 	}
 
@@ -110,21 +106,15 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
 
         for (int i = 0; i < imagesToCreate; i++, profiler.reset()) {
 			File jpegFile = createJpeg(GENERATED_IMAGES);
-			URL url = jpegFile.toURI().toURL();
 
-	    	profiler.start();
-			Response res = client.createBlobFromURI("https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg");//url.toString());
+            profiler.start();
+			Response res = client.createBlobFromURI(StaticImage.BIRD.getUrl());
 			try {
 				profiler.stop();
 		        assertStatusCode(res, testName);
 
-		        logger.debug(
-						i + ": Uploaded image to Nuxeo in "
-						+ profiler.getCumulativeTime()
-						+ " milleseconds "
-						+ " - "
-						+ " : "
-						+ jpegFile.getAbsolutePath());
+                logger.debug("{}: Uploaded image to Nuxeo in {} milleseconds  -  : {}", i, profiler.getCumulativeTime(),
+                             jpegFile.getAbsolutePath());
 
 		        String csid = extractId(res);
 		        this.knownResourceId = csid;
@@ -138,14 +128,12 @@ public class BlobScaleTest extends BaseServiceTest<AbstractCommonList> {
         }
 	}
 
-	private void createDirectory(String dirName) {
-		boolean success = (
-				new File(dirName)).mkdir();
-		if (success) {
-			logger.debug("Directory: "
-					+ dirName + " created");
-		}
-	}
+    private void createDirectory(String dirName) {
+        boolean success = (new File(dirName)).mkdir();
+        if (success) {
+            logger.debug("Directory: {} created", dirName);
+        }
+    }
 
 	public File createJpeg(String destDir) {
 		File result = null;

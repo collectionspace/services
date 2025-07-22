@@ -30,6 +30,7 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.collectionspace.serivces.blob.StaticImage;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.BlobClient;
 import org.collectionspace.services.client.PayloadOutputPart;
@@ -51,22 +52,17 @@ import org.jboss.resteasy.plugins.providers.multipart.OutputPart;
  * $LastChangedDate:  $
  */
 @SuppressWarnings("rawtypes")
-public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
+public class BlobServiceIT extends AbstractPoxServiceTestImpl<AbstractCommonList, BlobsCommon> {
 
-    private final String CLASS_NAME = BlobServiceTest.class.getName();
-    private final Logger logger = LoggerFactory.getLogger(CLASS_NAME);
+    private final Logger logger = LoggerFactory.getLogger(BlobServiceIT.class);
 
     private final static String KNOWN_IMAGE_FILENAME = "01-03-09_1546.jpg";
     private final static int WIDTH_DIMENSION_INDEX = 0;
     private final static int HEIGHT_DIMENSION_INDEX = 1;
 
-    private final static String KNOWN_IMAGE_SIZE = "56261";
-    private final static BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal(640.0);
-    private final static BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal(480.0);
-
-    private final static String PUBLIC_URL_BIRD = "https://farm6.static.flickr.com/5289/5688023100_15e00cde47_o.jpg";
-    private final static String PUBLIC_URL_DECK = "https://farm8.staticflickr.com/7231/6962564226_4bdfc17599_k_d.jpg";
-
+    private static final String KNOWN_IMAGE_SIZE = "56261";
+    private static final BigDecimal KNOWN_IMAGE_WIDTH = new BigDecimal("640.0");
+    private static final BigDecimal KNOWN_IMAGE_HEIGHT = new BigDecimal("480.0");
 
     private boolean blobCleanup = true;
 
@@ -131,44 +127,44 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         String blobsDirPath = currentDir + File.separator + BLOBS_DIR;
         File blobsDir = new File(blobsDirPath);
         if (blobsDir != null && blobsDir.exists()) {
-	        File[] children = blobsDir.listFiles();
-	        if (children != null && children.length > 0) {
-	        	for (File child : children) {
-	        		if (isBlobbable(child) == true) {
-	        			Response res = null;
-		        		String mimeType = this.getMimeType(child);
-		        		logger.debug("Processing file URI: " + child.getAbsolutePath());
-		        		logger.debug("MIME type is: " + mimeType);
-		        		if (fromUri == true) {
-		        			if (uri != null) {
-			        			res = client.createBlobFromURI(uri);
-			        			//break;
-		        			} else {
-			        			URL childUrl = child.toURI().toURL();
-			        			res = client.createBlobFromURI(childUrl.toString());
-		        			}
-		        		} else {
-				            MultipartFormDataOutput form = new MultipartFormDataOutput();
-				            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
-				            res = client.createBlobFromFormData(form);
-		        		}
-		        		try {
-				            assertStatusCode(res, testName);
-				            if (isBlobCleanup() == true) {
-				            	allResourceIdsCreated.add(extractId(res));
-				            }
-		        		} finally {
-		        			if (res != null) {
-		                        res.close();
-		                    }
-		        		}
-	        		}
-	        	}
-	        } else {
-	        	logger.debug("Directory: " + blobsDirPath + " is empty or cannot be read.");
-	        }
+            File[] children = blobsDir.listFiles();
+            if (children != null && children.length > 0) {
+                for (File child : children) {
+                    if (isBlobbable(child)) {
+                        Response res = null;
+                        String mimeType = this.getMimeType(child);
+                        logger.debug("Processing file URI: {}", child.getAbsolutePath());
+                        logger.debug("MIME type is: {}", mimeType);
+                        if (fromUri) {
+                            if (uri != null) {
+                                res = client.createBlobFromURI(uri);
+                                // break;
+                            } else {
+                                URL childUrl = child.toURI().toURL();
+                                res = client.createBlobFromURI(childUrl.toString());
+                            }
+                        } else {
+                            MultipartFormDataOutput form = new MultipartFormDataOutput();
+                            OutputPart outputPart = form.addFormData("file", child, MediaType.valueOf(mimeType));
+                            res = client.createBlobFromFormData(form);
+                        }
+                        try {
+                            assertStatusCode(res, testName);
+                            if (isBlobCleanup()) {
+                                allResourceIdsCreated.add(extractId(res));
+                            }
+                        } finally {
+                            if (res != null) {
+                                res.close();
+                            }
+                        }
+                    }
+                }
+            } else {
+                logger.debug("Directory: {} is empty or cannot be read.", blobsDirPath);
+            }
         } else {
-        	logger.debug("Directory: " + blobsDirPath + " is missing or cannot be read.");
+            logger.debug("Directory: {} is missing or cannot be read.", blobsDirPath);
         }
     }
 
@@ -189,17 +185,17 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         // Create the blob
         //
         BlobClient client = new BlobClient();
-		Response res = null;
-		res = client.createBlobFromURI(uri);
-		String blobCsid = null;
-		try {
-	        assertStatusCode(res, testName);
-	        blobCsid = extractId(res);
-	        if (isBlobCleanup() == true) {
-	        	allResourceIdsCreated.add(blobCsid);
-	        }
-		} finally {
-			if (res != null) {
+        Response res = null;
+        res = client.createBlobFromURI(uri);
+        String blobCsid = null;
+        try {
+            assertStatusCode(res, testName);
+            blobCsid = extractId(res);
+            if (isBlobCleanup()) {
+                allResourceIdsCreated.add(blobCsid);
+            }
+        } finally {
+            if (res != null) {
                 res.close();
             }
 		}
@@ -243,13 +239,13 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL1(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, PUBLIC_URL_BIRD);
+    	createBlob(testName, true /*with URI*/, StaticImage.BIRD.getUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
     		dependsOnMethods = {"CRUDTests"})
     public void createBlobWithURL2(String testName) throws Exception {
-    	createBlob(testName, true /*with URI*/, PUBLIC_URL_DECK);
+    	createBlob(testName, true /*with URI*/, StaticImage.DECK.getUrl());
     }
 
     @Test(dataProvider = "testName", dataProviderClass = AbstractServiceTestImpl.class,
@@ -275,10 +271,8 @@ public class BlobServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLi
         PoxPayloadOut multipart = new PoxPayloadOut(BlobClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = multipart.addPart(client.getCommonPartName(), blob);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, blob common");
-            logger.debug(objectAsXmlString(blob, BlobsCommon.class));
-        }
+        logger.debug("to be created, blob common");
+        logger.debug(objectAsXmlString(blob, BlobsCommon.class));
 
         return multipart;
     }
