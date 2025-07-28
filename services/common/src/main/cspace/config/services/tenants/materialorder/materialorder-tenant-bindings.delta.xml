@@ -1,0 +1,715 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tenant:TenantBindingConfig
+        xmlns:merge='http://xmlmerge.el4j.elca.ch'
+        xmlns:tenant='http://collectionspace.org/services/config/tenant'>
+
+    <!-- Add your changes, if any, within the following tag pair. -->
+    <!-- The value of the 'id' attribute, below, should match the corresponding -->
+    <!-- value in cspace/config/services/tenants/materials-tenant-bindings-proto.xml -->
+
+    <tenant:tenantBinding id="100001">
+      <tenant:elasticSearchDocumentWriter merge:action="replace">
+          org.collectionspace.services.nuxeo.elasticsearch.materials.MaterialsESDocumentWriter
+        </tenant:elasticSearchDocumentWriter>
+
+        <tenant:elasticSearchIndexConfig merge:action="replace">
+            <tenant:mapping merge:action="replace">
+              {
+                // For now, don't index a field unless there's a mapping explicitly defined. This keeps the
+                // index as small as possible. We may want to turn this on in the future, to support arbitrary
+                // searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
+                "dynamic": false,
+                "_all" : {
+                  "enabled": false
+                },
+                "_source": {
+                  "includes": [
+                    "collectionspace_denorm:*",
+                    "collectionspace_core:*",
+                    "ecm:currentLifeCycleState",
+                    "ecm:name",
+                    "ecm:primaryType",
+                    "materials_common:shortIdentifier",
+                    "materials_common:featuredCollectionGroupList",
+                    "materials_common:publishToList",
+                    "materials_common:externalUrlGroupList",
+                    "materials_common:materialTermGroupList",
+                    "materials_common:materialCompositionGroupList",
+                    "materials_common:description",
+                    "materials_common:typicalUses",
+                    "materials_common:discontinued",
+                    "materials_common:productionDate",
+                    "materials_common:materialProductionOrganizationGroupList",
+                    "materials_common:materialProductionPersonGroupList",
+                    "materials_common:materialProductionPlaceGroupList",
+                    "materials_common:productionNote",
+                    "materials_common:additionalResourceGroupList",
+                    "materials_common:featuredApplicationGroupList",
+                    "materials_common:commonForm",
+                    "materials_common:formTypeGroupList",
+                    "materials_common:acousticalPropertyGroupList",
+                    "materials_common:durabilityPropertyGroupList",
+                    "materials_common:electricalPropertyGroupList",
+                    "materials_common:hygrothermalPropertyGroupList",
+                    "materials_common:mechanicalPropertyGroupList",
+                    "materials_common:opticalPropertyGroupList",
+                    "materials_common:sensorialPropertyGroupList",
+                    "materials_common:smartMaterialPropertyGroupList",
+                    "materials_common:additionalPropertyGroupList",
+                    "materials_common:propertyNote",
+                    "materials_common:recycledContentGroupList",
+                    "materials_common:lifecycleComponentGroupList",
+                    "materials_common:embodiedEnergyGroupList",
+                    "materials_common:certificationCreditGroupList",
+                    "materials_common:ecologyNote",
+                    "materials_common:castingProcesses",
+                    "materials_common:joiningProcesses",
+                    "materials_common:moldingProcesses",
+                    "materials_common:surfacingProcesses",
+                    "materials_common:deformingProcesses",
+                    "materials_common:machiningProcesses",
+                    "materials_common:rapidPrototypingProcesses",
+                    "materials_common:additionalProcessGroupList",
+                    "materials_common:processNote",
+                    "collectionobjects_common:contentDescription",
+                    "collectionobjects_common:contentEvents",
+                    "collectionobjects_common:contentOrganizations",
+                    "collectionobjects_common:contentPersons",
+                    "collectionobjects_common:objectHistoryNote",
+                    "collectionobjects_common:objectNumber",
+                    "collectionobjects_common:objectStatusList",
+                    "collectionobjects_common:publishedRelatedLinkGroupList",
+                    "collectionobjects_common:publishToList",
+                    "collectionobjects_common:materialGroupList",
+                    "collectionobjects_common:otherNumberList",
+                    "collectionobjects_common:ownersContributionNote",
+                    "collectionobjects_common:collection",
+                    "collectionobjects_common:namedCollections",
+                    "collectionobjects_common:computedCurrentLocation",
+                    "collectionobjects_materials:materialContainerGroupList",
+                    "collectionobjects_materials:materialConditionGroupList",
+                    "collectionobjects_materials:materialHandlingGroupList",
+                    "collectionobjects_materials:materialPhysicalDescriptions",
+                    "collectionobjects_common:colors",
+                    "collectionobjects_materials:materialGenericColors",
+                    "collectionobjects_materials:materialFinishGroupList",
+                    "collectionobjects_common:numberOfObjects",
+                    "collectionobjects_common:objectCountGroupList",
+                    "collectionobjects_common:briefDescriptions",
+                    "collectionobjects_common:measuredPartGroupList",
+                    "collectionobjects_common:viewersContributionNote",
+                    "collectionobjects_common:rightsGroupList.rightStatement",
+                    "collectionobjects_common:rightsGroupList.standardizedRightStatement",
+                    "collectionobjects_common:rightsInGroupList.rightReproductionStatement",
+                    "media_common:blobCsid",
+                    "media_materials:publishToList"
+                  ]
+                },
+                "properties" : {
+                  "all_field": {
+                    "type": "text",
+                    "analyzer": "fulltext"
+                  },
+
+                  "ecm:currentLifeCycleState": {
+                    "type": "keyword"
+                  },
+                  "ecm:name": {
+                    "type": "keyword"
+                  },
+                  "ecm:primaryType": {
+                    "type": "text",
+                    "analyzer" : "doctype_analyzer"
+                  },
+
+                  "collectionspace_denorm:title": {
+                    "type": "keyword",
+                    "normalizer": "sorting_normalizer"
+                  },
+                  "collectionspace_denorm:commercialNames": {
+                    "type": "text",
+                    "analyzer": "fulltext"
+                  },
+                  "collectionspace_denorm:commonNames": {
+                    "type": "text",
+                    "analyzer": "fulltext"
+                  },
+                  "collectionspace_denorm:holdingInstitutions": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionspace_denorm:mediaAltText": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionspace_denorm:exhibition": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "keyword",
+                        "copy_to": "all_field"
+                      },
+                      "generalNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      },
+                      "curatorialNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      }
+                    }
+                  },
+
+                  "collectionspace_core:createdAt": {
+                    "type": "date",
+                    // Sometimes the timestamp only has a two digit fractional second, instead of three.
+                    // From imported data??
+                    "format" : "date_time||yyyy-MM-dd'T'HH:mm:ss.SSZZ"
+                  },
+
+                  "materials_common:shortIdentifier": {
+                    "type": "keyword",
+                    "copy_to": "all_field"
+                  },
+                  "materials_common:materialTermGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "termDisplayName": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      }
+                    }
+                  },
+                  "materials_common:featuredCollectionGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "featuredCollection": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:publishToList": {
+                    "type": "keyword",
+                    "fields": {
+                      "shortid": {
+                        "type": "keyword",
+                        "normalizer": "refname_shortid_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:materialCompositionGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "materialCompositionFamilyName": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      },
+                      "materialCompositionClassName": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      },
+                      "materialCompositionGenericName": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:description": {
+                    "type": "text",
+                    "analyzer" : "fulltext",
+                    "copy_to": "all_field"
+                  },
+                  "materials_common:typicalUses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:materialProductionOrganizationGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "materialProductionOrganization": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:materialProductionPersonGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "materialProductionPerson": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:materialProductionPlaceGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "materialProductionPlace": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:featuredApplicationGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "featuredApplication": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:commonForm": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:formTypeGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "formType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  // Properties
+                  "materials_common:acousticalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "acousticalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:durabilityPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "durabilityPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:electricalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "electricalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:hygrothermalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "hygrothermalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:mechanicalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "mechanicalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:opticalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "opticalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:sensorialPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "sensorialPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:smartMaterialPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "smartMaterialPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:additionalPropertyGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "additionalPropertyType": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  // Material Ecology
+                  "materials_common:recycledContentGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "recycledContentQualifier": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "materials_common:lifecycleComponentGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "lifecycleComponent": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  // TODO: embodiedEnergy - range?
+                  "materials_common:certificationCreditGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "certificationProgram": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  // Process
+                  "materials_common:castingProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:joiningProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:moldingProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:surfacingProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:deformingProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:machiningProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:rapidPrototypingProcesses": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "materials_common:additionalProcessGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "additionalProcess": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+
+                  "collectionobjects_common:objectNumber": {
+                    "type": "keyword",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:publishToList": {
+                    "type": "keyword",
+                    "fields": {
+                      "shortid": {
+                        "type": "keyword",
+                        "normalizer": "refname_shortid_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:briefDescriptions": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:contentDescription": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:contentEvents": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:contentOrganizations": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:contentPersons": {
+                    "type": "keyword",
+                    "copy_to": "all_field",
+                    "fields": {
+                      "displayName": {
+                        "type": "keyword",
+                        "normalizer": "refname_displayname_normalizer"
+                      }
+                    }
+                  },
+                  "collectionobjects_common:materialGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "material": {
+                        "type": "keyword",
+                        "copy_to": "all_field",
+                        "fields": {
+                          "displayName": {
+                            "type": "keyword",
+                            "normalizer": "refname_displayname_normalizer"
+                          },
+                          "shortid": {
+                            "type": "keyword",
+                            "normalizer": "refname_shortid_normalizer"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "collectionobjects_common:objectHistoryNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:ownersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:viewersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+
+                  "media_materials:publishToList": {
+                    "type": "keyword",
+                    "fields": {
+                      "shortid": {
+                        "type": "keyword",
+                        "normalizer": "refname_shortid_normalizer"
+                      }
+                    }
+                  }
+                }
+              }
+            </tenant:mapping>
+        </tenant:elasticSearchIndexConfig>
+    </tenant:tenantBinding>
+</tenant:TenantBindingConfig>
