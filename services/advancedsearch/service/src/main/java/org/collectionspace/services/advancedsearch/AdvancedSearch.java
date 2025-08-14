@@ -46,7 +46,7 @@ import org.w3c.dom.Element;
 public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem,AdvancedsearchListItem> {
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
-	private CollectionObjectClient client = null;
+	private CollectionObjectClient collectionObjectClient = null;
 	private final MediaResource mr = new MediaResource();
 		
 	@GET
@@ -67,7 +67,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
 		try {		
-			client = new CollectionObjectClient();
+			collectionObjectClient = new CollectionObjectClient();
+			collectionObjectClient.setupHttpClient4();
 		} catch (Exception e) {
 			// FIXME need better error handling
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
@@ -90,19 +91,22 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			/*
 			 * NOTE code below is derived from CollectionObjectServiceTest.readCollectionObjectCommonPart and AbstractPoxServiceTestImpl
 			 */
-	        Response res = client.read(csid);
+	        Response res = collectionObjectClient.read(csid);
+	        int statusCode = res.getStatus();
+	        logger.warn("advancedsearch: call to CollectionObjectClient returned status = ",statusCode);
 	        CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
 				String responseXml = res.readEntity(String.class);
 				input = new PoxPayloadIn(responseXml);
+				logger.warn("advancedsearch: call to CollectionObjectClient returned XML = ",responseXml);
 			} catch (DocumentException e) {
 				// FIXME need better error handling
 				logger.error("advancedsearch: could not create PoxPayloadIn",e);
 				continue;
 			}
 			if(null != input) {
-	            PayloadInputPart payloadInputPart = input.getPart(client.getCommonPartName());
+	            PayloadInputPart payloadInputPart = input.getPart(collectionObjectClient.getCommonPartName());
 				if (null != payloadInputPart) {
 					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
 				}
