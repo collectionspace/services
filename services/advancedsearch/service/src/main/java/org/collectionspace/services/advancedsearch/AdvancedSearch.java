@@ -93,13 +93,13 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			 */
 	        Response res = collectionObjectClient.read(csid);
 	        int statusCode = res.getStatus();
-	        logger.warn("advancedsearch: call to CollectionObjectClient returned status = ",statusCode);
+	        logger.warn("advancedsearch: call to CollectionObjectClient returned status {}",statusCode);
 	        CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
 				String responseXml = res.readEntity(String.class);
+				logger.warn("advancedsearch: call to CollectionObjectClient returned XML: {}",responseXml);
 				input = new PoxPayloadIn(responseXml);
-				logger.warn("advancedsearch: call to CollectionObjectClient returned XML = ",responseXml);
 			} catch (DocumentException e) {
 				// FIXME need better error handling
 				logger.error("advancedsearch: could not create PoxPayloadIn",e);
@@ -139,7 +139,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				} catch (DatatypeConfigurationException e) {
 					// FIXME need better error handling
 					logger.error("advancedsearch: could not create XMLGregorianCalendar for updatedAt ",e);
-					logger.error("advancedsearch: updatedAt = ",collectionObjectValuesMap.get("updatedAt"));
+					logger.error("advancedsearch: updatedAt: {}",collectionObjectValuesMap.get("updatedAt"));
 				}
 				
 				// add the populated item to the results
