@@ -23,27 +23,32 @@ import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsL
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.collectionspace.services.media.MediaResource;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
-
 
 @Path(AdvancedSearchClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem,AdvancedsearchListItem> {
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
-
+	private final CollectionObjectResource cor = new CollectionObjectResource();
+	private CollectionObjectClient client = null;
+	private final MediaResource mr = new MediaResource();
+		
 	@GET
 	public AbstractCommonList getList(@Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
@@ -59,10 +64,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		// the logic here is to use CollectionObjectResource to perform the search, then use
 		// CollectionObjectClient to retrieve corresponding CollectionobjectsCommon objects, which have more fields
 		// TODO the resource and client are both singletons, are they not? If so we should create them once rather than at each call to getList
-		CollectionObjectResource cor = new CollectionObjectResource();
 		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
-		CollectionObjectClient client = null;
 		try {		
 			client = new CollectionObjectClient();
 		} catch (Exception e) {
@@ -70,6 +73,8 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 			logger.error("advancedsearch: could not create CollectionObjectClient",e);
 			return resultsList;
 		}
+		
+		// FIXME: is there no better way to do this?
 		HashMap<String, String> collectionObjectValuesMap = new HashMap<String,String>();
 		for(ListItem item: collectionObjectListItems) {
 			List<Element> els = item.getAny();
@@ -79,6 +84,9 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		        collectionObjectValuesMap.put(elementName, elementText);
 			}
 			String csid = collectionObjectValuesMap.get("csid");
+			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
+			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
+			
 			/*
 			 * NOTE code below is derived from CollectionObjectServiceTest.readCollectionObjectCommonPart and AbstractPoxServiceTestImpl
 			 */
@@ -104,8 +112,18 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 				listItem.setBriefDescription(BriefDescriptionListModel.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
 				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation()); // "Computed Current Location: Display full string" from https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				listItem.setObjectName(ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
-				listItem.setObjectTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
-				listItem.setResponsibleDepartments(ResponsibleDepartmentsListModel.responsibleDepartmentListToResponsibleDepartmentsList(collectionObject.getResponsibleDepartments()));
+				listItem.setTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
+				ResponsibleDepartmentsList rdl = ResponsibleDepartmentsListModel.responsibleDepartmentListToResponsibleDepartmentsList(collectionObject.getResponsibleDepartments());
+				listItem.setResponsibleDepartments(rdl);
+				if(null != rdl && null != rdl.responsibleDepartment && rdl.responsibleDepartment.size() > 0) {
+					ResponsibleDepartment rd = rdl.responsibleDepartment.get(0);
+					listItem.setResponsibleDepartment(rd.name);
+				}
+				
+				// from media resource
+				if(blobCsids.size() > 0) {
+					listItem.setBlobCsid(blobCsids.get(0));
+				}
 				
 				// from collectionobject
 				listItem.setCsid(collectionObjectValuesMap.get("csid"));
@@ -135,9 +153,36 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		abstractList.setPageNum(collectionObjectList.getPageNum());
 		abstractList.setPageSize(collectionObjectList.getPageSize());
 		abstractList.setTotalItems(collectionObjectList.getTotalItems());
-		abstractList.setFieldsReturned("uri|csid|updatedAt|objectId|objectName|objectTitle|computedCurrentLocation|responsibleDepartments|briefDescription");
+		// FIXME: is there a way to generate this rather than hardcode it?
+		abstractList.setFieldsReturned("uri|csid|blobCsid|updatedAt|objectId|objectName|title|computedCurrentLocation|responsibleDepartments|briefDescription");
 		
 		return resultsList;
+	}
+
+	private List<String> findBlobCsids(String csid, UriInfoWrapper wrappedUriInfo) {
+		// FIXME: is there no better way to do this?
+		MultivaluedMap<String, String> wrappedQueryParams = wrappedUriInfo.getQueryParameters();
+		wrappedQueryParams.clear();
+		wrappedQueryParams.add(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, csid);
+		wrappedQueryParams.add("pgSz", "1");
+		wrappedQueryParams.add("pgNum", "0");
+		wrappedQueryParams.add("sortBy", "title");
+		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
+		HashMap<String,String> mediaResourceValuesMap = new HashMap<String,String>();
+		ArrayList<String> blobCsids = new ArrayList<String>();
+		for(ListItem item : associatedMedia.getListItem()) {
+			List<Element> els = item.getAny();
+			for(Element el: els) {
+				String elementName = el.getTagName();
+				String elementText = el.getTextContent();
+				mediaResourceValuesMap.put(elementName, elementText);
+			}
+			String blobCsid = mediaResourceValuesMap.get("blobCsid");
+			if(null != blobCsid) {
+				blobCsids.add(blobCsid);
+			}
+		}
+		return blobCsids;
 	}
 
 	@Override
