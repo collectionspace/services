@@ -154,7 +154,7 @@ public class AdvancedSearch extends AbstractCollectionSpaceResourceImpl<Advanced
 		abstractList.setPageSize(collectionObjectList.getPageSize());
 		abstractList.setTotalItems(collectionObjectList.getTotalItems());
 		// FIXME: is there a way to generate this rather than hardcode it?
-		abstractList.setFieldsReturned("uri|csid|blobCsid|updatedAt|objectId|objectName|title|computedCurrentLocation|responsibleDepartments|briefDescription");
+		abstractList.setFieldsReturned("uri|csid|blobCsid|updatedAt|objectId|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|briefDescription");
 		
 		return resultsList;
 	}
