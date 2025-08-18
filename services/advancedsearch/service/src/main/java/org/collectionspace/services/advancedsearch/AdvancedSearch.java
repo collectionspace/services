@@ -76,8 +76,6 @@ public class AdvancedSearch
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
 		try {
 			collectionObjectClient = new CollectionObjectClient();
-			collectionObjectClient.setupHttpClient(); // FIXME: do we need both?
-			collectionObjectClient.setupHttpClient4();
 		} catch (Exception e) {
 			// FIXME need better error handling
 			logger.error("advancedsearch: could not create CollectionObjectClient", e);
