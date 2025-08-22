@@ -8,11 +8,14 @@ import org.collectionspace.services.collectionobject.ContentConceptList;
 public class ContentConceptListModel {
 
 	public static String contentConceptListDisplayString(ContentConceptList conceptList) {
-		List<String> concepts = conceptList.getContentConcept();
 		List<String> displayConcepts = new ArrayList<String>();
-		for (String conceptRefname : concepts) {
-			displayConcepts.add(displayNameFromRefName(conceptRefname));
+		if(null != conceptList) {
+			List<String> concepts = conceptList.getContentConcept();
+			for (String conceptRefname : concepts) {
+				displayConcepts.add(displayNameFromRefName(conceptRefname));
+			}
 		}
+
 		return String.join(",", displayConcepts);
 	}
 
