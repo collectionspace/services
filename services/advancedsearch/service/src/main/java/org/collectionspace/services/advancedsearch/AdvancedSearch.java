@@ -18,6 +18,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
+import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
 import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
@@ -28,6 +29,7 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.ContentConceptList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -136,10 +138,11 @@ public class AdvancedSearch
 						.responsibleDepartmentListToResponsibleDepartmentsList(
 								collectionObject.getResponsibleDepartments());
 				listItem.setResponsibleDepartments(rdl);
-				if (null != rdl && null != rdl.responsibleDepartment && rdl.responsibleDepartment.size() > 0) {
-					ResponsibleDepartment rd = rdl.responsibleDepartment.get(0);
-					listItem.setResponsibleDepartment(rd.name);
-				}
+				listItem.setResponsibleDepartment(
+						ResponsibleDepartmentsListModel.responsibleDepartmentsListDisplayString(rdl));
+
+				listItem.setContentConcepts(
+						ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
 
 				// from media resource
 				if (blobCsids.size() > 0) {
@@ -151,6 +154,8 @@ public class AdvancedSearch
 				listItem.setObjectId(collectionObjectValuesMap.get("objectId")); // "Identification Number: Display full
 																					// string" from
 																					// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
+				listItem.setObjectNumber(collectionObjectValuesMap.get("objectNumber"));
+				listItem.setRefName(collectionObjectValuesMap.get("refName"));
 				listItem.setUri(collectionObjectValuesMap.get("uri"));
 				try {
 					XMLGregorianCalendar date = DatatypeFactory.newInstance()
@@ -181,7 +186,7 @@ public class AdvancedSearch
 		abstractList.setTotalItems(collectionObjectList.getTotalItems());
 		// FIXME: is there a way to generate this rather than hardcode it?
 		abstractList.setFieldsReturned(
-				"uri|csid|blobCsid|updatedAt|objectId|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|briefDescription");
+				"uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription");
 
 		return resultsList;
 	}
@@ -193,7 +198,7 @@ public class AdvancedSearch
 		wrappedQueryParams.add(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, csid);
 		wrappedQueryParams.add("pgSz", "1");
 		wrappedQueryParams.add("pgNum", "0");
-		wrappedQueryParams.add("sortBy", "title");
+		wrappedQueryParams.add("sortBy", "media_common:title");
 		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
 		HashMap<String, String> mediaResourceValuesMap = new HashMap<String, String>();
 		ArrayList<String> blobCsids = new ArrayList<String>();
