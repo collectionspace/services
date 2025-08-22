@@ -29,7 +29,6 @@ import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.ContentConceptList;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -126,10 +125,19 @@ public class AdvancedSearch
 				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
 				listItem.setBriefDescription(BriefDescriptionListModel
 						.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
-				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation()); // "Computed Current
-																									// Location: Display
-																									// full string" from
-																									// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
+				// TODO: collectionObject.getComputedCurrentLocation() is (can be?) a refname.
+				// code below extracts display name. there's probably something in RefName or
+				// similar to do this kind of thing see also
+				// ContentConceptListModel.displayNameFromRefName
+				String currLoc = collectionObject.getComputedCurrentLocation();
+				String currLocDisplayName = currLoc;
+				if (null != currLoc && currLoc.indexOf("'") < currLoc.lastIndexOf("'")) {
+					currLocDisplayName = currLoc.substring(currLoc.indexOf("'") + 1, currLoc.lastIndexOf("'"));
+				}
+				listItem.setComputedCurrentLocation(currLocDisplayName); // "Computed Current
+																			// Location: Display
+																			// full string" from
+																			// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
 				listItem.setObjectName(
 						ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
 				listItem.setTitle(
