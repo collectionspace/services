@@ -23,4 +23,12 @@ public class ResponsibleDepartmentsListModel {
 
 		return responsibleDepartmentList;
 	}
+	public static String responsibleDepartmentsListDisplayString(ResponsibleDepartmentsList rdl) {
+		String rdlString = "";
+		if (null != rdl && null != rdl.getResponsibleDepartment() && rdl.getResponsibleDepartment().size() > 0) {
+			ResponsibleDepartment rd = rdl.getResponsibleDepartment().get(0);
+			rdlString = rd.getName();
+		}
+		return rdlString;
+	}
 }
