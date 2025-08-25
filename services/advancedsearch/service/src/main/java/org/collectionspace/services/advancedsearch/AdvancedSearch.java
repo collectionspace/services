@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -24,12 +25,14 @@ import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsL
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
 import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
+import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
@@ -37,6 +40,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.media.MediaResource;
 import org.dom4j.DocumentException;
+import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -48,7 +52,6 @@ public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
-	private CollectionObjectClient collectionObjectClient = null;
 	private final MediaResource mr = new MediaResource();
 
 	public AdvancedSearch() {
@@ -56,7 +59,7 @@ public class AdvancedSearch
 	}
 
 	@GET
-	public AbstractCommonList getList(@Context UriInfo uriInfo) {
+	public AbstractCommonList getList(@Context Request request, @Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(true);
 		logger.info("advancedsearch called with query params: {}", queryParams);
@@ -75,13 +78,6 @@ public class AdvancedSearch
 		// should create them once rather than at each call to getList
 		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
-		try {
-			collectionObjectClient = new CollectionObjectClient();
-		} catch (Exception e) {
-			// FIXME need better error handling
-			logger.error("advancedsearch: could not create CollectionObjectClient", e);
-			return resultsList;
-		}
 
 		// FIXME: is there no better way to do this?
 		HashMap<String, String> collectionObjectValuesMap = new HashMap<String, String>();
@@ -101,14 +97,15 @@ public class AdvancedSearch
 			 * CollectionObjectServiceTest.readCollectionObjectCommonPart and
 			 * AbstractPoxServiceTestImpl
 			 */
-			Response res = collectionObjectClient.read(csid);
+			ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+			Response res = cor.get(request, resourceMap, uriInfo, csid);
 			int statusCode = res.getStatus();
-			logger.warn("advancedsearch: call to CollectionObjectClient returned status {}", statusCode);
+			logger.warn("advancedsearch: call to cor returned status {}", statusCode);
 			CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
 				String responseXml = res.readEntity(String.class);
-				logger.warn("advancedsearch: call to CollectionObjectClient returned XML: {}", responseXml);
+				logger.warn("advancedsearch: call to cor returned XML: {}", responseXml);
 				input = new PoxPayloadIn(responseXml);
 			} catch (DocumentException e) {
 				// FIXME need better error handling
@@ -116,7 +113,8 @@ public class AdvancedSearch
 				continue;
 			}
 			if (null != input) {
-				PayloadInputPart payloadInputPart = input.getPart(collectionObjectClient.getCommonPartName());
+				String commonPartName = CollectionObjectClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.PART_COMMON_LABEL;
+				PayloadInputPart payloadInputPart = input.getPart(commonPartName);
 				if (null != payloadInputPart) {
 					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
 				}
