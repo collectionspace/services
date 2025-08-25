@@ -1,5 +1,6 @@
 package org.collectionspace.services.advancedsearch;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -104,9 +105,10 @@ public class AdvancedSearch
 			CollectionobjectsCommon collectionObject = null;
 			PoxPayloadIn input = null;
 			try {
-				String responseXml = res.readEntity(String.class);
-				logger.warn("advancedsearch: call to cor returned XML: {}", responseXml);
-				input = new PoxPayloadIn(responseXml);
+                logger.warn("advancedsearch: res.getEntity = {}",res.getEntity());
+                String responseXml = new String((byte[]) res.getEntity(),StandardCharsets.UTF_8);
+                logger.warn("advancedsearch: call to cor returned XML: {}", responseXml);
+                input = new PoxPayloadIn(responseXml);
 			} catch (DocumentException e) {
 				// FIXME need better error handling
 				logger.error("advancedsearch: could not create PoxPayloadIn", e);
