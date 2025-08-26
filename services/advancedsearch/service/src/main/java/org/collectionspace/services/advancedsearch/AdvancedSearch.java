@@ -46,11 +46,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+// FIXME: The *Client pattern should be deprecated; it's only really used in unit tests, and trying to use it in services creates authorization challenges. It's repeated here only to maintain parity with existing services.
+/**
+ * This class defines the advanced search endpoints.
+ */
 @Path(AdvancedSearchClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
+	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
+	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.PART_COMMON_LABEL; // FIXME: it's not great to hardcode this here
+
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
 	private final MediaResource mr = new MediaResource();
@@ -59,6 +66,13 @@ public class AdvancedSearch
 		super();
 	}
 
+	/**
+	 * Primary advanced search API endpoint.
+	 * 
+	 * @param request The incoming request. Injected. 
+	 * @param uriInfo The URI info of the incoming request, including query parameters and other search control parameters. Injected.
+	 * @return A possibly-empty AbstractCommonList of the advanced search results corresponding to the query
+	 */
 	@GET
 	public AbstractCommonList getList(@Context Request request, @Context UriInfo uriInfo) {
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
@@ -72,17 +86,14 @@ public class AdvancedSearch
 		resultsList.advancedsearchListItem = new ArrayList<AdvancedsearchListItem>();
 
 		// the logic here is to use CollectionObjectResource to perform the search, then
-		// use
-		// CollectionObjectClient to retrieve corresponding CollectionobjectsCommon
-		// objects, which have more fields
-		// TODO the resource and client are both singletons, are they not? If so we
-		// should create them once rather than at each call to getList
+		// loop over the results retrieving corresponding CollectionobjectsCommon objects, 
+		// which have more fields
 		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
 		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
 
-		// FIXME: is there no better way to do this?
 		HashMap<String, String> collectionObjectValuesMap = new HashMap<String, String>();
 		for (ListItem item : collectionObjectListItems) {
+			// FIXME: is there no better way to do this? We should at least abstract this logic out of here
 			List<Element> els = item.getAny();
 			for (Element el : els) {
 				String elementName = el.getTagName();
@@ -94,33 +105,32 @@ public class AdvancedSearch
 			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
 
 			/*
-			 * NOTE code below is derived from
+			 * NOTE: code below is partly based on
 			 * CollectionObjectServiceTest.readCollectionObjectCommonPart and
 			 * AbstractPoxServiceTestImpl
 			 */
 			ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
 			Response res = cor.get(request, resourceMap, uriInfo, csid);
 			int statusCode = res.getStatus();
-			logger.warn("advancedsearch: call to cor returned status {}", statusCode);
+			logger.warn("advancedsearch: call to CollectionObjectResource for csid {} returned status {}", csid, statusCode);
 			CollectionobjectsCommon collectionObject = null;
+			// FIXME: is there no better way to do this? We should at least abstract this logic out of here
 			PoxPayloadIn input = null;
 			try {
-                logger.warn("advancedsearch: res.getEntity = {}",res.getEntity());
                 String responseXml = new String((byte[]) res.getEntity(),StandardCharsets.UTF_8);
-                logger.warn("advancedsearch: call to cor returned XML: {}", responseXml);
                 input = new PoxPayloadIn(responseXml);
 			} catch (DocumentException e) {
-				// FIXME need better error handling
+				// TODO: need better error handling
 				logger.error("advancedsearch: could not create PoxPayloadIn", e);
 				continue;
 			}
 			if (null != input) {
-				String commonPartName = CollectionObjectClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.PART_COMMON_LABEL;
-				PayloadInputPart payloadInputPart = input.getPart(commonPartName);
+				PayloadInputPart payloadInputPart = input.getPart(COMMON_PART_NAME);
 				if (null != payloadInputPart) {
 					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
 				}
 			}
+			// build up a listitem for the result list using the additional fields in CollectionObjectsCommon
 			if (null != collectionObject) {
 				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
 				listItem.setBriefDescription(BriefDescriptionListModel
@@ -157,7 +167,7 @@ public class AdvancedSearch
 					listItem.setBlobCsid(blobCsids.get(0));
 				}
 
-				// from collectionobject
+				// from collectionobject itself
 				listItem.setCsid(collectionObjectValuesMap.get("csid"));
 				listItem.setObjectId(collectionObjectValuesMap.get("objectId")); // "Identification Number: Display full
 																					// string" from
@@ -193,14 +203,19 @@ public class AdvancedSearch
 		abstractList.setPageSize(collectionObjectList.getPageSize());
 		abstractList.setTotalItems(collectionObjectList.getTotalItems());
 		// FIXME: is there a way to generate this rather than hardcode it?
-		abstractList.setFieldsReturned(
-				"uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription");
+		abstractList.setFieldsReturned(FIELDS_RETURNED);
 
 		return resultsList;
 	}
 
+	/** 
+	 * Retrieves the blob CSIDs associated with a given object's CSID
+	 * 
+	 * @param csid The CSID of an object whose associated blobs (thumbnails) is desired
+	 * @param wrappedUriInfo The wrapped (mutable) UriInfo of the incoming query that ultimately triggered this call
+	 * @return A possibly-empty list of strings of the blob CSIDs associated with CSID
+	 */
 	private List<String> findBlobCsids(String csid, UriInfoWrapper wrappedUriInfo) {
-		// FIXME: is there no better way to do this?
 		MultivaluedMap<String, String> wrappedQueryParams = wrappedUriInfo.getQueryParameters();
 		wrappedQueryParams.clear();
 		wrappedQueryParams.add(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, csid);
@@ -211,6 +226,7 @@ public class AdvancedSearch
 		HashMap<String, String> mediaResourceValuesMap = new HashMap<String, String>();
 		ArrayList<String> blobCsids = new ArrayList<String>();
 		for (ListItem item : associatedMedia.getListItem()) {
+			// FIXME: is there no better way to do this? we should at least abstract out this logic
 			List<Element> els = item.getAny();
 			for (Element el : els) {
 				String elementName = el.getTagName();
