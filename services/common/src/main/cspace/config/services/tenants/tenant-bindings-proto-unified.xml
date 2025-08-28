@@ -203,6 +203,13 @@
 	    </tenant:serviceBindings>
 	    <!-- end systeminfo service meta-data -->
 
+	    <!-- begin advancedsearch service meta-data -->
+	    <tenant:serviceBindings id="advancedsearch" merge:matcher="id" name="advancedsearch" requiresDocumentHandler="false" type="utility"
+	        version="0.01">
+	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+	    </tenant:serviceBindings>
+	    <!-- end systeminfo service meta-data -->
+
 		<!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
 		<tenant:serviceBindings id="Blobs" merge:matcher="id" name="Blobs" type="utility" version="1.0">

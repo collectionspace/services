@@ -200,6 +200,7 @@
         <ant antfile="publicitem/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="uoc/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="transport/build.xml" target="deploy" inheritAll="false"/>
+    	<ant antfile="advancedsearch/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false"/>
     </target>
 
@@ -207,6 +208,7 @@
     <target name="undeploy"
             description="undeploy services from ${jee.server.cspace}">
         <ant antfile="JaxRsServiceProvider/build.xml" target="undeploy" inheritAll="false"/>
+    	<ant antfile="advancedsearch/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="vocabulary/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="citation/build.xml" target="undeploy" inheritAll="false"/>
         <ant antfile="organization/build.xml" target="undeploy" inheritAll="false"/>
@@ -307,6 +309,7 @@
         <ant antfile="person/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="citation/build.xml" target="dist" inheritAll="false"/>
         <ant antfile="acquisition/build.xml" target="dist" inheritAll="false"/>
+    	<ant antfile="advancedsearch/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="JaxRsServiceProvider/build.xml" target="dist" inheritAll="false"/>
         <copy file="${basedir}/target/${javadoc.jar}"
               todir="${services.trunk}/${dist.server.cspace}/cspace/services/docs"/>
