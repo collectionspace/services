@@ -14,7 +14,7 @@
 
 	<properties>
 		<annox.version>0.5.0</annox.version>
-		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>2.0.14</maven-jaxb2-plugin.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
 		<jaxb.codegen.phase>generate-sources</jaxb.codegen.phase>
