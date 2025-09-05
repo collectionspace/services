@@ -21,7 +21,7 @@
 		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
 		<jackson.version>2.14.3</jackson.version>
 		<jaxb.version>2.2.11</jaxb.version>
-		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
+		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
 		<log4j.version>2.17.1</log4j.version>
 		<java.version>17</java.version>
 		<nuxeo.general.release>2023.24-SNAPSHOT</nuxeo.general.release>
