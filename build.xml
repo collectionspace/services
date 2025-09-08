@@ -14,6 +14,15 @@
 		<os family="windows" />
 	</condition>
 
+  <scriptdef name="urlencode" language="javascript">
+    <attribute name="property"/>
+    <![CDATA[
+			var value = self.project.getProperty(attributes.get("property"));
+      var encoded = encodeURIComponent(value);
+      self.project.setProperty(attributes.get("property") + ".encoded", encoded)
+    ]]>
+  </scriptdef>
+
 	<target name="init">
 		<!-- Create the time stamp -->
 		<tstamp />
