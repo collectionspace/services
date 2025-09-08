@@ -17,7 +17,7 @@
   <scriptdef name="urlencode" language="javascript">
     <attribute name="property"/>
     <![CDATA[
-			var value = self.project.getProperty(attributes.get("property"));
+      var value = self.project.getProperty(attributes.get("property"));
       var encoded = encodeURIComponent(value);
       self.project.setProperty(attributes.get("property") + ".encoded", encoded)
     ]]>
