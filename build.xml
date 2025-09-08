@@ -224,10 +224,10 @@
 	</target>
 
 	<!--
-		This target sends the 'create_nuxeo_db' and 'create_nuxeo_db' targets to all the Ant sub-modules/directories
-		and creates some database utility functions
+		This target calls the 'create_nuxeo_db' and 'create_cspace_db' targets and creates some database utility functions
 	-->
 	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows">
+		<urlencode property="db.jdbc.urloptions" />
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 		<antcall target="create_update_userid_db_function" />
@@ -312,6 +312,7 @@
 	</target>
 
 	<target name="import" description="import default configuration">
+		<urlencode property="db.jdbc.urloptions" />
 		<ant antfile="services/build.xml" target="import" inheritAll="false" />
 	</target>
 
