@@ -124,13 +124,13 @@ public class UnfilteredDocumentModelHandler extends DocumentModelHandler<Documen
         long pageSize = docFilter.getPageSize();
         long pageNum = pageSize != 0 ? docFilter.getOffset() / pageSize : pageSize;
         // set the page size and page number
-        commonList.setPageNum(pageNum);
-        commonList.setPageSize(pageSize);
+        cspaceDocModelList.setPageNum(pageNum);
+        cspaceDocModelList.setPageSize(pageSize);
         DocumentModelList docList = wrapDoc.getWrappedObject();
         // Set num of items in list. this is useful to our testing framework.
-        commonList.setItemsInPage(docList.size());
+        cspaceDocModelList.setItemsInPage(docList.size());
         // set the total result size
-        commonList.setTotalItems(docList.totalSize());
+        cspaceDocModelList.setTotalItems(docList.totalSize());
 
         for (DocumentModel documentModel : documentModelList) {
             final PoxPayloadOut out = new PoxPayloadOut(NAME);
