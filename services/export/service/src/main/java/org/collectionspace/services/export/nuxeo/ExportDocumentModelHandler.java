@@ -23,65 +23,25 @@
  */
 package org.collectionspace.services.export.nuxeo;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
-import javax.naming.NamingException;
-import javax.ws.rs.core.Response;
-
-import org.apache.commons.lang.StringUtils;
-import org.collectionspace.authentication.AuthN;
-import org.collectionspace.services.ExportJAXBSchema;
-import org.collectionspace.services.account.AccountResource;
-import org.collectionspace.services.authorization.AuthZ;
-import org.collectionspace.services.authorization.CSpaceResource;
-import org.collectionspace.services.authorization.PermissionException;
-import org.collectionspace.services.authorization.URIResourceImpl;
-import org.collectionspace.services.authorization.perms.ActionType;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.client.ExportClient;
-import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.api.JEEServerDeployment;
-import org.collectionspace.services.common.api.FileTools;
-import org.collectionspace.services.common.api.Tools;
-import org.collectionspace.services.common.authorization_mgt.ActionGroup;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
-import org.collectionspace.services.common.invocable.InvocationContext.ListCSIDs;
-import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.config.service.ServiceBindingType;
-import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.export.ExportsCommon;
-import org.collectionspace.services.jaxb.InvocableJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
-import org.nuxeo.ecm.core.api.model.PropertyException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 import org.slf4j.Logger;
