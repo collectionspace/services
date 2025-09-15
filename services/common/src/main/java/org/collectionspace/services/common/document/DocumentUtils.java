@@ -556,7 +556,7 @@ public class DocumentUtils {
 		Schema schema = getSchemaFromName(partMeta.getLabel());
 
 		buildDocument(document, root, objectProps, schema);
-		String w3cDocumentStr = xmlToString(document);
+		// String w3cDocumentStr = xmlToString(document);
 
 		DOMReader reader = new DOMReader();
 		org.dom4j.Document dom4jDoc = reader.read(document);
@@ -564,8 +564,7 @@ public class DocumentUtils {
 		result.detach(); // return just the root element detached from the DOM
 							// document
 
-		return result;// FIXME: REM - Add if (logger.isTraceEnabled() == true)
-						// logger.trace(document.asXML());
+		return result;
 	}
 
 	/**
@@ -647,8 +646,7 @@ public class DocumentUtils {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private static void buildProperty(Document document, Element parent,
-			Field field, Object value) throws IOException {
+	public static void buildProperty(Document document, Element parent, Field field, Object value) throws IOException {
 		Type type = field.getType();
 		// no need to qualify each element name as namespace is already added
 		String propName = field.getName().getLocalName();
