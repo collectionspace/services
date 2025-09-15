@@ -107,14 +107,10 @@ public abstract class AbstractDocumentHandlerImpl<T, TL, WT, WTL>
         this.properties = properties;
     }
 
-//    public void initializeDocumentFilter(ServiceContext ctx) {
-//    	DocumentFilter docFilter = this.createDocumentFilter(ctx);
-//    	this.setDocumentFilter(docFilter);
-//    }
-    /* (non-Javadoc)
- * @see org.collectionspace.services.common.document.DocumentHandler#createDocumentFilter()
- */
-@Override
+    /**
+     * @see org.collectionspace.services.common.document.DocumentHandler#createDocumentFilter()
+     */
+    @Override
     public abstract DocumentFilter createDocumentFilter();
 
     /**
