@@ -39,7 +39,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.collectionspace.services.authorization.PermissionException;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
@@ -87,7 +86,13 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     
     /** The storage client. */
     private StorageClient storageClient;
-    
+
+    /**
+     * A DocumentHandler provided for use instead of the default from the ServiceContext
+     * Note: considering a provider or something here, not entirely sure yet
+     */
+    private Class<? extends DocumentHandler> documentHandlerClass;
+
     /**
      * Extract id.
      *
@@ -159,9 +164,16 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
      * 
      * @throws Exception the exception
      */
-    public DocumentHandler createDocumentHandler(ServiceContext<IT, OT> ctx,
-    		Object commonPart) throws Exception {
-        DocumentHandler docHandler = ctx.getDocumentHandler();
+    public DocumentHandler createDocumentHandler(ServiceContext<IT, OT> ctx, Object commonPart) throws Exception {
+        DocumentHandler docHandler;
+        if (documentHandlerClass != null) {
+            docHandler = documentHandlerClass.newInstance();
+            docHandler.setServiceContext(ctx);
+        } else {
+            docHandler = ctx.getDocumentHandler();
+        }
+
+        // common part is the jaxb class?
         docHandler.setCommonPart(commonPart);
         return docHandler;
     }    
@@ -779,5 +791,9 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     	}
     	
     	return responseBuilder;
-    }	
+    }
+
+    public void setDocumentHandlerClass(Class<? extends DocumentHandler> dhClass) {
+        this.documentHandlerClass = dhClass;
+    }
 }
