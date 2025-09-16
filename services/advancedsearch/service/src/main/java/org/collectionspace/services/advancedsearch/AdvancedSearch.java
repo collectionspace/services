@@ -12,6 +12,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
@@ -37,8 +40,10 @@ import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
 import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModelHandler;
+import org.dom4j.io.DOMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -92,13 +97,29 @@ public class AdvancedSearch
 			return resultsList;
 		}
 
+		Unmarshaller unmarshaller;
 		CSDocumentModelList collectionObjectList = (CSDocumentModelList) abstractCommonList;
+		try {
+			JAXBContext context = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class);
+			unmarshaller = context.createUnmarshaller();
+		} catch (JAXBException e) {
+			throw new RuntimeException(e);
+		}
+
+		DOMWriter domWriter = new DOMWriter();
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
 			PoxPayloadOut outputPayload = response.getPayload();
 			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
-			CollectionSpaceCore core = (CollectionSpaceCore) corePart.getBody();
 			PayloadOutputPart commonPart = outputPayload.getPart(COMMON_PART_NAME);
-			CollectionobjectsCommon collectionObject = (CollectionobjectsCommon) commonPart.getBody();
+			CollectionSpaceCore core;
+			CollectionobjectsCommon collectionObject;
+
+			try {
+				core = (CollectionSpaceCore) unmarshaller.unmarshal((Document) corePart.getBody());
+				collectionObject = (CollectionobjectsCommon) unmarshaller.unmarshal((Document) commonPart.getBody());
+			} catch (JAXBException e) {
+				throw new RuntimeException(e);
+			}
 
 			String csid = response.getCsid();
 			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);

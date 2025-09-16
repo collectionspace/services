@@ -157,11 +157,7 @@ public class UnfilteredDocumentModelHandler extends DocumentModelHandler<Documen
                     }
                 }
 
-                final DOMReader reader = new DOMReader();
-                final org.dom4j.Document dom4jDoc = reader.read(document);
-                org.dom4j.Element result = dom4jDoc.getRootElement();
-                result.detach();
-                out.addPart(schemaName, result);
+                out.addPart(schemaName, document);
             }
 
             cspaceDocModelList.addResponsePayload(documentModel.getName(), out);
