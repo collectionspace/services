@@ -1219,7 +1219,8 @@
 							"ecm:primaryType",
 							"media_common:blobCsid",
 							"media_common:identificationNumber",
-							"media_common:title"
+							"media_common:title",
+							"media_common:altText",
 						]
 					},
 					"properties" : {
@@ -1490,6 +1491,9 @@
 						"media_common:identificationNumber": {
 							"type": "keyword",
 							"normalizer": "sorting_normalizer"
+						},
+						"media_common:altText": {
+							"type": "text"
 						},
 						"media_common:title": {
 							"type": "keyword",
