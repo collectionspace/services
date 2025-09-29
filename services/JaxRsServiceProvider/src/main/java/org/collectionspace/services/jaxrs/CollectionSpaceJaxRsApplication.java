@@ -98,7 +98,6 @@ import org.collectionspace.services.common.ResourceMapImpl;
 import org.collectionspace.services.common.publicitem.PublicItemResource;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
-import org.collectionspace.services.advancedsearch.AdvancedSearch;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
