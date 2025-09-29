@@ -40,7 +40,6 @@ import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
 import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModelHandler;
-import org.dom4j.io.DOMWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -63,9 +62,15 @@ public class AdvancedSearch
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
 	private final MediaResource mr = new MediaResource();
+	private final JAXBContext jaxbContext;
 
 	public AdvancedSearch() {
 		super();
+		try {
+			jaxbContext = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class);
+		} catch (JAXBException e) {
+			throw new RuntimeException("Unable to initialize AdvancedSearch JAXBContext", e);
+		}
 	}
 
 	/**
@@ -100,13 +105,12 @@ public class AdvancedSearch
 		Unmarshaller unmarshaller;
 		CSDocumentModelList collectionObjectList = (CSDocumentModelList) abstractCommonList;
 		try {
-			JAXBContext context = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class);
-			unmarshaller = context.createUnmarshaller();
+			unmarshaller = jaxbContext.createUnmarshaller();
 		} catch (JAXBException e) {
-			throw new RuntimeException(e);
+			// this should result in a 500, need to verify from bigReThrow to see what exception it should be
+			throw new RuntimeException("Unable to create unmarshaller for AdvancedSearch", e);
 		}
 
-		DOMWriter domWriter = new DOMWriter();
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
 			PoxPayloadOut outputPayload = response.getPayload();
 			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
