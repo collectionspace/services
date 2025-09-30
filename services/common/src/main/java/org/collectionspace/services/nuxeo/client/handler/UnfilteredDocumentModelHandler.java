@@ -138,7 +138,6 @@ public class UnfilteredDocumentModelHandler extends DocumentModelHandler<Documen
             // todo: only work on schemas we support
             for (Schema schema : documentModel.getDocumentType().getSchemas()) {
                 final String schemaName = schema.getName();
-                // todo: use dom4j so we don't convert between the two impls
                 org.w3c.dom.Document document = documentBuilder.newDocument();
                 final String namespaceUri = schema.getNamespace().uri;
                 final String qualifiedName = xmlNs + ":" + schemaName;

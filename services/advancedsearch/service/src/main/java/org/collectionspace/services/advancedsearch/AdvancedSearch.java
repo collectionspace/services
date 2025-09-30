@@ -12,7 +12,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
@@ -62,15 +61,9 @@ public class AdvancedSearch
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
 	private final MediaResource mr = new MediaResource();
-	private final JAXBContext jaxbContext;
 
 	public AdvancedSearch() {
 		super();
-		try {
-			jaxbContext = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class);
-		} catch (JAXBException e) {
-			throw new RuntimeException("Unable to initialize AdvancedSearch JAXBContext", e);
-		}
 	}
 
 	/**
@@ -105,7 +98,7 @@ public class AdvancedSearch
 		Unmarshaller unmarshaller;
 		CSDocumentModelList collectionObjectList = (CSDocumentModelList) abstractCommonList;
 		try {
-			unmarshaller = jaxbContext.createUnmarshaller();
+			unmarshaller = AdvancedSearchJAXBContext.getJaxbContext().createUnmarshaller();
 		} catch (JAXBException e) {
 			// this should result in a 500, need to verify from bigReThrow to see what exception it should be
 			throw new RuntimeException("Unable to create unmarshaller for AdvancedSearch", e);
