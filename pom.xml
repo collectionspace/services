@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
@@ -22,6 +21,8 @@
 		<jackson.version>2.14.3</jackson.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
+		<jaxb-runtime.version>3.0.2</jaxb-runtime.version>
+		<xml-bind.version>3.0.1</xml-bind.version>
 		<log4j.version>2.17.1</log4j.version>
 		<java.version>17</java.version>
 		<nuxeo.general.release>2023.24-SNAPSHOT</nuxeo.general.release>
@@ -200,7 +201,7 @@
 					<version>3.1</version>
 					<configuration>
 						<source>${java.version}</source>
-						<target>${java.version}</target>s>
+						<target>${java.version}</target>s&gt;
 					</configuration>
 				</plugin>
 				<plugin>
@@ -419,34 +420,21 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<property environment="env" />
-								<fail unless="env.CSPACE_INSTANCE_ID"
-									message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value." />
-								<fail unless="env.JEE_PORT"
-									message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value." />
-								<fail unless="env.DB_HOST"
-									message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value." />
-								<fail unless="env.DB_PORT"
-									message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value." />
-								<fail unless="env.CSPACE_JEESERVER_HOME"
-									message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable." />
-								<fail unless="env.DB_CSPACE_PASSWORD"
-									message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
-								<fail unless="env.DB_NUXEO_PASSWORD"
-									message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
-								<fail unless="env.DB_READER_PASSWORD"
-									message="Required environment variable DB_READER_PASSWORD has not been set." />
-								<fail unless="env.DB_CSADMIN_PASSWORD"
-									message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
+								<property environment="env"/>
+								<fail unless="env.CSPACE_INSTANCE_ID" message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value."/>
+								<fail unless="env.JEE_PORT" message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value."/>
+								<fail unless="env.DB_HOST" message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value."/>
+								<fail unless="env.DB_PORT" message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value."/>
+								<fail unless="env.CSPACE_JEESERVER_HOME" message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable."/>
+								<fail unless="env.DB_CSPACE_PASSWORD" message="Required environment variable DB_CSPACE_PASSWORD has not been set."/>
+								<fail unless="env.DB_NUXEO_PASSWORD" message="Required environment variable DB_NUXEO_PASSWORD has not been set."/>
+								<fail unless="env.DB_READER_PASSWORD" message="Required environment variable DB_READER_PASSWORD has not been set."/>
+								<fail unless="env.DB_CSADMIN_PASSWORD" message="Required environment variable DB_CSADMIN_PASSWORD has not been set."/>
 								<!-- Fail if these deprecated environment variables are set. -->
-								<fail if="env.DB_USER"
-									message="The deprecated environment variable DB_USER should not be set." />
-								<fail if="env.DB_PASSWORD"
-									message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_CSPACE"
-									message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
-								<fail if="env.DB_PASSWORD_NUXEO"
-									message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
+								<fail if="env.DB_USER" message="The deprecated environment variable DB_USER should not be set."/>
+								<fail if="env.DB_PASSWORD" message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead."/>
+								<fail if="env.DB_PASSWORD_CSPACE" message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead."/>
+								<fail if="env.DB_PASSWORD_NUXEO" message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead."/>
 							</tasks>
 						</configuration>
 					</execution>
@@ -1133,17 +1121,13 @@
 				<version>2.0.2</version>
 			</dependency>
 			<dependency>
-				<groupId>org.jvnet.jaxb2_commons</groupId>
+				<groupId>org.jvnet.jaxb</groupId>
 				<artifactId>jaxb2-basics</artifactId>
 				<version>${jaxb2-basics.version}</version>
 			</dependency>
+			
 			<dependency>
-				<groupId>org.jvnet.jaxb2-commons</groupId>
-				<artifactId>property-listener-injector</artifactId>
-				<version>1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jvnet.jaxb2_commons</groupId>
+				<groupId>org.jvnet.jaxb</groupId>
 				<artifactId>jaxb2-basics-runtime</artifactId>
 				<version>${jaxb2-basics.version}</version>
 			</dependency>
@@ -1187,20 +1171,16 @@
 				<artifactId>commons-cli</artifactId>
 				<version>1.2</version>
 			</dependency>
+			
 			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-core</artifactId>
-				<version>${jaxb.version}</version>
+				<groupId>org.glassfish.jaxb</groupId>
+				<artifactId>jaxb-runtime</artifactId>
+				<version>${jaxb-runtime.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-impl</artifactId>
-				<version>${jaxb.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.xml.bind</groupId>
-				<artifactId>jaxb-api</artifactId>
-				<version>${jaxb.version}</version>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<version>${xml-bind.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
@@ -1224,12 +1204,7 @@
 				<artifactId>hibernate-c3p0</artifactId>
 				<version>3.6.10.Final</version>
 			</dependency>
-			<dependency>
-				<groupId>org.jvnet.hyperjaxb3</groupId>
-				<!-- for time type adapters -->
-				<artifactId>hyperjaxb3-ejb-runtime</artifactId>
-				<version>0.6.0</version>
-			</dependency>
+			
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>

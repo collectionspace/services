@@ -10,7 +10,7 @@
 		<!--
 		<jaxb:bindings node="xs:complexType[@name='permission']">
 			<annox:annotate>
-				<annox:annotate annox:class="javax.xml.bind.annotation.XmlRootElement" name="permission" />
+				<annox:annotate annox:class="jakarta.xml.bind.annotation.XmlRootElement" name="permission" />
 			</annox:annotate>
 		</jaxb:bindings>
 		-->

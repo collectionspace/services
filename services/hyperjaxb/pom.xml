@@ -1,27 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<!--
- pom.xml
-
- A Maven 2 project file for the 'jaxb' module of the ID Service project.
-
- This document is a part of the source code and related artifacts
- for CollectionSpace, an open source collections management system
- for museums and related institutions:
-
- http://www.collectionspace.org
- http://wiki.collectionspace.org
-
- Based on work by Sanjay Dalal and Richard Millet.
-
- $LastChangedBy: aron $
- $LastChangedRevision: 302 $
- $LastChangedDate: 2009-06-29 15:36:29 -0700 (Mon, 29 Jun 2009) $
--->
-
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <parent>
     <groupId>org.collectionspace.services</groupId>
@@ -49,8 +27,8 @@
 		</dependency>
 		 -->
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
     <!-- Dependencies for HyperJaxB -->
 		<dependency>
@@ -66,10 +44,7 @@
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>org.jvnet.hyperjaxb3</groupId>
-		    <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-		</dependency>
+		
   </dependencies>
 
   <build>
@@ -78,8 +53,8 @@
 
     <plugins>
 		<plugin>
-		    <groupId>org.jvnet.hyperjaxb3</groupId>
-		    <artifactId>maven-hyperjaxb3-plugin</artifactId>
+		    <groupId>org.jvnet.jaxb</groupId>
+		    <artifactId>hyperjaxb3-ejb-plugin</artifactId>
 		</plugin>
     </plugins>
   </build>

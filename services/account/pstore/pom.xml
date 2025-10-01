@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version='1.0' encoding='UTF-8'?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<parent>
 		<artifactId>org.collectionspace.services.account</artifactId>
 		<groupId>org.collectionspace.services</groupId>
@@ -17,14 +16,8 @@
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.jaxb2-commons</groupId>
-			<artifactId>property-listener-injector</artifactId>
-		</dependency>
+		
+		
 		<!-- External dependencies -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
@@ -53,8 +46,8 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<property name="runtime-classpath" refid="maven.runtime.classpath" />
-								<ant target="setup_hibernate.cfg" inheritRefs="true" />
+								<property name="runtime-classpath" refid="maven.runtime.classpath"/>
+								<ant target="setup_hibernate.cfg" inheritRefs="true"/>
 							</tasks>
 						</configuration>
 					</execution>
@@ -122,8 +115,7 @@
 								<phase>process-test-resources</phase>
 								<configuration>
 									<tasks>
-										<copy file="${basedir}/target/hibernate3/sql/${sql.file}"
-											tofile="${sql.dir}/${db}/${sql.file}" />
+										<copy file="${basedir}/target/hibernate3/sql/${sql.file}" tofile="${sql.dir}/${db}/${sql.file}"/>
 									</tasks>
 								</configuration>
 								<goals>
@@ -138,4 +130,3 @@
 		</profile>
 	</profiles>
 </project>
-
