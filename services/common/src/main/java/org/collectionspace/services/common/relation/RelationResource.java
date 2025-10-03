@@ -108,6 +108,9 @@ public class RelationResource extends NuxeoBasedResource {
 		return resultList;
 	}
 
+	public RelationsCommonList getList(String subject, String object, UriInfo uriInfo) {
+		return getRelationList(null, uriInfo, subject, null, null, object, null, false);
+	}
 
 	private RelationsCommonList getRelationList(
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
@@ -129,7 +132,7 @@ public class RelationResource extends NuxeoBasedResource {
             //
             // Handle keyword clause
             //
-            String keywords = uriInfo.getQueryParameters().getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);            
+            String keywords = uriInfo.getQueryParameters().getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
             if (keywords != null && keywords.isEmpty() == false) {
             	String keywordClause = QueryManager.createWhereClauseFromKeywords(keywords);
             	handler.getDocumentFilter().appendWhereClause(keywordClause, IQueryManager.SEARCH_QUALIFIER_AND);
