@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RelationObjectsByQueryIterator extends RelationsByQueryIterator implements Iterator<PoxPayloadOut> {
-	private final Logger logger = LoggerFactory.getLogger(RelationObjectsByQueryIterator.class);
+  private final Logger logger = LoggerFactory.getLogger(RelationObjectsByQueryIterator.class);
 
   RelationObjectsByQueryIterator(
     ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext,
@@ -36,7 +36,7 @@ public class RelationObjectsByQueryIterator extends RelationsByQueryIterator imp
     String relationObjectCsid = relationObject.getCsid();
     String relationObjectDocType = relationObject.getDocumentType();
 
-		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+    TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
     ServiceBindingType relationObjectServiceBinding = tenantBindingConfigReader.getServiceBindingForDocType(serviceContext.getTenantId(), relationObjectDocType);
     String relationObjectServiceType = relationObjectServiceBinding.getType();
     String relationObjectServiceName = relationObjectServiceBinding.getName();
@@ -53,8 +53,7 @@ public class RelationObjectsByQueryIterator extends RelationsByQueryIterator imp
         : relationObjectResource.getWithParentCtx(serviceContext, relationObjectCsid));
     }
     catch (Exception e) {
-      logger.warn("Could not get document with csid " + relationObjectCsid, e);
-
+	    logger.warn("Could not get document with csid {}", relationObjectCsid, e);
       return null;
     }
   }

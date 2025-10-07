@@ -24,7 +24,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 
 public class CsvExportWriter extends AbstractExportWriter {
-	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+\\/)*(\\w+)(\\[.*\\])?$");
+	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+/)*(\\w+)(\\[.*])?$");
 	private static final String VALUE_DELIMITER_PARAM_NAME = "valuedelimiter";
 
 	private CSVPrinter csvPrinter;
@@ -40,7 +40,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 		// present.
 
 		InvocationContext.IncludeFields includeFields = invocationContext.getIncludeFields();
-		List<Field> fields = (includeFields != null ? includeFields.getField() : new ArrayList<Field>());
+		List<Field> fields = (includeFields != null ? includeFields.getField() : new ArrayList<>());
 
 		if (fields.size() == 0) {
 			throw new Exception("For CSV output, the fields to export must be specified using includeFields.");
@@ -70,7 +70,6 @@ public class CsvExportWriter extends AbstractExportWriter {
 		this.csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(headers.toArray(headersArray)));
 
 		// Set the delimiter.
-
 		InvocationContext.Params params = invocationContext.getParams();
 
 		if (params != null) {
@@ -80,7 +79,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 
 					break;
 				}
-			};
+			}
 		}
 	}
 
@@ -106,7 +105,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 
 	@Override
 	public void close() throws Exception {
-	  csvPrinter.close();
+		csvPrinter.close();
 	}
 
 	private String collectValues(PoxPayloadOut document, String fieldSpec) {
@@ -135,7 +134,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 			boolean hasValue = false;
 
 			for (Node node : matches) {
-				String textValue = "";
+				String textValue;
 
 				if (depth < path.size() - 1) {
 					textValue = collectValues(docType, partName, (Element) node, path, depth + 1);
@@ -143,7 +142,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 				else {
 					textValue = node.getText();
 
-					boolean isRefName = isRefField(docType, partName, fieldName.replaceFirst("\\[.*\\]", ""));
+					boolean isRefName = isRefField(docType, partName, fieldName.replaceFirst("\\[.*]", ""));
 
 					if (isRefName && StringUtils.isNotEmpty(textValue)) {
 						textValue = RefNameUtils.getDisplayName(textValue);
@@ -183,21 +182,21 @@ public class CsvExportWriter extends AbstractExportWriter {
 		ServiceBindingType serviceBinding = tenantBindingConfigReader.getServiceBinding(serviceContext.getTenantId(), docType);
 
 		for (String termRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.TERM_REF_PROP, false)) {
-			String[] segments = termRefField.split("[\\/\\|]");
+			String[] segments = termRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
 			refFields.add(fieldName);
 		}
 
 		for (String authRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.AUTH_REF_PROP, false)) {
-			String[] segments = authRefField.split("[\\/\\|]");
+			String[] segments = authRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
 			refFields.add(fieldName);
 		}
 
 		if (!refFieldsByDocType.containsKey(docType)) {
-			refFieldsByDocType.put(docType, new HashMap<String, Set<String>>());
+			refFieldsByDocType.put(docType, new HashMap<>());
 		}
 
 		refFieldsByDocType.get(docType).put(partName, refFields);

@@ -1,9 +1,5 @@
 package org.collectionspace.services.export;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -40,8 +36,8 @@ public class XmlExportWriter extends AbstractExportWriter {
 			Namespace partNamespace = element.getNamespaceForPrefix("ns2");
 			String partNamespaceUri = partNamespace.getURI();
 
-			for (Object namespace : element.additionalNamespaces()) {
-				element.remove((Namespace) namespace);
+			for (Namespace namespace : element.additionalNamespaces()) {
+				element.remove(namespace);
 			}
 
 			element.remove(partNamespace);

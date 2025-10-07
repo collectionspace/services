@@ -38,12 +38,10 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.export.ExportsCommon;
-import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,17 +147,6 @@ public class ExportDocumentModelHandler extends NuxeoDocumentModelHandler<Export
 
 		return null;
 	}
-
-	// private InputStream buildExportResult(String exportCSID,
-	// 		HashMap<String, Object> params,
-	// 		String exportFileName,
-	// 		String outputMimeType,
-	// 		StringBuffer outExportFileName) throws Exception {
-	// 	Connection conn = null;
-	// 	InputStream result = null;
-
-	// 	return result;
-	// }
 
 	private class DocumentsByCsidIterator implements Iterator<DocumentModel> {
 		private NuxeoBasedResource resource;
