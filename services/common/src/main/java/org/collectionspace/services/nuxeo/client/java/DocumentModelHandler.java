@@ -384,9 +384,9 @@ public abstract class DocumentModelHandler<T, TL>
 
         MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
         String asSubjectCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
-        String asOjectCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+        String asObjectCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
         String asEither = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
-        if (asSubjectCsid != null || asOjectCsid != null || asEither != null) {
+        if (asSubjectCsid != null || asObjectCsid != null || asEither != null) {
             result = true;
         }
 
