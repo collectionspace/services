@@ -1,8 +1,10 @@
 package org.collectionspace.services.advancedsearch;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,6 +18,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
+import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
@@ -35,6 +38,7 @@ import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
@@ -43,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * This class defines the advanced search endpoints.
@@ -187,22 +192,17 @@ public class AdvancedSearch
 		wrappedQueryParams.add("pgNum", "0");
 		wrappedQueryParams.add("sortBy", "media_common:title");
 		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
-		HashMap<String, String> mediaResourceValuesMap = new HashMap<>();
-		ArrayList<String> blobCsids = new ArrayList<>();
-		for (ListItem item : associatedMedia.getListItem()) {
-			// FIXME: is there no better way to do this? we should at least abstract out this logic
-			List<Element> els = item.getAny();
-			for (Element el : els) {
-				String elementName = el.getTagName();
-				String elementText = el.getTextContent();
-				mediaResourceValuesMap.put(elementName, elementText);
-			}
-			String blobCsid = mediaResourceValuesMap.get("blobCsid");
-			if (null != blobCsid) {
-				blobCsids.add(blobCsid);
-			}
+		if (associatedMedia == null || associatedMedia.getListItem() == null) {
+			return Collections.emptyList();
 		}
-		return blobCsids;
+
+		return associatedMedia.getListItem().stream()
+			.filter(item -> item != null && item.getAny() != null)
+			.flatMap(li -> li.getAny().stream())
+			.filter(element -> MediaJAXBSchema.blobCsid.equals(element.getTagName()))
+			.map(Element::getTextContent)
+			.filter(blobCsid -> blobCsid != null && !blobCsid.isEmpty())
+			.collect(Collectors.toList());
 	}
 
 	@Override
