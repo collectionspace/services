@@ -86,11 +86,7 @@ public class AdvancedSearch
 		// FIXME: this shouldn't be necessary?
 		resultsList.advancedsearchListItem = new ArrayList<>();
 
-		// the logic here is to use CollectionObjectResource to perform the search, then
-		// loop over the results retrieving corresponding CollectionobjectsCommon objects, 
-		// which have more fields
 		AbstractCommonList abstractCommonList = cor.getList(uriInfo);
-
 		if (!(abstractCommonList instanceof CSDocumentModelList)) {
 			return resultsList;
 		}
