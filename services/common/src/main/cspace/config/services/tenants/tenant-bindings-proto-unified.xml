@@ -1220,7 +1220,7 @@
 							"media_common:blobCsid",
 							"media_common:identificationNumber",
 							"media_common:title",
-							"media_common:altText",
+							"media_common:altText"
 						]
 					},
 					"properties" : {
