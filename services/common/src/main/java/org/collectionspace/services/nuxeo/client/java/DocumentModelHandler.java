@@ -23,7 +23,6 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -31,7 +30,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.lang.StringUtils;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.CollectionSpaceClient;
-import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.IRelationsManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -47,7 +45,6 @@ import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.AbstractMultipartDocumentHandlerImpl;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.DocumentWrapper;
 import org.collectionspace.services.common.document.DocumentWrapperImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
@@ -57,18 +54,10 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
-import org.collectionspace.services.lifecycle.State;
-import org.collectionspace.services.lifecycle.StateList;
-import org.collectionspace.services.lifecycle.TransitionDef;
-import org.collectionspace.services.lifecycle.TransitionDefList;
-import org.collectionspace.services.lifecycle.TransitionList;
-import org.nuxeo.ecm.core.NXCore;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-import org.nuxeo.ecm.core.lifecycle.LifeCycle;
-import org.nuxeo.ecm.core.lifecycle.LifeCycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -391,22 +380,19 @@ public abstract class DocumentModelHandler<T, TL>
      * @see org.collectionspace.services.common.document.AbstractDocumentHandlerImpl#isCMISQuery()
      */
     public boolean isCMISQuery() {
-    	boolean result = false;
-    	
-    	MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
-    	//
-    	// Look the query params to see if we need to make a CMSIS query.
-    	//
-    	String asSubjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);    	
-    	String asOjectCsid = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);    	
-    	String asEither = (String)queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);    	
-    	if (asSubjectCsid != null || asOjectCsid != null || asEither != null) {
-    		result = true;
-    	}
-    	
-    	return result;
+        boolean result = false;
+
+        MultivaluedMap<String, String> queryParams = getServiceContext().getQueryParams();
+        String asSubjectCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT);
+        String asObjectCsid = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_OBJECT);
+        String asEither = queryParams.getFirst(IQueryManager.SEARCH_RELATED_TO_CSID_AS_EITHER);
+        if (asSubjectCsid != null || asObjectCsid != null || asEither != null) {
+            result = true;
+        }
+
+        return result;
     }
-    
+
     @Override
     public String getDocumentsToIndexQuery(String indexId, String csid) throws DocumentException, Exception {
     	String result = null;

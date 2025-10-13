@@ -1,25 +1,10 @@
 package org.collectionspace.services.client;
 
-//import java.io.ByteArrayInputStream; //FIXME: REM - Remove these unneeded import statements
-//import java.io.InputStream;
-//import java.io.Reader;
-//import java.io.StringReader;
-//import java.util.Iterator;
-//import java.util.List;
-
-//import javax.xml.transform.Source;
-//import javax.xml.transform.stream.StreamSource;
-
-//import org.dom4j.Attribute;
-//import org.dom4j.Document;
 import java.io.File;
 import java.io.IOException;
 
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-//import org.dom4j.Namespace;
-//import org.dom4j.io.SAXReader;
-//import org.xml.sax.InputSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

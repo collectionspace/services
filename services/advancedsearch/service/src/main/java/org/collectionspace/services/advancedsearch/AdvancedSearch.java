@@ -1,9 +1,10 @@
 package org.collectionspace.services.advancedsearch;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -12,51 +13,55 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 
+import org.collectionspace.collectionspace_core.CollectionSpaceCore;
+import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
 import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
-import org.collectionspace.services.client.AdvancedSearchClient;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PayloadInputPart;
-import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
-import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
+import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.media.MediaResource;
-import org.dom4j.DocumentException;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
+import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
+import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModelHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-// FIXME: The *Client pattern should be deprecated; it's only really used in unit tests, and trying to use it in services creates authorization challenges. It's repeated here only to maintain parity with existing services.
 /**
  * This class defines the advanced search endpoints.
  */
-@Path(AdvancedSearchClient.SERVICE_PATH)
+@Path(AdvancedSearchConstants.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
 	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
-	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME + CollectionSpaceClient.PART_LABEL_SEPARATOR + CollectionSpaceClient.PART_COMMON_LABEL; // FIXME: it's not great to hardcode this here
+	// FIXME: it's not great to hardcode this here
+	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME
+	                                               + CollectionSpaceClient.PART_LABEL_SEPARATOR
+	                                               + CollectionSpaceClient.PART_COMMON_LABEL;
 
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
@@ -79,120 +84,84 @@ public class AdvancedSearch
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(true);
 		logger.info("advancedsearch called with query params: {}", queryParams);
 
-		// the list to return
+		cor.setDocumentHandlerClass(UnfilteredDocumentModelHandler.class);
 		ObjectFactory objectFactory = new ObjectFactory();
+		// the list to return
 		AdvancedsearchCommonList resultsList = objectFactory.createAdvancedsearchCommonList();
 		// FIXME: this shouldn't be necessary?
-		resultsList.advancedsearchListItem = new ArrayList<AdvancedsearchListItem>();
+		resultsList.advancedsearchListItem = new ArrayList<>();
 
-		// the logic here is to use CollectionObjectResource to perform the search, then
-		// loop over the results retrieving corresponding CollectionobjectsCommon objects, 
-		// which have more fields
-		AbstractCommonList collectionObjectList = cor.getList(uriInfo);
-		List<ListItem> collectionObjectListItems = collectionObjectList.getListItem();
+		AbstractCommonList abstractCommonList = cor.getList(uriInfo);
+		if (!(abstractCommonList instanceof CSDocumentModelList)) {
+			return resultsList;
+		}
 
-		HashMap<String, String> collectionObjectValuesMap = new HashMap<String, String>();
-		for (ListItem item : collectionObjectListItems) {
-			// FIXME: is there no better way to do this? We should at least abstract this logic out of here
-			List<Element> els = item.getAny();
-			for (Element el : els) {
-				String elementName = el.getTagName();
-				String elementText = el.getTextContent();
-				collectionObjectValuesMap.put(elementName, elementText);
+		Unmarshaller unmarshaller;
+		CSDocumentModelList collectionObjectList = (CSDocumentModelList) abstractCommonList;
+		try {
+			unmarshaller = AdvancedSearchJAXBContext.getJaxbContext().createUnmarshaller();
+		} catch (JAXBException e) {
+			// this should result in a 500, need to verify from bigReThrow to see what exception it should be
+			throw new RuntimeException("Unable to create unmarshaller for AdvancedSearch", e);
+		}
+
+		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
+			PoxPayloadOut outputPayload = response.getPayload();
+			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
+			PayloadOutputPart commonPart = outputPayload.getPart(COMMON_PART_NAME);
+			CollectionSpaceCore core;
+			CollectionobjectsCommon collectionObject;
+
+			try {
+				core = (CollectionSpaceCore) unmarshaller.unmarshal((Document) corePart.getBody());
+				collectionObject = (CollectionobjectsCommon) unmarshaller.unmarshal((Document) commonPart.getBody());
+			} catch (JAXBException e) {
+				throw new RuntimeException(e);
 			}
-			String csid = collectionObjectValuesMap.get("csid");
+
+			String csid = response.getCsid();
 			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
 			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
 
-			/*
-			 * NOTE: code below is partly based on
-			 * CollectionObjectServiceTest.readCollectionObjectCommonPart and
-			 * AbstractPoxServiceTestImpl
-			 */
-			ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-			Response res = cor.get(request, resourceMap, uriInfo, csid);
-			int statusCode = res.getStatus();
-			logger.warn("advancedsearch: call to CollectionObjectResource for csid {} returned status {}", csid, statusCode);
-			CollectionobjectsCommon collectionObject = null;
-			// FIXME: is there no better way to do this? We should at least abstract this logic out of here
-			PoxPayloadIn input = null;
-			try {
-                String responseXml = new String((byte[]) res.getEntity(),StandardCharsets.UTF_8);
-                input = new PoxPayloadIn(responseXml);
-			} catch (DocumentException e) {
-				// TODO: need better error handling
-				logger.error("advancedsearch: could not create PoxPayloadIn", e);
-				continue;
+			AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
+			if (core != null) {
+				listItem.setCsid(csid);
+				listItem.setRefName(core.getRefName());
+				listItem.setUri(core.getUri());
+				listItem.setUpdatedAt(core.getUpdatedAt());
+			} else {
+				logger.warn("advancedsearch: could not find collectionspace_core associated with csid {}", csid);
 			}
-			if (null != input) {
-				PayloadInputPart payloadInputPart = input.getPart(COMMON_PART_NAME);
-				if (null != payloadInputPart) {
-					collectionObject = (CollectionobjectsCommon) payloadInputPart.getBody();
-				}
-			}
-			// build up a listitem for the result list using the additional fields in CollectionObjectsCommon
-			if (null != collectionObject) {
-				AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
+
+			if (collectionObject != null) {
+				listItem.setObjectNumber(collectionObject.getObjectNumber());
 				listItem.setBriefDescription(BriefDescriptionListModel
-						.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
-				// TODO: collectionObject.getComputedCurrentLocation() is (can be?) a refname.
-				// code below extracts display name. there's probably something in RefName or
-				// similar to do this kind of thing see also
-				// ContentConceptListModel.displayNameFromRefName
-				String currLoc = collectionObject.getComputedCurrentLocation();
-				String currLocDisplayName = currLoc;
-				if (null != currLoc && currLoc.indexOf("'") < currLoc.lastIndexOf("'")) {
-					currLocDisplayName = currLoc.substring(currLoc.indexOf("'") + 1, currLoc.lastIndexOf("'"));
-				}
-				listItem.setComputedCurrentLocation(currLocDisplayName); // "Computed Current
-																			// Location: Display
-																			// full string" from
-																			// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
+					.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
+				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
 				listItem.setObjectName(
-						ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
+					ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
 				listItem.setTitle(
-						TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
+					TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
 				ResponsibleDepartmentsList rdl = ResponsibleDepartmentsListModel
-						.responsibleDepartmentListToResponsibleDepartmentsList(
-								collectionObject.getResponsibleDepartments());
+					.responsibleDepartmentListToResponsibleDepartmentsList(
+						collectionObject.getResponsibleDepartments());
 				listItem.setResponsibleDepartments(rdl);
 				listItem.setResponsibleDepartment(
-						ResponsibleDepartmentsListModel.responsibleDepartmentsListDisplayString(rdl));
+					ResponsibleDepartmentsListModel.responsibleDepartmentsListDisplayString(rdl));
 
 				listItem.setContentConcepts(
-						ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
+					ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
 
 				// from media resource
 				if (blobCsids.size() > 0) {
 					listItem.setBlobCsid(blobCsids.get(0));
 				}
-
-				// from collectionobject itself
-				listItem.setCsid(collectionObjectValuesMap.get("csid"));
-				listItem.setObjectId(collectionObjectValuesMap.get("objectId")); // "Identification Number: Display full
-																					// string" from
-																					// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
-				listItem.setObjectNumber(collectionObjectValuesMap.get("objectNumber"));
-				listItem.setRefName(collectionObjectValuesMap.get("refName"));
-				listItem.setUri(collectionObjectValuesMap.get("uri"));
-				try {
-					XMLGregorianCalendar date = DatatypeFactory.newInstance()
-							.newXMLGregorianCalendar(collectionObjectValuesMap.get("updatedAt"));
-					listItem.setUpdatedAt(date); // "Last Updated Date: Display Date, if updated same day can we display
-													// x number of hours ago" from
-													// https://docs.google.com/spreadsheets/d/103jyxa2oCtt8U0IQ25xsOyIxqwKvPNXlcCtcjGlT5tQ/edit?gid=0#gid=0
-				} catch (DatatypeConfigurationException e) {
-					// FIXME need better error handling
-					logger.error("advancedsearch: could not create XMLGregorianCalendar for updatedAt ", e);
-					logger.error("advancedsearch: updatedAt: {}", collectionObjectValuesMap.get("updatedAt"));
-				}
-
 				// add the populated item to the results
 				resultsList.getAdvancedsearchListItem().add(listItem);
 			} else {
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
 			}
-			res.close();
+
 		}
 
 		// NOTE: I think this is necessary for the front end to know what to do with
@@ -223,22 +192,17 @@ public class AdvancedSearch
 		wrappedQueryParams.add("pgNum", "0");
 		wrappedQueryParams.add("sortBy", "media_common:title");
 		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
-		HashMap<String, String> mediaResourceValuesMap = new HashMap<String, String>();
-		ArrayList<String> blobCsids = new ArrayList<String>();
-		for (ListItem item : associatedMedia.getListItem()) {
-			// FIXME: is there no better way to do this? we should at least abstract out this logic
-			List<Element> els = item.getAny();
-			for (Element el : els) {
-				String elementName = el.getTagName();
-				String elementText = el.getTextContent();
-				mediaResourceValuesMap.put(elementName, elementText);
-			}
-			String blobCsid = mediaResourceValuesMap.get("blobCsid");
-			if (null != blobCsid) {
-				blobCsids.add(blobCsid);
-			}
+		if (associatedMedia == null || associatedMedia.getListItem() == null) {
+			return Collections.emptyList();
 		}
-		return blobCsids;
+
+		return associatedMedia.getListItem().stream()
+			.filter(item -> item != null && item.getAny() != null)
+			.flatMap(li -> li.getAny().stream())
+			.filter(element -> MediaJAXBSchema.blobCsid.equals(element.getTagName()))
+			.map(Element::getTextContent)
+			.filter(blobCsid -> blobCsid != null && !blobCsid.isEmpty())
+			.collect(Collectors.toList());
 	}
 
 	@Override
@@ -254,7 +218,7 @@ public class AdvancedSearch
 
 	@Override
 	public String getServiceName() {
-		return AdvancedSearchClient.SERVICE_NAME;
+		return AdvancedSearchConstants.SERVICE_NAME;
 	}
 
 	@Override
