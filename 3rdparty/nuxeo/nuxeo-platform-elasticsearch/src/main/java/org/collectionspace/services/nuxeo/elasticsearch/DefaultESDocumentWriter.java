@@ -78,6 +78,13 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			List<Map<String, Object>> prodDateGroupList = (List<Map<String, Object>>) doc.getProperty("collectionobjects_common", "objectProductionDateGroupList");
 
 			denormValues.putArray("prodYears").addAll(structDatesToYearNodes(prodDateGroupList));
+		} else if ("Media".equals(docType) && isMediaPublished(doc)) {
+			CoreSession session = doc.getCoreSession();
+			String csid = doc.getName();
+			String tenantId = (String) doc.getProperty("collectionspace_core", "tenantId");
+
+			// Add media-specific denormalized fields
+			denormRelatedObjects(session, csid, tenantId, denormValues);
 		}
 
 		return denormValues;
@@ -133,6 +140,31 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		denormValues.putArray("mediaCsid").addAll(mediaCsids);
 		denormValues.putArray("mediaAltText").addAll(mediaAltTexts);
 		denormValues.put("hasMedia", mediaCsids.size() > 0);
+	}
+
+	private void denormRelatedObjects(CoreSession session, String csid, String tenantId, ObjectNode denormValues) {
+		// Store the objectCsid of objects that are related to this media.
+
+		String relatedRecordQuery = String.format(
+				"SELECT * FROM Relation WHERE relations_common:objectCsid = '%s' AND relations_common:subjectDocumentType = 'CollectionObject' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'",
+				csid, tenantId);
+		DocumentModelList relationDocs = session.query(relatedRecordQuery);
+		List<JsonNode> objectCsids = new ArrayList<JsonNode>();
+
+		if (relationDocs.size() > 0) {
+			Iterator<DocumentModel> iterator = relationDocs.iterator();
+
+			while (iterator.hasNext()) {
+				DocumentModel relationDoc = iterator.next();
+				String objectCsid = (String) relationDoc.getProperty("relations_common", "subjectCsid");
+
+				if (objectCsid != null) {
+					objectCsids.add(new TextNode(objectCsid));
+				}
+			}
+		}
+
+		denormValues.putArray("objectCsid").addAll(objectCsids);
 	}
 
 	private void denormAcquisitionRecords(CoreSession session, String csid, String tenantId, ObjectNode denormValues) {

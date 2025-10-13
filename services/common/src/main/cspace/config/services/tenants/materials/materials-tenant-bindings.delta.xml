@@ -102,6 +102,9 @@
                     "collectionobjects_common:rightsGroupList.standardizedRightStatement",
                     "collectionobjects_common:rightsInGroupList.rightReproductionStatement",
                     "media_common:blobCsid",
+                    "media_common:identificationNumber",
+                    "media_common:title",
+                    "media_common:altText",
                     "media_materials:publishToList"
                   ]
                 },
@@ -165,8 +168,17 @@
                       }
                     }
                   },
+                  "collectionspace_denorm:objectCsid": {
+                    "type": "keyword"
+                  },
 
                   "collectionspace_core:createdAt": {
+                    "type": "date",
+                    // Sometimes the timestamp only has a two digit fractional second, instead of three.
+                    // From imported data??
+                    "format" : "date_time||yyyy-MM-dd'T'HH:mm:ss.SSZZ"
+                  },
+                  "collectionspace_core:updatedAt": {
                     "type": "date",
                     // Sometimes the timestamp only has a two digit fractional second, instead of three.
                     // From imported data??
@@ -697,7 +709,17 @@
                     "type": "text",
                     "copy_to": "all_field"
                   },
-
+                  "media_common:identificationNumber": {
+                    "type": "keyword",
+                    "normalizer": "sorting_normalizer"
+                  },
+                  "media_common:altText": {
+                    "type": "text"
+                  },
+                  "media_common:title": {
+                    "type": "keyword",
+                    "normalizer": "sorting_normalizer"
+                  },
                   "media_materials:publishToList": {
                     "type": "keyword",
                     "fields": {

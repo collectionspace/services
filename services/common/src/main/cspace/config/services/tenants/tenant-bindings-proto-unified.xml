@@ -1217,7 +1217,10 @@
 							"ecm:currentLifeCycleState",
 							"ecm:name",
 							"ecm:primaryType",
-							"media_common:blobCsid"
+							"media_common:blobCsid",
+							"media_common:identificationNumber",
+							"media_common:title",
+							"media_common:altText"
 						]
 					},
 					"properties" : {
@@ -1238,6 +1241,10 @@
 						},
 
 						"collectionspace_core:createdAt": {
+							"type": "date",
+							"format": "date_time"
+						},
+						"collectionspace_core:updatedAt": {
 							"type": "date",
 							"format": "date_time"
 						},
@@ -1309,7 +1316,9 @@
 								}
 							}
 						},
-
+						"collectionspace_denorm:objectCsid": {
+							"type": "keyword"
+						},
 						"collectionobjects_common:objectNumber": {
 							"type": "keyword",
 							"copy_to": "all_field"
@@ -1478,6 +1487,17 @@
 
 						"media_common:blobCsid": {
 							"type": "keyword"
+						},
+						"media_common:identificationNumber": {
+							"type": "keyword",
+							"normalizer": "sorting_normalizer"
+						},
+						"media_common:altText": {
+							"type": "text"
+						},
+						"media_common:title": {
+							"type": "keyword",
+							"normalizer": "sorting_normalizer"
 						},
 						"media_common:publishToList": {
 							"type": "keyword",
