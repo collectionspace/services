@@ -31,13 +31,14 @@ import org.dom4j.Node;
 public class CsvExportWriter extends AbstractExportWriter {
 	private static final Pattern VALID_FIELD_XPATH_PATTERN = Pattern.compile("^\\w+:(\\w+/)*(\\w+)(\\[.*])?$");
 	private static final String VALUE_DELIMITER_PARAM_NAME = "valuedelimiter";
-	private static final String VALUE_EXPORT_AUTH_HEADER_NAME = "authexport";
+	private static final String INCLUDE_AUTHORITY_PARAM = "includeauthority";
+	private static final String AUTHORITY_SUFFIX = "AuthorityVocabulary";
 
 	private CSVPrinter csvPrinter;
 	private Map<String, Map<String, Set<String>>> refFieldsByDocType = new HashMap<>();
 	private String valueDelimiter = "|";
 	private String nestedValueDelimiter = "^^";
-	private AuthorityVocabExport authorityExportType = AuthorityVocabExport.DEFAULT;
+	private boolean includeAuthority = false;
 
 	/**
 	 * Authority names in the service bindings start with a single capital letter, e.g. Personauthorities, but in
@@ -65,8 +66,8 @@ public class CsvExportWriter extends AbstractExportWriter {
 			for (InvocationContext.Params.Param param : params.getParam()) {
 				if (param.getKey().equals(VALUE_DELIMITER_PARAM_NAME)) {
 					this.valueDelimiter = param.getValue();
-				} else if (param.getKey().equals(VALUE_EXPORT_AUTH_HEADER_NAME)) {
-					this.authorityExportType = AuthorityVocabExport.fromString(param.getValue());
+				} else if (param.getKey().equals(INCLUDE_AUTHORITY_PARAM)) {
+					this.includeAuthority = Boolean.parseBoolean(param.getValue());
 					collectAuthorityVocabs();
 				}
 			}
@@ -90,14 +91,13 @@ public class CsvExportWriter extends AbstractExportWriter {
 
 			headers.add(fieldName);
 
-			if (authorityExportType == AuthorityVocabExport.COMBINED) {
-				// maybe introduce a way to get a doc type from a part name? Or embed as part of the Field?
-				// would need to pull the Field out of an xsd format though
+			// Create additional authority vocabulary column if requested
+			if (includeAuthority) {
 				String partName = fieldSpec.split(":", 2)[0];
 				String docType = partName.substring(0, partName.indexOf("_"));
 				if (isRefField(docType, partName, fieldName)) {
 					// make constant
-					headers.add(fieldName + "AuthorityVocabulary");
+					headers.add(fieldName + AUTHORITY_SUFFIX);
 				}
 			}
 		}
@@ -121,7 +121,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 			boolean isRefName = isRefField(document, field);
 
 			csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.FIELD));
-			if (isRefName && authorityExportType == AuthorityVocabExport.COMBINED) {
+			if (isRefName && includeAuthority) {
 				csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.AUTHORITY));
 			}
 		}
@@ -264,6 +264,10 @@ public class CsvExportWriter extends AbstractExportWriter {
 	 * Vocabulary displayName (title)
 	 */
 	private void collectAuthorityVocabs() {
+		if (!includeAuthority) {
+			return;
+		}
+
 		TenantBindingType tenantBinding = tenantBindingConfigReader.getTenantBinding(serviceContext.getTenantId());
 
 		Predicate<ServiceBindingType> hasAuthorityInstances = (binding) ->
