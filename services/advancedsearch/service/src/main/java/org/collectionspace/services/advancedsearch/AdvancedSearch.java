@@ -2,7 +2,6 @@ package org.collectionspace.services.advancedsearch;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +35,8 @@ import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
-import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
@@ -50,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * This class defines the advanced search endpoints.
