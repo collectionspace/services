@@ -146,7 +146,8 @@ public class CsvExportWriter extends AbstractExportWriter {
 		PayloadOutputPart part = document.getPart(partName);
 
 		if (part != null) {
-			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, isRefField, columnType);
+			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, isRefField,
+			                                columnType);
 		}
 
 		return delimitedValues;
@@ -172,9 +173,9 @@ public class CsvExportWriter extends AbstractExportWriter {
 					textValue = node.getText();
 
 					if (Strings.isNotEmpty(textValue)) {
-						RefNameUtils.AuthorityTermInfo authorityTermInfo = RefNameUtils.getAuthorityTermInfo(textValue);
-						final String authority = authorityTermInfo.inAuthority.resource;
-						final String shortId = authorityTermInfo.inAuthority.name;
+						final RefNameUtils.AuthorityTermInfo termInfo = RefNameUtils.getAuthorityTermInfo(textValue);
+						final String authority = termInfo.inAuthority.resource;
+						final String shortId = termInfo.inAuthority.name;
 
 						String authorityDisplayName = authority;
 						String vocabDisplayName = shortId;
@@ -283,6 +284,11 @@ public class CsvExportWriter extends AbstractExportWriter {
 			.forEach((mapping) -> authorityDisplayNames.put(mapping.authority, mapping));
 	}
 
+	/**
+	 * The type of column which we want to collect data for.
+	 * Field - the text value or display name if a refname is present
+	 * Authority - The aggregate of the Authority display name and Authority Vocabulary display name
+	 */
 	private enum ColumnType {
 		FIELD, AUTHORITY
 	}
