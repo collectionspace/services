@@ -120,9 +120,9 @@ public class CsvExportWriter extends AbstractExportWriter {
 		for (Field field : fields) {
 			boolean isRefName = isRefField(document, field);
 
-			csvRecord.add(collectValues(document, field.getValue(), isRefName));
+			csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.FIELD));
 			if (isRefName && authorityExportType == AuthorityVocabExport.COMBINED) {
-				csvRecord.add(collectAuthorityRefs(document, field.getValue()));
+				csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.AUTHORITY));
 			}
 		}
 
@@ -137,7 +137,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 		csvPrinter.close();
 	}
 
-	private String collectValues(PoxPayloadOut document, String fieldSpec, boolean isRefField) {
+	private String collectValues(PoxPayloadOut document, String fieldSpec, boolean isRefField, ColumnType columnType) {
 		String delimitedValues = "";
 		String[] segments = fieldSpec.split(":", 2);
 		String partName = segments[0];
@@ -146,30 +146,14 @@ public class CsvExportWriter extends AbstractExportWriter {
 		PayloadOutputPart part = document.getPart(partName);
 
 		if (part != null) {
-			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, isRefField);
+			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, isRefField, columnType);
 		}
 
 		return delimitedValues;
 	}
 
-	private String collectAuthorityRefs(PoxPayloadOut document, String fieldSpec) {
-		String delimitedValues = "";
-		String[] segments = fieldSpec.split(":", 2);
-		String partName = segments[0];
-		String xpath = segments[1];
-
-		PayloadOutputPart part = document.getPart(partName);
-
-		if (part != null) {
-			delimitedValues = collectAuthorityRefs(part.getElementBody(), Arrays.asList(xpath.split("/")), 0);
-		}
-
-		return delimitedValues;
-	}
-
-	private String collectAuthorityRefs(Element element,
-	                                    List<String> path,
-	                                    int depth) {
+	private String collectValues(Element element, List<String> path, int depth, boolean isRefName,
+	                             ColumnType columnType) {
 		String delimitedValues = "";
 		String fieldName = path.get(depth);
 		String delimiter = (depth / 2 > 0) ? this.nestedValueDelimiter : this.valueDelimiter;
@@ -183,8 +167,8 @@ public class CsvExportWriter extends AbstractExportWriter {
 				String textValue;
 
 				if (depth < path.size() - 1) {
-					textValue = collectAuthorityRefs((Element) node, path, depth + 1);
-				} else {
+					textValue = collectValues((Element) node, path, depth + 1, isRefName, columnType);
+				} else if (columnType == ColumnType.AUTHORITY) {
 					textValue = node.getText();
 
 					if (Strings.isNotEmpty(textValue)) {
@@ -202,39 +186,6 @@ public class CsvExportWriter extends AbstractExportWriter {
 
 						textValue = authorityDisplayName + "/" + vocabDisplayName;
 					}
-				}
-
-				if (StringUtils.isNotEmpty(textValue)) {
-					hasValue = true;
-				}
-
-				values.add(textValue);
-			}
-
-			if (hasValue) {
-				delimitedValues = String.join(delimiter, values);
-			}
-		}
-
-		return delimitedValues;
-	}
-
-	private String collectValues(Element element, List<String> path, int depth,
-	                             boolean isRefName) {
-		String delimitedValues = "";
-		String fieldName = path.get(depth);
-		String delimiter = (depth / 2 > 0) ? this.nestedValueDelimiter : this.valueDelimiter;
-		List<Node> matches = element.selectNodes(fieldName);
-
-		if (matches.size() > 0) {
-			List<String> values = new ArrayList<>();
-			boolean hasValue = false;
-
-			for (Node node : matches) {
-				String textValue;
-
-				if (depth < path.size() - 1) {
-					textValue = collectValues((Element) node, path, depth + 1, isRefName);
 				} else {
 					textValue = node.getText();
 
@@ -328,6 +279,9 @@ public class CsvExportWriter extends AbstractExportWriter {
 			.forEach((mapping) -> authorityDisplayNames.put(mapping.authority, mapping));
 	}
 
+	private enum ColumnType {
+		FIELD, AUTHORITY
+	}
 
 	private static class AuthorityDisplayMapping {
 		final String authority;
@@ -354,70 +308,4 @@ public class CsvExportWriter extends AbstractExportWriter {
 		}
 	}
 
-	private static class CollectedValue {
-		private final String textValue;
-		private String authorityReference;
-
-		private CollectedValue(final String textValue) {
-			this.textValue = textValue;
-		}
-
-		private CollectedValue(final String textValue, final String authorityReference) {
-			this.textValue = textValue;
-			this.authorityReference = authorityReference;
-		}
-
-		public String textValue() {
-			return textValue;
-		}
-
-		public void setAuthorityReference(String authorityReference) {
-			this.authorityReference = authorityReference;
-		}
-
-		public String authorityReference() {
-			return authorityReference;
-		}
-
-		public boolean isAuthority() {
-			return authorityReference != null;
-		}
-	}
-
-	private static class CollectedValues {
-		final List<String> values = new ArrayList<>();
-		final List<String> reftypes = new ArrayList<>();
-		boolean hasRefField;
-
-		public void addValue(final String value) {
-			if (hasRefField) {
-				throw new IllegalStateException("addValue must only be used on non-authority based fields");
-			}
-			values.add(value);
-		}
-
-		public void addAuthorityValue(final String value, final String reftype) {
-			if (!hasRefField) {
-				throw new IllegalStateException("addAuthorityValue must only be used on authority based fields");
-			}
-			values.add(value);
-			reftypes.add(reftype);
-		}
-
-		public void setHasRefField(final boolean hasRefField) {
-			this.hasRefField = hasRefField;
-		}
-
-		public boolean hasRefField() {
-			return hasRefField;
-		}
-
-		public List<String> getValues() {
-			return values;
-		}
-
-		public List<String> getReftypes() {
-			return reftypes;
-		}
-	}
 }
