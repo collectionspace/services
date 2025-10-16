@@ -163,7 +163,7 @@ public class AdvancedSearch
 			}
 
 			if (markRelated != null) {
-				RelationsCommonList relationsList = relations.getList(markRelated, csid, uriInfo);
+				RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
 				listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 			}
 		}

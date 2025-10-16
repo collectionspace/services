@@ -108,7 +108,7 @@ public class RelationResource extends NuxeoBasedResource {
 		return resultList;
 	}
 
-	public RelationsCommonList getList(String subject, String object, UriInfo uriInfo) {
+	public RelationsCommonList getRelationForSubject(String subject, String object, UriInfo uriInfo) {
 		return getRelationList(null, uriInfo, subject, null, null, object, null, false);
 	}
 
