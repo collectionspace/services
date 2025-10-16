@@ -76,6 +76,7 @@
 
         <!-- name of the service, this is also the default URI path to access this service binding -->
         <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="displayName" type="xs:string"/>
         <xs:attribute name="type" type="xs:string" use="optional"/>
         <xs:attribute name="version" type="types:VersionType" use="required"/>
         <xs:attribute name="elasticsearchIndexed" type="xs:boolean" default="false"/>
