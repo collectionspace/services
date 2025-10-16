@@ -11,63 +11,63 @@
 <xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="2.0" elementFormDefault="unqualified"
+  jaxb:version="2.0"
   xmlns="http://collectionspace.org/services/advancedsearch"
   targetNamespace="http://collectionspace.org/services/advancedsearch"
   version="0.1"
 >
 
-  	<xs:complexType name="abstractCommonList">
-    	<xs:annotation>
-        	<xs:appinfo>
-            	<jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
-        	</xs:appinfo>
-    	</xs:annotation>
-	</xs:complexType>
-  
-  	<xs:complexType name="responsibleDepartment">
- 		<xs:sequence>
-            <xs:element name="uri" type="xs:anyURI" minOccurs="1"/>
-            <xs:element name="csid" type="xs:string" minOccurs="1"/>
-            <xs:element name="refName" type="xs:string" minOccurs="1"/>
-            <xs:element name="name" type="xs:string" minOccurs="1"/>
-  		</xs:sequence>
-  	</xs:complexType>
-  	<xs:complexType name="responsibleDepartmentsList">
-  		<xs:sequence>
-            <xs:element name="responsibleDepartment" type="responsibleDepartment" minOccurs="0" maxOccurs="unbounded" />
-  		</xs:sequence>
-  	</xs:complexType>
-  
-    <xs:element name="advancedsearch-common-list">
-        <xs:complexType>
-            <xs:complexContent>
-                <xs:extension base="abstractCommonList">                    
-                    <xs:sequence>
-                         <xs:element name="advancedsearch-list-item" maxOccurs="unbounded">
-                            <xs:complexType>
-                                <xs:sequence>
-                                	<xs:element name="uri" type="xs:anyURI" minOccurs="1" />
-                                	<xs:element name="csid" type="xs:string" minOccurs="1" />
-																	<xs:element name="related" type="xs:boolean" minOccurs="1" />
-                                	<xs:element name="refName" type="xs:string" minOccurs="1" />
-                                	<xs:element name="blobCsid" type="xs:string" minOccurs="1" />
-                                	<xs:element name="updatedAt" type="xs:dateTime" minOccurs="1" />
-                                	<xs:element name="objectId" type="xs:string" minOccurs="1" />
-                                	<xs:element name="objectNumber" type="xs:string" minOccurs="1" />
-                                	<xs:element name="objectName" type="xs:string" minOccurs="1" />
-                                	<xs:element name="title" type="xs:string" minOccurs="1" />
-                                	<xs:element name="computedCurrentLocation" type="xs:string" minOccurs="1" />
-                                	<xs:element name="responsibleDepartments" type="responsibleDepartmentsList" minOccurs="1" />
-                                	<xs:element name="responsibleDepartment" type="xs:string" minOccurs="1" />
-                                	<xs:element name="contentConcepts" type="xs:string" minOccurs="1" />
-                                	<xs:element name="briefDescription" type="xs:string" minOccurs="1" />
-                                </xs:sequence>
-                            </xs:complexType>
-                         </xs:element>
-                    </xs:sequence>
-				</xs:extension>
-			</xs:complexContent>
-		</xs:complexType>
-	</xs:element>
+  <xs:complexType name="abstractCommonList">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:complexType>
+
+  <xs:complexType name="responsibleDepartment">
+    <xs:sequence>
+      <xs:element name="uri" type="xs:anyURI"/>
+      <xs:element name="csid" type="xs:string"/>
+      <xs:element name="refName" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="responsibleDepartmentsList">
+    <xs:sequence>
+      <xs:element name="responsibleDepartment" type="responsibleDepartment" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="advancedsearch-common-list">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="abstractCommonList">
+          <xs:sequence>
+            <xs:element name="advancedsearch-list-item" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="uri" type="xs:anyURI"/>
+                  <xs:element name="csid" type="xs:string"/>
+                  <xs:element name="related" type="xs:boolean" minOccurs="0"/>
+                  <xs:element name="refName" type="xs:string"/>
+                  <xs:element name="blobCsid" type="xs:string"/>
+                  <xs:element name="updatedAt" type="xs:dateTime"/>
+                  <xs:element name="objectId" type="xs:string"/>
+                  <xs:element name="objectNumber" type="xs:string"/>
+                  <xs:element name="objectName" type="xs:string"/>
+                  <xs:element name="title" type="xs:string"/>
+                  <xs:element name="computedCurrentLocation" type="xs:string"/>
+                  <xs:element name="responsibleDepartments" type="responsibleDepartmentsList"/>
+                  <xs:element name="responsibleDepartment" type="xs:string"/>
+                  <xs:element name="contentConcepts" type="xs:string"/>
+                  <xs:element name="briefDescription" type="xs:string"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
 </xs:schema>
