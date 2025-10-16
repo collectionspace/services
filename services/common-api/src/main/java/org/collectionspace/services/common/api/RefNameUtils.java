@@ -285,13 +285,13 @@ public class RefNameUtils {
      */
     public static String getDisplayName(String refName) throws IllegalArgumentException {
     	String displayName = null;
-    	
+
     	try {
     		AuthorityTermInfo authorityTermInfo = parseAuthorityTermInfo(refName);
     		displayName = authorityTermInfo.displayName;
     	}
     	catch(IllegalArgumentException invalidAuthorityTermRefNameException) {
-        	try {   		
+        	try {
         		AuthorityInfo authorityInfo = parseAuthorityInfo(refName);
         		displayName = authorityInfo.displayName;
         	}
@@ -299,9 +299,22 @@ public class RefNameUtils {
         		throw new IllegalArgumentException("Invalid refName");
         	}
     	}
-    	
+
     	return displayName;
     }
+
+	/**
+	 * @param refName A string representation of the CollectionSpace {@link RefName} to parse
+	 * @return The {@link AuthorityInfo for the refname}
+	 * @throws IllegalArgumentException if the refName cannot be parsed
+	 */
+	public static AuthorityTermInfo getAuthorityTermInfo(String refName) throws IllegalArgumentException {
+		try {
+			return parseAuthorityTermInfo(refName);
+		} catch(IllegalArgumentException invalidAuthorityTermRefNameException) {
+			throw new IllegalArgumentException("Invalid refName");
+		}
+	}
 
     /**
      * Compare two refname strings.  They're considered equal if the short IDs match
