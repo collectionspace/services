@@ -210,6 +210,15 @@ public class CsvExportWriter extends AbstractExportWriter {
 		return delimitedValues;
 	}
 
+	/**
+	 * Check if a {@link Field} is for a TermRef or an AuthRef. We expect {@link Field#getValue} to return
+	 * something which matches our Field Spec, i.e. "namespace:path/to/field". We allow for some xpath operations,
+	 * such as contains, so we also need to be mindful of that and filter them out appropriately.
+	 *
+	 * @param document the document we're searching in
+	 * @param field the field being searched for
+	 * @return true if the field is a TermRef or an AuthRef
+	 */
 	private boolean isRefField(PoxPayloadOut document, Field field) {
 		final String fieldSpec = field.getValue();
 		final String[] segments = fieldSpec.split(":", 2);
