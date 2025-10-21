@@ -118,11 +118,11 @@ public class CsvExportWriter extends AbstractExportWriter {
 		List<String> csvRecord = new ArrayList<>();
 
 		for (Field field : fields) {
-			boolean isRefName = isRefField(document, field);
+			boolean isRefField = isRefField(document, field);
 
-			csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.FIELD));
-			if (isRefName && includeAuthority) {
-				csvRecord.add(collectValues(document, field.getValue(), isRefName, ColumnType.AUTHORITY));
+			csvRecord.add(collectValues(document, field.getValue(), isRefField, ColumnType.FIELD));
+			if (isRefField && includeAuthority) {
+				csvRecord.add(collectValues(document, field.getValue(), isRefField, ColumnType.AUTHORITY));
 			}
 		}
 
