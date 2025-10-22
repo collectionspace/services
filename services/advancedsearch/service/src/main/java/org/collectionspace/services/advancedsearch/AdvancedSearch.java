@@ -2,7 +2,6 @@ package org.collectionspace.services.advancedsearch;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,18 +35,17 @@ import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
-import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList;
 import org.collectionspace.services.nuxeo.client.handler.CSDocumentModelList.CSDocumentModelResponse;
 import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModelHandler;
+import org.collectionspace.services.relation.RelationsCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * This class defines the advanced search endpoints.
@@ -66,6 +64,7 @@ public class AdvancedSearch
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
 	private final MediaResource mr = new MediaResource();
+	private final RelationResource relations = new RelationResource();
 
 	public AdvancedSearch() {
 		super();
@@ -83,6 +82,7 @@ public class AdvancedSearch
 		logger.info("advancedsearch called with path: {}", uriInfo.getPath());
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters(true);
 		logger.info("advancedsearch called with query params: {}", queryParams);
+		final String markRelated = queryParams.getFirst(IQueryManager.MARK_RELATED_TO_CSID_AS_SUBJECT);
 
 		cor.setDocumentHandlerClass(UnfilteredDocumentModelHandler.class);
 		ObjectFactory objectFactory = new ObjectFactory();
@@ -162,6 +162,10 @@ public class AdvancedSearch
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
 			}
 
+			if (markRelated != null) {
+				RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
+				listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
+			}
 		}
 
 		// NOTE: I think this is necessary for the front end to know what to do with
