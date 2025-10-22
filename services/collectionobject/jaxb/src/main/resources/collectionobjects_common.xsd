@@ -217,6 +217,7 @@
             <xs:element name="objectNameSystem" type="xs:string"/>
             <xs:element name="objectNameType" type="xs:string"/>
             <xs:element name="objectNameLanguage" type="xs:string"/>
+            <xs:element name="objectNameControlled" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
