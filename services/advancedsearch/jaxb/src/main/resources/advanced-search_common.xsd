@@ -62,6 +62,13 @@
                   <xs:element name="responsibleDepartment" type="xs:string"/>
                   <xs:element name="contentConcepts" type="xs:string"/>
                   <xs:element name="briefDescription" type="xs:string"/>
+
+                  <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                  <xs:element name="fieldCollectionSite" type="xs:string"/>
+                  <!-- TBD - Not yet in wireframes
+                  <xs:element name="fieldCollectionAgent" type="xs:string"/>
+                  <xs:element name="fieldCollectionAgentRole" type="xs:string"/>
+                  -->
                 </xs:sequence>
               </xs:complexType>
             </xs:element>

@@ -21,6 +21,7 @@ import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
+import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
 import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
@@ -151,6 +152,9 @@ public class AdvancedSearch
 
 				listItem.setContentConcepts(
 					ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
+
+				listItem.setFieldCollectionPlace(FieldCollectionModel.fieldCollectionPlace(collectionObject));
+				listItem.setFieldCollectionSite(FieldCollectionModel.fieldCollectionSite(collectionObject));
 
 				// from media resource
 				if (blobCsids.size() > 0) {
