@@ -143,15 +143,11 @@ public class AdvancedSearch
 					ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
 				listItem.setTitle(
 					TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
-				ResponsibleDepartmentsList rdl = ResponsibleDepartmentsListModel
-					.responsibleDepartmentListToResponsibleDepartmentsList(
-						collectionObject.getResponsibleDepartments());
-				listItem.setResponsibleDepartments(rdl);
 				listItem.setResponsibleDepartment(
-					ResponsibleDepartmentsListModel.responsibleDepartmentsListDisplayString(rdl));
+					ResponsibleDepartmentsListModel.responsibleDepartmentString(collectionObject));
 
-				listItem.setContentConcepts(
-					ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
+                listItem.setContentConcepts(
+                    ContentConceptListModel.contentConceptList(collectionObject));
 
 				listItem.setFieldCollectionPlace(FieldCollectionModel.fieldCollectionPlace(collectionObject));
 				listItem.setFieldCollectionSite(FieldCollectionModel.fieldCollectionSite(collectionObject));
@@ -172,15 +168,13 @@ public class AdvancedSearch
 			}
 		}
 
-		// NOTE: I think this is necessary for the front end to know what to do with
-		// what's returned (?)
-		AbstractCommonList abstractList = (AbstractCommonList) resultsList;
-		abstractList.setItemsInPage(collectionObjectList.getItemsInPage());
-		abstractList.setPageNum(collectionObjectList.getPageNum());
-		abstractList.setPageSize(collectionObjectList.getPageSize());
-		abstractList.setTotalItems(collectionObjectList.getTotalItems());
+		// AbstractCommonList abstractList = resultsList;
+		resultsList.setItemsInPage(collectionObjectList.getItemsInPage());
+		resultsList.setPageNum(collectionObjectList.getPageNum());
+		resultsList.setPageSize(collectionObjectList.getPageSize());
+		resultsList.setTotalItems(collectionObjectList.getTotalItems());
 		// FIXME: is there a way to generate this rather than hardcode it?
-		abstractList.setFieldsReturned(FIELDS_RETURNED);
+		resultsList.setFieldsReturned(FIELDS_RETURNED);
 
 		return resultsList;
 	}
