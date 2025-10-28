@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    CollectionObject NAGPRA Extension schema (XSD)
+
+    Entity  : CollectionObject
+    Part    : Domain - NAGPRA
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+           jaxb:version="2.0"
+           xmlns:common="http://collectionspace.org/services/collectionobject"
+           xmlns:nagpra="http://collectionspace.org/services/collectionobject/domain/nagpra"
+           targetNamespace="http://collectionspace.org/services/collectionobject/domain/nagpra"
+           version="0.1"
+>
+
+  <xs:import schemaLocation="collectionobjects_common.xsd"
+             namespace="http://collectionspace.org/services/collectionobject"/>
+
+  <xs:element name="collectionobjects_nagpra">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="CollectionObjectsNAGPRA"/>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="nagpraDetermGroupList" type="nagpra:nagpraDetermGroupList"/>
+
+        <xs:element name="nagpraCategories">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="nagpraCategory" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="nagpraReportFiledGroupList" type="nagpra:nagpraReportFiledGroupList"/>
+
+        <xs:element name="nagpraInventoryNames">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="nagpraInventoryName" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="nagpraCulturalDeterminations">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="nagpraCulturalDetermination" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="nagpraNotes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="nagpraNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="repatriationNotes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="repatriationNote" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="graveAssocCodes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="graveAssocCode" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="nagpraReportFiledGroupList">
+    <xs:sequence>
+      <xs:element name="nagpraReportFiledGroup" type="nagpra:nagpraReportFiledGroup" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraReportFiledGroup">
+    <xs:sequence>
+      <xs:element name="nagpraReportFiled" type="xs:boolean"/>
+      <xs:element name="nagpraReportFiledWith" type="xs:string"/>
+      <xs:element name="nagpraReportFiledBy" type="xs:string"/>
+      <xs:element name="nagpraReportFiledDate" type="common:structuredDateGroup"/>
+      <xs:element name="nagpraReportFiledNote" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraDetermGroupList">
+    <xs:sequence>
+      <xs:element name="nagpraDetermGroup" type="nagpra:nagpraDetermGroup" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraDetermGroup">
+    <xs:sequence>
+      <xs:element name="nagpraDetermCulture" type="xs:string"/>
+      <xs:element name="nagpraDetermType" type="xs:string"/>
+      <xs:element name="nagpraDetermBy" type="xs:string"/>
+      <xs:element name="nagpraDetermNote" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
