@@ -1,8 +1,10 @@
 package org.collectionspace.services.advancedsearch.model;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.StructuredDateGroup;
 
 public class FieldCollectionModel {
 
@@ -28,7 +30,25 @@ public class FieldCollectionModel {
 		return fieldCollectionSite;
 	}
 
-	public static String fieldCollectionAgent(CollectionobjectsCommon common) {
-		throw new UnsupportedOperationException("tbd");
+	public static String fieldCollectionDate(CollectionobjectsCommon common) {
+		String fieldCollectionDate = null;
+		if (common != null && common.getFieldCollectionDateGroup() != null) {
+			StructuredDateGroup fieldCollectionDateGroup = common.getFieldCollectionDateGroup();
+			fieldCollectionDate = fieldCollectionDateGroup.getDateDisplayDate();
+		}
+		return fieldCollectionDate;
+	}
+
+
+	public static Optional<String> fieldCollector(CollectionobjectsCommon common) {
+		String fieldCollector = null;
+		if (common != null && common.getFieldCollectors() != null) {
+			final List<String> fieldCollectors = common.getFieldCollectors().getFieldCollector();
+			if (!fieldCollectors.isEmpty()) {
+				fieldCollector = fieldCollectors.get(0);
+			}
+		}
+
+		return Optional.ofNullable(fieldCollector);
 	}
 }
