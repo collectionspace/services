@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,10 +18,12 @@ import javax.xml.bind.Unmarshaller;
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
+import org.collectionspace.services.advancedsearch.model.AgentModel;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
+import org.collectionspace.services.advancedsearch.model.ObjectProductionModel;
 import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
 import org.collectionspace.services.client.CollectionObjectClient;
@@ -56,8 +57,8 @@ import org.w3c.dom.Element;
 @Produces("application/xml")
 public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
+	// FIXME: it's not great to hardcode either of these
 	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
-	// FIXME: it's not great to hardcode this here
 	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME
 	                                               + CollectionSpaceClient.PART_LABEL_SEPARATOR
 	                                               + CollectionSpaceClient.PART_COMMON_LABEL;
@@ -139,18 +140,35 @@ public class AdvancedSearch
 				listItem.setBriefDescription(BriefDescriptionListModel
 					.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
 				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
-				listItem.setObjectName(
-					ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
-				listItem.setTitle(
-					TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
-				listItem.setResponsibleDepartment(
-					ResponsibleDepartmentsListModel.responsibleDepartmentString(collectionObject));
 
-                listItem.setContentConcepts(
-                    ContentConceptListModel.contentConceptList(collectionObject));
+				listItem.setTitle(TitleGroupListModel.titleGroupListToDisplayString(
+					collectionObject.getTitleGroupList()));
+				listItem.setResponsibleDepartment(ResponsibleDepartmentsListModel.responsibleDepartmentString(
+					collectionObject));
 
+				listItem.setObjectName(ObjectNameListModel.objectName(collectionObject));
+				listItem.setObjectNameControlled(ObjectNameListModel.objectNameControlled(collectionObject));
+
+				listItem.setContentConcepts(ContentConceptListModel.contentConceptList(collectionObject));
+
+				// Field collection items (place, site, date, collector, role)
 				listItem.setFieldCollectionPlace(FieldCollectionModel.fieldCollectionPlace(collectionObject));
 				listItem.setFieldCollectionSite(FieldCollectionModel.fieldCollectionSite(collectionObject));
+				listItem.setFieldCollectionDate(FieldCollectionModel.fieldCollectionDate(collectionObject));
+				FieldCollectionModel.fieldCollector(collectionObject).ifPresent(collector -> {
+					listItem.setFieldCollector(collector);
+					listItem.setFieldCollectorRole("field collector"); // todo: how would we i18n this?
+				});
+
+
+				// Object Production Information (place, date, agent, agent role)
+				listItem.setObjectProductionDate(ObjectProductionModel.objectProductionDate(collectionObject));
+				listItem.setObjectProductionPlace(ObjectProductionModel.objectProductionPlace(collectionObject));
+
+				AgentModel.agent(collectionObject).ifPresent(agent -> {
+					listItem.setAgent(agent.getAgent());
+					listItem.setAgentRole(agent.getRole());
+				});
 
 				// from media resource
 				if (blobCsids.size() > 0) {
@@ -168,12 +186,10 @@ public class AdvancedSearch
 			}
 		}
 
-		// AbstractCommonList abstractList = resultsList;
 		resultsList.setItemsInPage(collectionObjectList.getItemsInPage());
 		resultsList.setPageNum(collectionObjectList.getPageNum());
 		resultsList.setPageSize(collectionObjectList.getPageSize());
 		resultsList.setTotalItems(collectionObjectList.getTotalItems());
-		// FIXME: is there a way to generate this rather than hardcode it?
 		resultsList.setFieldsReturned(FIELDS_RETURNED);
 
 		return resultsList;
