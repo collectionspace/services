@@ -2,7 +2,7 @@
 
 <!--
     CollectionObject schema (XSD)
-    
+
     Entity  : CollectionObject
     Part    : Domain - Natural History (example)
     Used for: JAXB binding between XML and Java objects
@@ -11,14 +11,21 @@
     $LastChangedDate$
 -->
 
-<xs:schema
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
-  targetNamespace="http://collectionspace.org/services/collectionobject/domain/naturalhistory"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns="http://collectionspace.org/services/collectionobject/domain/naturalhistory_extension"
+  targetNamespace="http://collectionspace.org/services/collectionobject/domain/naturalhistory_extension"
   version="0.1"
 >
   <!-- collection-object for museum of natural history  -->
-  <xs:element name="collectionobjects_naturalhistory">
+  <xs:element name="collectionobjects_naturalhistory_extension">
+    <!-- keep old class name -->
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class name="CollectionobjectsNaturalhistory"/>
+      </xs:appinfo>
+    </xs:annotation>
     <xs:complexType>
       <xs:sequence>
         <xs:element name="fieldLocVerbatim" type="xs:string"/>

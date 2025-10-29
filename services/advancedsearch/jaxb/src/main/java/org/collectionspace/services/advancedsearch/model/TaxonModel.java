@@ -1,12 +1,11 @@
 package org.collectionspace.services.advancedsearch.model;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
-import org.collectionspace.services.collectionobject.domain.naturalhistory.TaxonomicIdentGroup;
-import org.collectionspace.services.collectionobject.domain.naturalhistory.TaxonomicIdentGroupList;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.CollectionobjectsNaturalhistory;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.TaxonomicIdentGroup;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.TaxonomicIdentGroupList;
 
 public class TaxonModel {
 
@@ -23,7 +22,6 @@ public class TaxonModel {
 
 		return taxon;
 	}
-
 
 	public static String preservationForm(final CollectionobjectsCommon common) {
 		String form = null;
