@@ -22,9 +22,11 @@ import org.collectionspace.services.advancedsearch.model.AgentModel;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
+import org.collectionspace.services.advancedsearch.model.NAGPRACategoryModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
 import org.collectionspace.services.advancedsearch.model.ObjectProductionModel;
 import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
+import org.collectionspace.services.advancedsearch.model.TaxonModel;
 import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -33,6 +35,8 @@ import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.domain.nagpra.CollectionObjectsNAGPRA;
+import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -60,8 +64,16 @@ public class AdvancedSearch
 	// FIXME: it's not great to hardcode either of these
 	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
 	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME
-	                                               + CollectionSpaceClient.PART_LABEL_SEPARATOR
-	                                               + CollectionSpaceClient.PART_COMMON_LABEL;
+		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
+		+ CollectionSpaceClient.PART_COMMON_LABEL;
+
+	private static final String NATHIST_PART_NAME = CollectionObjectClient.SERVICE_NAME
+		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
+		+ CollectionSpaceClient.NATURALHISTORY_EXT_EXTENSION_NAME;
+
+	private static final String NAGPRA_PART_NAME = CollectionObjectClient.SERVICE_NAME
+		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
+		+ CollectionSpaceClient.NAGPRA_EXTENSION_NAME;
 
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
@@ -111,12 +123,26 @@ public class AdvancedSearch
 			PoxPayloadOut outputPayload = response.getPayload();
 			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
 			PayloadOutputPart commonPart = outputPayload.getPart(COMMON_PART_NAME);
+
 			CollectionSpaceCore core;
 			CollectionobjectsCommon collectionObject;
+			CollectionObjectsNAGPRA objectsNAGPRA = null;
+			CollectionobjectsNaturalhistory naturalHistory = null;
 
 			try {
 				core = (CollectionSpaceCore) unmarshaller.unmarshal((Document) corePart.getBody());
 				collectionObject = (CollectionobjectsCommon) unmarshaller.unmarshal((Document) commonPart.getBody());
+
+				PayloadOutputPart nagpraPart = outputPayload.getPart(NAGPRA_PART_NAME);
+				if (nagpraPart != null) {
+					objectsNAGPRA = (CollectionObjectsNAGPRA) unmarshaller.unmarshal((Document) nagpraPart.getBody());
+				}
+
+				PayloadOutputPart natHistPart = outputPayload.getPart(NATHIST_PART_NAME);
+				if (natHistPart != null) {
+					naturalHistory = (CollectionobjectsNaturalhistory) unmarshaller.unmarshal(
+						(Document) natHistPart.getBody());
+				}
 			} catch (JAXBException e) {
 				throw new RuntimeException(e);
 			}
@@ -170,6 +196,8 @@ public class AdvancedSearch
 					listItem.setAgentRole(agent.getRole());
 				});
 
+				listItem.setForm(TaxonModel.preservationForm(collectionObject));
+
 				// from media resource
 				if (blobCsids.size() > 0) {
 					listItem.setBlobCsid(blobCsids.get(0));
@@ -178,6 +206,14 @@ public class AdvancedSearch
 				resultsList.getAdvancedsearchListItem().add(listItem);
 			} else {
 				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
+			}
+
+			if (naturalHistory != null) {
+				listItem.setTaxon(TaxonModel.taxon(naturalHistory));
+			}
+
+			if (objectsNAGPRA != null) {
+				listItem.setNagpraCategories(NAGPRACategoryModel.napgraCategories(objectsNAGPRA));
 			}
 
 			if (markRelated != null) {
