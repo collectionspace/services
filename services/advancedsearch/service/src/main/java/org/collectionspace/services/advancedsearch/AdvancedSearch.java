@@ -1,6 +1,5 @@
 package org.collectionspace.services.advancedsearch;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,28 +14,11 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
-import org.collectionspace.services.advancedsearch.model.AgentModel;
-import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
-import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
-import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
-import org.collectionspace.services.advancedsearch.model.NAGPRACategoryModel;
-import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
-import org.collectionspace.services.advancedsearch.model.ObjectProductionModel;
-import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
-import org.collectionspace.services.advancedsearch.model.TaxonModel;
-import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
-import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.advancedsearch.mapper.CollectionObjectMapper;
 import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.domain.nagpra.CollectionObjectsNAGPRA;
-import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.CollectionobjectsNaturalhistory;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -50,7 +32,6 @@ import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModel
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -63,17 +44,6 @@ public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
 	// FIXME: it's not great to hardcode either of these
 	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
-	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME
-		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
-		+ CollectionSpaceClient.PART_COMMON_LABEL;
-
-	private static final String NATHIST_PART_NAME = CollectionObjectClient.SERVICE_NAME
-		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
-		+ CollectionSpaceClient.NATURALHISTORY_EXT_EXTENSION_NAME;
-
-	private static final String NAGPRA_PART_NAME = CollectionObjectClient.SERVICE_NAME
-		+ CollectionSpaceClient.PART_LABEL_SEPARATOR
-		+ CollectionSpaceClient.NAGPRA_EXTENSION_NAME;
 
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
@@ -100,10 +70,7 @@ public class AdvancedSearch
 
 		cor.setDocumentHandlerClass(UnfilteredDocumentModelHandler.class);
 		ObjectFactory objectFactory = new ObjectFactory();
-		// the list to return
 		AdvancedsearchCommonList resultsList = objectFactory.createAdvancedsearchCommonList();
-		// FIXME: this shouldn't be necessary?
-		resultsList.advancedsearchListItem = new ArrayList<>();
 
 		AbstractCommonList abstractCommonList = cor.getList(uriInfo);
 		if (!(abstractCommonList instanceof CSDocumentModelList)) {
@@ -119,106 +86,19 @@ public class AdvancedSearch
 			throw new RuntimeException("Unable to create unmarshaller for AdvancedSearch", e);
 		}
 
+		final CollectionObjectMapper responseMapper = new CollectionObjectMapper(unmarshaller);
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
-			PoxPayloadOut outputPayload = response.getPayload();
-			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
-			PayloadOutputPart commonPart = outputPayload.getPart(COMMON_PART_NAME);
-
-			CollectionSpaceCore core;
-			CollectionobjectsCommon collectionObject;
-			CollectionObjectsNAGPRA objectsNAGPRA = null;
-			CollectionobjectsNaturalhistory naturalHistory = null;
-
-			try {
-				core = (CollectionSpaceCore) unmarshaller.unmarshal((Document) corePart.getBody());
-				collectionObject = (CollectionobjectsCommon) unmarshaller.unmarshal((Document) commonPart.getBody());
-
-				PayloadOutputPart nagpraPart = outputPayload.getPart(NAGPRA_PART_NAME);
-				if (nagpraPart != null) {
-					objectsNAGPRA = (CollectionObjectsNAGPRA) unmarshaller.unmarshal((Document) nagpraPart.getBody());
-				}
-
-				PayloadOutputPart natHistPart = outputPayload.getPart(NATHIST_PART_NAME);
-				if (natHistPart != null) {
-					naturalHistory = (CollectionobjectsNaturalhistory) unmarshaller.unmarshal(
-						(Document) natHistPart.getBody());
-				}
-			} catch (JAXBException e) {
-				throw new RuntimeException(e);
-			}
-
 			String csid = response.getCsid();
 			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
 			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
 
-			AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
-			if (core != null) {
-				listItem.setCsid(csid);
-				listItem.setRefName(core.getRefName());
-				listItem.setUri(core.getUri());
-				listItem.setUpdatedAt(core.getUpdatedAt());
-			} else {
-				logger.warn("advancedsearch: could not find collectionspace_core associated with csid {}", csid);
-			}
-
-			if (collectionObject != null) {
-				listItem.setObjectNumber(collectionObject.getObjectNumber());
-				listItem.setBriefDescription(BriefDescriptionListModel
-					.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
-				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
-
-				listItem.setTitle(TitleGroupListModel.titleGroupListToDisplayString(
-					collectionObject.getTitleGroupList()));
-				listItem.setResponsibleDepartment(ResponsibleDepartmentsListModel.responsibleDepartmentString(
-					collectionObject));
-
-				listItem.setObjectName(ObjectNameListModel.objectName(collectionObject));
-				listItem.setObjectNameControlled(ObjectNameListModel.objectNameControlled(collectionObject));
-
-				listItem.setContentConcepts(ContentConceptListModel.contentConceptList(collectionObject));
-
-				// Field collection items (place, site, date, collector, role)
-				listItem.setFieldCollectionPlace(FieldCollectionModel.fieldCollectionPlace(collectionObject));
-				listItem.setFieldCollectionSite(FieldCollectionModel.fieldCollectionSite(collectionObject));
-				listItem.setFieldCollectionDate(FieldCollectionModel.fieldCollectionDate(collectionObject));
-				FieldCollectionModel.fieldCollector(collectionObject).ifPresent(collector -> {
-					listItem.setFieldCollector(collector);
-					listItem.setFieldCollectorRole("field collector"); // todo: how would we i18n this?
-				});
-
-
-				// Object Production Information (place, date, agent, agent role)
-				listItem.setObjectProductionDate(ObjectProductionModel.objectProductionDate(collectionObject));
-				listItem.setObjectProductionPlace(ObjectProductionModel.objectProductionPlace(collectionObject));
-
-				AgentModel.agent(collectionObject).ifPresent(agent -> {
-					listItem.setAgent(agent.getAgent());
-					listItem.setAgentRole(agent.getRole());
-				});
-
-				listItem.setForm(TaxonModel.preservationForm(collectionObject));
-
-				// from media resource
-				if (blobCsids.size() > 0) {
-					listItem.setBlobCsid(blobCsids.get(0));
+			AdvancedsearchListItem listItem = responseMapper.asListItem(response, blobCsids);
+			if (listItem != null) {
+				if (markRelated != null) {
+					RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
+					listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 				}
-				// add the populated item to the results
 				resultsList.getAdvancedsearchListItem().add(listItem);
-			} else {
-				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
-			}
-
-			if (naturalHistory != null) {
-				listItem.setTaxon(TaxonModel.taxon(naturalHistory));
-			}
-
-			if (objectsNAGPRA != null) {
-				listItem.setNagpraCategories(NAGPRACategoryModel.napgraCategories(objectsNAGPRA));
-			}
-
-			if (markRelated != null) {
-				RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
-				listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 			}
 		}
 
