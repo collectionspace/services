@@ -298,6 +298,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 		final List<String> fields = Arrays.asList("contentConcepts",
 			"contentEvents",
 			"contentPersons",
+			"contentPlaces",
 			"contentOrganizations");
 
 		for (String field : fields) {
@@ -306,7 +307,11 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 			for (String content  : contentList) {
 				if (content != null) {
 					final ObjectNode node = objectMapper.createObjectNode();
-					node.put("subject", RefNameUtils.getDisplayName(content));
+					if ("contentPlaces".equals(field)) {
+						node.put("subject", content); // Directly use the value for contentPlaces
+					} else {
+						node.put("subject", RefNameUtils.getDisplayName(content)); // Use RefNameUtils for other fields
+					}
 					denormContentSubject.add(node);
 				}
 			}
