@@ -13,7 +13,7 @@
 		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["notice_type,places,sites,collectors,category_determinations,object_category_units,object_functions,controlled_object_names,acquisition_methods,acquisition_sources"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["notice_type,places,sites,collectors,category_determinations,object_category_units,object_category_categories,object_functions,controlled_object_names,acquisition_methods,acquisition_sources"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="csid" class="java.lang.String" isForPrompting="false" />
 	<parameter name="whereclause_cte" class="java.lang.String" isForPrompting="false">
@@ -55,6 +55,7 @@ SELECT nt.item AS notice_type,
 	coalesce(object_count_afo.object_count_afo, 0) as object_count_afo,
 	coalesce(object_category.object_category_units, '{}') AS object_category_units,
 	coalesce(object_category.object_category_counts, '{}') AS object_category_counts,
+	coalesce(object_category.object_category_categories, '{}') AS object_category_categories,
 	coalesce(object_names.object_names, '{}') as object_names,
 	coalesce(object_names.controlled_object_names, '{}') AS controlled_object_names,
 	coalesce(acquisition_data.acquisition_numbers, '{}') as acquisition_numbers,
@@ -120,7 +121,8 @@ FROM hierarchy
 	LEFT JOIN LATERAL (
 		SELECT category_hierarchy.parentid,
 			array_agg(category.categorycountunit) AS object_category_units,
-			array_agg(category.categorycount) AS object_category_counts
+			array_agg(category.categorycount) AS object_category_counts,
+			array_agg(category.category) AS object_category_categories
 		FROM hierarchy category_hierarchy
 			INNER JOIN objectcategorygroup category ON category.id = category_hierarchy.id
 		WHERE category_hierarchy.name = 'collectionobjects_objectcategory_extension:objectCategoryGroupList'
@@ -229,6 +231,10 @@ $P!{whereclause}]]>
 	<field name="object_category_counts" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="object_category_counts"/>
 		<property name="com.jaspersoft.studio.field.label" value="object_category_counts"/>
+	</field>
+	<field name="object_category_categories" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="object_category_categories"/>
+		<property name="com.jaspersoft.studio.field.label" value="object_category_categories"/>
 	</field>
 	<field name="controlled_object_names" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="controlled_object_names"/>
@@ -402,14 +408,18 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression>
-					<![CDATA[var units = $F{object_category_units}.getArray();
-						$F{object_category_counts}.getArray().map(function(value, index) {
-							if (!value) {
-								return null;
-							}
-
-							return units[index] === null ? value : value + ' ' + units[index];
-						}).filter((value) => !!value).join('; ')
+					<![CDATA[
+					var units = $F{object_category_units}.getArray();
+					var counts = $F{object_category_counts}.getArray();
+					var categories = $F{object_category_categories}.getArray();
+					counts.map(function(value, index) {
+						if (!value) {
+							return null;
+						}
+						var category = categories[index] || 'unknown';
+						var unit = units[index] === null ? '' : ' ' + units[index];
+						return category + ' (' + value + unit + ')';
+					}).filter((value) => !!value).join('; ')
 					]]>
 				</textFieldExpression>
 			</textField>
