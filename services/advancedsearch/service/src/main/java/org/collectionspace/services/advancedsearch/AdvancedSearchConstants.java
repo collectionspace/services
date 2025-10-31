@@ -1,7 +1,7 @@
 package org.collectionspace.services.advancedsearch;
 
 /**
- * Maybe better as an enum type?
+ * Constants for the AdvancedSearch API
  */
 public interface AdvancedSearchConstants {
 
