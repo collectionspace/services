@@ -29,6 +29,7 @@
 							"collectionobjects_common:contentEvents",
 							"collectionobjects_common:contentOrganizations",
 							"collectionobjects_common:contentPersons",
+							"collectionobjects_common:contentPlaces",
 							"collectionobjects_common:materialGroupList",
 							"collectionobjects_common:measuredPartGroupList",
 							"collectionobjects_common:numberOfObjects",
@@ -309,6 +310,10 @@
 									"normalizer": "refname_displayname_normalizer"
 								}
 							}
+						},
+						"collectionobjects_common:contentPlaces": {
+							"type": "keyword",
+							"copy_to": "all_field"
 						},
 						"collectionobjects_common:techniqueGroupList": {
 							"type": "object",
