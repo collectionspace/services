@@ -13,50 +13,50 @@
     <xs:element name="invocationContext">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="outputMIME" type="xs:string"></xs:element>
-                <xs:element name="mode" type="xs:string"></xs:element>
-                <xs:element name="updateCoreValues" type="xs:string"></xs:element>
-                <xs:element name="docType" type="xs:string"></xs:element>
-                <xs:element name="vocabulary" type="xs:string"></xs:element>
-                <xs:element name="singleCSID" type="xs:string"></xs:element>
-                <xs:element name="groupCSID" type="xs:string"></xs:element>
+                <xs:element name="outputMIME" type="xs:string"/>
+                <xs:element name="mode" type="xs:string"/>
+                <xs:element name="updateCoreValues" type="xs:string"/>
+                <xs:element name="docType" type="xs:string"/>
+                <xs:element name="vocabulary" type="xs:string"/>
+                <xs:element name="singleCSID" type="xs:string"/>
+                <xs:element name="groupCSID" type="xs:string"/>
                 <xs:element name="listCSIDs">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="csid" type="xs:string" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                            <xs:element name="csid" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="query">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="kw" type="xs:string"></xs:element>
-                            <xs:element name="as" type="xs:string"></xs:element>
-                            <xs:element name="pgSz" type="xs:integer"></xs:element>
-                            <xs:element name="pgNum" type="xs:integer"></xs:element>
-                            <xs:element name="wf_deleted" type="xs:boolean" minOccurs="0"></xs:element>
+                            <xs:element name="kw" type="xs:string"/>
+                            <xs:element name="as" type="xs:string"/>
+                            <xs:element name="pgSz" type="xs:integer"/>
+                            <xs:element name="pgNum" type="xs:integer"/>
+                            <xs:element name="wf_deleted" type="xs:boolean" minOccurs="0"/>
 
                             <!-- Relation query parameters -->
-                            <xs:element name="sbj" type="xs:string"></xs:element>
-                            <xs:element name="sbjType" type="xs:string"></xs:element>
-                            <xs:element name="prd" type="xs:string"></xs:element>
-                            <xs:element name="obj" type="xs:string"></xs:element>
-                            <xs:element name="objType" type="xs:string"></xs:element>
-                            <xs:element name="andReciprocal" type="xs:boolean" minOccurs="0"></xs:element>
+                            <xs:element name="sbj" type="xs:string"/>
+                            <xs:element name="sbjType" type="xs:string"/>
+                            <xs:element name="prd" type="xs:string"/>
+                            <xs:element name="obj" type="xs:string"/>
+                            <xs:element name="objType" type="xs:string"/>
+                            <xs:element name="andReciprocal" type="xs:boolean" minOccurs="0"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="includeFields">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
                 <xs:element name="excludeFields">
                     <xs:complexType>
                         <xs:sequence>
-                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"></xs:element>
+                            <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
                         </xs:sequence>
                     </xs:complexType>
                 </xs:element>
@@ -66,8 +66,8 @@
                             <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
                                 <xs:complexType>
                                     <xs:sequence>
-                                        <xs:element name="key" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
-                                        <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"></xs:element>
+                                        <xs:element name="key" type="xs:string" minOccurs="0" maxOccurs="1"/>
+                                        <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
                                     </xs:sequence>
                                 </xs:complexType>
                             </xs:element>

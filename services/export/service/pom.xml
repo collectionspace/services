@@ -15,18 +15,6 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.authentication.service</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.account.service</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.authority.service</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
@@ -34,12 +22,6 @@
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.config</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.authority.jaxb</artifactId>
-			<optional>true</optional>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -56,53 +38,20 @@
 			<artifactId>org.collectionspace.services.export.client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 		<!-- External dependencies -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
 			<version>1.8</version>
 		</dependency>
 
-		<!-- javax -->
-
-		<dependency>
-			<groupId>javax.security</groupId>
-			<artifactId>jaas</artifactId>
-			<version>1.0.01</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- jboss -->
-
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxb-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-multipart-provider</artifactId>
-		</dependency>
 
 		<!-- nuxeo -->
-
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-api</artifactId>

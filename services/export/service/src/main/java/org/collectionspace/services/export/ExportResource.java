@@ -33,6 +33,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.StringUtils;
@@ -51,30 +59,18 @@ import org.collectionspace.services.common.invocable.Invocable;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 @Path(ExportClient.SERVICE_PATH)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPayloadIn, PoxPayloadOut> {
-	private final Logger logger = LoggerFactory.getLogger(ExportResource.class);
 
 	// There is no way to tell from config that collectionspace_core should not be exported, so it
 	// has to be hardcoded here. At that point we might as well also hardcode account_permission,
 	// so we don't need to look at config at all.
 	private static final ImmutableMap<String, List<String>> EXCLUDE_PARTS = ImmutableMap.of(
 		"collectionspace_core", Arrays.asList("workflowState", "tenantId", "refName"),
-		"account_permission", Collections.<String>emptyList());
+		"account_permission", Collections.emptyList());
 
 	private static final String MIME_TYPE_CSV = "text/csv";
 	private static final String MIME_TYPE_XML = "application/xml";
@@ -229,12 +225,12 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 				PayloadOutputPart part = document.getPart(partName);
 
 				if (part != null) {
-					org.dom4j.Element partElement = part.getElementBody();
-					List<Node> matches = (List<Node>) partElement.selectNodes(xpath);
+					Element partElement = part.getElementBody();
+					List<Node> matches = partElement.selectNodes(xpath);
 
 					for (Node includeNode : matches) {
 						if (includeNode.getNodeType() == Node.ELEMENT_NODE) {
-							markIncluded((org.dom4j.Element) includeNode);
+							markIncluded((Element) includeNode);
 						}
 					}
 				}
@@ -243,7 +239,7 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 			ArrayList<PayloadOutputPart> includedParts = new ArrayList<>();
 
 			for (PayloadOutputPart part : document.getParts()) {
-				org.dom4j.Element partElement = part.getElementBody();
+				Element partElement = part.getElementBody();
 
 				if (partElement.attributeValue(INCLUDE_ATTRIBUTE_NAME) != null) {
 					includedParts.add(part);
@@ -257,7 +253,7 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 
 	private void detach(final String xpath, final Element element) {
 		if (element != null) {
-			List<Node> matches = (List<Node>) element.selectNodes(xpath);
+			List<Node> matches = element.selectNodes(xpath);
 
 			for (Node excludeNode : matches) {
 				if (excludeNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -267,8 +263,8 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 		}
 	}
 
-	private void markIncluded(org.dom4j.Element element) {
-		org.dom4j.Element parentElement = element.getParent();
+	private void markIncluded(Element element) {
+		Element parentElement = element.getParent();
 
 		if (parentElement != null) {
 			markIncluded(parentElement);
@@ -277,17 +273,17 @@ public class ExportResource extends AbstractCollectionSpaceResourceImpl<PoxPaylo
 		element.addAttribute(INCLUDE_ATTRIBUTE_NAME, "1");
 	}
 
-	private void removeUnincluded(org.dom4j.Element element) {
+	private void removeUnincluded(Element element) {
 		if (element.attributeValue(INCLUDE_ATTRIBUTE_NAME) == null) {
 			element.detach();
 		}
 		else {
 			element.addAttribute(INCLUDE_ATTRIBUTE_NAME, null);
 
-			Iterator childIterator = element.elementIterator();
+			Iterator<Element> childIterator = element.elementIterator();
 
 			while (childIterator.hasNext()) {
-				org.dom4j.Element childElement = (org.dom4j.Element) childIterator.next();
+				Element childElement = childIterator.next();
 
 				removeUnincluded(childElement);
 			}

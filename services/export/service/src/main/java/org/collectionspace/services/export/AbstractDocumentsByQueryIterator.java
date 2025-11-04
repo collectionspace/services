@@ -148,7 +148,7 @@ public abstract class AbstractDocumentsByQueryIterator<ListItemType> implements 
 			: resource.getWithParentCtx(serviceContext, csid));
 		}
 		catch (Exception e) {
-			logger.warn("Could not get document with csid " + csid, e);
+			logger.warn("Could not get document with csid {}", csid, e);
 
 			return null;
 		}
@@ -163,7 +163,7 @@ public abstract class AbstractDocumentsByQueryIterator<ListItemType> implements 
 
 		// Some code in services assumes pathSegments will have at least one element, so add an
 		// empty one.
-		List<PathSegment> pathSegments = Arrays.asList((PathSegment) new PathSegmentImpl("", false));
+		List<PathSegment> pathSegments = Arrays.asList(new PathSegmentImpl("", false));
 
 		URIBuilder uriBuilder = new URIBuilder();
 
