@@ -165,7 +165,8 @@
                 <xs:element name="fieldCollectionMethods" type="fieldCollectionMethodList"/>
                 <xs:element name="fieldCollectionNote" type="xs:string"/>
                 <xs:element name="fieldCollectionNumber" type="xs:string"/>
-                <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                <xs:element name="fieldCollectionPlaces" type="fieldCollectionPlaceList"/>
+                <xs:element name="fieldCollectionSites" type="fieldCollectionSiteList"/>
                 <xs:element name="fieldCollectionSources" type="fieldCollectionSourceList"/>
                 <xs:element name="fieldCollectors" type="fieldCollectorList"/>
                 <xs:element name="fieldColEventNames" type="fieldColEventNameList"/>
@@ -217,6 +218,7 @@
             <xs:element name="objectNameSystem" type="xs:string"/>
             <xs:element name="objectNameType" type="xs:string"/>
             <xs:element name="objectNameLanguage" type="xs:string"/>
+            <xs:element name="objectNameControlled" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
@@ -812,6 +814,18 @@
     <xs:complexType name="fieldCollectionSourceList">
         <xs:sequence>
             <xs:element name="fieldCollectionSource" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionPlaceList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionPlace" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="fieldCollectionSiteList">
+        <xs:sequence>
+            <xs:element name="fieldCollectionSite" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
 

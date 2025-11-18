@@ -24,10 +24,8 @@
 
 package org.collectionspace.services.client;
 
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
-import org.collectionspace.services.collectionobject.domain.naturalhistory.CollectionobjectsNaturalhistory;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.CollectionobjectsNaturalhistory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

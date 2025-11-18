@@ -5,6 +5,8 @@ import javax.xml.bind.JAXBException;
 
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
+import org.collectionspace.services.collectionobject.domain.nagpra.CollectionObjectsNAGPRA;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.CollectionobjectsNaturalhistory;
 
 /**
  * Singleton for the {@link JAXBContext} which the AdvancedSearch will use
@@ -18,7 +20,8 @@ public final class AdvancedSearchJAXBContext {
 
 	private AdvancedSearchJAXBContext() {
 		try {
-			jaxbContext = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class);
+			jaxbContext = JAXBContext.newInstance(CollectionSpaceCore.class, CollectionobjectsCommon.class,
+			                                      CollectionobjectsNaturalhistory.class, CollectionObjectsNAGPRA.class);
 		} catch (JAXBException e) {
 			throw new RuntimeException("Unable to create JAXBContext for AdvancedSearch");
 		}

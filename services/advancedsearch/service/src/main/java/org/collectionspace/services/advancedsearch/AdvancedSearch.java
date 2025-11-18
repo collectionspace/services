@@ -1,10 +1,8 @@
 package org.collectionspace.services.advancedsearch;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -16,21 +14,11 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
-import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
-import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
-import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
-import org.collectionspace.services.advancedsearch.model.ResponsibleDepartmentsListModel;
-import org.collectionspace.services.advancedsearch.model.TitleGroupListModel;
-import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.advancedsearch.mapper.CollectionObjectMapper;
 import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
-import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
@@ -44,7 +32,6 @@ import org.collectionspace.services.nuxeo.client.handler.UnfilteredDocumentModel
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -55,11 +42,8 @@ import org.w3c.dom.Element;
 @Produces("application/xml")
 public class AdvancedSearch
 		extends AbstractCollectionSpaceResourceImpl<AdvancedsearchListItem, AdvancedsearchListItem> {
+	// FIXME: it's not great to hardcode either of these
 	private static final String FIELDS_RETURNED = "uri|csid|refName|blobCsid|updatedAt|objectId|objectNumber|objectName|title|computedCurrentLocation|responsibleDepartments|responsibleDepartment|contentConcepts|briefDescription";
-	// FIXME: it's not great to hardcode this here
-	private static final String COMMON_PART_NAME = CollectionObjectClient.SERVICE_NAME
-	                                               + CollectionSpaceClient.PART_LABEL_SEPARATOR
-	                                               + CollectionSpaceClient.PART_COMMON_LABEL;
 
 	private final Logger logger = LoggerFactory.getLogger(AdvancedSearch.class);
 	private final CollectionObjectResource cor = new CollectionObjectResource();
@@ -86,10 +70,7 @@ public class AdvancedSearch
 
 		cor.setDocumentHandlerClass(UnfilteredDocumentModelHandler.class);
 		ObjectFactory objectFactory = new ObjectFactory();
-		// the list to return
 		AdvancedsearchCommonList resultsList = objectFactory.createAdvancedsearchCommonList();
-		// FIXME: this shouldn't be necessary?
-		resultsList.advancedsearchListItem = new ArrayList<>();
 
 		AbstractCommonList abstractCommonList = cor.getList(uriInfo);
 		if (!(abstractCommonList instanceof CSDocumentModelList)) {
@@ -105,78 +86,27 @@ public class AdvancedSearch
 			throw new RuntimeException("Unable to create unmarshaller for AdvancedSearch", e);
 		}
 
+		final CollectionObjectMapper responseMapper = new CollectionObjectMapper(unmarshaller);
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
-			PoxPayloadOut outputPayload = response.getPayload();
-			PayloadOutputPart corePart = outputPayload.getPart(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA);
-			PayloadOutputPart commonPart = outputPayload.getPart(COMMON_PART_NAME);
-			CollectionSpaceCore core;
-			CollectionobjectsCommon collectionObject;
-
-			try {
-				core = (CollectionSpaceCore) unmarshaller.unmarshal((Document) corePart.getBody());
-				collectionObject = (CollectionobjectsCommon) unmarshaller.unmarshal((Document) commonPart.getBody());
-			} catch (JAXBException e) {
-				throw new RuntimeException(e);
-			}
-
 			String csid = response.getCsid();
 			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
 			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
 
-			AdvancedsearchListItem listItem = objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
-			if (core != null) {
-				listItem.setCsid(csid);
-				listItem.setRefName(core.getRefName());
-				listItem.setUri(core.getUri());
-				listItem.setUpdatedAt(core.getUpdatedAt());
-			} else {
-				logger.warn("advancedsearch: could not find collectionspace_core associated with csid {}", csid);
-			}
-
-			if (collectionObject != null) {
-				listItem.setObjectNumber(collectionObject.getObjectNumber());
-				listItem.setBriefDescription(BriefDescriptionListModel
-					.briefDescriptionListToDisplayString(collectionObject.getBriefDescriptions()));
-				listItem.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
-				listItem.setObjectName(
-					ObjectNameListModel.objectNameListToDisplayString(collectionObject.getObjectNameList()));
-				listItem.setTitle(
-					TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
-				ResponsibleDepartmentsList rdl = ResponsibleDepartmentsListModel
-					.responsibleDepartmentListToResponsibleDepartmentsList(
-						collectionObject.getResponsibleDepartments());
-				listItem.setResponsibleDepartments(rdl);
-				listItem.setResponsibleDepartment(
-					ResponsibleDepartmentsListModel.responsibleDepartmentsListDisplayString(rdl));
-
-				listItem.setContentConcepts(
-					ContentConceptListModel.contentConceptListDisplayString(collectionObject.getContentConcepts()));
-
-				// from media resource
-				if (blobCsids.size() > 0) {
-					listItem.setBlobCsid(blobCsids.get(0));
+			AdvancedsearchListItem listItem = responseMapper.asListItem(response, blobCsids);
+			if (listItem != null) {
+				if (markRelated != null) {
+					RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
+					listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 				}
-				// add the populated item to the results
 				resultsList.getAdvancedsearchListItem().add(listItem);
-			} else {
-				logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
-			}
-
-			if (markRelated != null) {
-				RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
-				listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 			}
 		}
 
-		// NOTE: I think this is necessary for the front end to know what to do with
-		// what's returned (?)
-		AbstractCommonList abstractList = (AbstractCommonList) resultsList;
-		abstractList.setItemsInPage(collectionObjectList.getItemsInPage());
-		abstractList.setPageNum(collectionObjectList.getPageNum());
-		abstractList.setPageSize(collectionObjectList.getPageSize());
-		abstractList.setTotalItems(collectionObjectList.getTotalItems());
-		// FIXME: is there a way to generate this rather than hardcode it?
-		abstractList.setFieldsReturned(FIELDS_RETURNED);
+		resultsList.setItemsInPage(collectionObjectList.getItemsInPage());
+		resultsList.setPageNum(collectionObjectList.getPageNum());
+		resultsList.setPageSize(collectionObjectList.getPageSize());
+		resultsList.setTotalItems(collectionObjectList.getTotalItems());
+		resultsList.setFieldsReturned(FIELDS_RETURNED);
 
 		return resultsList;
 	}

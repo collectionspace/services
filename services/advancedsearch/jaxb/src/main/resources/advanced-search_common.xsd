@@ -25,17 +25,15 @@
     </xs:annotation>
   </xs:complexType>
 
-  <xs:complexType name="responsibleDepartment">
+  <xs:complexType name="contentConcepts">
     <xs:sequence>
-      <xs:element name="uri" type="xs:anyURI"/>
-      <xs:element name="csid" type="xs:string"/>
-      <xs:element name="refName" type="xs:string"/>
-      <xs:element name="name" type="xs:string"/>
+      <xs:element name="contentConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:complexType name="responsibleDepartmentsList">
+
+  <xs:complexType name="nagpraCategories">
     <xs:sequence>
-      <xs:element name="responsibleDepartment" type="responsibleDepartment" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="nagpraCategory" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -53,15 +51,29 @@
                   <xs:element name="refName" type="xs:string"/>
                   <xs:element name="blobCsid" type="xs:string"/>
                   <xs:element name="updatedAt" type="xs:dateTime"/>
-                  <xs:element name="objectId" type="xs:string"/>
                   <xs:element name="objectNumber" type="xs:string"/>
-                  <xs:element name="objectName" type="xs:string"/>
                   <xs:element name="title" type="xs:string"/>
                   <xs:element name="computedCurrentLocation" type="xs:string"/>
-                  <xs:element name="responsibleDepartments" type="responsibleDepartmentsList"/>
                   <xs:element name="responsibleDepartment" type="xs:string"/>
-                  <xs:element name="contentConcepts" type="xs:string"/>
                   <xs:element name="briefDescription" type="xs:string"/>
+
+                  <xs:element name="objectName" type="xs:string"/>
+                  <xs:element name="objectNameControlled" type="xs:string"/>
+                  <xs:element name="taxon" type="xs:string"/>
+                  <xs:element name="form" type="xs:string"/>
+                  <xs:element name="agent" type="xs:string"/>
+                  <xs:element name="agentRole" type="xs:string"/>
+                  <xs:element name="fieldCollector" type="xs:string"/>
+                  <xs:element name="fieldCollectorRole" type="xs:string"/>
+
+                  <xs:element name="fieldCollectionDate" type="xs:string"/>
+                  <xs:element name="fieldCollectionPlace" type="xs:string"/>
+                  <xs:element name="fieldCollectionSite" type="xs:string"/>
+                  <xs:element name="objectProductionDate" type="xs:string"/>
+                  <xs:element name="objectProductionPlace" type="xs:string"/>
+
+                  <xs:element name="contentConcepts" type="contentConcepts"/>
+                  <xs:element name="nagpraCategories" type="nagpraCategories"/>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>
