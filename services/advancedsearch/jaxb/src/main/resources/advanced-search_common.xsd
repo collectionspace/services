@@ -50,6 +50,7 @@
                   <xs:element name="related" type="xs:boolean" minOccurs="0"/>
                   <xs:element name="refName" type="xs:string"/>
                   <xs:element name="blobCsid" type="xs:string"/>
+                  <xs:element name="blobAltText" type="xs:string"/>
                   <xs:element name="updatedAt" type="xs:dateTime"/>
                   <xs:element name="objectNumber" type="xs:string"/>
                   <xs:element name="title" type="xs:string"/>
