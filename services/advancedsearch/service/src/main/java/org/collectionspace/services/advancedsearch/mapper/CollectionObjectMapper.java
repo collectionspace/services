@@ -6,10 +6,11 @@ import static org.collectionspace.services.client.CollectionSpaceClient.NATURALH
 import static org.collectionspace.services.client.CollectionSpaceClient.PART_COMMON_LABEL;
 import static org.collectionspace.services.client.CollectionSpaceClient.PART_LABEL_SEPARATOR;
 
-import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
+import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.ObjectFactory;
 import org.collectionspace.services.advancedsearch.model.AgentModel;
@@ -71,7 +72,8 @@ public class CollectionObjectMapper {
      * @param blobCsids The blobs associated with the object
      * @return the advanced search list item
      */
-    public AdvancedsearchListItem asListItem(final CSDocumentModelResponse response, final List<String> blobCsids) {
+    public AdvancedsearchListItem asListItem(final CSDocumentModelResponse response,
+                                             final Map<String, String> blobInfo) {
         // todo: what makes sense here?
         if (response == null || response.getPayload() == null) {
             return objectFactory.createAdvancedsearchCommonListAdvancedsearchListItem();
@@ -139,8 +141,9 @@ public class CollectionObjectMapper {
             item.setForm(TaxonModel.preservationForm(collectionObject));
 
             // from media resource
-            if (blobCsids.size() > 0) {
-                item.setBlobCsid(blobCsids.get(0));
+            if (!blobInfo.isEmpty()) {
+                item.setBlobCsid(blobInfo.get(MediaJAXBSchema.blobCsid));
+                item.setBlobAltText(blobInfo.get(MediaJAXBSchema.altText));
             }
         } else {
             logger.warn("advancedsearch: could not find CollectionobjectsCommon associated with csid {}", csid);
