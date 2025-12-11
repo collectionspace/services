@@ -13,7 +13,7 @@
 		<defaultValueExpression><![CDATA["1500"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["controlled_object_names,summary_type,status,culture,involved_party,tribeornation,places,sites,collectors,acquisition_sources,category_determinations,locations,acquisition_sources"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["controlled_object_names,summary_type,statusgroup_statuses,culture,involved_party,tribeornation,places,sites,collectors,acquisition_sources,category_determinations,locations,acquisition_sources"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="csidlist" class="java.lang.String" isForPrompting="false"/>
   <parameter name="csid" class="java.lang.String" isForPrompting="false" />
@@ -59,7 +59,8 @@ SELECT
   coalesce(partiesinvolved.involvedparty, '{}') as involved_party,
   coalesce(partiesinvolved.title, '{}') as involved_party_title,
   coalesce(partiesinvolved.email, '{}') as involved_party_email,
-  statusgroup.status,
+  coalesce(statusgroup.statusgroup_statuses, '{}') as statusgroup_statuses,
+  coalesce(statusgroup.statusgroup_status_dates, '{}') as statusgroup_status_dates,
   coalesce(field_collection_places.places, '{}') AS places,
   coalesce(field_collection_sites.sites, '{}') AS sites,
   coalesce(field_collectors.collectors, '{}') AS collectors,
@@ -119,12 +120,13 @@ FROM hierarchy summary_hierarchy
   ) culturalgroup ON culturalgroup.parentid = summary.id -- status group or whatever
   LEFT JOIN LATERAL (
     SELECT hierarchy.parentid,
-      status.status
+      array_agg(status.status) AS statusgroup_statuses,
+      array_agg(status.statusdate) AS statusgroup_status_dates
     FROM hierarchy
       INNER JOIN statusgroup status ON status.id = hierarchy.id
       AND hierarchy.name = 'summarydocumentations_common:statusGroupList'
-      AND hierarchy.pos = 0
       AND hierarchy.parentid = summary.id
+    GROUP BY hierarchy.parentid
   ) statusgroup ON statusgroup.parentid = summary.id
   -- Object Fields:
   --   + computedcurrentlocation | collectionobjects_common | agg
@@ -272,10 +274,13 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.name" value="involved_party_email"/>
 		<property name="com.jaspersoft.studio.field.label" value="involved_party_email"/>
 	</field>
-	<field name="status" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="status"/>
-		<property name="com.jaspersoft.studio.field.label" value="status"/>
-		<property name="com.jaspersoft.studio.field.tree.path" value="statusgroup"/>
+	<field name="statusgroup_statuses" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="statusgroup_statuses"/>
+		<property name="com.jaspersoft.studio.field.label" value="statusgroup_statuses"/>
+	</field>
+	<field name="statusgroup_status_dates" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="statusgroup_status_dates"/>
+		<property name="com.jaspersoft.studio.field.label" value="statusgroup_status_dates"/>
 	</field>
 	<field name="places" class="java.sql.Array">
 		<property name="com.jaspersoft.studio.field.name" value="places"/>
@@ -653,7 +658,20 @@ WHERE summary_hierarchy.primarytype = 'SummaryDocumentation' $P!{whereclause}]]>
 				<reportElement style="Detail" x="2225" y="0" width="100" height="30" uuid="de4f3b4d-920e-4674-bc73-2eb39e3fc758">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+				<textFieldExpression>
+					<![CDATA[
+					var statuses = $F{statusgroup_statuses}.getArray();
+					var status_dates = $F{statusgroup_status_dates}.getArray();
+
+					statuses.map(function(status, index) {
+						if (!status) {
+							return null;
+						}
+						var status_date = status_dates[index] ? status_dates[index].toLocalDateTime().toLocalDate() : 'unknown';
+						return status + ' (' + status_date + ')';
+					}).filter((value) => !!value).join('; ')
+					]]>
+				</textFieldExpression>
 			</textField>
 		</band>
 	</detail>
