@@ -19,22 +19,7 @@ BEGIN
 				WITH unaccent, english_stem;
 
 			CREATE OR REPLACE FUNCTION nx_to_tsvector(string VARCHAR) RETURNS TSVECTOR AS $func$
-				DECLARE
-					search_namespace TEXT;
-					result TSVECTOR;
-				BEGIN
-					SELECT
-						nspname INTO search_namespace
-					FROM
-						pg_namespace
-						INNER JOIN pg_ts_config ON pg_namespace.oid = pg_ts_config.cfgnamespace
-						AND cfgname = 'cspace_english' :: text;
-
-					PERFORM set_config('search_path', search_namespace, true);
-
-					result := TO_TSVECTOR('cspace_english', SUBSTR($1, 1, 250000));
-					RETURN result;
-				END;
+			    SELECT TO_TSVECTOR('cspace_english', SUBSTR($1, 1, 250000));
 			$func$ LANGUAGE plpgsql IMMUTABLE;
 		END IF;
 	END IF;
