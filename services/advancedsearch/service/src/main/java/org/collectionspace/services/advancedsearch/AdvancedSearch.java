@@ -1,7 +1,8 @@
 package org.collectionspace.services.advancedsearch;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -90,9 +91,9 @@ public class AdvancedSearch
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
 			String csid = response.getCsid();
 			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
-			List<String> blobCsids = findBlobCsids(csid, wrappedUriInfo);
+			Map<String, String> blobInfo = findBlobInfo(csid, wrappedUriInfo);
 
-			AdvancedsearchListItem listItem = responseMapper.asListItem(response, blobCsids);
+			AdvancedsearchListItem listItem = responseMapper.asListItem(response, blobInfo);
 			if (listItem != null) {
 				if (markRelated != null) {
 					RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
@@ -118,7 +119,7 @@ public class AdvancedSearch
 	 * @param wrappedUriInfo The wrapped (mutable) UriInfo of the incoming query that ultimately triggered this call
 	 * @return A possibly-empty list of strings of the blob CSIDs associated with CSID
 	 */
-	private List<String> findBlobCsids(String csid, UriInfoWrapper wrappedUriInfo) {
+	private Map<String, String> findBlobInfo(String csid, UriInfoWrapper wrappedUriInfo) {
 		MultivaluedMap<String, String> wrappedQueryParams = wrappedUriInfo.getQueryParameters();
 		wrappedQueryParams.clear();
 		wrappedQueryParams.add(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, csid);
@@ -127,16 +128,19 @@ public class AdvancedSearch
 		wrappedQueryParams.add("sortBy", "media_common:title");
 		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
 		if (associatedMedia == null || associatedMedia.getListItem() == null) {
-			return Collections.emptyList();
+			return Collections.emptyMap();
 		}
 
-		return associatedMedia.getListItem().stream()
+		Predicate<Element> tagFilter = (element -> MediaJAXBSchema.blobCsid.equals(element.getTagName()) ||
+												   MediaJAXBSchema.altText.equals(element.getTagName()));
+		Predicate<Element> tagNotEmpty = (element -> element.getTextContent()  != null &&
+													 !element.getTextContent().isEmpty());
+
+        return associatedMedia.getListItem().stream()
 			.filter(item -> item != null && item.getAny() != null)
 			.flatMap(li -> li.getAny().stream())
-			.filter(element -> MediaJAXBSchema.blobCsid.equals(element.getTagName()))
-			.map(Element::getTextContent)
-			.filter(blobCsid -> blobCsid != null && !blobCsid.isEmpty())
-			.collect(Collectors.toList());
+			.filter(tagFilter.and(tagNotEmpty))
+			.collect(Collectors.toMap(Element::getTagName, Element::getTextContent));
 	}
 
 	@Override

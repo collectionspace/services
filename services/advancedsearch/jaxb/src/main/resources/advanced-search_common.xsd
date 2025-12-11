@@ -45,35 +45,36 @@
             <xs:element name="advancedsearch-list-item" maxOccurs="unbounded">
               <xs:complexType>
                 <xs:sequence>
-                  <xs:element name="uri" type="xs:anyURI"/>
-                  <xs:element name="csid" type="xs:string"/>
+                  <xs:element name="uri" type="xs:anyURI" nillable="true"/>
+                  <xs:element name="csid" type="xs:string" nillable="true"/>
                   <xs:element name="related" type="xs:boolean" minOccurs="0"/>
-                  <xs:element name="refName" type="xs:string"/>
-                  <xs:element name="blobCsid" type="xs:string"/>
-                  <xs:element name="updatedAt" type="xs:dateTime"/>
-                  <xs:element name="objectNumber" type="xs:string"/>
-                  <xs:element name="title" type="xs:string"/>
-                  <xs:element name="computedCurrentLocation" type="xs:string"/>
-                  <xs:element name="responsibleDepartment" type="xs:string"/>
-                  <xs:element name="briefDescription" type="xs:string"/>
+                  <xs:element name="refName" type="xs:string" nillable="true"/>
+                  <xs:element name="updatedAt" type="xs:dateTime" nillable="true"/>
+                  <xs:element name="blobCsid" type="xs:string" nillable="true"/>
+                  <xs:element name="blobAltText" type="xs:string" nillable="true"/>
+                  <xs:element name="objectNumber" type="xs:string" nillable="true"/>
+                  <xs:element name="title" type="xs:string" nillable="true"/>
+                  <xs:element name="computedCurrentLocation" type="xs:string" nillable="true"/>
+                  <xs:element name="responsibleDepartment" type="xs:string" nillable="true"/>
+                  <xs:element name="briefDescription" type="xs:string" nillable="true"/>
 
-                  <xs:element name="objectName" type="xs:string"/>
-                  <xs:element name="objectNameControlled" type="xs:string"/>
-                  <xs:element name="taxon" type="xs:string"/>
-                  <xs:element name="form" type="xs:string"/>
-                  <xs:element name="agent" type="xs:string"/>
-                  <xs:element name="agentRole" type="xs:string"/>
-                  <xs:element name="fieldCollector" type="xs:string"/>
-                  <xs:element name="fieldCollectorRole" type="xs:string"/>
+                  <xs:element name="objectName" type="xs:string" nillable="true"/>
+                  <xs:element name="objectNameControlled" type="xs:string" nillable="true"/>
+                  <xs:element name="taxon" type="xs:string" nillable="true"/>
+                  <xs:element name="form" type="xs:string" nillable="true"/>
+                  <xs:element name="agent" type="xs:string" nillable="true"/>
+                  <xs:element name="agentRole" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollector" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectorRole" type="xs:string" nillable="true"/>
 
-                  <xs:element name="fieldCollectionDate" type="xs:string"/>
-                  <xs:element name="fieldCollectionPlace" type="xs:string"/>
-                  <xs:element name="fieldCollectionSite" type="xs:string"/>
-                  <xs:element name="objectProductionDate" type="xs:string"/>
-                  <xs:element name="objectProductionPlace" type="xs:string"/>
+                  <xs:element name="fieldCollectionDate" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectionPlace" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectionSite" type="xs:string" nillable="true"/>
+                  <xs:element name="objectProductionDate" type="xs:string" nillable="true"/>
+                  <xs:element name="objectProductionPlace" type="xs:string" nillable="true"/>
 
-                  <xs:element name="contentConcepts" type="contentConcepts"/>
-                  <xs:element name="nagpraCategories" type="nagpraCategories"/>
+                  <xs:element name="contentConcepts" type="contentConcepts" nillable="true"/>
+                  <xs:element name="nagpraCategories" type="nagpraCategories" nillable="true"/>
                 </xs:sequence>
               </xs:complexType>
             </xs:element>

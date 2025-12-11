@@ -1,30 +1,31 @@
-/**
- * 
- */
 package org.collectionspace.services;
 
+/**
+ * Field names for the Media Schema
+ */
 public interface MediaJAXBSchema {
-    final static String contributor = "contributor";
-    final static String copyrightStatement = "copyrightStatement";
-    final static String coverage = "coverage";
-    final static String creator = "creator";
-    final static String dates = "dates";
-    final static String dateCreated = "dateCreated";
-    final static String dateModified = "dateModified";
-    final static String description = "description";
-    final static String dimensions = "dimensions";
-    final static String filename = "filename";
-    final static String format = "format";
-    final static String identificationNumber = "identificationNumber";
-    final static String languages = "languages";
-    final static String location = "location";
-    final static String publisher = "publisher";
-    final static String relation = "relation";
-    final static String rightsHolder = "rightsHolder";
-    final static String source = "source";
-    final static String subjects = "subjects";
-    final static String title = "title";
-    final static String type = "type";
-    final static String uri = "uri";
-    final static String blobCsid = "blobCsid";
+    String altText = "altText";
+    String contributor = "contributor";
+    String copyrightStatement = "copyrightStatement";
+    String coverage = "coverage";
+    String creator = "creator";
+    String dates = "dates";
+    String dateCreated = "dateCreated";
+    String dateModified = "dateModified";
+    String description = "description";
+    String dimensions = "dimensions";
+    String filename = "filename";
+    String format = "format";
+    String identificationNumber = "identificationNumber";
+    String languages = "languages";
+    String location = "location";
+    String publisher = "publisher";
+    String relation = "relation";
+    String rightsHolder = "rightsHolder";
+    String source = "source";
+    String subjects = "subjects";
+    String title = "title";
+    String type = "type";
+    String uri = "uri";
+    String blobCsid = "blobCsid";
 }
