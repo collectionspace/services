@@ -1,7 +1,12 @@
 package org.collectionspace.services.export;
 
+import static org.collectionspace.services.common.context.ServiceBindingUtils.AUTH_REF_PROP;
+import static org.collectionspace.services.common.context.ServiceBindingUtils.TERM_REF_PROP;
+import static org.collectionspace.services.common.context.ServiceBindingUtils.getPropertyValuesForPart;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +17,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +26,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefNameUtils;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.config.service.AuthorityInstanceType;
@@ -35,7 +41,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 	private static final String AUTHORITY_SUFFIX = "AuthorityVocabulary";
 
 	private CSVPrinter csvPrinter;
-	private Map<String, Map<String, Set<String>>> refFieldsByDocType = new HashMap<>();
+	private Map<String, Table<String, String, Set<String>>> refFieldsByDocType = new HashMap<>();
 	private String valueDelimiter = "|";
 	private String nestedValueDelimiter = "^^";
 	private boolean includeAuthority = false;
@@ -233,40 +239,45 @@ public class CsvExportWriter extends AbstractExportWriter {
 		return getRefFields(docType, partName).contains(fieldName);
 	}
 
-	private Set<String> getRefFields(String docType, String partName) {
-		Set<String> refFields = refFieldsByDocType.containsKey(docType)
-			? refFieldsByDocType.get(docType).get(partName)
-			: null;
+	private Map<String, Set<String>> getRefFields(String docType, String partName) {
+		Map<String, Set<String>> refFields = refFieldsByDocType.containsKey(docType)
+											 ? refFieldsByDocType.get(docType).row(partName)
+											 : null;
 
 		if (refFields != null) {
 			return refFields;
 		}
 
-		refFields = new HashSet<>();
+		Set<String> authRefs = new HashSet<>();
+		Set<String> termRefs = new HashSet<>();
+		Table<String, String, Set<String>> refTable = HashBasedTable.create();
 
-		ServiceBindingType serviceBinding = tenantBindingConfigReader.getServiceBinding(serviceContext.getTenantId(), docType);
+		ServiceBindingType serviceBinding =
+			tenantBindingConfigReader.getServiceBinding(serviceContext.getTenantId(), docType);
 
-		for (String termRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.TERM_REF_PROP, false)) {
+		for (String termRefField : getPropertyValuesForPart(serviceBinding, partName, TERM_REF_PROP, false)) {
 			String[] segments = termRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
-			refFields.add(fieldName);
+			termRefs.add(fieldName);
 		}
 
-		for (String authRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.AUTH_REF_PROP, false)) {
+		for (String authRefField : getPropertyValuesForPart(serviceBinding, partName, AUTH_REF_PROP, false)) {
 			String[] segments = authRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
-			refFields.add(fieldName);
+			authRefs.add(fieldName);
 		}
+
+		refTable.put(partName, TERM_REF_PROP, termRefs);
+		refTable.put(partName, AUTH_REF_PROP, authRefs);
 
 		if (!refFieldsByDocType.containsKey(docType)) {
-			refFieldsByDocType.put(docType, new HashMap<>());
+			refFieldsByDocType.put(docType, HashBasedTable.create());
 		}
 
-		refFieldsByDocType.get(docType).put(partName, refFields);
-
-		return refFields;
+		refFieldsByDocType.get(docType).putAll(refTable);
+		return refTable.row(partName);
 	}
 
 	/**
