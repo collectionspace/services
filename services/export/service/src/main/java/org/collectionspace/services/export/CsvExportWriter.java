@@ -302,6 +302,14 @@ public class CsvExportWriter extends AbstractExportWriter {
 		FIELD, AUTHORITY
 	}
 
+	private enum FieldType {
+		STANDARD, TERM_REF, AUTH_REF;
+
+		public boolean isRefField() {
+			return this == TERM_REF || this == AUTH_REF;
+		}
+	}
+
 	private static class AuthorityDisplayMapping {
 		final String authority;
 		final String displayName;
