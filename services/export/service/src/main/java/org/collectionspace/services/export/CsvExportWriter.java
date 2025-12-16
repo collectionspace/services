@@ -137,7 +137,6 @@ public class CsvExportWriter extends AbstractExportWriter {
 		}
 	}
 
-
 	@Override
 	public void close() throws Exception {
 		csvPrinter.close();
@@ -247,9 +246,9 @@ public class CsvExportWriter extends AbstractExportWriter {
 	}
 
 	private Map<String, Set<String>> getRefFields(String docType, String partName) {
-		Map<String, Set<String>> refFields = refFieldsByDocType.containsKey(docType)
-											 ? refFieldsByDocType.get(docType).row(partName)
-											 : null;
+		boolean containsDocTypeAndPart = refFieldsByDocType.containsKey(docType)
+				&& refFieldsByDocType.get(docType).containsRow(partName);
+		Map<String, Set<String>> refFields = containsDocTypeAndPart ? refFieldsByDocType.get(docType).row(partName) : null;
 
 		if (refFields != null) {
 			return refFields;
@@ -352,5 +351,4 @@ public class CsvExportWriter extends AbstractExportWriter {
 			return vocabDisplayNames.getOrDefault(shortId, shortId);
 		}
 	}
-
 }
