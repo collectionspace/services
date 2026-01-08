@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["publicartproductiondatetype,responsibledepartment,publicartproductionpersons,publicartproductionpersonroles,publishto,installationtype,worktype,material,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["publicartproductiondatetype,responsibledepartment,publicartproductionpersons,publicartproductionpersonroles,publishto,installationtype,worktypes,materials,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -32,8 +32,8 @@
 	publishto.item AS publishto,
 	installationtype.item AS installationtype,
 	objectCountGroup.objectcount AS numberofobjects,
-	worktype.objectname AS worktype,
-	material.material, -- deurn
+	coalesce(worktype_agg.worktypes, '{}') AS worktypes,
+	coalesce(material_agg.materials, '{}') AS materials,
 	bd.item AS briefdescription,
 	comment.item AS comment,
 	coalesce(publicart_collections.collections, '{}') as collections,
@@ -85,10 +85,26 @@ LEFT JOIN collectionobjects_common_publishtolist publishto ON publishto.id = obj
 LEFT JOIN collectionobjects_common_inventorystatuslist installationtype ON installationtype.id = obj.id AND installationtype.pos = 0
 LEFT JOIN collectionobjects_common_briefdescriptions bd ON bd.id = obj.id AND bd.pos = 0
 LEFT JOIN collectionobjects_common_comments comment ON comment.id = obj.id AND comment.pos = 0
-LEFT JOIN hierarchy work_hier on work_hier.parentid = obj.id and work_hier.primarytype = 'objectNameGroup' and work_hier.pos = 0
-LEFT JOIN objectnamegroup worktype on worktype.id = work_hier.id
-LEFT JOIN hierarchy material_hier on material_hier.parentid = obj.id and material_hier.primarytype = 'materialGroup' and material_hier.pos = 0
-LEFT JOIN materialgroup material on material.id = material_hier.id
+-- AGGREGATE ALL WORK TYPES
+LEFT JOIN (
+  SELECT
+    work_hier.parentid AS obj_id,
+    array_agg(coalesce(worktype.objectname, '')) AS worktypes
+  FROM hierarchy work_hier
+  LEFT JOIN objectnamegroup worktype ON worktype.id = work_hier.id
+  WHERE work_hier.primarytype = 'objectNameGroup'
+  GROUP BY work_hier.parentid
+) worktype_agg ON worktype_agg.obj_id = obj.id
+-- AGGREGATE ALL MATERIALS
+LEFT JOIN (
+  SELECT
+    material_hier.parentid AS obj_id,
+    array_agg(coalesce(material.material, '')) AS materials
+  FROM hierarchy material_hier
+  LEFT JOIN materialgroup material ON material.id = material_hier.id
+  WHERE material_hier.primarytype = 'materialGroup'
+  GROUP BY material_hier.parentid
+) material_agg ON material_agg.obj_id = obj.id
 LEFT JOIN (
 	SELECT
 		id AS obj_id,
@@ -194,14 +210,14 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="numberofobjects"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="collectionobjects_common"/>
 	</field>
-	<field name="worktype" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="worktype"/>
-		<property name="com.jaspersoft.studio.field.label" value="worktype"/>
+	<field name="worktypes" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="worktypes"/>
+		<property name="com.jaspersoft.studio.field.label" value="worktypes"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="objectnamegroup"/>
 	</field>
-	<field name="material" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="material"/>
-		<property name="com.jaspersoft.studio.field.label" value="material"/>
+	<field name="materials" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="materials"/>
+		<property name="com.jaspersoft.studio.field.label" value="materials"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="materialgroup"/>
 	</field>
 	<field name="briefdescription" class="java.lang.String">
@@ -368,7 +384,7 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Creators]]></text>
+				<text><![CDATA[Creator]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="0b898d02-9a4d-4658-a814-d8ac7995a982">
@@ -417,7 +433,7 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Materal]]></text>
+				<text><![CDATA[Material]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="40c138fe-ed94-4433-b5ad-4dbe3a9ff58a">
@@ -676,13 +692,13 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="7384199e-4476-46a9-88f0-ddb9a89eb948">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{worktype}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{worktypes}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="7368bb5a-e0a0-492c-8396-56385eaa187a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{material}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{materials}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="f0be7108-9cbb-483a-ae78-a1a4bd4636bf">
