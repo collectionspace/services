@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["publicartproductiondatetype,publicartproductionperson,publicartproductionpersonrole,responsibledepartment,publishto,installationtype,worktype,material,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["publicartproductiondatetype,responsibledepartment,publicartproductionpersons,publicartproductionpersonroles,publishto,installationtype,worktype,material,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -25,8 +25,8 @@
 	tg.title,
 	dategroup.publicartproductiondatetype,
 	proddate.datedisplaydate AS objectproductiondate,
-	creator.publicartproductionperson,
-	creator.publicartproductionpersonrole,
+	coalesce(creator_agg.publicartproductionpersons, '{}') as publicartproductionpersons,
+	coalesce(creator_agg.publicartproductionpersonroles, '{}') as publicartproductionpersonroles,
 	rd.item AS responsibledepartment,
 	obj.recordstatus,
 	publishto.item AS publishto,
@@ -69,8 +69,17 @@ LEFT JOIN hierarchy proddategroup_hier ON proddategroup_hier.parentid = obj.id A
 LEFT JOIN publicartproductiondategroup dategroup ON dategroup.id = proddategroup_hier.id
 LEFT JOIN hierarchy proddate_hier ON proddate_hier.parentid = proddategroup_hier.id
 LEFT JOIN structureddategroup proddate ON proddate.id = proddate_hier.id
-LEFT JOIN hierarchy creator_hier ON creator_hier.parentid = obj.id AND creator_hier.primarytype = 'publicartProductionPersonGroup' AND creator_hier.pos = 0
-LEFT JOIN publicartproductionpersongroup creator ON creator.id = creator_hier.id
+-- AGGREGATE ALL CREATORS AND ROLES
+LEFT JOIN (
+  SELECT
+    creator_hier.parentid AS obj_id,
+	array_agg(coalesce(creator.publicartproductionperson, '')) AS publicartproductionpersons,
+	array_agg(coalesce(creator.publicartproductionpersonrole, '')) AS publicartproductionpersonroles
+  FROM hierarchy creator_hier
+  LEFT JOIN publicartproductionpersongroup creator ON creator.id = creator_hier.id
+  WHERE creator_hier.primarytype = 'publicartProductionPersonGroup'
+  GROUP BY creator_hier.parentid
+) creator_agg ON creator_agg.obj_id = obj.id
 LEFT JOIN collectionobjects_common_responsibledepartments rd ON rd.id = obj.id AND rd.pos = 0
 LEFT JOIN collectionobjects_common_publishtolist publishto ON publishto.id = obj.id AND publishto.pos = 0
 LEFT JOIN collectionobjects_common_inventorystatuslist installationtype ON installationtype.id = obj.id AND installationtype.pos = 0
@@ -150,14 +159,14 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="objectproductiondate"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="structureddategroup"/>
 	</field>
-	<field name="publicartproductionperson" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="publicartproductionperson"/>
-		<property name="com.jaspersoft.studio.field.label" value="publicartproductionperson"/>
+	<field name="publicartproductionpersons" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="publicartproductionpersons"/>
+		<property name="com.jaspersoft.studio.field.label" value="publicartproductionpersons"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="publicartproductionpersongroup"/>
 	</field>
-	<field name="publicartproductionpersonrole" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="publicartproductionpersonrole"/>
-		<property name="com.jaspersoft.studio.field.label" value="publicartproductionpersonrole"/>
+	<field name="publicartproductionpersonroles" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="publicartproductionpersonroles"/>
+		<property name="com.jaspersoft.studio.field.label" value="publicartproductionpersonroles"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="publicartproductionpersongroup"/>
 	</field>
 	<field name="responsibledepartment" class="java.lang.String">
@@ -359,14 +368,7 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Creator]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="61d945d1-a38a-4c79-8eca-ecabbb0952e3">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Creator Role]]></text>
+				<text><![CDATA[Creators]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="0b898d02-9a4d-4658-a814-d8ac7995a982">
@@ -625,13 +627,20 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="684b01a8-875b-4405-a580-b9ef32528154">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{publicartproductionperson}]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="c9a6e1f9-b088-4e28-8d3a-f185609211b5">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{publicartproductionpersonrole}]]></textFieldExpression>
+				<textFieldExpression>
+					<![CDATA[
+					var persons = $F{publicartproductionpersons}.getArray();
+					var roles = $F{publicartproductionpersonroles}.getArray();
+
+					persons.map(function(person, index) {
+						if (!person) {
+							return null;
+						}
+						var role = roles[index];
+						return person + ' (' + role + ')';
+					}).filter((value) => !!value).join('; ')
+					]]>
+				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="86bdc0bd-65c1-4c30-9716-7d4815131536">
