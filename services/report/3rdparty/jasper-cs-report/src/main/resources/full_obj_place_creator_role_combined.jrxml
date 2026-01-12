@@ -384,14 +384,7 @@ $P!{whereclause}]]>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
-				<text><![CDATA[Creator]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="Column header" x="500" y="0" width="100" height="44" uuid="61d945d1-a38a-4c79-8eca-ecabbb0952e3">
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-				</reportElement>
-				<textElement markup="styled"/>
-				<text><![CDATA[Creator Role]]></text>
+				<text><![CDATA[Creator (Creator Role)]]></text>
 			</staticText>
 			<staticText>
 				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="0b898d02-9a4d-4658-a814-d8ac7995a982">
@@ -650,13 +643,20 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="684b01a8-875b-4405-a580-b9ef32528154">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{publicartproductionpersons}.getArray().join('; ')]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="500" y="0" width="100" height="30" uuid="c9a6e1f9-b088-4e28-8d3a-f185609211b5">
-					<property name="com.jaspersoft.studio.unit.y" value="px"/>
-				</reportElement>
-				<textFieldExpression><![CDATA[$F{publicartproductionpersonroles}.getArray().join('; ')]]></textFieldExpression>
+				<textFieldExpression>
+					<![CDATA[
+					var persons = $F{publicartproductionpersons}.getArray();
+					var roles = $F{publicartproductionpersonroles}.getArray();
+
+					persons.map(function(person, index) {
+						if (!person) {
+							return null;
+						}
+						var role = roles[index];
+						return person + ' (' + role + ')';
+					}).filter((value) => !!value).join('; ')
+					]]>
+				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="86bdc0bd-65c1-4c30-9716-7d4815131536">
