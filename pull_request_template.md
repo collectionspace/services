@@ -13,3 +13,6 @@
 **Has the application documentation been updated for these changes?**
 
 **Did someone actually run this code to verify it works?**
+
+**Have any new security vulnerabilities been handled?**
+[Check SonarQube for IDE plugin for any security vulnerabilities introduced and describe how they have been handled]
