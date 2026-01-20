@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.1.final using JasperReports Library version 6.20.1-7584acb244139816654f64e2fd57a00d3e31921e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="obj_full_place" language="javascript" pageWidth="3900" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="f6c7eb78-afcd-4bd5-9a53-61ee9a1f43f8">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="obj_full_place_creator_role_combined" language="javascript" pageWidth="3900" pageHeight="800" orientation="Landscape" columnWidth="100" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="e7341792-0aee-463a-847c-462d12bf8e24">
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="nuxeo"/>
 	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="193"/>
@@ -352,259 +352,259 @@ $P!{whereclause}]]>
 			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.FreeLayout"/>
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<staticText>
-				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="119975c6-15b4-4b7c-a2d0-8815d558d7f2">
+				<reportElement style="Column header" x="0" y="0" width="100" height="44" uuid="7f5bf8c5-d4d8-47ce-9a87-196159f49d51">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Artwork ID]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="d0373d0c-ba31-4842-8df0-a82c66f46e9f">
+				<reportElement style="Column header" x="100" y="0" width="100" height="44" uuid="e18fc5d2-ec59-4015-9bd0-4c2cadedc7cc">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Title]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="249592a9-ab99-4d8e-9de9-befada32b462">
+				<reportElement style="Column header" x="200" y="0" width="100" height="44" uuid="e42249c3-2d9a-4fdb-b152-083bcd458945">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Production Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="1d833620-fec4-4323-96de-c69600d3b544">
+				<reportElement style="Column header" x="300" y="0" width="100" height="44" uuid="47dbec68-a31e-4c52-ad98-0c81a208b125">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Production Date Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="16af1455-1c01-4981-bf2f-fa779267f296">
+				<reportElement style="Column header" x="400" y="0" width="100" height="44" uuid="b05cdf2f-45a7-414a-8e10-efa6a896d93d">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Creator (Creator Role)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="0b898d02-9a4d-4658-a814-d8ac7995a982">
+				<reportElement style="Column header" x="600" y="0" width="100" height="44" uuid="88e6a812-ab40-4d73-85fb-7af13d82bec3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Program Name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="5fe7a538-c02f-4eac-804b-61f20e3fcf46">
+				<reportElement style="Column header" x="700" y="0" width="100" height="44" uuid="2a0a2c6d-2ed1-4dd4-b916-17287045deb3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Record Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="18be299c-697d-4592-9d93-3433eb23f45b">
+				<reportElement style="Column header" x="800" y="0" width="100" height="44" uuid="b26015fa-a7d4-409c-be8d-3629a5e7d1fa">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Publish To]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="8f24e0f8-c446-4e7d-b897-64855ae352ab">
+				<reportElement style="Column header" x="900" y="0" width="100" height="44" uuid="f06f2010-e1d6-40d0-bae9-68e69d204da7">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Instalation Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="78297946-2a88-48de-ab53-5095b6dc9fe7">
+				<reportElement style="Column header" x="1000" y="0" width="100" height="44" uuid="4a3d8f5c-14c1-47b8-871b-59c7f060cde3">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Number of Objects]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="0541559f-12d5-4d75-a112-dff48c0d9652">
+				<reportElement style="Column header" x="1100" y="0" width="100" height="44" uuid="1f803ff8-45b1-4a34-a69b-7a402c51a1f8">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Work Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="1f3f8de3-237f-4382-ade7-3798d2af6aa0">
+				<reportElement style="Column header" x="1200" y="0" width="100" height="44" uuid="680a42d8-8c37-46a4-97ce-ab3032682f9a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Material]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="40c138fe-ed94-4433-b5ad-4dbe3a9ff58a">
+				<reportElement style="Column header" x="1300" y="0" width="100" height="44" uuid="3bc81e2e-1cc6-4aea-9aad-cc2ea579e051">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Description]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="8955cde4-401d-4b39-888a-80ca8377ab5b">
+				<reportElement style="Column header" x="1400" y="0" width="100" height="44" uuid="37ec46eb-d990-470f-a792-e65950e76882">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Comments]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="28d7ef37-ab72-4c23-bf6e-5ddefbcf15de">
+				<reportElement style="Column header" x="1500" y="0" width="100" height="44" uuid="8ee89d69-b9f3-4e1e-8c47-1678bb2ae56e">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Collection]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="c5b66644-aec1-4802-841d-ddd49e6bee61">
+				<reportElement style="Column header" x="1600" y="0" width="100" height="44" uuid="290145b5-c739-4d89-9e35-52363c4b3539">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Owner]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="dbdb09ca-bf41-4c94-a80a-50676f3188d8">
+				<reportElement style="Column header" x="1700" y="0" width="100" height="44" uuid="885c0873-8f95-41ba-aa93-e5b35674d1c9">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Measurement]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="86aaf027-c117-4784-b68b-774c323af062">
+				<reportElement style="Column header" x="1800" y="0" width="100" height="44" uuid="e19dde7b-424e-4776-871a-16ce1281a95a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Computed Current Location]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="2567c664-ac15-41e6-a652-cf7a53529154">
+				<reportElement style="Column header" x="1900" y="0" width="100" height="44" uuid="d77c8825-0788-4ce1-adeb-893f7058f202">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Location Note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="393afbf0-a326-4eb7-b7a0-9acfa0a3566d">
+				<reportElement style="Column header" x="2000" y="0" width="100" height="44" uuid="4fd19fa9-d5c8-4795-9249-1ef735a8ff12">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Placement Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2100" y="0" width="100" height="44" uuid="7e5650fd-da0c-40d1-a4b5-81e4bf38c690">
+				<reportElement style="Column header" x="2100" y="0" width="100" height="44" uuid="bd91bea0-2b73-41a1-8e6c-1f98c220f22a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Placement Environment]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="312f7bea-182e-4fa4-a86c-85a0d1986618">
+				<reportElement style="Column header" x="2200" y="0" width="100" height="44" uuid="9a719d3b-d547-4726-8af4-bcac3ad56803">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2300" y="0" width="100" height="44" uuid="a34709db-d110-456b-b3bc-08fea3c18bb8">
+				<reportElement style="Column header" x="2300" y="0" width="100" height="44" uuid="eebb9e8a-e0bf-4b9e-be76-0a773afd16b1">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Owner]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2400" y="0" width="100" height="44" uuid="a7344557-a4f0-4817-9e33-fc7b7d9a968f">
+				<reportElement style="Column header" x="2400" y="0" width="100" height="44" uuid="37b02046-e9ac-4785-8612-d375eb4d0196">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Owner Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2500" y="0" width="100" height="44" uuid="86997684-5ee3-4006-a20d-ffcecb9a644e">
+				<reportElement style="Column header" x="2500" y="0" width="100" height="44" uuid="be336898-6d37-4b12-8c37-00240645c916">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Owner Date]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2600" y="0" width="100" height="44" uuid="7d45bb4d-1a17-4772-be09-90d8a234c96e">
+				<reportElement style="Column header" x="2600" y="0" width="100" height="44" uuid="9a98fc55-bec3-4923-bd4d-84aaaf49e785">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Owner Note]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2700" y="0" width="100" height="44" uuid="87a7e5c2-454a-4977-a66b-4c1cbb26ad20">
+				<reportElement style="Column header" x="2700" y="0" width="100" height="44" uuid="82de0dfb-ef9c-4626-924a-4cde835b36ac">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Address Line 1]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2800" y="0" width="100" height="44" uuid="e62e7a71-7b1b-4712-ac21-398a8a437ec5">
+				<reportElement style="Column header" x="2800" y="0" width="100" height="44" uuid="f8dd2612-4e96-4b5f-ae20-4c91ae301b87">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Address Line 2]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="2900" y="0" width="100" height="44" uuid="e9bccab6-8123-4500-9948-fe37aaa4cc7e">
+				<reportElement style="Column header" x="2900" y="0" width="100" height="44" uuid="cf8bd67c-2041-4f2f-b4f8-a2c7c10eae91">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Municipality]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3000" y="0" width="100" height="44" uuid="c3642e31-40cd-40c8-9ae0-0b377e822f36">
+				<reportElement style="Column header" x="3000" y="0" width="100" height="44" uuid="5db09d4f-5dfc-45a1-b785-0459624c8c29">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place State/Province]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3100" y="0" width="100" height="44" uuid="e5870420-6ff1-4614-a748-094f0de46672">
+				<reportElement style="Column header" x="3100" y="0" width="100" height="44" uuid="e07cf8ff-7a8f-4966-9791-cbd42167d9c5">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Country]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3200" y="0" width="100" height="44" uuid="5091f4c3-f1dc-4a4d-ba57-695dcc1a22ca">
+				<reportElement style="Column header" x="3200" y="0" width="100" height="44" uuid="2f8f8a9a-39d1-4b3d-b05b-e8177de4aabc">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Address Type]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3300" y="0" width="100" height="44" uuid="d621f46a-fc12-4f69-b24f-04dc79b33db4">
+				<reportElement style="Column header" x="3300" y="0" width="100" height="44" uuid="f4265ca1-12b4-4bd0-986f-2aba295759ad">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Place Postal Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3400" y="0" width="100" height="44" uuid="01116813-4fad-41a5-8c65-8b53d4d0891b">
+				<reportElement style="Column header" x="3400" y="0" width="100" height="44" uuid="aa8f6fe9-6387-4a9e-bbb0-21997c5ff177">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Decimal Latitude]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3500" y="0" width="100" height="44" uuid="66e11760-4686-49d8-bac9-7fdac46d0bbf">
+				<reportElement style="Column header" x="3500" y="0" width="100" height="44" uuid="bdd72a82-b756-44d0-9d3b-8404a422f239">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Decimal Longitude]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3600" y="0" width="100" height="44" uuid="0be5512b-143a-4b09-a2da-afe5725b5eaa">
+				<reportElement style="Column header" x="3600" y="0" width="100" height="44" uuid="d25ecba9-3cf3-4215-9bf2-87d94e244cfc">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
 				<text><![CDATA[Hierarchy Broader Place]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="Column header" x="3700" y="0" width="100" height="44" uuid="7fb09d15-24af-4edd-b15c-0763823aef76">
+				<reportElement style="Column header" x="3700" y="0" width="100" height="44" uuid="d00d1738-8a2a-48d1-bb75-237eaeecef8a">
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
 				<textElement markup="styled"/>
@@ -616,31 +616,31 @@ $P!{whereclause}]]>
 		<band height="66" splitType="Stretch">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="9f91a43b-cc9f-4873-99f8-7ce83a9794e5">
+				<reportElement style="Detail" x="0" y="0" width="100" height="30" uuid="329d7cca-0e59-4b4b-a9db-a00983705651">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectnumber}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="a0037a18-3b74-4434-845d-6daa3e7f371d">
+				<reportElement style="Detail" x="100" y="0" width="100" height="30" uuid="e72bd744-d4e6-42c4-88c9-8692c39ae730">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{title}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="d5ad38fe-b24e-414a-b834-0089dcbc73d1">
+				<reportElement style="Detail" x="200" y="0" width="100" height="30" uuid="0f5d4d5e-a6a8-47a0-99bf-291f59c503ca">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{objectproductiondate}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="c800d128-e2e0-4c02-b94e-9f5668b9f53c">
+				<reportElement style="Detail" x="300" y="0" width="100" height="30" uuid="acf887f8-6fdf-45b1-a8ea-041ea46efa4c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{publicartproductiondatetype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="684b01a8-875b-4405-a580-b9ef32528154">
+				<reportElement style="Detail" x="400" y="0" width="100" height="30" uuid="fd47819e-2277-4105-be4d-e5e9531cd0f1">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression>
@@ -659,193 +659,193 @@ $P!{whereclause}]]>
 				</textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="86bdc0bd-65c1-4c30-9716-7d4815131536">
+				<reportElement style="Detail" x="600" y="0" width="100" height="30" uuid="d71a9e95-c14e-43af-9188-3b270d982adf">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{responsibledepartment}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="616f0d88-8f75-45c1-8c78-3358f7643e46">
+				<reportElement style="Detail" x="700" y="0" width="100" height="30" uuid="99b99fe8-9554-475c-aed3-a43a374f8932">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{recordstatus}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="a9ea9475-58ae-48eb-929d-c8f5193dbfa1">
+				<reportElement style="Detail" x="800" y="0" width="100" height="30" uuid="3fe28021-38a6-4f05-89e9-543efff1a05d">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{publishto}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="dc23e896-31a4-4780-810e-14c0af95174a">
+				<reportElement style="Detail" x="900" y="0" width="100" height="30" uuid="42adcc58-f026-49ce-8055-ee5567f40cea">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{installationtype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="cfef9aae-abe3-4d71-a704-71334ee0ac4b">
+				<reportElement style="Detail" x="1000" y="0" width="100" height="30" uuid="6c173670-a1db-43fa-9bae-138637abf17c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{numberofobjects}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="7384199e-4476-46a9-88f0-ddb9a89eb948">
+				<reportElement style="Detail" x="1100" y="0" width="100" height="30" uuid="f5ed52e8-dee0-4376-bf6c-74ccb891b706">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{worktypes}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="7368bb5a-e0a0-492c-8396-56385eaa187a">
+				<reportElement style="Detail" x="1200" y="0" width="100" height="30" uuid="647d56b4-1d6c-4284-930b-e6a561a0fee2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{materials}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="f0be7108-9cbb-483a-ae78-a1a4bd4636bf">
+				<reportElement style="Detail" x="1300" y="0" width="100" height="30" uuid="37195d8b-62ca-49a7-85d9-8cc77632657f">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{briefdescription}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="6fe06969-298c-4d56-84da-203ae0a446f0">
+				<reportElement style="Detail" x="1400" y="0" width="100" height="30" uuid="427561d6-0e53-4640-b293-1033427cadb2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{comment}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="de9184ff-9c09-43b7-899d-349eea573fbf">
+				<reportElement style="Detail" x="1500" y="0" width="100" height="30" uuid="118cecdc-6f8e-4be9-b84a-51095772c449">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{collections}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="05d7d996-03ef-49f8-b43a-226864d2b9e9">
+				<reportElement style="Detail" x="1600" y="0" width="100" height="30" uuid="547fe798-a381-4299-bc51-9ab9a003ec93">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{owner}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="66f56234-95fe-4b57-beae-3d9211327156">
+				<reportElement style="Detail" x="1700" y="0" width="100" height="30" uuid="ec3253d7-c5dc-42d3-9298-73817aea8471">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{dimension}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="b4a2ef8e-fd1d-44ba-891f-1b75472880c0">
+				<reportElement style="Detail" x="1800" y="0" width="100" height="30" uuid="54975571-1a08-4cc2-b2e5-45404db7881a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{computedcurrentlocation}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="284f507d-1c90-4b07-bca5-5dd3cd6f2363">
+				<reportElement style="Detail" x="1900" y="0" width="100" height="30" uuid="69adde0e-8c36-4298-a462-fe0236bdef81">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{currentlocationnote}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="52b33190-796b-42ba-990c-ab86d1d02950">
+				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="e703c8f3-255d-4e9b-86c2-6c3ff4a5d57c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{placementtype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="1ae3ea7d-79cd-4254-aa47-67dc138787f6">
+				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="bf82c6ce-f8fa-4d71-975d-5aac2739aa36">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{placementenvironment}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="ff9d2e44-827c-43d9-9a79-b138a679019e">
+				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="d8b3cb62-ef05-4108-a4d1-91eb6b40daf4">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{placetype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2300" y="0" width="100" height="30" uuid="f29bc0cb-c282-49fe-bc66-86b32da69ceb">
+				<reportElement style="Detail" x="2300" y="0" width="100" height="30" uuid="0d2aedb2-b30d-46e2-8127-a28616a502c2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{placeowner}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2400" y="0" width="100" height="30" uuid="1da21fcb-9911-4637-a551-d22aa5f59e0f">
+				<reportElement style="Detail" x="2400" y="0" width="100" height="30" uuid="555820d4-8200-487a-93c1-55183eac8ce7">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{ownershipnote}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2500" y="0" width="100" height="30" uuid="cea54e87-5160-4f39-a263-b6de262b0b31">
+				<reportElement style="Detail" x="2500" y="0" width="100" height="30" uuid="d1325b38-832f-41ec-97e7-8ba0785fd3ca">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{ownertype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2600" y="0" width="100" height="30" uuid="68dd5f62-0ad1-45f5-8542-b59194ce2df1">
+				<reportElement style="Detail" x="2600" y="0" width="100" height="30" uuid="a09f4407-8e56-486d-afbd-28103d9d11ee">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{ownershipdate}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2700" y="0" width="100" height="30" uuid="7e9c4946-6a6a-4e5f-80ae-f4b39d4c625d">
+				<reportElement style="Detail" x="2700" y="0" width="100" height="30" uuid="01830e1d-cee3-41fc-b52d-37e03692e5e4">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addressplace1}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2800" y="0" width="100" height="30" uuid="a6f09f39-5826-453e-bfd7-43c37c7cac3e">
+				<reportElement style="Detail" x="2800" y="0" width="100" height="30" uuid="61fd47ab-c389-4783-bcd5-58950d292f49">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addressplace2}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="2900" y="0" width="100" height="30" uuid="aeb0ed59-c40a-483e-b7c0-5762dde5b8f5">
+				<reportElement style="Detail" x="2900" y="0" width="100" height="30" uuid="761ae437-27a9-47de-8a86-6d5f49c2b335">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addressmunicipality}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3000" y="0" width="100" height="30" uuid="384553e7-a5c3-4a91-9c32-97d0897a2f6f">
+				<reportElement style="Detail" x="3000" y="0" width="100" height="30" uuid="34700833-f428-42ea-9d7e-d85c623e37b2">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addressstateorprovince}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3100" y="0" width="100" height="30" uuid="6b3790da-45b2-44d4-8955-ebc2d6542e2d">
+				<reportElement style="Detail" x="3100" y="0" width="100" height="30" uuid="6f4c695b-869e-4e42-bf7c-099798dcc12a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addresscountry}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3200" y="0" width="100" height="30" uuid="29d1118d-ebfb-4d65-9ca5-ad9188d33609">
+				<reportElement style="Detail" x="3200" y="0" width="100" height="30" uuid="b230f942-d14d-4cc8-8ee6-d546cfea4616">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addresstype}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3300" y="0" width="100" height="30" uuid="89de5ace-4b29-4bc7-9f5f-6bda4357b7e8">
+				<reportElement style="Detail" x="3300" y="0" width="100" height="30" uuid="d148c0a6-94d0-4509-b2d1-915085cb8a10">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{addresspostcode}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3400" y="0" width="100" height="30" uuid="c254ca87-73c1-431a-bd8d-1bd459f80392">
+				<reportElement style="Detail" x="3400" y="0" width="100" height="30" uuid="30a948ed-116f-4eda-bb3f-5ab5f4c2390a">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{decimallatitude}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3500" y="0" width="100" height="30" uuid="b23c57bf-7658-4f27-8fc9-63a657f10da3">
+				<reportElement style="Detail" x="3500" y="0" width="100" height="30" uuid="90b39e6b-2249-4a2f-95dc-14dc87e0a3b3">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{decimallongitude}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3600" y="0" width="100" height="30" uuid="d1103a09-9178-42c8-ad5a-695cc568c8ce">
+				<reportElement style="Detail" x="3600" y="0" width="100" height="30" uuid="a3c03608-c101-4a0a-bfee-26acfe5c62e6">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{broaderplace}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="Detail" x="3700" y="0" width="100" height="30" uuid="299168ea-36af-4565-a7fb-3e58dbb8aa1b">
+				<reportElement style="Detail" x="3700" y="0" width="100" height="30" uuid="5de64dd8-7f25-4dda-8034-800edc19ff9c">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
 				<textFieldExpression><![CDATA[$F{placenote}]]></textFieldExpression>
