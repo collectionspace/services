@@ -1,7 +1,12 @@
 package org.collectionspace.services.export;
 
+import static org.collectionspace.services.common.context.ServiceBindingUtils.AUTH_REF_PROP;
+import static org.collectionspace.services.common.context.ServiceBindingUtils.TERM_REF_PROP;
+import static org.collectionspace.services.common.context.ServiceBindingUtils.getPropertyValuesForPart;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -12,6 +17,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +26,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.RefNameUtils;
-import org.collectionspace.services.common.context.ServiceBindingUtils;
 import org.collectionspace.services.common.invocable.Field;
 import org.collectionspace.services.common.invocable.InvocationContext;
 import org.collectionspace.services.config.service.AuthorityInstanceType;
@@ -35,7 +41,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 	private static final String AUTHORITY_SUFFIX = "AuthorityVocabulary";
 
 	private CSVPrinter csvPrinter;
-	private Map<String, Map<String, Set<String>>> refFieldsByDocType = new HashMap<>();
+	private Map<String, Table<String, String, Set<String>>> refFieldsByDocType = new HashMap<>();
 	private String valueDelimiter = "|";
 	private String nestedValueDelimiter = "^^";
 	private boolean includeAuthority = false;
@@ -95,8 +101,8 @@ public class CsvExportWriter extends AbstractExportWriter {
 			if (includeAuthority) {
 				String partName = fieldSpec.split(":", 2)[0];
 				String docType = partName.substring(0, partName.indexOf("_"));
-				if (isRefField(docType, partName, fieldName)) {
-					// make constant
+				FieldType fieldType = getFieldType(docType, partName, fieldName);
+				if (fieldType == FieldType.AUTH_REF) {
 					headers.add(fieldName + AUTHORITY_SUFFIX);
 				}
 			}
@@ -118,11 +124,11 @@ public class CsvExportWriter extends AbstractExportWriter {
 		List<String> csvRecord = new ArrayList<>();
 
 		for (Field field : fields) {
-			boolean isRefField = isRefField(document, field);
+			FieldType fieldType = getFieldType(document, field);
 
-			csvRecord.add(collectValues(document, field.getValue(), isRefField, ColumnType.FIELD));
-			if (isRefField && includeAuthority) {
-				csvRecord.add(collectValues(document, field.getValue(), isRefField, ColumnType.AUTHORITY));
+			csvRecord.add(collectValues(document, field.getValue(), fieldType, ColumnType.FIELD));
+			if (fieldType == FieldType.AUTH_REF && includeAuthority) {
+				csvRecord.add(collectValues(document, field.getValue(), fieldType, ColumnType.AUTHORITY));
 			}
 		}
 
@@ -131,13 +137,12 @@ public class CsvExportWriter extends AbstractExportWriter {
 		}
 	}
 
-
 	@Override
 	public void close() throws Exception {
 		csvPrinter.close();
 	}
 
-	private String collectValues(PoxPayloadOut document, String fieldSpec, boolean isRefField, ColumnType columnType) {
+	private String collectValues(PoxPayloadOut document, String fieldSpec, FieldType fieldType, ColumnType columnType) {
 		String delimitedValues = "";
 		String[] segments = fieldSpec.split(":", 2);
 		String partName = segments[0];
@@ -146,14 +151,14 @@ public class CsvExportWriter extends AbstractExportWriter {
 		PayloadOutputPart part = document.getPart(partName);
 
 		if (part != null) {
-			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, isRefField,
+			delimitedValues = collectValues(part.getElementBody(), Arrays.asList(xpath.split("/")), 0, fieldType,
 			                                columnType);
 		}
 
 		return delimitedValues;
 	}
 
-	private String collectValues(Element element, List<String> path, int depth, boolean isRefName,
+	private String collectValues(Element element, List<String> path, int depth, FieldType fieldType,
 	                             ColumnType columnType) {
 		String delimitedValues = "";
 		String fieldName = path.get(depth);
@@ -168,7 +173,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 				String textValue;
 
 				if (depth < path.size() - 1) {
-					textValue = collectValues((Element) node, path, depth + 1, isRefName, columnType);
+					textValue = collectValues((Element) node, path, depth + 1, fieldType, columnType);
 				} else if (columnType == ColumnType.AUTHORITY) {
 					textValue = node.getText();
 
@@ -190,7 +195,7 @@ public class CsvExportWriter extends AbstractExportWriter {
 				} else {
 					textValue = node.getText();
 
-					if (isRefName && StringUtils.isNotEmpty(textValue)) {
+					if (fieldType.isRefField() && StringUtils.isNotEmpty(textValue)) {
 						textValue = RefNameUtils.getDisplayName(textValue);
 					}
 				}
@@ -211,62 +216,74 @@ public class CsvExportWriter extends AbstractExportWriter {
 	}
 
 	/**
-	 * Check if a {@link Field} is for a TermRef or an AuthRef. We expect {@link Field#getValue} to return
+	 * Get the {@link FieldType} for a given {@link Field}. We expect {@link Field#getValue} to return
 	 * something which matches our Field Spec, i.e. "namespace:path/to/field". We allow for some xpath operations,
 	 * such as contains, so we also need to be mindful of that and filter them out appropriately.
 	 *
 	 * @param document the document we're searching in
 	 * @param field the field being searched for
-	 * @return true if the field is a TermRef or an AuthRef
+	 * @return the field type
 	 */
-	private boolean isRefField(PoxPayloadOut document, Field field) {
+	private FieldType getFieldType(PoxPayloadOut document, Field field) {
 		final String fieldSpec = field.getValue();
 		final String[] segments = fieldSpec.split(":", 2);
 		final String partName = segments[0];
 		final List<String> xpath = Arrays.asList(segments[1].split("/"));
 		final String fieldName = xpath.get(xpath.size() - 1);
 
-		return isRefField(document.getName(), partName, fieldName.replaceFirst("\\[.*]", ""));
+		return getFieldType(document.getName(), partName, fieldName.replaceFirst("\\[.*]", ""));
 	}
 
-	private boolean isRefField(String docType, String partName, String fieldName) {
-		return getRefFields(docType, partName).contains(fieldName);
+	private FieldType getFieldType(String docType, String partName, String fieldName) {
+		Map<String, Set<String>> refs = getRefFields(docType, partName);
+		if (refs.getOrDefault(TERM_REF_PROP, Collections.emptySet()).contains(fieldName)) {
+			return FieldType.TERM_REF;
+		} else if (refs.getOrDefault(AUTH_REF_PROP, Collections.emptySet()).contains(fieldName)) {
+			return FieldType.AUTH_REF;
+		}
+
+		return FieldType.STANDARD;
 	}
 
-	private Set<String> getRefFields(String docType, String partName) {
-		Set<String> refFields = refFieldsByDocType.containsKey(docType)
-			? refFieldsByDocType.get(docType).get(partName)
-			: null;
+	private Map<String, Set<String>> getRefFields(String docType, String partName) {
+		boolean containsDocTypeAndPart = refFieldsByDocType.containsKey(docType)
+				&& refFieldsByDocType.get(docType).containsRow(partName);
+		Map<String, Set<String>> refFields = containsDocTypeAndPart ? refFieldsByDocType.get(docType).row(partName) : null;
 
 		if (refFields != null) {
 			return refFields;
 		}
 
-		refFields = new HashSet<>();
+		Set<String> authRefs = new HashSet<>();
+		Set<String> termRefs = new HashSet<>();
+		Table<String, String, Set<String>> refTable = HashBasedTable.create();
 
-		ServiceBindingType serviceBinding = tenantBindingConfigReader.getServiceBinding(serviceContext.getTenantId(), docType);
+		ServiceBindingType serviceBinding =
+			tenantBindingConfigReader.getServiceBinding(serviceContext.getTenantId(), docType);
 
-		for (String termRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.TERM_REF_PROP, false)) {
+		for (String termRefField : getPropertyValuesForPart(serviceBinding, partName, TERM_REF_PROP, false)) {
 			String[] segments = termRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
-			refFields.add(fieldName);
+			termRefs.add(fieldName);
 		}
 
-		for (String authRefField : ServiceBindingUtils.getPropertyValuesForPart(serviceBinding, partName, ServiceBindingUtils.AUTH_REF_PROP, false)) {
+		for (String authRefField : getPropertyValuesForPart(serviceBinding, partName, AUTH_REF_PROP, false)) {
 			String[] segments = authRefField.split("[/|]");
 			String fieldName = segments[segments.length - 1];
 
-			refFields.add(fieldName);
+			authRefs.add(fieldName);
 		}
+
+		refTable.put(partName, TERM_REF_PROP, termRefs);
+		refTable.put(partName, AUTH_REF_PROP, authRefs);
 
 		if (!refFieldsByDocType.containsKey(docType)) {
-			refFieldsByDocType.put(docType, new HashMap<>());
+			refFieldsByDocType.put(docType, HashBasedTable.create());
 		}
 
-		refFieldsByDocType.get(docType).put(partName, refFields);
-
-		return refFields;
+		refFieldsByDocType.get(docType).putAll(refTable);
+		return refTable.row(partName);
 	}
 
 	/**
@@ -302,6 +319,14 @@ public class CsvExportWriter extends AbstractExportWriter {
 		FIELD, AUTHORITY
 	}
 
+	private enum FieldType {
+		STANDARD, TERM_REF, AUTH_REF;
+
+		public boolean isRefField() {
+			return this == TERM_REF || this == AUTH_REF;
+		}
+	}
+
 	private static class AuthorityDisplayMapping {
 		final String authority;
 		final String displayName;
@@ -326,5 +351,4 @@ public class CsvExportWriter extends AbstractExportWriter {
 			return vocabDisplayNames.getOrDefault(shortId, shortId);
 		}
 	}
-
 }
