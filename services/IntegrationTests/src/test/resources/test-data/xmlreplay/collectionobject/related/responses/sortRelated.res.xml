@@ -3,7 +3,7 @@
     <itemsInPage>3</itemsInPage>
     <totalItems>3</totalItems>
     <fieldsReturned>
-        csid|uri|refName|updatedAt|workflowState|identificationNumber|blobCsid|title
+        csid|uri|refName|updatedAt|workflowState|altText|identificationNumber|blobCsid|title
     </fieldsReturned>
     <list-item>
         <csid>${first}</csid>

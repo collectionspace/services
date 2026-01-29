@@ -31,7 +31,6 @@ import java.io.OutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.text.DecimalFormat;
-import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -65,7 +64,6 @@ import org.collectionspace.services.config.service.XmlContentType;
 import org.dom4j.io.DOMReader;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
-//import org.jboss.resteasy.plugins.providers.multipart.MultipartOutput;
 
 import org.nuxeo.ecm.core.io.ExportConstants;
 import org.nuxeo.common.collections.PrimitiveArrays;
@@ -93,13 +91,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
-
-//import org.dom4j.Document;
-//import org.dom4j.Element;
-//import org.dom4j.Node;
-//import org.dom4j.NodeList;
-//import org.dom4j.Text;
 
 /**
  * DocumentUtils is a collection of utilities related to document management
@@ -565,7 +556,7 @@ public class DocumentUtils {
 		Schema schema = getSchemaFromName(partMeta.getLabel());
 
 		buildDocument(document, root, objectProps, schema);
-		String w3cDocumentStr = xmlToString(document);
+		// String w3cDocumentStr = xmlToString(document);
 
 		DOMReader reader = new DOMReader();
 		org.dom4j.Document dom4jDoc = reader.read(document);
@@ -573,8 +564,7 @@ public class DocumentUtils {
 		result.detach(); // return just the root element detached from the DOM
 							// document
 
-		return result;// FIXME: REM - Add if (logger.isTraceEnabled() == true)
-						// logger.trace(document.asXML());
+		return result;
 	}
 
 	/**
@@ -656,8 +646,7 @@ public class DocumentUtils {
 	 * @throws IOException
 	 *             Signals that an I/O exception has occurred.
 	 */
-	private static void buildProperty(Document document, Element parent,
-			Field field, Object value) throws IOException {
+	public static void buildProperty(Document document, Element parent, Field field, Object value) throws IOException {
 		Type type = field.getType();
 		// no need to qualify each element name as namespace is already added
 		String propName = field.getName().getLocalName();

@@ -5,11 +5,12 @@
     </description>
 	<!-- set global properties for this build -->
     <property name="services.trunk" value="../.."/>
+    <import file="${services.trunk}/build.xml" />
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-	<property name="application.trunk" location="${services.trunk}/../application" />
-	<property name="cspace.tool.csmake" value="csmake" />
+    <property name="application.trunk" location="${services.trunk}/../application" />
+    <property name="cspace.tool.csmake" value="csmake" />
     <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
@@ -52,10 +53,12 @@
 
     <target name="package" depends="package-unix,package-windows"
   description="Package CollectionSpace Services" />
+    <urlencode property="db.jdbc.urloptions" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
             <arg value="-Dmaven.test.skip=true" />
+            <arg value="-Ddb.jdbc.urloptions.encoded=${db.jdbc.urloptions.encoded}" />
             <arg value="-f" />
             <arg value="${basedir}/pom.xml" />
             <arg value="-N" />
@@ -150,15 +153,15 @@
 		<delete dir="${jee.deploy.cspace}/${cspace.services.context}"/>
         <copy file="${basedir}/target/${cspace.services.war}" todir="${jee.deploy.cspace}"/>
     </target>
-	
+
 	<!--
 		This target attempts to generate a set of Service artifacts (Nuxeo bundles and tenant bindings) by using the
 		Application layer's configuration files.
-		
+
 		This target has a dependency on the Application layer's source tree.  It assumes the Application layer's src tree root
 		is a directory sibling of the Source layer's source tree root.  Also, it assumes the "csmake.jar" exists in the target
 		directory of the Application layer's "tomcat-main" module.
-		
+
 		This target also assumes that the system environment variable 'CSPACE_JEESERVER_HOME' is set and pointing to the root
 		JEE server (usually Apache Tomcat) where CollectionSpace is installed.  All generated Service artifacts wi
 	-->

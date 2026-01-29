@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DocumentsByCsidIterator implements Iterator<PoxPayloadOut> {
-	private final Logger logger = LoggerFactory.getLogger(DocumentsByCsidIterator.class);
+  private final Logger logger = LoggerFactory.getLogger(DocumentsByCsidIterator.class);
 
   private NuxeoBasedResource resource;
   private String vocabulary;
@@ -60,8 +60,7 @@ public class DocumentsByCsidIterator implements Iterator<PoxPayloadOut> {
         : resource.getWithParentCtx(serviceContext, csid));
     }
     catch (Exception e) {
-      logger.warn("Could not get document with csid " + csid, e);
-
+      logger.warn("Could not get document with csid {}", csid, e);
       return null;
     }
   }

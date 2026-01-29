@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    AdvancedSearch schema (XSD)
+
+    Entity  : AdvancedSearch
+    Part    : Common
+    Used for: JAXB binding between XML and Java objects
+-->
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+  jaxb:version="2.0"
+  xmlns="http://collectionspace.org/services/advancedsearch"
+  targetNamespace="http://collectionspace.org/services/advancedsearch"
+  version="0.1"
+>
+
+  <xs:complexType name="abstractCommonList">
+    <xs:annotation>
+      <xs:appinfo>
+        <jaxb:class ref="org.collectionspace.services.jaxb.AbstractCommonList"/>
+      </xs:appinfo>
+    </xs:annotation>
+  </xs:complexType>
+
+  <xs:complexType name="contentConcepts">
+    <xs:sequence>
+      <xs:element name="contentConcept" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="nagpraCategories">
+    <xs:sequence>
+      <xs:element name="nagpraCategory" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="advancedsearch-common-list">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="abstractCommonList">
+          <xs:sequence>
+            <xs:element name="advancedsearch-list-item" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="uri" type="xs:anyURI" nillable="true"/>
+                  <xs:element name="csid" type="xs:string" nillable="true"/>
+                  <xs:element name="related" type="xs:boolean" minOccurs="0"/>
+                  <xs:element name="refName" type="xs:string" nillable="true"/>
+                  <xs:element name="updatedAt" type="xs:dateTime" nillable="true"/>
+                  <xs:element name="blobCsid" type="xs:string" nillable="true"/>
+                  <xs:element name="blobAltText" type="xs:string" nillable="true"/>
+                  <xs:element name="objectNumber" type="xs:string" nillable="true"/>
+                  <xs:element name="title" type="xs:string" nillable="true"/>
+                  <xs:element name="computedCurrentLocation" type="xs:string" nillable="true"/>
+                  <xs:element name="responsibleDepartment" type="xs:string" nillable="true"/>
+                  <xs:element name="briefDescription" type="xs:string" nillable="true"/>
+
+                  <xs:element name="objectName" type="xs:string" nillable="true"/>
+                  <xs:element name="objectNameControlled" type="xs:string" nillable="true"/>
+                  <xs:element name="taxon" type="xs:string" nillable="true"/>
+                  <xs:element name="form" type="xs:string" nillable="true"/>
+                  <xs:element name="agent" type="xs:string" nillable="true"/>
+                  <xs:element name="agentRole" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollector" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectorRole" type="xs:string" nillable="true"/>
+
+                  <xs:element name="fieldCollectionDate" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectionPlace" type="xs:string" nillable="true"/>
+                  <xs:element name="fieldCollectionSite" type="xs:string" nillable="true"/>
+                  <xs:element name="objectProductionDate" type="xs:string" nillable="true"/>
+                  <xs:element name="objectProductionPlace" type="xs:string" nillable="true"/>
+
+                  <xs:element name="contentConcepts" type="contentConcepts" nillable="true"/>
+                  <xs:element name="nagpraCategories" type="nagpraCategories" nillable="true"/>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

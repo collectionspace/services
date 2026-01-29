@@ -63,6 +63,7 @@ import org.collectionspace.services.propagation.PropagationResource;
 import org.collectionspace.services.pottag.PottagResource;
 import org.collectionspace.services.report.ReportResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
+import org.collectionspace.services.advancedsearch.AdvancedSearch;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.structureddate.StructuredDateResource;
@@ -131,6 +132,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         singletons.add(new IndexResource());
         singletons.add(new LoginResource());
         singletons.add(new LogoutResource());
+        singletons.add(new AdvancedSearch());
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());

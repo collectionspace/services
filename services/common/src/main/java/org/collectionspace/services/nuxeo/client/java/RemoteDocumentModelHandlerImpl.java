@@ -101,10 +101,10 @@ import org.slf4j.LoggerFactory;
  *
  * $LastChangedRevision: $
  * $LastChangedDate: $
- * @param <T> 
+ * @param <T>
  * @param <TL> 
  */
-public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
+public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         extends DocumentModelHandler<T, TL> {
 
     /** The logger. */
@@ -674,9 +674,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      * @throws Exception
      */
     @Deprecated
-    protected Map<String, Object> extractPart(
-            DocumentModel docModel, String schema, ObjectPartType partMeta,
-            Map<String, Object> addToMap)
+    protected Map<String, Object> extractPart(DocumentModel docModel,
+                                              String schema,
+                                              ObjectPartType partMeta,
+                                              Map<String, Object> addToMap)
             throws Exception {
         Map<String, Object> result = null;
 
@@ -685,58 +686,6 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         return result;
     }
     
-    /* 
-    public String getStringPropertyFromDoc(
-    		ServiceContext ctx,
-    		String csid,
-    		String propertyXPath ) throws DocumentNotFoundException, DocumentException {
-    	RepositoryInstance repoSession = null;
-    	boolean releaseRepoSession = false;
-    	String returnValue = null;
-
-    	try{ 
-    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
-    		repoSession = this.getRepositorySession();
-    		if (repoSession == null) {
-    			repoSession = repoClient.getRepositorySession();
-    			releaseRepoSession = true;
-    		}
-
-    		try {
-    			DocumentWrapper<DocumentModel> wrapper = repoClient.getDoc(repoSession, ctx, csid);
-    			DocumentModel docModel = wrapper.getWrappedObject();
-    			returnValue = (String) docModel.getPropertyValue(propertyXPath);
-    		} catch (PropertyException pe) {
-    			throw pe;
-    		} catch (DocumentException de) {
-    			throw de;
-    		} catch (Exception e) {
-    			if (logger.isDebugEnabled()) {
-    				logger.debug("Caught exception ", e);
-    			}
-    			throw new DocumentException(e);
-    		} finally {
-    			if (releaseRepoSession && repoSession != null) {
-    				repoClient.releaseRepositorySession(repoSession);
-    			}
-    		}
-    	} catch (Exception e) {
-    		if (logger.isDebugEnabled()) {
-    			logger.debug("Caught exception ", e);
-    		}
-    		throw new DocumentException(e);
-    	}	        
-
-
-    	if (logger.isWarnEnabled() == true) {
-    		logger.warn("Returned DocumentModel instance was created with a repository session that is now closed.");
-    	}
-    	return returnValue;
-    }
-     */
-
-    
-
     /* (non-Javadoc)
      * @see org.collectionspace.services.nuxeo.client.java.DocumentModelHandler#getAuthorityRefs(org.collectionspace.services.common.document.DocumentWrapper, java.util.List)
      */

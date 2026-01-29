@@ -98,6 +98,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     //
     // Profile schema name suffixes and extension suffixes
     //
+    public final static String NAGPRA_EXTENSION_NAME = "nagpra";
     public final static String NATURALHISTORY_EXTENSION_NAME = "naturalhistory";
     public final static String NATURALHISTORY_EXT_EXTENSION_NAME = "naturalhistory_extension";
     public final static String VARIABLEMEDIA_EXTENSION_NAME = "variablemedia";
