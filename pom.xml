@@ -1,5 +1,6 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.collectionspace.services</groupId>
@@ -201,7 +202,7 @@
 					<version>3.1</version>
 					<configuration>
 						<source>${java.version}</source>
-						<target>${java.version}</target>s&gt;
+						<target>${java.version}</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -420,21 +421,34 @@
 						</goals>
 						<configuration>
 							<tasks>
-								<property environment="env"/>
-								<fail unless="env.CSPACE_INSTANCE_ID" message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value."/>
-								<fail unless="env.JEE_PORT" message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value."/>
-								<fail unless="env.DB_HOST" message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value."/>
-								<fail unless="env.DB_PORT" message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value."/>
-								<fail unless="env.CSPACE_JEESERVER_HOME" message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable."/>
-								<fail unless="env.DB_CSPACE_PASSWORD" message="Required environment variable DB_CSPACE_PASSWORD has not been set."/>
-								<fail unless="env.DB_NUXEO_PASSWORD" message="Required environment variable DB_NUXEO_PASSWORD has not been set."/>
-								<fail unless="env.DB_READER_PASSWORD" message="Required environment variable DB_READER_PASSWORD has not been set."/>
-								<fail unless="env.DB_CSADMIN_PASSWORD" message="Required environment variable DB_CSADMIN_PASSWORD has not been set."/>
+								<property environment="env" />
+								<fail unless="env.CSPACE_INSTANCE_ID"
+									message="Required environment variable CSPACE_INSTANCE_ID has not been set. Use '_default' as a default value." />
+								<fail unless="env.JEE_PORT"
+									message="Required environment variable JEE_PORT has not been set.  Use '8180' as a default value." />
+								<fail unless="env.DB_HOST"
+									message="Required environment variable DB_HOST has not been set.  Use 'localhost' as a default value." />
+								<fail unless="env.DB_PORT"
+									message="Required environment variable DB_PORT has not been set.  Use 5432 as a default value." />
+								<fail unless="env.CSPACE_JEESERVER_HOME"
+									message="Required environment variable CSPACE_JEESERVER_HOME has not been set.  Usually the same value as CATALINA_HOME environment variable." />
+								<fail unless="env.DB_CSPACE_PASSWORD"
+									message="Required environment variable DB_CSPACE_PASSWORD has not been set." />
+								<fail unless="env.DB_NUXEO_PASSWORD"
+									message="Required environment variable DB_NUXEO_PASSWORD has not been set." />
+								<fail unless="env.DB_READER_PASSWORD"
+									message="Required environment variable DB_READER_PASSWORD has not been set." />
+								<fail unless="env.DB_CSADMIN_PASSWORD"
+									message="Required environment variable DB_CSADMIN_PASSWORD has not been set." />
 								<!-- Fail if these deprecated environment variables are set. -->
-								<fail if="env.DB_USER" message="The deprecated environment variable DB_USER should not be set."/>
-								<fail if="env.DB_PASSWORD" message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead."/>
-								<fail if="env.DB_PASSWORD_CSPACE" message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead."/>
-								<fail if="env.DB_PASSWORD_NUXEO" message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead."/>
+								<fail if="env.DB_USER"
+									message="The deprecated environment variable DB_USER should not be set." />
+								<fail if="env.DB_PASSWORD"
+									message="The deprecated environment variable DB_PASSWORD should not be set.  Ensure that DB_CSADMIN_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_CSPACE"
+									message="The deprecated environment variable DB_PASSWORD_CSPACE should not be set.  Ensure that DB_CSPACE_PASSWORD is set instead." />
+								<fail if="env.DB_PASSWORD_NUXEO"
+									message="The deprecated environment variable DB_PASSWORD_NUXEO should not be set.  Ensure that DB_NUXEO_PASSWORD is set instead." />
 							</tasks>
 						</configuration>
 					</execution>
