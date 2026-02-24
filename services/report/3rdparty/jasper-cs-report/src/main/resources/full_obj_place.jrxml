@@ -10,7 +10,7 @@
 	<style name="Column header" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="deurnfields" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA["publicartproductiondatetype,responsibledepartment,publicartproductionpersons,publicartproductionpersonroles,publishto,installationtype,worktypes,materials,collections,owner,computedcurrentlocation,placementtype,placetype,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
+		<defaultValueExpression><![CDATA["publicartproductiondatetype,responsibledepartment,publicartproductionpersons,publicartproductionpersonroles,publishto,installationtype,worktypes,materials,collections,owner,computedcurrentlocation,placementtypes,placetypes,placeowner,addressmunicipality,addressstateorprovince,addresscountry,addresstype,addresstype,broaderplace"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="tenantid" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["5000"]]></defaultValueExpression>
@@ -42,9 +42,9 @@
 	obj.computedcurrentlocation,
 	movement.currentlocationnote,
 	place.placenote,
-	placement.item AS placementtype,
+	coalesce(placementtype_agg.placementtypes, '{}') AS placementtypes,
 	place_pa.placementenvironment,
-	placetype.item AS placetype,
+	coalesce(placetype_agg.placetypes, '{}') AS placetypes,
 	placeowner.owner AS placeowner,
 	placeowner.ownershipnote,
 	placeowner.ownertype,
@@ -140,9 +140,23 @@ LEFT JOIN (
 ) movement ON movement.objectcsid = hier.name AND movement.currentlocation = obj.computedcurrentlocation
 -- place and all place fields
 LEFT JOIN places_common place on place.refname = obj.computedcurrentlocation
-LEFT JOIN places_publicart_placementtypes placement on placement.id = place.id AND placement.pos = 0
+-- AGGREGATE ALL PLACEMENTTYPES
+LEFT JOIN (
+  SELECT
+    placementtypes.id AS place_id,
+    array_agg(placementtypes.item) AS placementtypes
+  FROM places_publicart_placementtypes placementtypes
+  GROUP BY placementtypes.id
+) placementtype_agg ON placementtype_agg.place_id = place.id
 LEFT JOIN places_publicart place_pa on place_pa.id = place.id
-LEFT JOIN places_publicart_publicartplacetypes placetype on placetype.id = place.id AND placetype.pos = 0
+-- AGGREGATE ALL PLACETYPES
+LEFT JOIN (
+  SELECT
+    placetype.id AS place_id,
+    array_agg(placetype.item) AS placetypes
+  FROM places_publicart_publicartplacetypes placetype
+  GROUP BY placetype.id
+) placetype_agg ON placetype_agg.place_id = place.id
 LEFT JOIN hierarchy placeowner_hier on placeowner_hier.parentid = place.id and placeowner_hier.primarytype = 'publicartPlaceOwnerGroup' and placeowner_hier.pos = 0
 LEFT JOIN hierarchy placeownerdate_hier on placeownerdate_hier.parentid = placeowner_hier.id
 LEFT JOIN publicartplaceownergroup placeowner on placeowner.id = placeowner_hier.id
@@ -254,9 +268,9 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="currentlocationnote"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="movements_common"/>
 	</field>
-	<field name="placementtype" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="placementtype"/>
-		<property name="com.jaspersoft.studio.field.label" value="placementtype"/>
+	<field name="placementtypes" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="placementtypes"/>
+		<property name="com.jaspersoft.studio.field.label" value="placementtypes"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="places_publicart_placementtypes"/>
 	</field>
 	<field name="placementenvironment" class="java.lang.String">
@@ -264,9 +278,9 @@ $P!{whereclause}]]>
 		<property name="com.jaspersoft.studio.field.label" value="placementenvironment"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="places_publicart"/>
 	</field>
-	<field name="placetype" class="java.lang.String">
-		<property name="com.jaspersoft.studio.field.name" value="placetype"/>
-		<property name="com.jaspersoft.studio.field.label" value="placetype"/>
+	<field name="placetypes" class="java.sql.Array">
+		<property name="com.jaspersoft.studio.field.name" value="placetypes"/>
+		<property name="com.jaspersoft.studio.field.label" value="placetypes"/>
 		<property name="com.jaspersoft.studio.field.tree.path" value="places_publicart_publicartplacetypes"/>
 	</field>
 	<field name="placeowner" class="java.lang.String">
@@ -746,7 +760,7 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="2000" y="0" width="100" height="30" uuid="52b33190-796b-42ba-990c-ab86d1d02950">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{placementtype}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{placementtypes}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2100" y="0" width="100" height="30" uuid="1ae3ea7d-79cd-4254-aa47-67dc138787f6">
@@ -758,7 +772,7 @@ $P!{whereclause}]]>
 				<reportElement style="Detail" x="2200" y="0" width="100" height="30" uuid="ff9d2e44-827c-43d9-9a79-b138a679019e">
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 				</reportElement>
-				<textFieldExpression><![CDATA[$F{placetype}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{placetypes}.getArray().join('; ')]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="Detail" x="2300" y="0" width="100" height="30" uuid="f29bc0cb-c282-49fe-bc66-86b32da69ceb">

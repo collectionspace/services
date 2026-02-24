@@ -85,6 +85,7 @@
 							"collectionobjects_common:techniqueGroupList",
 							"collectionobjects_common:titleGroupList",
 							"collectionobjects_common:viewersContributionNote",
+							"collectionobjects_anthro:materialTechniqueDescription",
 							"collectionobjects_naturalhistory_extension:taxonomicIdentGroupList",
 							"collectionspace_core:*",
 							"collectionspace_denorm:*",
