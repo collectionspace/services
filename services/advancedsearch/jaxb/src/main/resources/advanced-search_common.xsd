@@ -73,6 +73,12 @@
                   <xs:element name="objectProductionDate" type="xs:string" nillable="true"/>
                   <xs:element name="objectProductionPlace" type="xs:string" nillable="true"/>
 
+                  <!-- for materials profile -->
+                  <xs:element name="material" type="xs:string" nillable="true"/>
+
+                  <!-- for herbarium profile -->
+                  <xs:element name="determinationTaxon" type="xs:string" nillable="true"/>
+
                   <xs:element name="contentConcepts" type="contentConcepts" nillable="true"/>
                   <xs:element name="nagpraCategories" type="nagpraCategories" nillable="true"/>
                 </xs:sequence>

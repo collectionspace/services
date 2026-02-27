@@ -17,6 +17,7 @@ import org.collectionspace.services.advancedsearch.model.AgentModel;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
+import org.collectionspace.services.advancedsearch.model.MaterialModel;
 import org.collectionspace.services.advancedsearch.model.NAGPRACategoryModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
 import org.collectionspace.services.advancedsearch.model.ObjectProductionModel;
@@ -139,6 +140,7 @@ public class CollectionObjectMapper {
             });
 
             item.setForm(TaxonModel.preservationForm(collectionObject));
+            item.setMaterial(MaterialModel.material(collectionObject));
 
             // from media resource
             if (!blobInfo.isEmpty()) {
@@ -151,6 +153,7 @@ public class CollectionObjectMapper {
 
         if (naturalHistory != null) {
             item.setTaxon(TaxonModel.taxon(naturalHistory));
+            item.setDeterminationTaxon(TaxonModel.determinationTaxon(naturalHistory));
         }
 
         if (objectsNAGPRA != null) {
