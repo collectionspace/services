@@ -42,7 +42,7 @@ public class HttpDownloadUtility {
         	}
         	return null;
         }
-        
+
         return destDir;
     }
 
@@ -54,7 +54,7 @@ public class HttpDownloadUtility {
         	if (tmpdir.endsWith(File.separator) == false) {
         		tmpdir = tmpdir + File.separator;
         	}
-        	
+
         	String destDir = getDestDir(tmpdir + UUID.randomUUID() + File.separator);
         	String filePath = downloadFile(fileURL, destDir);
         	result = new File(filePath);
@@ -62,13 +62,13 @@ public class HttpDownloadUtility {
     		String msg = String.format("Could not download file use this URL: %s", fileURL);
     		logger.error(msg, e);
     	}
-    	
+
     	return result;
 	}
-	
+
 	/**
 	 * Downloads a file from a URL
-	 * 
+	 *
 	 * @param fileURL HTTP URL of the file to be downloaded
 	 * @param saveDir path of the directory to save the file
 	 * @throws IOException
@@ -81,7 +81,7 @@ public class HttpDownloadUtility {
 
 		try {
 			httpResponseCode = httpConn.getResponseCode();
-	
+
 			// always check HTTP response code first
 			if (httpResponseCode == HttpURLConnection.HTTP_OK) {
 				String fileName = "";
@@ -96,8 +96,13 @@ public class HttpDownloadUtility {
 				} else {
 					// extracts file name from URL
 					fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
+					// Remove query parameters from filename
+					int qIndex = fileName.indexOf("?");
+					if (qIndex > -1) {
+						fileName = fileName.substring(0, qIndex);
+					}
 				}
-				
+
 				if (logger.isDebugEnabled()) {
 					String contentType = httpConn.getContentType();
 					int contentLength = httpConn.getContentLength();
@@ -105,15 +110,15 @@ public class HttpDownloadUtility {
 					logger.debug("Disposition is:" + disposition != null ? disposition : "<empty>");
 					logger.debug("Content type is:" + contentType != null ? contentType : "<empty>");
 					logger.debug("Content length is:" + contentLength);
-				}				
+				}
 
 				// opens input stream from the HTTP connection
 				InputStream inputStream = httpConn.getInputStream();
 				String saveFilePath = saveDir + File.separator + fileName; //FIXME: File.separator NOT needed
-	
+
 				// opens an output stream to save into file
 				FileOutputStream outputStream = new FileOutputStream(saveFilePath);
-	
+
 				try {
 					int bytesRead = -1;
 					byte[] buffer = new byte[BUFFER_SIZE];

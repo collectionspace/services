@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.CollectionobjectsNaturalhistory;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.DeterminationHistoryGroup;
+import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.DeterminationHistoryGroupList;
 import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.TaxonomicIdentGroup;
 import org.collectionspace.services.collectionobject.domain.naturalhistory_extension.TaxonomicIdentGroupList;
 
@@ -33,5 +35,19 @@ public class TaxonModel {
 		}
 
 		return form;
+	}
+
+	public static String determinationTaxon(final CollectionobjectsNaturalhistory naturalHistory) {
+		String taxon = null;
+		if (naturalHistory != null && naturalHistory.getTaxonomicIdentGroupList() != null) {
+			DeterminationHistoryGroupList determinationGroupList = naturalHistory.getDeterminationHistoryGroupList();
+			List<DeterminationHistoryGroup> determinationGroups = determinationGroupList.getDeterminationHistoryGroup();
+			if (!determinationGroups.isEmpty()) {
+				DeterminationHistoryGroup group = determinationGroups.get(0);
+				taxon = group.getDeterminationTaxon();
+			}
+		}
+
+		return taxon;
 	}
 }
