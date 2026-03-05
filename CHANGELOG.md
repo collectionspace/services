@@ -12,6 +12,7 @@
 * Add contentPlaces, materialTechniqueDescription to ES mappings
 * Add blob alt text to media responses
 * Remove cspace_english namespace search
+* Media Handling: Remove any query parameters from file name created, after uploading external media files 
 
 ### Bug Fixes
 
