@@ -36,11 +36,13 @@
 			<version>2.12.2</version>
 			<scope>test</scope>
 		</dependency>
+    <!--
 		<dependency>
 			<groupId>org.jvnet.jaxb2_commons</groupId>
 			<artifactId>jaxb2-basics</artifactId>
-            <version>${jaxb2-basics.version}</version>
+      <version>${jaxb2-basics.version}</version>
 		</dependency>
+		-->
         
 		<dependency>
 			<groupId>org.jvnet.jaxb</groupId>
