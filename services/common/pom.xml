@@ -64,8 +64,6 @@
 			<artifactId>org.collectionspace.services.publicitem.jaxb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.collectionspace.services</groupId> <artifactId>org.collectionspace.services.3rdparty.nuxeo.quote-api</artifactId>
-			<version>${project.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -230,7 +228,7 @@
 		</dependency>
 		<!-- nuxeo -->
 		<dependency>
-			<groupId>org.nuxeo.binary.metadata</groupId>
+			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-binary-metadata</artifactId>
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
@@ -241,28 +239,12 @@
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-types-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-types-core</artifactId>
+			<artifactId>nuxeo-platform-types</artifactId>
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-imaging-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-filemanager-api</artifactId>
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
 		<dependency>

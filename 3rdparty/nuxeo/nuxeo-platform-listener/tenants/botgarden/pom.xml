@@ -24,11 +24,6 @@
             <version>${nuxeo.core.version}</version>
         </dependency>
 	    <dependency>
-	      <groupId>org.nuxeo.ecm.platform</groupId>
-	      <artifactId>nuxeo-platform-filemanager-api</artifactId>
-		  <version>${nuxeo.platform.version}</version>	      
-	    </dependency>
-	    <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.collectionobject.service</artifactId>
             <version>${project.version}</version>
@@ -68,5 +63,5 @@
             </plugin>
         </plugins>
     </build>
-	
+
 </project>

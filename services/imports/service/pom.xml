@@ -85,12 +85,6 @@
         </dependency>
 
         <!-- Nuxeo -->
-
-        <dependency>
-            <groupId>org.nuxeo.shell</groupId>
-            <artifactId>nuxeo-shell-core</artifactId>
-            <version>${nuxeo.shell.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.platform</groupId>
             <artifactId>nuxeo-importer-core</artifactId>

@@ -26,7 +26,7 @@
 		<xml-bind.version>3.0.1</xml-bind.version>
 		<log4j.version>2.17.1</log4j.version>
 		<java.version>17</java.version>
-		<nuxeo.general.release>9.10-HF30</nuxeo.general.release>
+		<nuxeo.general.release>2023.39</nuxeo.general.release>
 		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
 		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
 		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>

@@ -714,11 +714,6 @@
 			<artifactId>nuxeo-runtime-datasource</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-usermanager-api</artifactId>
-			<version>${nuxeo.core.version}</version>
-        </dependency>
-        <dependency>
     		<groupId>org.nuxeo.ecm.platform</groupId>
           	<artifactId>nuxeo-platform-commandline-executor</artifactId>
             <version>${nuxeo.core.version}</version>
