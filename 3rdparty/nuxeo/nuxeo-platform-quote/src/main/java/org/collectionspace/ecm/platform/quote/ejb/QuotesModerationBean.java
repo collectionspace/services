@@ -39,7 +39,7 @@ public class QuotesModerationBean implements QuotesModerationService {
 
 
     protected QuotesModerationService getQuotesModerationService() {
-        return Framework.getLocalService(QuotesModerationService.class);
+        return Framework.getService(QuotesModerationService.class);
     }
 
 

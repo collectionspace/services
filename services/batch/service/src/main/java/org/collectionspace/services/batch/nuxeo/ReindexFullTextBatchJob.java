@@ -531,7 +531,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		runAsyncBatch(asyncIds);
 
 		// wait for async completion after transaction commit
-		Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+		Framework.getService(EventService.class).waitForAsyncCompletion();
 	}
 
 	private List<String> quoteList(List<String> values) {
@@ -642,7 +642,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		runAsyncBatch(asyncIds);
 
 		// wait for async completion after transaction commit
-		Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+		Framework.getService(EventService.class).waitForAsyncCompletion();
 	}
 
 	/*
@@ -692,7 +692,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			return;
 		}
 		String repositoryName = coreSession.getRepositoryName();
-		WorkManager workManager = Framework.getLocalService(WorkManager.class);
+		WorkManager workManager = Framework.getService(WorkManager.class);
 		for (String id : asyncIds) {
 			Work work = new SQLFulltextExtractorWork(repositoryName, id);
 			// schedule immediately, we're outside a transaction

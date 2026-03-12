@@ -263,7 +263,7 @@ public class ReindexFulltextRoot {
         runAsyncBatch(asyncIds);
 
         // wait for async completion after transaction commit
-        Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+        Framework.getService(EventService.class).waitForAsyncCompletion();
     }
 
     /*
@@ -312,7 +312,7 @@ public class ReindexFulltextRoot {
             return;
         }
         String repositoryName = coreSession.getRepositoryName();
-        WorkManager workManager = Framework.getLocalService(WorkManager.class);
+        WorkManager workManager = Framework.getService(WorkManager.class);
         for (String id : asyncIds) {
             Work work = new SQLFulltextExtractorWork(repositoryName, id);
             // schedule immediately, we're outside a transaction
