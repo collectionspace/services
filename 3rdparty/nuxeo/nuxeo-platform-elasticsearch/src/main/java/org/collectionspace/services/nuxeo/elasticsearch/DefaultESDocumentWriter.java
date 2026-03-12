@@ -12,29 +12,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.core.HttpHeaders;
-
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.IntNode;
-import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.node.TextNode;
 import org.collectionspace.services.common.api.RefNameUtils;
-import org.nuxeo.ecm.automation.jaxrs.io.documents.JsonESDocumentWriter;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.elasticsearch.io.JsonESDocumentWriter;
 
 public class DefaultESDocumentWriter extends JsonESDocumentWriter {
-	private static ObjectMapper objectMapper = new ObjectMapper();
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	@Override
-	public void writeDoc(JsonGenerator jg, DocumentModel doc, String[] schemas,
-			Map<String, String> contextParameters, HttpHeaders headers)
-			throws IOException {
-
+	public void writeESDocument(JsonGenerator jg, DocumentModel doc, String[] schemas,
+								Map<String, String> contextParameters) throws IOException {
 		ObjectNode denormValues = getDenormValues(doc);
 
 		jg.writeStartObject();
@@ -42,7 +38,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		writeSystemProperties(jg, doc);
 		writeSchemas(jg, doc, schemas);
 		writeContextParameters(jg, doc, contextParameters);
-		writeDenormValues(jg, doc, denormValues);
+		writeDenormValues(jg, denormValues);
 
 		jg.writeEndObject();
 		jg.flush();
@@ -90,13 +86,13 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 		return denormValues;
 	}
 
-	public void writeDenormValues(JsonGenerator jg, DocumentModel doc, ObjectNode denormValues) throws IOException {
-		if (denormValues != null && denormValues.size() > 0) {
+	public void writeDenormValues(JsonGenerator jg, ObjectNode denormValues) throws IOException {
+		if (denormValues != null && !denormValues.isEmpty()) {
 			if (jg.getCodec() == null) {
 				jg.setCodec(objectMapper);
 			}
 
-			Iterator<Map.Entry<String, JsonNode>> entries = denormValues.getFields();
+			Iterator<Map.Entry<String, JsonNode>> entries = denormValues.fields();
 
 			while (entries.hasNext()) {
 				Map.Entry<String, JsonNode> entry = entries.next();
@@ -112,29 +108,26 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 
 		String relatedRecordQuery = String.format("SELECT * FROM Relation WHERE relations_common:subjectCsid = '%s' AND relations_common:objectDocumentType = 'Media' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'", csid, tenantId);
 		DocumentModelList relationDocs = session.query(relatedRecordQuery);
-		List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
-		List<JsonNode> mediaAltTexts = new ArrayList<JsonNode>();
+		List<JsonNode> mediaCsids = new ArrayList<>();
+		List<JsonNode> mediaAltTexts = new ArrayList<>();
 
 		if (relationDocs.size() > 0) {
-			Iterator<DocumentModel> iterator = relationDocs.iterator();
+            for (DocumentModel relationDoc : relationDocs) {
+                String mediaCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
+                DocumentModel mediaDoc = getRecordByCsid(session, tenantId, "Media", mediaCsid);
 
-			while (iterator.hasNext()) {
-				DocumentModel relationDoc = iterator.next();
-				String mediaCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
-				DocumentModel mediaDoc = getRecordByCsid(session, tenantId, "Media", mediaCsid);
+                if (isMediaPublished(mediaDoc)) {
+                    mediaCsids.add(new TextNode(mediaCsid));
 
-				if (isMediaPublished(mediaDoc)) {
-					mediaCsids.add(new TextNode(mediaCsid));
+                    String altText = (String) mediaDoc.getProperty("media_common", "altText");
 
-					String altText = (String) mediaDoc.getProperty("media_common", "altText");
+                    if (altText == null) {
+                        altText = "";
+                    }
 
-					if (altText == null) {
-						altText = "";
-					}
-
-					mediaAltTexts.add(new TextNode(altText));
-				}
-			}
+                    mediaAltTexts.add(new TextNode(altText));
+                }
+            }
 		}
 
 		denormValues.putArray("mediaCsid").addAll(mediaCsids);
@@ -149,19 +142,16 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 				"SELECT * FROM Relation WHERE relations_common:objectCsid = '%s' AND relations_common:subjectDocumentType = 'CollectionObject' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'",
 				csid, tenantId);
 		DocumentModelList relationDocs = session.query(relatedRecordQuery);
-		List<JsonNode> objectCsids = new ArrayList<JsonNode>();
+		List<JsonNode> objectCsids = new ArrayList<>();
 
 		if (relationDocs.size() > 0) {
-			Iterator<DocumentModel> iterator = relationDocs.iterator();
+            for (DocumentModel relationDoc : relationDocs) {
+                String objectCsid = (String) relationDoc.getProperty("relations_common", "subjectCsid");
 
-			while (iterator.hasNext()) {
-				DocumentModel relationDoc = iterator.next();
-				String objectCsid = (String) relationDoc.getProperty("relations_common", "subjectCsid");
-
-				if (objectCsid != null) {
-					objectCsids.add(new TextNode(objectCsid));
-				}
-			}
+                if (objectCsid != null) {
+                    objectCsids.add(new TextNode(objectCsid));
+                }
+            }
 		}
 
 		denormValues.putArray("objectCsid").addAll(objectCsids);
@@ -172,20 +162,17 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 
 		String relatedRecordQuery = String.format("SELECT * FROM Relation WHERE relations_common:subjectCsid = '%s' AND relations_common:objectDocumentType = 'Acquisition' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'", csid, tenantId);
 		DocumentModelList relationDocs = session.query(relatedRecordQuery);
-		List<JsonNode> creditLines = new ArrayList<JsonNode>();
+		List<JsonNode> creditLines = new ArrayList<>();
 
 		if (relationDocs.size() > 0) {
-			Iterator<DocumentModel> iterator = relationDocs.iterator();
+            for (DocumentModel relationDoc : relationDocs) {
+                String acquisitionCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
+                String creditLine = getCreditLine(session, tenantId, acquisitionCsid);
 
-			while (iterator.hasNext()) {
-				DocumentModel relationDoc = iterator.next();
-				String acquisitionCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
-				String creditLine = getCreditLine(session, tenantId, acquisitionCsid);
-
-				if (creditLine != null && creditLine.length() > 0) {
-					creditLines.add(new TextNode(creditLine));
-				}
-			}
+                if (creditLine != null && !creditLine.isEmpty()) {
+                    creditLines.add(new TextNode(creditLine));
+                }
+            }
 		}
 
 		denormValues.putArray("creditLine").addAll(creditLines);
@@ -196,30 +183,27 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 
 	String relatedRecordQuery = String.format("SELECT * FROM Relation WHERE relations_common:subjectCsid = '%s' AND relations_common:objectDocumentType = 'Exhibition' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s'", csid, tenantId);
 	DocumentModelList relationDocs = session.query(relatedRecordQuery);
-	List<JsonNode> exhibitions = new ArrayList<JsonNode>();
+	List<JsonNode> exhibitions = new ArrayList<>();
 
 	if (relationDocs.size() > 0) {
-		Iterator<DocumentModel> iterator = relationDocs.iterator();
+        for (DocumentModel relationDoc : relationDocs) {
+            String exhibitionCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
+            DocumentModel exhibitionDoc = getRecordByCsid(session, tenantId, "Exhibition", exhibitionCsid);
 
-		while (iterator.hasNext()) {
-			DocumentModel relationDoc = iterator.next();
-			String exhibitionCsid = (String) relationDoc.getProperty("relations_common", "objectCsid");
-			DocumentModel exhibitionDoc = getRecordByCsid(session, tenantId, "Exhibition", exhibitionCsid);
+            if (exhibitionDoc != null && isExhibitionPublished(exhibitionDoc)) {
+                ObjectNode exhibitionNode = objectMapper.createObjectNode();
 
-			if (exhibitionDoc != null && isExhibitionPublished(exhibitionDoc)) {
-				ObjectNode exhibitionNode = objectMapper.createObjectNode();
+                String title = (String) exhibitionDoc.getProperty("exhibitions_common", "title");
+                String generalNote = (String) exhibitionDoc.getProperty("exhibitions_common", "generalNote");
+                String curatorialNote = (String) exhibitionDoc.getProperty("exhibitions_common", "curatorialNote");
 
-				String title = (String) exhibitionDoc.getProperty("exhibitions_common", "title");
-				String generalNote = (String) exhibitionDoc.getProperty("exhibitions_common", "generalNote");
-				String curatorialNote = (String) exhibitionDoc.getProperty("exhibitions_common", "curatorialNote");
+                exhibitionNode.put("title", title);
+                exhibitionNode.put("generalNote", generalNote);
+                exhibitionNode.put("curatorialNote", curatorialNote);
 
-				exhibitionNode.put("title", title);
-				exhibitionNode.put("generalNote", generalNote);
-				exhibitionNode.put("curatorialNote", curatorialNote);
-
-				exhibitions.add(exhibitionNode);
-			}
-		}
+                exhibitions.add(exhibitionNode);
+            }
+        }
 	}
 
 	denormValues.putArray("exhibition").addAll(exhibitions);
@@ -376,15 +360,14 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 			List<String> publishToValues = (List<String>) doc.getProperty(publishedFieldPart, publishedFieldName);
 
 			if (publishToValues != null) {
-				for (int i=0; i<publishToValues.size(); i++) {
-					String value = publishToValues.get(i);
-					String shortId = RefNameUtils.getItemShortId(value);
+                for (String value : publishToValues) {
+                    String shortId = RefNameUtils.getItemShortId(value);
 
-					if (shortId.equals("all") || shortId.equals("cspacepub")) {
-						isPublished = true;
-						break;
-					}
-				}
+                    if (shortId.equals("all") || shortId.equals("cspacepub")) {
+                        isPublished = true;
+                        break;
+                    }
+                }
 			}
 		}
 
@@ -428,7 +411,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 	}
 
 	protected List<JsonNode> structDatesToYearNodes(List<Map<String, Object>> structDates) {
-		Set<Integer> years = new HashSet<Integer>();
+		Set<Integer> years = new HashSet<>();
 
 		for (Map<String, Object> structDate : structDates) {
 			if (structDate != null) {
@@ -440,8 +423,8 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 					// Subtract one day to make it inclusive.
 					latestCalendar.add(Calendar.DATE, -1);
 
-					Integer earliestYear = earliestCalendar.get(Calendar.YEAR);
-					Integer latestYear = latestCalendar.get(Calendar.YEAR);;
+					int earliestYear = earliestCalendar.get(Calendar.YEAR);
+					int latestYear = latestCalendar.get(Calendar.YEAR);
 
 					for (int year = earliestYear; year <= latestYear; year++) {
 						years.add(year);
@@ -450,10 +433,10 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 			}
 		}
 
-		List<Integer> yearList = new ArrayList<Integer>(years);
+		List<Integer> yearList = new ArrayList<>(years);
 		Collections.sort(yearList);
 
-		List<JsonNode> yearNodes = new ArrayList<JsonNode>();
+		List<JsonNode> yearNodes = new ArrayList<>();
 
 		for (Integer year : yearList) {
 			yearNodes.add(new IntNode(year));
