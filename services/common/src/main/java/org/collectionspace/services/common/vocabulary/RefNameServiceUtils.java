@@ -31,11 +31,11 @@ import java.util.UUID;
 
 import javax.ws.rs.core.Response;
 
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.api.model.PropertyNotFoundException;
 import org.nuxeo.ecm.core.api.model.impl.primitives.StringProperty;
 import org.slf4j.Logger;
@@ -48,7 +48,6 @@ import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.ServletTools;
 import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistry;
@@ -794,7 +793,7 @@ public class RefNameServiceUtils {
     }
 
     // TODO there are multiple copies of this that should be put somewhere common.
-	protected static String getRefname(DocumentModel docModel) throws ClientException {
+	protected static String getRefname(DocumentModel docModel) throws NuxeoException {
 		String result = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
 				CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);
 		return result;
@@ -903,7 +902,7 @@ public class RefNameServiceUtils {
                 try {
                 	String itemRefName = getRefname(docModel);
                 	ilistItem.setRefName(itemRefName);
-                } catch (ClientException ce) {
+                } catch (NuxeoException ce) {
                     throw new RuntimeException(
                             "processRefObjsDocList: Problem fetching refName from item Object: "
                             		+ ce.getLocalizedMessage());
@@ -1003,7 +1002,7 @@ public class RefNameServiceUtils {
                 						+ refName + "]");
                 	}
                 }
-            } catch (ClientException ce) {
+            } catch (NuxeoException ce) {
             	throw new RuntimeException(
             			"getAuthorityRefDocs: Problem fetching values from repo: " + ce.getLocalizedMessage());
             }

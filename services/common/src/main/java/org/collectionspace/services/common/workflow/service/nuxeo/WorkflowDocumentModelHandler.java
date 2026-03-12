@@ -39,8 +39,8 @@ import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.workflow.WorkflowCommon;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +83,7 @@ public class WorkflowDocumentModelHandler
     }
     
     @Override
-    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws ClientException {
+    protected void handleRefNameChanges(ServiceContext ctx, DocumentModel docModel) throws NuxeoException {
     	//
     	// We are intentionally overriding this method to do nothing since the Workflow resource is a meta-resource without a refname
     	//
@@ -172,8 +172,7 @@ public class WorkflowDocumentModelHandler
     		String msg = "Unable to follow workflow transition to state = "
     				+ transitionToFollow;
     		logger.error(msg, e);
-    		ClientException ce = new ClientException("Unable to follow workflow transition: " + transitionToFollow);
-    		throw ce;
+            throw new NuxeoException("Unable to follow workflow transition: " + transitionToFollow);
     	}
     }
     
