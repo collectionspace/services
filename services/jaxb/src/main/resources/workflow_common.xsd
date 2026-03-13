@@ -11,11 +11,9 @@
     $LastChangedDate: 2010-06-02 16:03:51 -0700 (Wed, 02 Jun 2010) $
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/workflow"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
   xmlns="http://collectionspace.org/services/workflow"
   targetNamespace="http://collectionspace.org/services/workflow"
   version="0.1">
