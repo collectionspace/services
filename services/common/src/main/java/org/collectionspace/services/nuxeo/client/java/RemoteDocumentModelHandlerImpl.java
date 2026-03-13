@@ -251,7 +251,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
@@ -353,7 +353,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
 
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
