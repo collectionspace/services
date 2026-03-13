@@ -22,7 +22,7 @@
 		<jackson.version>2.14.3</jackson.version>
 		<jaxb.version>2.2.11</jaxb.version>
 		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
-		<jaxb-runtime.version>3.0.2</jaxb-runtime.version>
+		<jaxb-runtime.version>4.0.5</jaxb-runtime.version>
 		<xml-bind.version>3.0.1</xml-bind.version>
 		<log4j.version>2.17.1</log4j.version>
 		<java.version>17</java.version>
@@ -212,7 +212,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.1.1</version>
+					<version>3.4.0</version>
 					<configuration>
 						<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
 						<archive>
@@ -1129,22 +1129,25 @@
 				<scope>provided</scope>
 			</dependency>
 
+			<!--
 			<dependency>
 				<groupId>net.java.dev.jaxb2-commons</groupId>
 				<artifactId>jaxb-fluent-api</artifactId>
 				<version>2.0.2</version>
 			</dependency>
+
 			<dependency>
 				<groupId>org.jvnet.jaxb</groupId>
-				<artifactId>jaxb2-basics</artifactId>
-				<version>${jaxb2-basics.version}</version>
+				<artifactId>jaxb-plugins</artifactId>
+				<version>3.0.0</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.jvnet.jaxb</groupId>
-				<artifactId>jaxb2-basics-runtime</artifactId>
-				<version>${jaxb2-basics.version}</version>
+				<artifactId>jaxb-plugins-runtime</artifactId>
+				<version>3.0.0</version>
 			</dependency>
+			-->
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-jaxrs</artifactId>
