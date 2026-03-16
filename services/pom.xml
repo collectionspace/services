@@ -18,7 +18,6 @@
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
 		<jaxb.codegen.phase>generate-sources</jaxb.codegen.phase>
-		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
 	</properties>
 
 	<!--
@@ -208,10 +207,11 @@
 						<persistenceUnitName>garbage</persistenceUnitName>
 					</configuration>
 				</plugin>
+				-->
 				<plugin>
 					<groupId>org.jvnet.jaxb</groupId>
 					<artifactId>jaxb-maven-plugin</artifactId>
-					<version>4.0.8</version>
+					<version>${jvnet.jaxb.version}</version>
 					<executions>
 						<execution>
 							<id>jaxb-codegen</id>
@@ -230,14 +230,13 @@
 									<plugin>
 										<groupId>org.jvnet.jaxb</groupId>
 										<artifactId>jaxb-plugins</artifactId>
-										<version>4.0.8</version>
+										<version>${jvnet.jaxb.version}</version>
 									</plugin>
 								</plugins>
 							</configuration>
 						</execution>
 					</executions>
 				</plugin>
-				-->
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
@@ -331,7 +330,6 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 </project>

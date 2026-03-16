@@ -43,10 +43,10 @@
       <version>${jaxb2-basics.version}</version>
 		</dependency>
 		-->
-        
+
 		<dependency>
 			<groupId>org.jvnet.jaxb</groupId>
-			<artifactId>jaxb2-basics-runtime</artifactId>
+			<artifactId>jaxb-plugins-runtime</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>org.collectionspace.services</groupId>
