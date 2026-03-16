@@ -18,6 +18,7 @@ import javax.xml.bind.Unmarshaller;
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;
 import org.collectionspace.services.advancedsearch.mapper.CollectionObjectMapper;
+import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.AbstractCollectionSpaceResourceImpl;
@@ -50,6 +51,10 @@ public class AdvancedSearch
 	private final CollectionObjectResource cor = new CollectionObjectResource();
 	private final MediaResource mr = new MediaResource();
 	private final RelationResource relations = new RelationResource();
+
+	private static final String PAGE_SIZE = "1";
+	private static final String PAGE_NUM = "0";
+	private static final String MEDIA_SORT_BY = "media_common:title";
 
 	public AdvancedSearch() {
 		super();
@@ -88,15 +93,16 @@ public class AdvancedSearch
 		}
 
 		final CollectionObjectMapper responseMapper = new CollectionObjectMapper(unmarshaller);
+		final UriInfoWrapper relUriInfo = relationUriInfo(uriInfo);
 		for (CSDocumentModelResponse response : collectionObjectList.getResponseList()) {
 			String csid = response.getCsid();
-			UriInfoWrapper wrappedUriInfo = new UriInfoWrapper(uriInfo);
-			Map<String, String> blobInfo = findBlobInfo(csid, wrappedUriInfo);
+			UriInfoWrapper blobUriInfo = new UriInfoWrapper(uriInfo);
+			Map<String, String> blobInfo = findBlobInfo(csid, blobUriInfo);
 
 			AdvancedsearchListItem listItem = responseMapper.asListItem(response, blobInfo);
 			if (listItem != null) {
 				if (markRelated != null) {
-					RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, uriInfo);
+					RelationsCommonList relationsList = relations.getRelationForSubject(markRelated, csid, relUriInfo);
 					listItem.setRelated(!relationsList.getRelationListItem().isEmpty());
 				}
 				resultsList.getAdvancedsearchListItem().add(listItem);
@@ -112,6 +118,15 @@ public class AdvancedSearch
 		return resultsList;
 	}
 
+	private UriInfoWrapper relationUriInfo(final UriInfo uriInfo) {
+		final UriInfoWrapper wrapper = new UriInfoWrapper(uriInfo);
+		final MultivaluedMap<String, String> queryParameters = wrapper.getQueryParameters();
+		queryParameters.clear();
+		queryParameters.add(IClientQueryParams.PAGE_SIZE_PARAM, PAGE_SIZE);
+		queryParameters.add(IClientQueryParams.START_PAGE_PARAM, PAGE_NUM);
+		return wrapper;
+	}
+
 	/** 
 	 * Retrieves the blob CSIDs associated with a given object's CSID
 	 * 
@@ -123,9 +138,9 @@ public class AdvancedSearch
 		MultivaluedMap<String, String> wrappedQueryParams = wrappedUriInfo.getQueryParameters();
 		wrappedQueryParams.clear();
 		wrappedQueryParams.add(IQueryManager.SEARCH_RELATED_TO_CSID_AS_SUBJECT, csid);
-		wrappedQueryParams.add("pgSz", "1");
-		wrappedQueryParams.add("pgNum", "0");
-		wrappedQueryParams.add("sortBy", "media_common:title");
+		wrappedQueryParams.add(IClientQueryParams.PAGE_SIZE_PARAM, PAGE_SIZE);
+		wrappedQueryParams.add(IClientQueryParams.START_PAGE_PARAM, PAGE_NUM);
+		wrappedQueryParams.add(IClientQueryParams.ORDER_BY_PARAM, MEDIA_SORT_BY);
 		AbstractCommonList associatedMedia = mr.getList(wrappedUriInfo);
 		if (associatedMedia == null || associatedMedia.getListItem() == null) {
 			return Collections.emptyMap();
