@@ -1,0 +1,227 @@
+package org.collectionspace.services.authorization.perms;
+
+import java.util.Date;
+import java.util.List;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+
+import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
+import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "permission")
+@Entity(name = "Permission")
+@Table(name = "permissions")
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Permission {
+
+    protected String description;
+
+    @XmlElement(required = true)
+    protected String resourceName;
+
+    protected String attributeName;
+
+    protected String actionGroup;
+
+    @XmlElement(required = true)
+    protected List<PermissionAction> action;
+
+    @XmlElement(required = true)
+    protected EffectType effect;
+
+    protected String metadataProtection;
+
+    protected String actionsProtection;
+
+    @XmlElement(name = "tenant_id", required = true)
+    protected String tenantId;
+
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar createdAt;
+
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    protected XMLGregorianCalendar updatedAt;
+
+    @XmlAttribute(name = "csid")
+    protected String csid;
+
+    @Basic
+    @Column(name = "description", length = 255)
+    public String getDescription() {
+        return description;
+    }
+
+    public Permission setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "resource_name", nullable = false, length = 128)
+    public String getResourceName() {
+        return resourceName;
+    }
+
+    public Permission setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "attribute_name", nullable = true, length = 128)
+    public String getAttributeName() {
+        return attributeName;
+    }
+
+    public Permission setAttributeName(String attributeName) {
+        this.attributeName = attributeName;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "action_group", nullable = true, length = 128)
+    public String getActionGroup() {
+        return actionGroup;
+    }
+
+    public Permission setActionGroup(String actionGroup) {
+        this.actionGroup = actionGroup;
+        return this;
+    }
+
+    @OneToMany(
+        targetEntity = PermissionAction.class,
+        cascade = {CascadeType.ALL}
+    )
+    @JoinColumn(name = "ACTION__PERMISSION_CSID")
+    public List<PermissionAction> getAction() {
+        return action;
+    }
+
+    public Permission setAction(List<PermissionAction> action) {
+        this.action = action;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "effect", nullable = false, length = 32)
+    @Enumerated(EnumType.STRING)
+    public EffectType getEffect() {
+        return effect;
+    }
+
+    public Permission setEffect(EffectType effect) {
+        this.effect = effect;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "metadata_protection", nullable = true, length = 255)
+    public String getMetadataProtection() {
+        return metadataProtection;
+    }
+
+    public Permission setMetadataProtection(String metadataProtection) {
+        this.metadataProtection = metadataProtection;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "actions_protection", nullable = true, length = 255)
+    public String getActionsProtection() {
+        return actionsProtection;
+    }
+
+    public Permission setActionsProtection(String actionsProtection) {
+        this.actionsProtection = actionsProtection;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "tenant_id", nullable = false, length = 128)
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public Permission setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Transient
+    public XMLGregorianCalendar getCreatedAt() {
+        return createdAt;
+    }
+
+    public Permission setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    @Transient
+    public XMLGregorianCalendar getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Permission setUpdatedAt(XMLGregorianCalendar updatedAt) {
+        this.updatedAt = updatedAt;
+        return this;
+    }
+
+    @Id
+    @Column(name = "csid", nullable = false, length = 128)
+    public String getCsid() {
+        return csid;
+    }
+
+    public Permission setCsid(String csid) {
+        this.csid = csid;
+        return this;
+    }
+
+    @Basic
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getCreatedAtItem() {
+        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
+    }
+
+    public void setCreatedAtItem(Date target) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    }
+
+    @Basic
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getUpdatedAtItem() {
+        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
+    }
+
+    public void setUpdatedAtItem(Date target) {
+        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    }
+}
