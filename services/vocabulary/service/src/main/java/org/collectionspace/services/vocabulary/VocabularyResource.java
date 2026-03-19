@@ -76,7 +76,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends
