@@ -13,46 +13,31 @@
     <name>services.account.jaxb</name>
 
     <dependencies>
-
-        
-        
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>
-        <!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-        </dependency>
-        
-        <dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.jaxb</artifactId>
-			<version>${project.version}</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
-			<version>${project.version}</version>
+            <groupId>org.jvnet.jaxb</groupId>
+            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
+            <version>4.0.12</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
         <finalName>collectionspace-services-account-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
-        <plugins>
-        <!--
-            <plugin>
-                <groupId>org.jvnet.jaxb</groupId>
-                <artifactId>hyperjaxb3-ejb-plugin</artifactId>
-            </plugin>
-            -->
-        </plugins>
     </build>
 
 </project>
