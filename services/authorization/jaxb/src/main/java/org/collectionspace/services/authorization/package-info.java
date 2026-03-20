@@ -1,0 +1,1 @@
+package org.collectionspace.services.authorization;
