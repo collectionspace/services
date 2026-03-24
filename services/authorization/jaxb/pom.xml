@@ -77,10 +77,12 @@
         <finalName>collectionspace-services-authorization-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
         <plugins>
+        <!--
             <plugin>
                 <groupId>org.jvnet.jaxb</groupId>
                 <artifactId>hyperjaxb3-ejb-plugin</artifactId>
-            </plugin>
+                </plugin>
+                -->
         </plugins>
     </build>
 

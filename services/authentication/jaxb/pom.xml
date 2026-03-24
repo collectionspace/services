@@ -42,11 +42,12 @@
         <finalName>collectionspace-services-authentication-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
         <plugins>
+        <!--
             <plugin>
-                <!-- maven-hyperjaxb3-plugin generates jaxb + jpa bindings -->
                 <groupId>org.jvnet.jaxb</groupId>
                 <artifactId>hyperjaxb3-ejb-plugin</artifactId>
             </plugin>
+            -->
 
         </plugins>
     </build>
