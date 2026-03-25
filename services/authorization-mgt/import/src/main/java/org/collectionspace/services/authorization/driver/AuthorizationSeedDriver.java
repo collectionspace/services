@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -78,7 +79,8 @@ public class AuthorizationSeedDriver {
     private String tenantBindingFile;
     private String exportDir;
     private AuthorizationGen authzGen;
-    private org.springframework.jdbc.datasource.DataSourceTransactionManager txManager;
+    private DataSourceTransactionManager txManager;
+    private ClassPathXmlApplicationContext appContext;
 
     /**
      * AuthorizationSeedDriver
@@ -164,6 +166,15 @@ public class AuthorizationSeedDriver {
                 commitTransaction(status);
             }
             logout();
+        }
+    }
+
+    /**
+     * Close the application context to allow for a clean shutdown of the ImportAuthz application.
+     */
+    public void close() {
+        if (appContext != null && appContext.isActive()) {
+            appContext.close();
         }
     }
 

@@ -37,6 +37,7 @@ import org.apache.commons.cli.ParseException;
 import org.collectionspace.services.authorization.driver.AuthorizationSeedDriver;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,9 +141,9 @@ public class ImportAuthz {
     // Create our AuthZ metadata
     //
     public static void main(String[] args) throws TransactionException {
-
         Options options = createOptions();
 
+        AuthorizationSeedDriver driver = null;
         CommandLineParser parser = new GnuParser();
         JPATransactionContext jpaTransactionContext = new JPATransactionContext();
         try {
@@ -161,8 +162,7 @@ public class ImportAuthz {
             //
             // Instantiate an AuthZ seed driver and ask it to generate our AuthZ metadata
             //
-            AuthorizationSeedDriver driver = new AuthorizationSeedDriver(
-                    user, password, tenantBinding, exportDir);
+            driver = new AuthorizationSeedDriver(user, password, tenantBinding, exportDir);
         	jpaTransactionContext.beginTransaction();
             driver.generate(jpaTransactionContext);
             logger.info("Finished processing all tenant bindings files and generating all AuthN/AuthZ metadata.");
@@ -190,6 +190,10 @@ public class ImportAuthz {
             System.exit(1);
         } finally {
         	jpaTransactionContext.close();
+            JpaStorageUtils.releaseEntityManagerFactories();
+            if (driver != null) {
+                driver.close();
+            }
         }
     }
 }
