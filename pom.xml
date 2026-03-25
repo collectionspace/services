@@ -1193,7 +1193,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.4.0.GA</version>
+				<version>5.6.15.Final</version>
 				<exclusions>
 					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
 					<exclusion>
@@ -1205,7 +1205,7 @@
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-c3p0</artifactId>
-				<version>3.6.10.Final</version>
+				<version>5.6.15.Final</version>
 			</dependency>
 
 			<dependency>
