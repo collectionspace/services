@@ -11,9 +11,9 @@
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://127.0.0.1:5432/cspace_default" />
-            <property name="javax.persistence.jdbc.user" value="cspace_default" />
-            <property name="javax.persistence.jdbc.password" value="cspace" />
+            <property name="javax.persistence.jdbc.url" value="@DB_CSPACE_URL@" />
+            <property name="javax.persistence.jdbc.user" value="@DB_CSPACE_USER@" />
+            <property name="javax.persistence.jdbc.password" value="@DB_CSPACE_PASSWORD@" />
             <property name="hibernate.show_sql" value="true" />
         </properties>
     </persistence-unit>
