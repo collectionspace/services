@@ -14,10 +14,11 @@
 
 	<properties>
 		<annox.version>0.5.0</annox.version>
-		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>2.0.14</maven-jaxb2-plugin.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
 		<jaxb.codegen.phase>generate-sources</jaxb.codegen.phase>
+		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
 	</properties>
 
 	<!--
@@ -183,9 +184,9 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.jvnet.hyperjaxb3</groupId>
-					<artifactId>maven-hyperjaxb3-plugin</artifactId>
-					<version>0.6.0</version>
+					<groupId>org.jvnet.jaxb</groupId>
+					<artifactId>hyperjaxb3-ejb-plugin</artifactId>
+					<version>2.0.14</version>
 					<executions>
 						<execution>
 							<goals>
@@ -207,8 +208,8 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.jvnet.jaxb2.maven2</groupId>
-					<artifactId>maven-jaxb2-plugin</artifactId>
+					<groupId>org.jvnet.jaxb</groupId>
+					<artifactId>jaxb-maven-plugin</artifactId>
 					<version>${maven-jaxb2-plugin.version}</version>
 					<executions>
 						<execution>
@@ -230,6 +231,7 @@
 								<args>
 									<arg>-extension</arg>
 									<arg>-Xnamespace-prefix</arg>
+									<arg>-Xinject-listener-code</arg>
 									<arg>-Xannotate</arg>
 									<arg>-verbose</arg>
 									<!-- <arg>-XtoString</arg> -->
@@ -239,30 +241,27 @@
 								</args>
 								<plugins>
 									<plugin>
-										<groupId>javax.xml.bind</groupId>
-										<artifactId>jaxb-api</artifactId>
-										<version>${jaxb.version}</version>
+										<groupId>jakarta.xml.bind</groupId>
+										<artifactId>jakarta.xml.bind-api</artifactId>
+										<version>${xml-bind.version}</version>
 									</plugin>
 									<plugin>
 										<groupId>org.jvnet.jaxb2_commons</groupId>
 										<artifactId>jaxb2-basics-annotate</artifactId>
-										<version>${jaxb2-basics.version}</version>
+										<version>1.1.0</version>
 									</plugin>
 									<plugin>
 										<groupId>org.jvnet.jaxb2_commons</groupId>
 										<artifactId>jaxb2-basics</artifactId>
 										<version>${jaxb2-basics.version}</version>
 									</plugin>
+
 								</plugins>
 							</configuration>
 						</execution>
 					</executions>
 					<dependencies>
-						<dependency>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-namespace-prefix</artifactId>							<!-- Used to force a specific namespace prefix specified in src/main/resource/bindings.xml -->
-							<version>1.4-SNAPSHOT</version>
-						</dependency>
+						
 					</dependencies>
 				</plugin>
 				<plugin>

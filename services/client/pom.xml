@@ -78,12 +78,7 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-		    <groupId>com.sun.xml.bind</groupId>
-		    <artifactId>jaxb-core</artifactId>
-		    <type>jar</type>
-		    <scope>compile</scope>
-		</dependency>
+        
         <dependency>
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>

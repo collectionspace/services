@@ -145,14 +145,8 @@
 			<artifactId>persistence-api</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.jaxb2-commons</groupId>
-			<artifactId>property-listener-injector</artifactId>
-		</dependency>
+		
+		
 
 		<!-- jboss -->
 		<dependency>

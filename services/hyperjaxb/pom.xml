@@ -49,8 +49,8 @@
 		</dependency>
 		 -->
 		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
     <!-- Dependencies for HyperJaxB -->
 		<dependency>
@@ -66,10 +66,7 @@
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 		</dependency>
-		<dependency>
-		    <groupId>org.jvnet.hyperjaxb3</groupId>
-		    <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-		</dependency>
+		
   </dependencies>
 
   <build>
@@ -77,10 +74,12 @@
     <defaultGoal>install</defaultGoal>
 
     <plugins>
-		<plugin>
-		    <groupId>org.jvnet.hyperjaxb3</groupId>
-		    <artifactId>maven-hyperjaxb3-plugin</artifactId>
-		</plugin>
+    <!--
+      <plugin>
+       <groupId>org.jvnet.jaxb</groupId>
+       <artifactId>hyperjaxb3-ejb-plugin</artifactId>
+      </plugin>
+      -->
     </plugins>
   </build>
 
