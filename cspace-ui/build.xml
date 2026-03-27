@@ -11,7 +11,14 @@
 		</sequential>
 	</macrodef>
 
-	<scriptdef name="uppercase" language="javascript">
+  <path id="javax.classpath">
+    <!-- The subant calls in this file make it so we're required to traverse based off the ${tenant} directory -->
+    <fileset dir="../../3rdparty/ant/target/dependency">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+	<scriptdef name="uppercase" language="javascript" manager="javax" classpathref="javax.classpath">
 		<attribute name="property" />
 		<attribute name="string" />
 
@@ -73,6 +80,7 @@
 	</target>
 
 	<target name="deploy_cspace_ui_js" depends="build_cspace_ui_js,download_cspace_ui_js">
+    <echo message="${services.trunk}" />
 		<pathconvert property="cspace.ui.install.filename" targetos="unix">
 			<first>
 				<fileset dir="${staging.dir}" includes="${cspace.ui.library.name}@*.min.js" />
@@ -135,14 +143,18 @@
 	</target>
 
 	<target name="deploy_tenants" depends="deploy_cspace_ui_js,deploy_cspace_public_browser_js">
+    <echo message="${services.trunk}"/>
 		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
 			<dirset dir="." includes="*" excludes="${build.dir.name}" />
 		</subant>
 	</target>
 
 	<target name="deploy_tenant">
+    <echo message="${services.trunk}"/>
 		<basename property="tenant.shortname" file="${basedir}" />
+    <echo message="hi"/>
 		<uppercase property="tenant.shortname.upper" string="${tenant.shortname}" />
+    <echo message="hii"/>
 		<propertycopy name="tenant.create.disabled" from="env.CSPACE_${tenant.shortname.upper}_CREATE_DISABLED_OPT" />
 
 		<property file="${basedir}/build.properties" />

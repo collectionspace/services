@@ -3,6 +3,7 @@
 	<!-- environment should be declared before reading build.properties -->
 	<property environment="env" />
 	<!-- set global properties for this build -->
+	<property name="services.trunk" value="." />
 	<property file="build.properties" />
 	<property name="mvn.opts" value="-V" />
 	<property name="src" location="src" />
@@ -14,7 +15,13 @@
 		<os family="windows" />
 	</condition>
 
-  <scriptdef name="urlencode" language="javascript">
+  <path id="javax.classpath">
+    <fileset dir="${services.trunk}/3rdparty/ant/target/dependency">
+      <include name="*.jar" />
+    </fileset>
+  </path>
+
+  <scriptdef name="urlencode" language="javascript" manager="javax" classpathref="javax.classpath">
     <attribute name="property"/>
     <![CDATA[
       var value = self.project.getProperty(attributes.get("property"));
