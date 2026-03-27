@@ -53,7 +53,6 @@
 
     <target name="package" depends="package-unix,package-windows"
   description="Package CollectionSpace Services" />
-    <urlencode property="db.jdbc.urloptions" />
     <target name="package-unix" if="osfamily-unix">
         <exec executable="mvn" failonerror="true">
             <arg value="package" />
@@ -77,7 +76,6 @@
             <arg value="${mvn.opts}" />
         </exec>
     </target>
-
 
     <target name="clean" depends="clean-unix,clean-windows"
   description="Delete target directories" >

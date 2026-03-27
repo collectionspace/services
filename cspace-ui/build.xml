@@ -11,22 +11,7 @@
 		</sequential>
 	</macrodef>
 
-  <path id="javax.classpath">
-    <!-- The subant calls in this file make it so we're required to traverse based off the ${tenant} directory -->
-    <fileset dir="../../3rdparty/ant/target/dependency">
-      <include name="*.jar" />
-    </fileset>
-  </path>
-
-	<scriptdef name="uppercase" language="javascript" manager="javax" classpathref="javax.classpath">
-		<attribute name="property" />
-		<attribute name="string" />
-
-		project.setProperty(attributes.get("property"), attributes.get("string").toUpperCase());
-	</scriptdef>
-
 	<!-- set global properties for this build -->
-	<property name="services.trunk" value=".." />
 	<property name="build.dir.name" value="build" />
 	<property name="build.dir" value="./${build.dir.name}" />
 	<property name="source.dir" value="${build.dir}/source" />
@@ -150,11 +135,23 @@
 	</target>
 
 	<target name="deploy_tenant">
-    <echo message="${services.trunk}"/>
 		<basename property="tenant.shortname" file="${basedir}" />
-    <echo message="hi"/>
+    <path id="javax.classpath">
+      <!-- The subant calls in this file make it so we're required to traverse based off the ${tenant} directory -->
+      <fileset dir="../../3rdparty/ant">
+        <include name="**/*.jar" />
+      </fileset>
+    </path>
+
+    <scriptdef name="uppercase" language="javascript" manager="javax" classpathref="javax.classpath">
+      <attribute name="property" />
+      <attribute name="string" />
+
+      project.setProperty(attributes.get("property"), attributes.get("string").toUpperCase());
+    </scriptdef>
+
+
 		<uppercase property="tenant.shortname.upper" string="${tenant.shortname}" />
-    <echo message="hii"/>
 		<propertycopy name="tenant.create.disabled" from="env.CSPACE_${tenant.shortname.upper}_CREATE_DISABLED_OPT" />
 
 		<property file="${basedir}/build.properties" />
