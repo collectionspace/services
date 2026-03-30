@@ -12,6 +12,7 @@
 	</macrodef>
 
 	<!-- set global properties for this build -->
+	<property name="services.trunk" value=".." />
 	<property name="build.dir.name" value="build" />
 	<property name="build.dir" value="./${build.dir.name}" />
 	<property name="source.dir" value="${build.dir}/source" />
