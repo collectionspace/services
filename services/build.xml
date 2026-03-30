@@ -145,9 +145,9 @@
 
     <target name="import"
             description="import default configuration">
-      <ant antfile="authorization-mgt/build.xml" target="import" inheritAll="false">
-        <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
-      </ant>
+        <ant antfile="authorization-mgt/build.xml" target="import" inheritAll="false">
+            <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+        </ant>
     </target>
 
     <!-- this target is called in order based on the dependencies between the services -->
@@ -202,10 +202,10 @@
         <ant antfile="publicitem/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="uoc/build.xml" target="deploy" inheritAll="false"/>
         <ant antfile="transport/build.xml" target="deploy" inheritAll="false"/>
-    	<ant antfile="advancedsearch/build.xml" target="deploy" inheritAll="false"/>
-      <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false">
-        <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
-      </ant>
+        <ant antfile="advancedsearch/build.xml" target="deploy" inheritAll="false"/>
+        <ant antfile="JaxRsServiceProvider/build.xml" target="deploy" inheritAll="false">
+          <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+        </ant>
     </target>
 
     <!-- this target is called in reverse order of deploy targets -->

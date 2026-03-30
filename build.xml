@@ -327,8 +327,8 @@
 
 	<target name="import" depends="encode-jdbc-options" description="import default configuration">
 		<ant antfile="services/build.xml" target="import" inheritAll="false">
-      <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
-    </ant>
+			<property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+		</ant>
 	</target>
 
 	<target name="deploy" depends="install, setup_initdb.sql, encode-jdbc-options" description="deploy services in ${jee.server.cspace}">
@@ -338,9 +338,9 @@
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false" />
 		<ant antfile="common-lib/build.xml" target="deploy" inheritAll="false" />
-    <ant antfile="services/build.xml" target="deploy" inheritAll="false">
-      <property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
-    </ant>
+		<ant antfile="services/build.xml" target="deploy" inheritAll="false">
+			<property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+		</ant>
 		<ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
 	</target>
 
