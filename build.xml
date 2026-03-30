@@ -15,11 +15,11 @@
 		<os family="windows" />
 	</condition>
 
-  <target name="prepare-ant">
-    <ant antfile="3rdparty/ant/build.xml" target="prepare-ant" inheritAll="false" />
+  <target name="prepare-ant-libs">
+    <ant antfile="3rdparty/ant/build.xml" target="prepare-ant-libs" inheritAll="false" />
   </target>
 
-  <target name="encode-jdbc-options" depends="prepare-ant">
+  <target name="encode-jdbc-options" depends="prepare-ant-libs">
     <path id="javax.classpath">
       <fileset dir="${services.trunk}/3rdparty/ant/target/dependency">
         <include name="*.jar" />

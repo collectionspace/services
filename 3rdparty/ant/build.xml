@@ -1,13 +1,13 @@
 <project name="ant-libs" default="prepare-ant" basedir=".">
   <description>Collectionspace Services - Ant Libs</description>
 
-  <target name="prepare-ant">
+  <target name="prepare-ant-libs">
     <exec executable="mvn" failonerror="true">
       <arg value="dependency:copy-dependencies"/>
     </exec>
   </target>
 
-  <target name="test-classpath" depends="prepare-ant">
+  <target name="test-classpath" depends="prepare-ant-libs">
     <path id="javax.classpath">
       <fileset dir="./target/dependency">
         <include name="*.jar" />
