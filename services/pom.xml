@@ -224,7 +224,7 @@
 									<arg>-XtoString</arg>
 									<arg>-Xequals</arg>
 									<arg>-XhashCode</arg>
-									<arg>-Xcopyable</arg>
+									<arg>-Xnamespace-prefix</arg>
 								</args>
 								<plugins>
 									<plugin>
