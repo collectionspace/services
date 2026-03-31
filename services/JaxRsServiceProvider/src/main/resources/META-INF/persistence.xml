@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<persistence version="1.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd
-	http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
-	xmlns="http://java.sun.com/xml/ns/persistence" 
-	xmlns:orm="http://java.sun.com/xml/ns/persistence/orm"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<persistence version="2.0"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
+             xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <persistence-unit name="org.collectionspace.services">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<!-- Until our JNDI issue with Nuxeo is resolved, we can't use this datasource element
@@ -20,17 +19,15 @@
         <class>org.collectionspace.services.authorization.PermissionRoleRel</class>
         <class>org.collectionspace.services.authorization.Role</class>
         <class>org.collectionspace.services.authorization.AccountRoleRel</class>
-        
-        <properties>
-			<property name="hibernate.dialect" value="${db.dialect}"/>
-            <property name="hibernate.max_fetch_depth" value="3"/>
-			<!-- Until our JNDI issue with Nuxeo is resolved, we have to use these JDBC properties rather than a datasource -->
-			<property name="hibernate.connection.driver_class" value="${db.jdbc.driver.class}"/>
-			<property name="hibernate.connection.username" value="${db.cspace.user}"/>
-			<property name="hibernate.connection.password" value="${db.cspace.user.password}"/>
-			<property name="hibernate.connection.url" value="${db.jdbc.cspace.url.encoded}"/>
-            <!--property name="hibernate.hbm2ddl.auto" value="create-drop"/-->
 
+        <properties>
+            <property name="hibernate.dialect" value="${db.dialect}"/>
+            <property name="hibernate.max_fetch_depth" value="3"/>
+            <!-- Until our JNDI issue with Nuxeo is resolved, we have to use these JDBC properties rather than a datasource -->
+            <property name="javax.persistence.jdbc.driver" value="${db.jdbc.driver.class}"/>
+            <property name="javax.persistence.jdbc.user" value="${db.cspace.user}"/>
+            <property name="javax.persistence.jdbc.password" value="${db.cspace.user.password}"/>
+            <property name="javax.persistence.jdbc.url" value="${db.jdbc.cspace.url.encoded}"/>
             <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider"/>
             <property name="hibernate.c3p0.max_size" value="8"/>
         </properties>
