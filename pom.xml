@@ -76,22 +76,6 @@
 			</snapshots>
 		</repository>
 
-		<!-- <repository>
-			<id>nuxeo-public-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository> -->
-
-		<!-- <repository>
-			<id>nuxeo-vendor-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository> -->
-
 		<!-- CSpace copy of nuxeo-public-releases repo. -->
 		<repository>
 			<id>cspace-nuxeo-public-releases</id>
@@ -575,12 +559,12 @@
 			<dependency>
 				<groupId>org.nuxeo.lib.runtime</groupId>
 				<artifactId>nuxeo-runtime-launcher</artifactId>
-				<version>9.10-HF30</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.lib.runtime</groupId>
 				<artifactId>nuxeo-runtime-tomcat-adapter</artifactId>
-				<version>9.10-HF30</version>
+				<version>${nuxeo.general.release}</version>
 				<scope>provided</scope>
 			</dependency>
 
