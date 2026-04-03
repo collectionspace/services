@@ -16,16 +16,8 @@
 
   <repositories>
     <repository>
-      <id>nuxeo-public-releases</id>
-      <url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>nuxeo-vendor-releases</id>
-      <url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
+      <id>nuxeo-public-lts</id>
+      <url>https://packages.nuxeo.com/repositories/maven-public-lts</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -34,26 +26,14 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>internal-releases</id>
-      <url>https://mavenin.nuxeo.com/nexus/content/groups/internal-releases</url>
+      <id>nuxeo-public-lts</id>
+      <url>https://packages.nuxeo.com/repositories/maven-public-lts</url>
       <name>Nuxeo virtual release repository</name>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
         <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>internal-snapshots</id>
-      <url>https://mavenin.nuxeo.com/nexus/content/groups/internal-snapshots</url>
-      <name>Nuxeo virtual snapshot repository</name>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <updatePolicy>always</updatePolicy>
-        <enabled>true</enabled>
       </snapshots>
     </pluginRepository>
   </pluginRepositories>
