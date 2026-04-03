@@ -689,7 +689,7 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -716,7 +716,7 @@
         <dependency>
     		<groupId>org.nuxeo.ecm.platform</groupId>
           	<artifactId>nuxeo-platform-commandline-executor</artifactId>
-            <version>${nuxeo.core.version}</version>
+            <version>${nuxeo.general.release}</version>
             <scope>provided</scope>
             <exclusions>
             	<exclusion>
@@ -728,27 +728,27 @@
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-login</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-audit-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <!-- Needed by nuxeo-core and nuxeo-platform-imaging-core, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
         <dependency>

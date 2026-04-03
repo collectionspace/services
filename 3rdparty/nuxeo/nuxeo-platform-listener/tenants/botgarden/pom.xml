@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-storage-sql</artifactId>
-            <version>${nuxeo.core.version}</version>
+            <version>${nuxeo.general.release}</version>
         </dependency>
 	    <dependency>
             <groupId>org.collectionspace.services</groupId>

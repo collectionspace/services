@@ -230,22 +230,22 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-binary-metadata</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.lib.runtime</groupId>
 			<artifactId>nuxeo-runtime-launcher</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-types</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.common</groupId>
@@ -263,7 +263,7 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-query</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -286,7 +286,7 @@
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
