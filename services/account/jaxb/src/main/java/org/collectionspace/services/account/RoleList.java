@@ -32,8 +32,4 @@ public class RoleList {
         return ((this.role!= null)&&(!this.role.isEmpty()));
     }
 
-    public void unsetRole() {
-        this.role = null;
-    }
-
 }

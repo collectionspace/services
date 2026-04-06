@@ -26,10 +26,6 @@ public class TenantListItem {
         this.id = value;
     }
 
-    public boolean isSetId() {
-        return (this.id!= null);
-    }
-
     public String getName() {
         return name;
     }
@@ -48,10 +44,6 @@ public class TenantListItem {
 
     public void setDisabled(boolean value) {
         this.disabled = value;
-    }
-
-    public boolean isSetDisabled() {
-        return true;
     }
 
 }

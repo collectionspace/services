@@ -35,8 +35,4 @@ public class AccountsCommonList extends AbstractCommonList {
         return ((this.accountListItem!= null)&&(!this.accountListItem.isEmpty()));
     }
 
-    public void unsetAccountListItem() {
-        this.accountListItem = null;
-    }
-
 }

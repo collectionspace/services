@@ -107,7 +107,7 @@ public class AccountsCommon {
     }
 
     @Basic
-    @Column(name = "person_ref_name", length = 255)
+    @Column(name = "person_ref_name")
     public String getPersonRefName() {
         return personRefName;
     }
@@ -116,13 +116,8 @@ public class AccountsCommon {
         this.personRefName = value;
     }
 
-    @Transient
-    public boolean isSetPersonRefName() {
-        return (this.personRefName!= null);
-    }
-
     @Basic
-    @Column(name = "email", nullable = false, length = 255)
+    @Column(name = "email", nullable = false)
     public String getEmail() {
         return email;
     }
@@ -131,13 +126,8 @@ public class AccountsCommon {
         this.email = value;
     }
 
-    @Transient
-    public boolean isSetEmail() {
-        return (this.email!= null);
-    }
-
     @Basic
-    @Column(name = "phone", nullable = true, length = 255)
+    @Column(name = "phone")
     public String getPhone() {
         return phone;
     }
@@ -146,24 +136,14 @@ public class AccountsCommon {
         this.phone = value;
     }
 
-    @Transient
-    public boolean isSetPhone() {
-        return (this.phone!= null);
-    }
-
     @Basic
-    @Column(name = "mobile", nullable = true, length = 255)
+    @Column(name = "mobile")
     public String getMobile() {
         return mobile;
     }
 
     public void setMobile(String value) {
         this.mobile = value;
-    }
-
-    @Transient
-    public boolean isSetMobile() {
-        return (this.mobile!= null);
     }
 
     @Basic
@@ -189,11 +169,6 @@ public class AccountsCommon {
         this.password = value;
     }
 
-    @Transient
-    public boolean isSetPassword() {
-        return (this.password!= null);
-    }
-
     @Basic
     @Column(name = "require_sso")
     public Boolean isRequireSSO() {
@@ -202,11 +177,6 @@ public class AccountsCommon {
 
     public void setRequireSSO(Boolean value) {
         this.requireSSO = value;
-    }
-
-    @Transient
-    public boolean isSetRequireSSO() {
-        return (this.requireSSO!= null);
     }
 
     @NonNull
@@ -230,10 +200,6 @@ public class AccountsCommon {
         return ((this.tenants!= null)&&(!this.tenants.isEmpty()));
     }
 
-    public void unsetTenants() {
-        this.tenants = null;
-    }
-
     @Basic
     @Column(name = "status", nullable = false, length = 15)
     @Enumerated(EnumType.STRING)
@@ -251,7 +217,7 @@ public class AccountsCommon {
     }
 
     @Basic
-    @Column(name = "metadata_protection", nullable = true, length = 255)
+    @Column(name = "metadata_protection")
     public String getMetadataProtection() {
         return metadataProtection;
     }
@@ -260,24 +226,14 @@ public class AccountsCommon {
         this.metadataProtection = value;
     }
 
-    @Transient
-    public boolean isSetMetadataProtection() {
-        return (this.metadataProtection!= null);
-    }
-
     @Basic
-    @Column(name = "roles_protection", nullable = true, length = 255)
+    @Column(name = "roles_protection")
     public String getRolesProtection() {
         return rolesProtection;
     }
 
     public void setRolesProtection(String value) {
         this.rolesProtection = value;
-    }
-
-    @Transient
-    public boolean isSetRolesProtection() {
-        return (this.rolesProtection!= null);
     }
 
     @Transient
@@ -290,11 +246,6 @@ public class AccountsCommon {
     }
 
     @Transient
-    public boolean isSetCreatedAt() {
-        return (this.createdAt!= null);
-    }
-
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
@@ -304,22 +255,12 @@ public class AccountsCommon {
     }
 
     @Transient
-    public boolean isSetUpdatedAt() {
-        return (this.updatedAt!= null);
-    }
-
-    @Transient
     public RoleList getRoleList() {
         return roleList;
     }
 
     public void setRoleList(RoleList value) {
         this.roleList = value;
-    }
-
-    @Transient
-    public boolean isSetRoleList() {
-        return (this.roleList!= null);
     }
 
     @Id

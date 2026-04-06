@@ -64,20 +64,12 @@ public class AccountListItem {
         this.userid = value;
     }
 
-    public boolean isSetUserid() {
-        return (this.userid!= null);
-    }
-
     public String getTenantid() {
         return tenantid;
     }
 
     public void setTenantid(String value) {
         this.tenantid = value;
-    }
-
-    public boolean isSetTenantid() {
-        return (this.tenantid!= null);
     }
 
     @NonNull
@@ -96,20 +88,12 @@ public class AccountListItem {
         return ((this.tenants!= null)&&(!this.tenants.isEmpty()));
     }
 
-    public void unsetTenants() {
-        this.tenants = null;
-    }
-
     public String getPersonRefName() {
         return personRefName;
     }
 
     public void setPersonRefName(String value) {
         this.personRefName = value;
-    }
-
-    public boolean isSetPersonRefName() {
-        return (this.personRefName!= null);
     }
 
     public String getEmail() {
@@ -120,20 +104,12 @@ public class AccountListItem {
         this.email = value;
     }
 
-    public boolean isSetEmail() {
-        return (this.email!= null);
-    }
-
     public Boolean isRequireSSO() {
         return requireSSO;
     }
 
     public void setRequireSSO(Boolean value) {
         this.requireSSO = value;
-    }
-
-    public boolean isSetRequireSSO() {
-        return (this.requireSSO!= null);
     }
 
     public Status getStatus() {

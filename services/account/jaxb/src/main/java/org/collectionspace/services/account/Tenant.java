@@ -63,13 +63,8 @@ public class Tenant {
         this.id = value;
     }
 
-    @Transient
-    public boolean isSetId() {
-        return (this.id!= null);
-    }
-
     @Basic
-    @Column(name = "name", nullable = false, length = 255)
+    @Column(name = "name", nullable = false)
     public String getName() {
         return name;
     }
@@ -84,18 +79,13 @@ public class Tenant {
     }
 
     @Basic
-    @Column(name = "config_md5hash", length = 255)
+    @Column(name = "config_md5hash")
     public String getConfigMD5Hash() {
         return configMD5Hash;
     }
 
     public void setConfigMD5Hash(String value) {
         this.configMD5Hash = value;
-    }
-
-    @Transient
-    public boolean isSetConfigMD5Hash() {
-        return (this.configMD5Hash!= null);
     }
 
     @Basic
@@ -106,11 +96,6 @@ public class Tenant {
 
     public void setAuthoritiesInitialized(boolean value) {
         this.authoritiesInitialized = value;
-    }
-
-    @Transient
-    public boolean isSetAuthoritiesInitialized() {
-        return true;
     }
 
     @Basic
@@ -124,11 +109,6 @@ public class Tenant {
     }
 
     @Transient
-    public boolean isSetDisabled() {
-        return true;
-    }
-
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -138,22 +118,12 @@ public class Tenant {
     }
 
     @Transient
-    public boolean isSetCreatedAt() {
-        return (this.createdAt!= null);
-    }
-
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
     public void setUpdatedAt(XMLGregorianCalendar value) {
         this.updatedAt = value;
-    }
-
-    @Transient
-    public boolean isSetUpdatedAt() {
-        return (this.updatedAt!= null);
     }
 
     @Basic

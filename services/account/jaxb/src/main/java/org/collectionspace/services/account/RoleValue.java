@@ -32,10 +32,6 @@ public class RoleValue {
         this.roleRelationshipId = value;
     }
 
-    public boolean isSetRoleRelationshipId() {
-        return (this.roleRelationshipId!= null);
-    }
-
     public String getRoleId() {
         return roleId;
     }

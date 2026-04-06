@@ -36,8 +36,4 @@ public class TenantsList extends AbstractCommonList {
         return ((this.tenantListItem!= null)&&(!this.tenantListItem.isEmpty()));
     }
 
-    public void unsetTenantListItem() {
-        this.tenantListItem = null;
-    }
-
 }
