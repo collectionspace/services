@@ -9,15 +9,13 @@
     
 -->
 
-<xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="1.0" elementFormDefault="unqualified"
-    xmlns:ns="http://collectionspace.org/services/organization"
-    xmlns="http://collectionspace.org/services/organization"
-    targetNamespace="http://collectionspace.org/services/organization"
-    version="0.2"
-	>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+  xmlns="http://collectionspace.org/services/organization"
+  targetNamespace="http://collectionspace.org/services/organization"
+  version="0.2"
+>
     
     <!--
         Avoid XmlRootElement nightmare:
@@ -46,4 +44,3 @@
     </xs:element>
     
 </xs:schema>
-

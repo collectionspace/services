@@ -7,17 +7,21 @@
         <artifactId>org.collectionspace.services.collectionobject</artifactId>
         <version>${revision}</version>
     </parent>
-    
+
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.collectionobject.jaxb</artifactId>
     <name>services.collectionobject.jaxb</name>
-    
+
     <dependencies>
         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>        
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jvnet.jaxb</groupId>
+            <artifactId>jaxb-plugins-runtime</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -26,7 +30,7 @@
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb</groupId>
-                <artifactId>jaxb-maven-plugin</artifactId>             
+                <artifactId>jaxb-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
