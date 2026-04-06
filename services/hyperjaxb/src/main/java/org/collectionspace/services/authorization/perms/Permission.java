@@ -37,38 +37,38 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Permission {
 
-    protected String description;
+    private String description;
 
     @XmlElement(required = true)
-    protected String resourceName;
+    private String resourceName;
 
-    protected String attributeName;
+    private String attributeName;
 
-    protected String actionGroup;
-
-    @XmlElement(required = true)
-    protected List<PermissionAction> action;
+    private String actionGroup;
 
     @XmlElement(required = true)
-    protected EffectType effect;
+    private List<PermissionAction> action;
 
-    protected String metadataProtection;
+    @XmlElement(required = true)
+    private EffectType effect;
 
-    protected String actionsProtection;
+    private String metadataProtection;
+
+    private String actionsProtection;
 
     @XmlElement(name = "tenant_id", required = true)
-    protected String tenantId;
+    private String tenantId;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private XMLGregorianCalendar createdAt;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar updatedAt;
+    private XMLGregorianCalendar updatedAt;
 
     @XmlAttribute(name = "csid")
-    protected String csid;
+    private String csid;
 
     @Basic
     @Column(name = "description", length = 255)

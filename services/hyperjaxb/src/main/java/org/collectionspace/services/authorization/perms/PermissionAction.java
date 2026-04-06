@@ -27,16 +27,16 @@ import jakarta.xml.bind.annotation.XmlType;
 public class PermissionAction {
 
     @XmlElement(required = true)
-    protected ActionType name;
+    private ActionType name;
 
     @XmlElement(required = true)
-    protected String objectIdentity;
+    private String objectIdentity;
 
     @XmlElement(required = true)
-    protected String objectIdentityResource;
+    private String objectIdentityResource;
 
     @XmlAttribute(name = "Hjid")
-    protected Long hjid;
+    private Long hjid;
 
     @Basic
     @Column(name = "name", nullable = false, length = 128)

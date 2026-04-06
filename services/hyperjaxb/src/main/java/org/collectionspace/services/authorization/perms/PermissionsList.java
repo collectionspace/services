@@ -15,19 +15,19 @@ import jakarta.xml.bind.annotation.XmlType;
 public class PermissionsList {
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long pageNum;
+    private long pageNum;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long pageSize;
+    private long pageSize;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long itemsInPage;
+    private long itemsInPage;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long totalItems;
+    private long totalItems;
 
     @XmlElement(required = true)
-    protected List<Permission> permission;
+    private List<Permission> permission;
 
     public long getPageNum() {
         return pageNum;
