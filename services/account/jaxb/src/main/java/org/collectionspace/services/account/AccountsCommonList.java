@@ -9,6 +9,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.jspecify.annotations.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -18,6 +19,7 @@ public class AccountsCommonList extends AbstractCommonList {
     @XmlElement(name = "account-list-item", required = true)
     protected List<AccountListItem> accountListItem;
 
+    @NonNull
     public List<AccountListItem> getAccountListItem() {
         if (accountListItem == null) {
             accountListItem = new ArrayList<>();
