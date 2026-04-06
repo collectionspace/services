@@ -1,6 +1,7 @@
 package org.collectionspace.services.account;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -177,4 +178,23 @@ public class Tenant {
         setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Tenant tenant = (Tenant) o;
+        return authoritiesInitialized == tenant.authoritiesInitialized
+               && disabled == tenant.disabled
+               && Objects.equals(id, tenant.id)
+               && Objects.equals(name, tenant.name)
+               && Objects.equals(configMD5Hash, tenant.configMD5Hash)
+               && Objects.equals(createdAt, tenant.createdAt)
+               && Objects.equals(updatedAt, tenant.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, configMD5Hash, authoritiesInitialized, disabled, createdAt, updatedAt);
+    }
 }

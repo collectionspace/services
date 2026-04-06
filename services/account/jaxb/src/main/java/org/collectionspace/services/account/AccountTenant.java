@@ -1,5 +1,6 @@
 package org.collectionspace.services.account;
 
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -57,4 +58,17 @@ public class AccountTenant {
         this.hjid = value;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AccountTenant that = (AccountTenant) o;
+        return Objects.equals(tenantId, that.tenantId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(tenantId);
+    }
 }

@@ -1,8 +1,10 @@
 package org.collectionspace.services.account;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -355,4 +357,34 @@ public class AccountsCommon {
         setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AccountsCommon that = (AccountsCommon) o;
+        return Objects.equals(screenName, that.screenName)
+               && Objects.equals(personRefName, that.personRefName)
+               && Objects.equals(email, that.email)
+               && Objects.equals(phone, that.phone)
+               && Objects.equals(mobile, that.mobile)
+               && Objects.equals(userId, that.userId)
+               && Objects.deepEquals(password, that.password)
+               && Objects.equals(requireSSO, that.requireSSO)
+               && Objects.equals(tenants, that.tenants)
+               && status == that.status
+               && Objects.equals(metadataProtection, that.metadataProtection)
+               && Objects.equals(rolesProtection, that.rolesProtection)
+               && Objects.equals(createdAt, that.createdAt)
+               && Objects.equals(updatedAt, that.updatedAt)
+               && Objects.equals(roleList, that.roleList)
+               && Objects.equals(csid, that.csid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(screenName, personRefName, email, phone, mobile, userId, Arrays.hashCode(password),
+                            requireSSO, tenants, status, metadataProtection, rolesProtection, createdAt, updatedAt,
+                            roleList, csid);
+    }
 }
