@@ -1,5 +1,6 @@
 package org.collectionspace.services.authorization.perms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -8,6 +9,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
+import org.jspecify.annotations.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -65,7 +67,11 @@ public class PermissionsList {
         return this;
     }
 
+    @NonNull
     public List<Permission> getPermission() {
+        if (permission == null) {
+            permission = new ArrayList<>();
+        }
         return permission;
     }
 

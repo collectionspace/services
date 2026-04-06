@@ -1,5 +1,6 @@
 package org.collectionspace.services.authorization.perms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
 
+import org.jspecify.annotations.NonNull;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 
@@ -114,12 +116,16 @@ public class Permission {
         return this;
     }
 
+    @NonNull
     @OneToMany(
         targetEntity = PermissionAction.class,
         cascade = {CascadeType.ALL}
     )
     @JoinColumn(name = "ACTION__PERMISSION_CSID")
     public List<PermissionAction> getAction() {
+        if (action == null) {
+            action = new ArrayList<>();
+        }
         return action;
     }
 
