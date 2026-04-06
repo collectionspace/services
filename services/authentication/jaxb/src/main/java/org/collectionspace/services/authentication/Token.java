@@ -2,6 +2,7 @@ package org.collectionspace.services.authentication;
 
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -144,4 +145,23 @@ public class Token {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Token token = (Token) o;
+        return enabled == token.enabled
+               && Objects.equals(id, token.id)
+               && Objects.equals(accountCsid, token.accountCsid)
+               && Objects.equals(tenantId, token.tenantId)
+               && Objects.equals(expireSeconds, token.expireSeconds)
+               && Objects.equals(createdAt, token.createdAt)
+               && Objects.equals(updatedAt, token.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, accountCsid, tenantId, expireSeconds, enabled, createdAt, updatedAt);
+    }
 }

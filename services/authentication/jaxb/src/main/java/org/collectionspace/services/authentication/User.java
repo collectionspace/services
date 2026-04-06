@@ -1,6 +1,7 @@
 package org.collectionspace.services.authentication;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -141,4 +142,22 @@ public class User {
         setLastLogin(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        User user = (User) o;
+        return Objects.equals(username, user.username)
+               && Objects.equals(passwd, user.passwd)
+               && Objects.equals(salt, user.salt)
+               && Objects.equals(createdAt, user.createdAt)
+               && Objects.equals(updatedAt, user.updatedAt)
+               && Objects.equals(lastLogin, user.lastLogin);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, passwd, salt, createdAt, updatedAt, lastLogin);
+    }
 }
