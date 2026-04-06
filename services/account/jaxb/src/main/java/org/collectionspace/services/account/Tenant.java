@@ -33,25 +33,25 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 public class Tenant {
 
     @XmlElement(required = true)
-    protected String id;
+    private String id;
 
     @XmlElement(required = true)
-    protected String name;
+    private String name;
 
     @XmlElement(required = true)
-    protected String configMD5Hash;
+    private String configMD5Hash;
 
-    protected boolean authoritiesInitialized;
+    private boolean authoritiesInitialized;
 
-    protected boolean disabled;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private boolean disabled;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar updatedAt;
+    private XMLGregorianCalendar createdAt;
+
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
 
     @Id
     @Column(name = "id", nullable = false, length = 128)

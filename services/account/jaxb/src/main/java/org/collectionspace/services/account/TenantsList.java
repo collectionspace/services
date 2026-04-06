@@ -18,7 +18,7 @@ import org.jspecify.annotations.NonNull;
 public class TenantsList extends AbstractCommonList {
 
     @XmlElement(name = "tenant-list-item", required = true)
-    protected List<TenantListItem> tenantListItem;
+    private List<TenantListItem> tenantListItem;
 
     @NonNull
     public List<TenantListItem> getTenantListItem() {

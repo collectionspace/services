@@ -27,10 +27,10 @@ import jakarta.xml.bind.annotation.XmlType;
 public class AccountTenant {
 
     @XmlElement(name = "tenant_id", required = true)
-    protected String tenantId;
+    private String tenantId;
 
     @XmlAttribute(name = "Hjid")
-    protected Long hjid;
+    private Long hjid;
 
     @Basic
     @Column(name = "tenant_id", nullable = false, length = 128)

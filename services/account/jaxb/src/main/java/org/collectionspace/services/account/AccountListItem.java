@@ -15,34 +15,34 @@ import org.jspecify.annotations.NonNull;
 public class AccountListItem {
 
     @XmlElement(required = true)
-    protected String screenName;
+    private String screenName;
 
     @XmlElement(required = true)
-    protected String userid;
+    private String userid;
 
     @XmlElement(required = true)
-    protected String tenantid;
+    private String tenantid;
 
     @XmlElement(required = true)
-    protected List<AccountTenant> tenants;
+    private List<AccountTenant> tenants;
 
     @XmlElement(required = true)
-    protected String personRefName;
+    private String personRefName;
 
     @XmlElement(required = true)
-    protected String email;
+    private String email;
 
-    protected Boolean requireSSO;
+    private Boolean requireSSO;
 
     @XmlElement(required = true)
-    protected Status status;
+    private Status status;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "anyURI")
-    protected String uri;
+    private String uri;
 
     @XmlElement(required = true)
-    protected String csid;
+    private String csid;
 
     public String getScreenName() {
         return screenName;

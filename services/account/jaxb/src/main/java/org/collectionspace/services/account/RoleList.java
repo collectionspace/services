@@ -14,7 +14,7 @@ import org.jspecify.annotations.NonNull;
 public class RoleList {
 
     @XmlElement(required = true)
-    protected List<RoleValue> role;
+    private List<RoleValue> role;
 
     @NonNull
     public List<RoleValue> getRole() {

@@ -48,48 +48,48 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 public class AccountsCommon {
 
     @XmlElement(required = true)
-    protected String screenName;
+    private String screenName;
 
-    protected String personRefName;
-
-    @XmlElement(required = true)
-    protected String email;
+    private String personRefName;
 
     @XmlElement(required = true)
-    protected String phone;
+    private String email;
 
     @XmlElement(required = true)
-    protected String mobile;
+    private String phone;
 
     @XmlElement(required = true)
-    protected String userId;
-
-    protected byte[] password;
-
-    protected Boolean requireSSO;
+    private String mobile;
 
     @XmlElement(required = true)
-    protected List<AccountTenant> tenants;
+    private String userId;
+
+    private byte[] password;
+
+    private Boolean requireSSO;
 
     @XmlElement(required = true)
-    protected Status status;
-
-    protected String metadataProtection;
-
-    protected String rolesProtection;
+    private List<AccountTenant> tenants;
 
     @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private Status status;
+
+    private String metadataProtection;
+
+    private String rolesProtection;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar updatedAt;
+    private XMLGregorianCalendar createdAt;
 
-    protected RoleList roleList;
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
+
+    private RoleList roleList;
 
     @XmlAttribute(name = "csid")
-    protected String csid;
+    private String csid;
 
     @Basic
     @Column(name = "screen_name", nullable = false, length = 128)

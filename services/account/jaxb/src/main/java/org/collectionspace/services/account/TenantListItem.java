@@ -11,12 +11,12 @@ import jakarta.xml.bind.annotation.XmlType;
 public class TenantListItem {
 
     @XmlElement(required = true)
-    protected String id;
+    private String id;
 
     @XmlElement(required = true)
-    protected String name;
+    private String name;
 
-    protected boolean disabled;
+    private boolean disabled;
 
     public String getId() {
         return id;

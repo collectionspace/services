@@ -17,7 +17,7 @@ import org.jspecify.annotations.NonNull;
 public class AccountsCommonList extends AbstractCommonList {
 
     @XmlElement(name = "account-list-item", required = true)
-    protected List<AccountListItem> accountListItem;
+    private List<AccountListItem> accountListItem;
 
     @NonNull
     public List<AccountListItem> getAccountListItem() {
