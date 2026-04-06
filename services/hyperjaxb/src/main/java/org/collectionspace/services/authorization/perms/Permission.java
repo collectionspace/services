@@ -2,6 +2,7 @@ package org.collectionspace.services.authorization.perms;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -223,5 +224,30 @@ public class Permission {
 
     public void setUpdatedAtItem(Date target) {
         setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Permission that = (Permission) o;
+        return Objects.equals(description, that.description)
+               && Objects.equals(resourceName, that.resourceName)
+               && Objects.equals(attributeName, that.attributeName)
+               && Objects.equals(actionGroup, that.actionGroup)
+               && effect == that.effect
+               && Objects.equals(metadataProtection, that.metadataProtection)
+               && Objects.equals(actionsProtection, that.actionsProtection)
+               && Objects.equals(tenantId, that.tenantId)
+               && Objects.equals(createdAt, that.createdAt)
+               && Objects.equals(updatedAt, that.updatedAt)
+               && Objects.equals(csid, that.csid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description, resourceName, attributeName, actionGroup, effect, metadataProtection,
+                            actionsProtection, tenantId, createdAt, updatedAt, csid);
     }
 }

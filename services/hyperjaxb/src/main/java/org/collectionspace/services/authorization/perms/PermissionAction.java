@@ -1,5 +1,6 @@
 package org.collectionspace.services.authorization.perms;
 
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -81,5 +82,21 @@ public class PermissionAction {
     public PermissionAction setHjid(Long hjid) {
         this.hjid = hjid;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionAction that = (PermissionAction) o;
+        return name == that.name
+               && Objects.equals(objectIdentity,that.objectIdentity)
+               && Objects.equals(objectIdentityResource, that.objectIdentityResource);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, objectIdentity, objectIdentityResource);
     }
 }
