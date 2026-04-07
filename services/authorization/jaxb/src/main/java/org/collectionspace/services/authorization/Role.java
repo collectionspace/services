@@ -23,6 +23,7 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
+import org.jspecify.annotations.NonNull;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 
@@ -207,6 +208,7 @@ public class Role {
     }
 
     @Transient
+    @NonNull
     public List<PermissionValue> getPermission() {
         if (permission == null) {
             permission = new ArrayList<>();

@@ -9,6 +9,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
+import org.jspecify.annotations.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -18,6 +19,7 @@ public class PermissionsRolesList {
     @XmlElement(required = true)
     protected List<PermissionRole> permissionRole;
 
+    @NonNull
     public List<PermissionRole> getPermissionRole() {
         if (permissionRole == null) {
             permissionRole = new ArrayList<>();

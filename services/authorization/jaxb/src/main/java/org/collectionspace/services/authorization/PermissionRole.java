@@ -1,11 +1,13 @@
 package org.collectionspace.services.authorization;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
+import org.jspecify.annotations.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "permission_role")
@@ -28,7 +30,11 @@ public class PermissionRole {
         return this;
     }
 
+    @NonNull
     public List<PermissionValue> getPermission() {
+        if (permission == null) {
+            permission = new ArrayList<>();
+        }
         return permission;
     }
 
@@ -37,7 +43,11 @@ public class PermissionRole {
         return this;
     }
 
+    @NonNull
     public List<RoleValue> getRole() {
+        if (role == null) {
+            role = new ArrayList<>();
+        }
         return role;
     }
 
