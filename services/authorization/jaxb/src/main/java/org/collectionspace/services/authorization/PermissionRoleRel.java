@@ -67,13 +67,8 @@ public class PermissionRoleRel {
         this.permissionId = value;
     }
 
-    @Transient
-    public boolean isSetPermissionId() {
-        return (this.permissionId!= null);
-    }
-
     @Basic
-    @Column(name = "permission_resource", nullable = true, length = 255)
+    @Column(name = "permission_resource")
     public String getPermissionResource() {
         return permissionResource;
     }
@@ -82,24 +77,14 @@ public class PermissionRoleRel {
         this.permissionResource = value;
     }
 
-    @Transient
-    public boolean isSetPermissionResource() {
-        return (this.permissionResource!= null);
-    }
-
     @Basic
-    @Column(name = "actionGroup", nullable = true, length = 255)
+    @Column(name = "actionGroup")
     public String getActionGroup() {
         return actionGroup;
     }
 
     public void setActionGroup(String value) {
         this.actionGroup = value;
-    }
-
-    @Transient
-    public boolean isSetActionGroup() {
-        return (this.actionGroup!= null);
     }
 
     @Basic
@@ -112,13 +97,8 @@ public class PermissionRoleRel {
         this.roleId = value;
     }
 
-    @Transient
-    public boolean isSetRoleId() {
-        return (this.roleId!= null);
-    }
-
     @Basic
-    @Column(name = "role_name", nullable = true, length = 255)
+    @Column(name = "role_name")
     public String getRoleName() {
         return roleName;
     }
@@ -128,22 +108,12 @@ public class PermissionRoleRel {
     }
 
     @Transient
-    public boolean isSetRoleName() {
-        return (this.roleName!= null);
-    }
-
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(XMLGregorianCalendar value) {
         this.createdAt = value;
-    }
-
-    @Transient
-    public boolean isSetCreatedAt() {
-        return (this.createdAt!= null);
     }
 
     @Id

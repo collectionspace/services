@@ -67,24 +67,14 @@ public class AccountRoleRel {
         this.accountId = value;
     }
 
-    @Transient
-    public boolean isSetAccountId() {
-        return (this.accountId!= null);
-    }
-
     @Basic
-    @Column(name = "screen_name", nullable = true, length = 255)
+    @Column(name = "screen_name")
     public String getScreenName() {
         return screenName;
     }
 
     public void setScreenName(String value) {
         this.screenName = value;
-    }
-
-    @Transient
-    public boolean isSetScreenName() {
-        return (this.screenName!= null);
     }
 
     @Basic
@@ -97,11 +87,6 @@ public class AccountRoleRel {
         this.userId = value;
     }
 
-    @Transient
-    public boolean isSetUserId() {
-        return (this.userId!= null);
-    }
-
     @Basic
     @Column(name = "role_id", nullable = false, length = 128)
     public String getRoleId() {
@@ -112,13 +97,8 @@ public class AccountRoleRel {
         this.roleId = value;
     }
 
-    @Transient
-    public boolean isSetRoleId() {
-        return (this.roleId!= null);
-    }
-
     @Basic
-    @Column(name = "role_name", nullable = true, length = 255)
+    @Column(name = "role_name")
     public String getRoleName() {
         return roleName;
     }
@@ -128,22 +108,12 @@ public class AccountRoleRel {
     }
 
     @Transient
-    public boolean isSetRoleName() {
-        return (this.roleName!= null);
-    }
-
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(XMLGregorianCalendar value) {
         this.createdAt = value;
-    }
-
-    @Transient
-    public boolean isSetCreatedAt() {
-        return (this.createdAt!= null);
     }
 
     @Id

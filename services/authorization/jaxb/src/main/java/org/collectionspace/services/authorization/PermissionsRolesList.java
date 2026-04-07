@@ -31,12 +31,4 @@ public class PermissionsRolesList {
         this.permissionRole = permissionRole;
     }
 
-    public boolean isSetPermissionRole() {
-        return ((this.permissionRole!= null)&&(!this.permissionRole.isEmpty()));
-    }
-
-    public void unsetPermissionRole() {
-        this.permissionRole = null;
-    }
-
 }

@@ -84,11 +84,6 @@ public class Role {
         this.displayName = value;
     }
 
-    @Transient
-    public boolean isSetDisplayName() {
-        return (this.displayName!= null);
-    }
-
     @Basic
     @Column(name = "rolename", nullable = false, length = 200)
     public String getRoleName() {
@@ -99,13 +94,8 @@ public class Role {
         this.roleName = value;
     }
 
-    @Transient
-    public boolean isSetRoleName() {
-        return (this.roleName!= null);
-    }
-
     @Basic
-    @Column(name = "description", nullable = true, length = 255)
+    @Column(name = "description")
     public String getDescription() {
         return description;
     }
@@ -114,24 +104,14 @@ public class Role {
         this.description = value;
     }
 
-    @Transient
-    public boolean isSetDescription() {
-        return (this.description!= null);
-    }
-
     @Basic
-    @Column(name = "rolegroup", nullable = true, length = 255)
+    @Column(name = "rolegroup")
     public String getRoleGroup() {
         return roleGroup;
     }
 
     public void setRoleGroup(String value) {
         this.roleGroup = value;
-    }
-
-    @Transient
-    public boolean isSetRoleGroup() {
-        return (this.roleGroup!= null);
     }
 
     @Basic
@@ -144,13 +124,8 @@ public class Role {
         this.tenantId = value;
     }
 
-    @Transient
-    public boolean isSetTenantId() {
-        return (this.tenantId!= null);
-    }
-
     @Basic
-    @Column(name = "metadata_protection", nullable = true, length = 255)
+    @Column(name = "metadata_protection")
     public String getMetadataProtection() {
         return metadataProtection;
     }
@@ -159,24 +134,14 @@ public class Role {
         this.metadataProtection = value;
     }
 
-    @Transient
-    public boolean isSetMetadataProtection() {
-        return (this.metadataProtection!= null);
-    }
-
     @Basic
-    @Column(name = "perms_protection", nullable = true, length = 255)
+    @Column(name = "perms_protection")
     public String getPermsProtection() {
         return permsProtection;
     }
 
     public void setPermsProtection(String value) {
         this.permsProtection = value;
-    }
-
-    @Transient
-    public boolean isSetPermsProtection() {
-        return (this.permsProtection!= null);
     }
 
     @Transient
@@ -189,22 +154,12 @@ public class Role {
     }
 
     @Transient
-    public boolean isSetCreatedAt() {
-        return (this.createdAt!= null);
-    }
-
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
     public void setUpdatedAt(XMLGregorianCalendar value) {
         this.updatedAt = value;
-    }
-
-    @Transient
-    public boolean isSetUpdatedAt() {
-        return (this.updatedAt!= null);
     }
 
     @Transient
@@ -220,15 +175,6 @@ public class Role {
         this.permission = permission;
     }
 
-    @Transient
-    public boolean isSetPermission() {
-        return ((this.permission!= null)&&(!this.permission.isEmpty()));
-    }
-
-    public void unsetPermission() {
-        this.permission = null;
-    }
-
     @Id
     @Column(name = "csid", nullable = false, length = 128)
     public String getCsid() {
@@ -237,11 +183,6 @@ public class Role {
 
     public void setCsid(String value) {
         this.csid = value;
-    }
-
-    @Transient
-    public boolean isSetCsid() {
-        return (this.csid!= null);
     }
 
     @Basic
