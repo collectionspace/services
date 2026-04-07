@@ -32,30 +32,40 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Token {
 
+    @Id
+    @Column(name = "id", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String id;
 
+    @Basic
+    @Column(name = "account_csid", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String accountCsid;
 
+    @Basic
+    @Column(name = "tenant_id", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String tenantId;
 
+    @Basic
+    @Column(name = "expire_seconds", nullable = false, precision = 20, scale = 0)
     @XmlElement(required = true)
     protected BigInteger expireSeconds;
 
+    @Basic
+    @Column(name = "enabled", nullable = false)
     protected boolean enabled;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar createdAt;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar updatedAt;
 
-    @Id
-    @Column(name = "id", nullable = false, length = 128)
     public String getId() {
         return id;
     }
@@ -64,8 +74,6 @@ public class Token {
         this.id = value;
     }
 
-    @Basic
-    @Column(name = "account_csid", nullable = false, length = 128)
     public String getAccountCsid() {
         return accountCsid;
     }
@@ -74,8 +82,6 @@ public class Token {
         this.accountCsid = value;
     }
 
-    @Basic
-    @Column(name = "tenant_id", nullable = false, length = 128)
     public String getTenantId() {
         return tenantId;
     }
@@ -84,8 +90,6 @@ public class Token {
         this.tenantId = value;
     }
 
-    @Basic
-    @Column(name = "expire_seconds", nullable = false, precision = 20, scale = 0)
     public BigInteger getExpireSeconds() {
         return expireSeconds;
     }
@@ -94,8 +98,6 @@ public class Token {
         this.expireSeconds = value;
     }
 
-    @Basic
-    @Column(name = "enabled", nullable = false)
     public boolean isEnabled() {
         return enabled;
     }
@@ -104,7 +106,6 @@ public class Token {
         this.enabled = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -113,7 +114,6 @@ public class Token {
         this.createdAt = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }

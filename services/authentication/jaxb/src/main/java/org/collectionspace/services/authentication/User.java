@@ -31,29 +31,36 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
+    @Id
+    @Column(name = "username", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String username;
 
+    @Basic
+    @Column(name = "passwd", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String passwd;
 
+    @Basic
+    @Column(name = "salt", nullable = false, length = 128)
     @XmlElement(required = true)
     protected String salt;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar createdAt;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar updatedAt;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar lastLogin;
 
-    @Id
-    @Column(name = "username", nullable = false, length = 128)
     public String getUsername() {
         return username;
     }
@@ -62,8 +69,6 @@ public class User {
         this.username = value;
     }
 
-    @Basic
-    @Column(name = "passwd", nullable = false, length = 128)
     public String getPasswd() {
         return passwd;
     }
@@ -72,8 +77,6 @@ public class User {
         this.passwd = value;
     }
 
-    @Basic
-    @Column(name = "salt", nullable = false, length = 128)
     public String getSalt() {
         return salt;
     }
@@ -82,7 +85,6 @@ public class User {
         this.salt = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -91,7 +93,6 @@ public class User {
         this.createdAt = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
@@ -100,7 +101,6 @@ public class User {
         this.updatedAt = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getLastLogin() {
         return lastLogin;
     }
