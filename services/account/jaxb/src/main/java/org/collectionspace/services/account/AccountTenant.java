@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -43,11 +42,6 @@ public class AccountTenant {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
-    }
-
-    @Transient
-    public boolean isSetTenantId() {
-        return (this.tenantId!= null);
     }
 
     public Long getHjid() {
