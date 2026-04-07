@@ -38,27 +38,39 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class PermissionRoleRel {
 
-    @XmlElement(required = true)
-    private String permissionId;
-
-    private String permissionResource;
-
-    private String actionGroup;
-
-    @XmlElement(required = true)
-    private String roleId;
-
-    private String roleName;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
-
+    @Id
+    @Column(name = "HJID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @XmlAttribute(name = "Hjid")
     private Long hjid;
 
     @Basic
     @Column(name = "permission_id", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String permissionId;
+
+    @Basic
+    @Column(name = "permission_resource")
+    private String permissionResource;
+
+    @Basic
+    @Column(name = "actionGroup")
+    private String actionGroup;
+
+    @Basic
+    @Column(name = "role_id", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String roleId;
+
+    @Basic
+    @Column(name = "role_name")
+    private String roleName;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar createdAt;
+
     public String getPermissionId() {
         return permissionId;
     }
@@ -67,8 +79,6 @@ public class PermissionRoleRel {
         this.permissionId = value;
     }
 
-    @Basic
-    @Column(name = "permission_resource")
     public String getPermissionResource() {
         return permissionResource;
     }
@@ -77,8 +87,6 @@ public class PermissionRoleRel {
         this.permissionResource = value;
     }
 
-    @Basic
-    @Column(name = "actionGroup")
     public String getActionGroup() {
         return actionGroup;
     }
@@ -87,8 +95,6 @@ public class PermissionRoleRel {
         this.actionGroup = value;
     }
 
-    @Basic
-    @Column(name = "role_id", nullable = false, length = 128)
     public String getRoleId() {
         return roleId;
     }
@@ -97,8 +103,6 @@ public class PermissionRoleRel {
         this.roleId = value;
     }
 
-    @Basic
-    @Column(name = "role_name")
     public String getRoleName() {
         return roleName;
     }
@@ -107,7 +111,6 @@ public class PermissionRoleRel {
         this.roleName = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -116,9 +119,6 @@ public class PermissionRoleRel {
         this.createdAt = value;
     }
 
-    @Id
-    @Column(name = "HJID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getHjid() {
         return hjid;
     }

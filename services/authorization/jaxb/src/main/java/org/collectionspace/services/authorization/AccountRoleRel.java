@@ -38,27 +38,39 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountRoleRel {
 
-    private String accountId;
-
-    private String screenName;
-
-    @XmlElement(required = true)
-    private String userId;
-
-    @XmlElement(required = true)
-    private String roleId;
-
-    private String roleName;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
-
+    @Id
+    @Column(name = "HJID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @XmlAttribute(name = "Hjid")
     private Long hjid;
 
     @Basic
     @Column(name = "account_id", nullable = false, length = 128)
+    private String accountId;
+
+    @Basic
+    @Column(name = "screen_name")
+    private String screenName;
+
+    @Basic
+    @Column(name = "user_id", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String userId;
+
+    @Basic
+    @Column(name = "role_id", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String roleId;
+
+    @Basic
+    @Column(name = "role_name")
+    private String roleName;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar createdAt;
+
     public String getAccountId() {
         return accountId;
     }
@@ -67,8 +79,6 @@ public class AccountRoleRel {
         this.accountId = value;
     }
 
-    @Basic
-    @Column(name = "screen_name")
     public String getScreenName() {
         return screenName;
     }
@@ -77,8 +87,6 @@ public class AccountRoleRel {
         this.screenName = value;
     }
 
-    @Basic
-    @Column(name = "user_id", nullable = false, length = 128)
     public String getUserId() {
         return userId;
     }
@@ -87,8 +95,6 @@ public class AccountRoleRel {
         this.userId = value;
     }
 
-    @Basic
-    @Column(name = "role_id", nullable = false, length = 128)
     public String getRoleId() {
         return roleId;
     }
@@ -97,8 +103,6 @@ public class AccountRoleRel {
         this.roleId = value;
     }
 
-    @Basic
-    @Column(name = "role_name")
     public String getRoleName() {
         return roleName;
     }
@@ -107,7 +111,6 @@ public class AccountRoleRel {
         this.roleName = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -116,9 +119,6 @@ public class AccountRoleRel {
         this.createdAt = value;
     }
 
-    @Id
-    @Column(name = "HJID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getHjid() {
         return hjid;
     }

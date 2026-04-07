@@ -43,126 +43,128 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Role {
 
-    @XmlElement(required = true)
-    private String displayName;
-
-    @XmlElement(required = true)
-    private String roleName;
-
-    private String description;
-
-    private String roleGroup;
-
-    @XmlElement(name = "tenant_id", required = true)
-    private String tenantId;
-
-    private String metadataProtection;
-
-    private String permsProtection;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar updatedAt;
-
-    @XmlElement(required = true)
-    private List<PermissionValue> permission;
-
+    @Id
+    @Column(name = "csid", nullable = false, length = 128)
     @XmlAttribute(name = "csid")
     private String csid;
 
     @Basic
     @Column(name = "displayname", nullable = false, length = 200)
+    @XmlElement(required = true)
+    private String displayName;
+
+    @Basic
+    @Column(name = "rolename", nullable = false, length = 200)
+    @XmlElement(required = true)
+    private String roleName;
+
+    @Basic
+    @Column(name = "description")
+    private String description;
+
+    @Basic
+    @Column(name = "rolegroup")
+    private String roleGroup;
+
+    @Basic
+    @Column(name = "tenant_id", nullable = false, length = 128)
+    @XmlElement(name = "tenant_id", required = true)
+    private String tenantId;
+
+    @Basic
+    @Column(name = "metadata_protection")
+    private String metadataProtection;
+
+    @Basic
+    @Column(name = "perms_protection")
+    private String permsProtection;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar createdAt;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
+
+    @Transient
+    @XmlElement(required = true)
+    private List<PermissionValue> permission;
+
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String value) {
-        this.displayName = value;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
-    @Basic
-    @Column(name = "rolename", nullable = false, length = 200)
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String value) {
-        this.roleName = value;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
-    @Basic
-    @Column(name = "description")
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String value) {
-        this.description = value;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    @Basic
-    @Column(name = "rolegroup")
     public String getRoleGroup() {
         return roleGroup;
     }
 
-    public void setRoleGroup(String value) {
-        this.roleGroup = value;
+    public void setRoleGroup(String roleGroup) {
+        this.roleGroup = roleGroup;
     }
 
-    @Basic
-    @Column(name = "tenant_id", nullable = false, length = 128)
     public String getTenantId() {
         return tenantId;
     }
 
-    public void setTenantId(String value) {
-        this.tenantId = value;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
-    @Basic
-    @Column(name = "metadata_protection")
     public String getMetadataProtection() {
         return metadataProtection;
     }
 
-    public void setMetadataProtection(String value) {
-        this.metadataProtection = value;
+    public void setMetadataProtection(String metadataProtection) {
+        this.metadataProtection = metadataProtection;
     }
 
-    @Basic
-    @Column(name = "perms_protection")
     public String getPermsProtection() {
         return permsProtection;
     }
 
-    public void setPermsProtection(String value) {
-        this.permsProtection = value;
+    public void setPermsProtection(String permsProtection) {
+        this.permsProtection = permsProtection;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar value) {
-        this.createdAt = value;
+    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar value) {
-        this.updatedAt = value;
+    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    @Transient
     @NonNull
     public List<PermissionValue> getPermission() {
         if (permission == null) {
@@ -175,14 +177,12 @@ public class Role {
         this.permission = permission;
     }
 
-    @Id
-    @Column(name = "csid", nullable = false, length = 128)
     public String getCsid() {
         return csid;
     }
 
-    public void setCsid(String value) {
-        this.csid = value;
+    public void setCsid(String csid) {
+        this.csid = csid;
     }
 
     @Basic
@@ -192,8 +192,8 @@ public class Role {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setCreatedAtItem(Date createdAt) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Basic
@@ -203,8 +203,8 @@ public class Role {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
     }
 
-    public void setUpdatedAtItem(Date target) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setUpdatedAtItem(Date updatedAt) {
+        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
     }
 
     @Override
