@@ -31,8 +31,4 @@ public class AccountsCommonList extends AbstractCommonList {
         this.accountListItem = accountListItem;
     }
 
-    public boolean isSetAccountListItem() {
-        return ((this.accountListItem!= null)&&(!this.accountListItem.isEmpty()));
-    }
-
 }

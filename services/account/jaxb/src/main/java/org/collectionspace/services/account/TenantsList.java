@@ -32,8 +32,4 @@ public class TenantsList extends AbstractCommonList {
         this.tenantListItem = tenantListItem;
     }
 
-    public boolean isSetTenantListItem() {
-        return ((this.tenantListItem!= null)&&(!this.tenantListItem.isEmpty()));
-    }
-
 }

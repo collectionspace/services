@@ -26,14 +26,17 @@ import jakarta.xml.bind.annotation.XmlType;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountTenant {
 
-    @XmlElement(name = "tenant_id", required = true)
-    private String tenantId;
-
+    @Id
+    @Column(name = "HJID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @XmlAttribute(name = "Hjid")
     private Long hjid;
 
     @Basic
     @Column(name = "tenant_id", nullable = false, length = 128)
+    @XmlElement(name = "tenant_id", required = true)
+    private String tenantId;
+
     public String getTenantId() {
         return tenantId;
     }
@@ -47,9 +50,6 @@ public class AccountTenant {
         return (this.tenantId!= null);
     }
 
-    @Id
-    @Column(name = "HJID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getHjid() {
         return hjid;
     }

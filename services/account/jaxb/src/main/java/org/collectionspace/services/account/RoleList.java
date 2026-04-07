@@ -28,8 +28,4 @@ public class RoleList {
         this.role = role;
     }
 
-    public boolean isSetRole() {
-        return ((this.role!= null)&&(!this.role.isEmpty()));
-    }
-
 }

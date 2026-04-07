@@ -34,10 +34,6 @@ public class TenantListItem {
         this.name = value;
     }
 
-    public boolean isSetName() {
-        return (this.name!= null);
-    }
-
     public boolean isDisabled() {
         return disabled;
     }

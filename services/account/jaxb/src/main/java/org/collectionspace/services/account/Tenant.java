@@ -32,29 +32,39 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Tenant {
 
+    @Id
+    @Column(name = "id", nullable = false, length = 128)
     @XmlElement(required = true)
     private String id;
 
+    @Basic
+    @Column(name = "name", nullable = false)
     @XmlElement(required = true)
     private String name;
 
+    @Basic
+    @Column(name = "config_md5hash")
     @XmlElement(required = true)
     private String configMD5Hash;
 
+    @Basic
+    @Column(name = "authorities_initialized", nullable = false)
     private boolean authoritiesInitialized;
 
+    @Basic
+    @Column(name = "disabled", nullable = false)
     private boolean disabled;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar createdAt;
 
+    @Transient
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
     private XMLGregorianCalendar updatedAt;
 
-    @Id
-    @Column(name = "id", nullable = false, length = 128)
     public String getId() {
         return id;
     }
@@ -63,8 +73,6 @@ public class Tenant {
         this.id = value;
     }
 
-    @Basic
-    @Column(name = "name", nullable = false)
     public String getName() {
         return name;
     }
@@ -73,13 +81,6 @@ public class Tenant {
         this.name = value;
     }
 
-    @Transient
-    public boolean isSetName() {
-        return (this.name!= null);
-    }
-
-    @Basic
-    @Column(name = "config_md5hash")
     public String getConfigMD5Hash() {
         return configMD5Hash;
     }
@@ -88,8 +89,6 @@ public class Tenant {
         this.configMD5Hash = value;
     }
 
-    @Basic
-    @Column(name = "authorities_initialized", nullable = false)
     public boolean isAuthoritiesInitialized() {
         return authoritiesInitialized;
     }
@@ -98,8 +97,6 @@ public class Tenant {
         this.authoritiesInitialized = value;
     }
 
-    @Basic
-    @Column(name = "disabled", nullable = false)
     public boolean isDisabled() {
         return disabled;
     }

@@ -84,10 +84,6 @@ public class AccountListItem {
         this.tenants = tenants;
     }
 
-    public boolean isSetTenants() {
-        return ((this.tenants!= null)&&(!this.tenants.isEmpty()));
-    }
-
     public String getPersonRefName() {
         return personRefName;
     }
@@ -120,10 +116,6 @@ public class AccountListItem {
         this.status = value;
     }
 
-    public boolean isSetStatus() {
-        return (this.status!= null);
-    }
-
     public String getUri() {
         return uri;
     }
@@ -132,20 +124,12 @@ public class AccountListItem {
         this.uri = value;
     }
 
-    public boolean isSetUri() {
-        return (this.uri!= null);
-    }
-
     public String getCsid() {
         return csid;
     }
 
     public void setCsid(String value) {
         this.csid = value;
-    }
-
-    public boolean isSetCsid() {
-        return (this.csid!= null);
     }
 
 }

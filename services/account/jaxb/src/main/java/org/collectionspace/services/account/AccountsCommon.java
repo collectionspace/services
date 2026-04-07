@@ -47,52 +47,80 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountsCommon {
 
-    @XmlElement(required = true)
-    private String screenName;
-
-    private String personRefName;
-
-    @XmlElement(required = true)
-    private String email;
-
-    @XmlElement(required = true)
-    private String phone;
-
-    @XmlElement(required = true)
-    private String mobile;
-
-    @XmlElement(required = true)
-    private String userId;
-
-    private byte[] password;
-
-    private Boolean requireSSO;
-
-    @XmlElement(required = true)
-    private List<AccountTenant> tenants;
-
-    @XmlElement(required = true)
-    private Status status;
-
-    private String metadataProtection;
-
-    private String rolesProtection;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar updatedAt;
-
-    private RoleList roleList;
-
+    @Id
+    @Column(name = "csid", nullable = false, length = 128)
     @XmlAttribute(name = "csid")
     private String csid;
 
     @Basic
     @Column(name = "screen_name", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String screenName;
+
+    @Basic
+    @Column(name = "person_ref_name")
+    private String personRefName;
+
+    @Basic
+    @Column(name = "email", nullable = false)
+    @XmlElement(required = true)
+    private String email;
+
+    @Basic
+    @Column(name = "phone")
+    @XmlElement(required = true)
+    private String phone;
+
+    @Basic
+    @Column(name = "mobile")
+    @XmlElement(required = true)
+    private String mobile;
+
+    @Basic
+    @Column(name = "userid", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String userId;
+
+    private byte[] password;
+
+    @Basic
+    @Column(name = "require_sso")
+    private Boolean requireSSO;
+
+    @OneToMany(targetEntity = AccountTenant.class, cascade = {
+        CascadeType.ALL
+    })
+    @JoinColumn(name = "TENANTS_ACCOUNTS_COMMON_CSID")
+    @XmlElement(required = true)
+    private List<AccountTenant> tenants;
+
+    @Basic
+    @Column(name = "status", nullable = false, length = 15)
+    @Enumerated(EnumType.STRING)
+    @XmlElement(required = true)
+    private Status status;
+
+    @Basic
+    @Column(name = "metadata_protection")
+    private String metadataProtection;
+
+    @Basic
+    @Column(name = "roles_protection")
+    private String rolesProtection;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar createdAt;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
+
+    @Transient
+    private RoleList roleList;
+
     public String getScreenName() {
         return screenName;
     }
@@ -101,13 +129,6 @@ public class AccountsCommon {
         this.screenName = value;
     }
 
-    @Transient
-    public boolean isSetScreenName() {
-        return (this.screenName!= null);
-    }
-
-    @Basic
-    @Column(name = "person_ref_name")
     public String getPersonRefName() {
         return personRefName;
     }
@@ -116,8 +137,6 @@ public class AccountsCommon {
         this.personRefName = value;
     }
 
-    @Basic
-    @Column(name = "email", nullable = false)
     public String getEmail() {
         return email;
     }
@@ -126,8 +145,6 @@ public class AccountsCommon {
         this.email = value;
     }
 
-    @Basic
-    @Column(name = "phone")
     public String getPhone() {
         return phone;
     }
@@ -136,8 +153,6 @@ public class AccountsCommon {
         this.phone = value;
     }
 
-    @Basic
-    @Column(name = "mobile")
     public String getMobile() {
         return mobile;
     }
@@ -146,19 +161,12 @@ public class AccountsCommon {
         this.mobile = value;
     }
 
-    @Basic
-    @Column(name = "userid", nullable = false, length = 128)
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String value) {
         this.userId = value;
-    }
-
-    @Transient
-    public boolean isSetUserId() {
-        return (this.userId!= null);
     }
 
     public byte[] getPassword() {
@@ -169,8 +177,6 @@ public class AccountsCommon {
         this.password = value;
     }
 
-    @Basic
-    @Column(name = "require_sso")
     public Boolean isRequireSSO() {
         return requireSSO;
     }
@@ -180,10 +186,6 @@ public class AccountsCommon {
     }
 
     @NonNull
-    @OneToMany(targetEntity = AccountTenant.class, cascade = {
-        CascadeType.ALL
-    })
-    @JoinColumn(name = "TENANTS_ACCOUNTS_COMMON_CSID")
     public List<AccountTenant> getTenants() {
         if (tenants == null) {
             tenants = new ArrayList<>();
@@ -195,14 +197,6 @@ public class AccountsCommon {
         this.tenants = tenants;
     }
 
-    @Transient
-    public boolean isSetTenants() {
-        return ((this.tenants!= null)&&(!this.tenants.isEmpty()));
-    }
-
-    @Basic
-    @Column(name = "status", nullable = false, length = 15)
-    @Enumerated(EnumType.STRING)
     public Status getStatus() {
         return status;
     }
@@ -211,13 +205,6 @@ public class AccountsCommon {
         this.status = value;
     }
 
-    @Transient
-    public boolean isSetStatus() {
-        return (this.status!= null);
-    }
-
-    @Basic
-    @Column(name = "metadata_protection")
     public String getMetadataProtection() {
         return metadataProtection;
     }
@@ -226,8 +213,6 @@ public class AccountsCommon {
         this.metadataProtection = value;
     }
 
-    @Basic
-    @Column(name = "roles_protection")
     public String getRolesProtection() {
         return rolesProtection;
     }
@@ -236,7 +221,6 @@ public class AccountsCommon {
         this.rolesProtection = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -245,7 +229,6 @@ public class AccountsCommon {
         this.createdAt = value;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
@@ -254,7 +237,6 @@ public class AccountsCommon {
         this.updatedAt = value;
     }
 
-    @Transient
     public RoleList getRoleList() {
         return roleList;
     }
@@ -263,19 +245,12 @@ public class AccountsCommon {
         this.roleList = value;
     }
 
-    @Id
-    @Column(name = "csid", nullable = false, length = 128)
     public String getCsid() {
         return csid;
     }
 
     public void setCsid(String value) {
         this.csid = value;
-    }
-
-    @Transient
-    public boolean isSetCsid() {
-        return (this.csid!= null);
     }
 
     @Basic

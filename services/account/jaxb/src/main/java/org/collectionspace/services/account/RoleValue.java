@@ -40,20 +40,12 @@ public class RoleValue {
         this.roleId = value;
     }
 
-    public boolean isSetRoleId() {
-        return (this.roleId!= null);
-    }
-
     public String getRoleName() {
         return roleName;
     }
 
     public void setRoleName(String value) {
         this.roleName = value;
-    }
-
-    public boolean isSetRoleName() {
-        return (this.roleName!= null);
     }
 
     public String getDisplayName() {
@@ -64,20 +56,12 @@ public class RoleValue {
         this.displayName = value;
     }
 
-    public boolean isSetDisplayName() {
-        return (this.displayName!= null);
-    }
-
     public String getTenantId() {
         return tenantId;
     }
 
     public void setTenantId(String value) {
         this.tenantId = value;
-    }
-
-    public boolean isSetTenantId() {
-        return (this.tenantId!= null);
     }
 
 }
