@@ -65,48 +65,48 @@ public class User {
         return username;
     }
 
-    public void setUsername(String value) {
-        this.username = value;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPasswd() {
         return passwd;
     }
 
-    public void setPasswd(String value) {
-        this.passwd = value;
+    public void setPasswd(String passwd) {
+        this.passwd = passwd;
     }
 
     public String getSalt() {
         return salt;
     }
 
-    public void setSalt(String value) {
-        this.salt = value;
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar value) {
-        this.createdAt = value;
+    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
     }
 
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar value) {
-        this.updatedAt = value;
+    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public XMLGregorianCalendar getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(XMLGregorianCalendar value) {
-        this.lastLogin = value;
+    public void setLastLogin(XMLGregorianCalendar lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     @Basic
@@ -116,8 +116,8 @@ public class User {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setCreatedAtItem(Date createdAt) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Basic
@@ -127,8 +127,8 @@ public class User {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
     }
 
-    public void setUpdatedAtItem(Date target) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setUpdatedAtItem(Date updatedAt) {
+        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
     }
 
     @Basic
@@ -138,8 +138,8 @@ public class User {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getLastLogin());
     }
 
-    public void setLastLoginItem(Date target) {
-        setLastLogin(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setLastLoginItem(Date lastLogin) {
+        setLastLogin(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, lastLogin));
     }
 
     @Override
