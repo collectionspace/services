@@ -22,24 +22,24 @@ public class TenantListItem {
         return id;
     }
 
-    public void setId(String value) {
-        this.id = value;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String value) {
-        this.name = value;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public boolean isDisabled() {
         return disabled;
     }
 
-    public void setDisabled(boolean value) {
-        this.disabled = value;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
 }

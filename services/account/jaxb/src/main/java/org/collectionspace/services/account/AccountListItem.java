@@ -48,28 +48,24 @@ public class AccountListItem {
         return screenName;
     }
 
-    public void setScreenName(String value) {
-        this.screenName = value;
-    }
-
-    public boolean isSetScreenName() {
-        return (this.screenName!= null);
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
     }
 
     public String getUserid() {
         return userid;
     }
 
-    public void setUserid(String value) {
-        this.userid = value;
+    public void setUserid(String userId) {
+        this.userid = userId;
     }
 
     public String getTenantid() {
         return tenantid;
     }
 
-    public void setTenantid(String value) {
-        this.tenantid = value;
+    public void setTenantid(String tenantId) {
+        this.tenantid = tenantId;
     }
 
     @NonNull
@@ -88,48 +84,48 @@ public class AccountListItem {
         return personRefName;
     }
 
-    public void setPersonRefName(String value) {
-        this.personRefName = value;
+    public void setPersonRefName(String personRefName) {
+        this.personRefName = personRefName;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String value) {
-        this.email = value;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public Boolean isRequireSSO() {
         return requireSSO;
     }
 
-    public void setRequireSSO(Boolean value) {
-        this.requireSSO = value;
+    public void setRequireSSO(Boolean requireSSO) {
+        this.requireSSO = requireSSO;
     }
 
     public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Status value) {
-        this.status = value;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getUri() {
         return uri;
     }
 
-    public void setUri(String value) {
-        this.uri = value;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public String getCsid() {
         return csid;
     }
 
-    public void setCsid(String value) {
-        this.csid = value;
+    public void setCsid(String csid) {
+        this.csid = csid;
     }
 
 }

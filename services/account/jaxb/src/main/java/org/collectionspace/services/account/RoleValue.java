@@ -28,40 +28,40 @@ public class RoleValue {
         return roleRelationshipId;
     }
 
-    public void setRoleRelationshipId(String value) {
-        this.roleRelationshipId = value;
+    public void setRoleRelationshipId(String roleRelationshipId) {
+        this.roleRelationshipId = roleRelationshipId;
     }
 
     public String getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(String value) {
-        this.roleId = value;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String value) {
-        this.roleName = value;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public void setDisplayName(String value) {
-        this.displayName = value;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public String getTenantId() {
         return tenantId;
     }
 
-    public void setTenantId(String value) {
-        this.tenantId = value;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
 }

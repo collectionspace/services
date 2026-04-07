@@ -125,64 +125,64 @@ public class AccountsCommon {
         return screenName;
     }
 
-    public void setScreenName(String value) {
-        this.screenName = value;
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
     }
 
     public String getPersonRefName() {
         return personRefName;
     }
 
-    public void setPersonRefName(String value) {
-        this.personRefName = value;
+    public void setPersonRefName(String personRefName) {
+        this.personRefName = personRefName;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String value) {
-        this.email = value;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {
         return phone;
     }
 
-    public void setPhone(String value) {
-        this.phone = value;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getMobile() {
         return mobile;
     }
 
-    public void setMobile(String value) {
-        this.mobile = value;
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String value) {
-        this.userId = value;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public byte[] getPassword() {
         return password;
     }
 
-    public void setPassword(byte[] value) {
-        this.password = value;
+    public void setPassword(byte[] password) {
+        this.password = password;
     }
 
     public Boolean isRequireSSO() {
         return requireSSO;
     }
 
-    public void setRequireSSO(Boolean value) {
-        this.requireSSO = value;
+    public void setRequireSSO(Boolean requireSSO) {
+        this.requireSSO = requireSSO;
     }
 
     @NonNull
@@ -201,56 +201,56 @@ public class AccountsCommon {
         return status;
     }
 
-    public void setStatus(Status value) {
-        this.status = value;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getMetadataProtection() {
         return metadataProtection;
     }
 
-    public void setMetadataProtection(String value) {
-        this.metadataProtection = value;
+    public void setMetadataProtection(String metadataProtection) {
+        this.metadataProtection = metadataProtection;
     }
 
     public String getRolesProtection() {
         return rolesProtection;
     }
 
-    public void setRolesProtection(String value) {
-        this.rolesProtection = value;
+    public void setRolesProtection(String rolesProtection) {
+        this.rolesProtection = rolesProtection;
     }
 
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar value) {
-        this.createdAt = value;
+    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
     }
 
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar value) {
-        this.updatedAt = value;
+    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public RoleList getRoleList() {
         return roleList;
     }
 
-    public void setRoleList(RoleList value) {
-        this.roleList = value;
+    public void setRoleList(RoleList roleList) {
+        this.roleList = roleList;
     }
 
     public String getCsid() {
         return csid;
     }
 
-    public void setCsid(String value) {
-        this.csid = value;
+    public void setCsid(String csid) {
+        this.csid = csid;
     }
 
     @Basic
@@ -260,8 +260,8 @@ public class AccountsCommon {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setCreatedAtItem(Date createdAt) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Basic
@@ -271,8 +271,8 @@ public class AccountsCommon {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
     }
 
-    public void setUpdatedAtItem(Date target) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setUpdatedAtItem(Date updatedAt) {
+        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
     }
 
     @Override

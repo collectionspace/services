@@ -69,58 +69,56 @@ public class Tenant {
         return id;
     }
 
-    public void setId(String value) {
-        this.id = value;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String value) {
-        this.name = value;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getConfigMD5Hash() {
         return configMD5Hash;
     }
 
-    public void setConfigMD5Hash(String value) {
-        this.configMD5Hash = value;
+    public void setConfigMD5Hash(String configMD5Hash) {
+        this.configMD5Hash = configMD5Hash;
     }
 
     public boolean isAuthoritiesInitialized() {
         return authoritiesInitialized;
     }
 
-    public void setAuthoritiesInitialized(boolean value) {
-        this.authoritiesInitialized = value;
+    public void setAuthoritiesInitialized(boolean authoritiesInitialized) {
+        this.authoritiesInitialized = authoritiesInitialized;
     }
 
     public boolean isDisabled() {
         return disabled;
     }
 
-    public void setDisabled(boolean value) {
-        this.disabled = value;
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar value) {
-        this.createdAt = value;
+    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar value) {
-        this.updatedAt = value;
+    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     @Basic
@@ -130,8 +128,8 @@ public class Tenant {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setCreatedAtItem(Date createdAt) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Basic
@@ -141,8 +139,8 @@ public class Tenant {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
     }
 
-    public void setUpdatedAtItem(Date target) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setUpdatedAtItem(Date updatedAt) {
+        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
     }
 
     @Override

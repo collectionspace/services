@@ -41,8 +41,8 @@ public class AccountTenant {
         return tenantId;
     }
 
-    public void setTenantId(String value) {
-        this.tenantId = value;
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     @Transient
@@ -54,8 +54,8 @@ public class AccountTenant {
         return hjid;
     }
 
-    public void setHjid(Long value) {
-        this.hjid = value;
+    public void setHjid(Long hjid) {
+        this.hjid = hjid;
     }
 
     @Override
