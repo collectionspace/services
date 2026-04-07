@@ -75,56 +75,56 @@ public class AccountRoleRel {
         return accountId;
     }
 
-    public void setAccountId(String value) {
-        this.accountId = value;
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String getScreenName() {
         return screenName;
     }
 
-    public void setScreenName(String value) {
-        this.screenName = value;
+    public void setScreenName(String screenName) {
+        this.screenName = screenName;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public void setUserId(String value) {
-        this.userId = value;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(String value) {
-        this.roleId = value;
+    public void setRoleId(String roleId) {
+        this.roleId = roleId;
     }
 
     public String getRoleName() {
         return roleName;
     }
 
-    public void setRoleName(String value) {
-        this.roleName = value;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar value) {
-        this.createdAt = value;
+    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Long getHjid() {
         return hjid;
     }
 
-    public void setHjid(Long value) {
-        this.hjid = value;
+    public void setHjid(Long hjid) {
+        this.hjid = hjid;
     }
 
     @Basic
@@ -134,8 +134,8 @@ public class AccountRoleRel {
         return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
+    public void setCreatedAtItem(Date createdAt) {
+        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Override
