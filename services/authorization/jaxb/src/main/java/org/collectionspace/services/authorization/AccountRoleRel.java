@@ -1,6 +1,7 @@
 package org.collectionspace.services.authorization;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -55,6 +56,7 @@ public class AccountRoleRel {
 
     @XmlAttribute(name = "Hjid")
     protected Long hjid;
+
     @Basic
     @Column(name = "account_id", nullable = false, length = 128)
     public String getAccountId() {
@@ -166,4 +168,22 @@ public class AccountRoleRel {
         setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AccountRoleRel that = (AccountRoleRel) o;
+        return Objects.equals(accountId, that.accountId)
+               && Objects.equals(screenName, that.screenName)
+               && Objects.equals(userId, that.userId)
+               && Objects.equals(roleId, that.roleId)
+               && Objects.equals(roleName, that.roleName)
+               && Objects.equals(createdAt, that.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountId, screenName, userId, roleId, roleName, createdAt);
+    }
 }

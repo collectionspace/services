@@ -1,6 +1,7 @@
 package org.collectionspace.services.authorization;
 
 import java.util.Date;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -167,4 +168,22 @@ public class PermissionRoleRel {
         setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PermissionRoleRel that = (PermissionRoleRel) o;
+        return Objects.equals(permissionId, that.permissionId)
+               && Objects.equals(permissionResource, that.permissionResource)
+               && Objects.equals(actionGroup, that.actionGroup)
+               && Objects.equals(roleId, that.roleId)
+               && Objects.equals(roleName, that.roleName)
+               && Objects.equals(createdAt, that.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(permissionId, permissionResource, actionGroup, roleId, roleName, createdAt);
+    }
 }

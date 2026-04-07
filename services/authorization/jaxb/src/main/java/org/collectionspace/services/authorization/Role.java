@@ -3,6 +3,7 @@ package org.collectionspace.services.authorization;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -263,4 +264,28 @@ public class Role {
         setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Role role = (Role) o;
+        return Objects.equals(displayName, role.displayName)
+               && Objects.equals(roleName, role.roleName)
+               && Objects.equals(description, role.description)
+               && Objects.equals(roleGroup, role.roleGroup)
+               && Objects.equals(tenantId, role.tenantId)
+               && Objects.equals(metadataProtection, role.metadataProtection)
+               && Objects.equals(permsProtection, role.permsProtection)
+               && Objects.equals(createdAt, role.createdAt)
+               && Objects.equals(updatedAt, role.updatedAt)
+               && Objects.equals(permission, role.permission)
+               && Objects.equals(csid, role.csid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(displayName, roleName, description, roleGroup, tenantId, metadataProtection,
+                            permsProtection, createdAt, updatedAt, permission, csid);
+    }
 }
