@@ -39,23 +39,23 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 public class PermissionRoleRel {
 
     @XmlElement(required = true)
-    protected String permissionId;
+    private String permissionId;
 
-    protected String permissionResource;
+    private String permissionResource;
 
-    protected String actionGroup;
+    private String actionGroup;
 
     @XmlElement(required = true)
-    protected String roleId;
+    private String roleId;
 
-    protected String roleName;
+    private String roleName;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private XMLGregorianCalendar createdAt;
 
     @XmlAttribute(name = "Hjid")
-    protected Long hjid;
+    private Long hjid;
 
     @Basic
     @Column(name = "permission_id", nullable = false, length = 128)

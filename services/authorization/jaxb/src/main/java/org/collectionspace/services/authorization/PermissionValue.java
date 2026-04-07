@@ -9,19 +9,19 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "permission_value")
 public class PermissionValue {
 
-    protected String permRelationshipId;
+    private String permRelationshipId;
 
     @XmlElement(required = true)
-    protected String permissionId;
+    private String permissionId;
 
     @XmlElement(required = true)
-    protected String resourceName;
+    private String resourceName;
 
     @XmlElement(required = true)
-    protected String actionGroup;
+    private String actionGroup;
 
     @XmlElement(required = true)
-    protected String tenantId;
+    private String tenantId;
 
     public String getPermRelationshipId() {
         return permRelationshipId;

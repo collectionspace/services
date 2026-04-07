@@ -10,16 +10,16 @@ import jakarta.xml.bind.annotation.XmlType;
 public class AccountValue {
 
     @XmlElement(required = true)
-    protected String accountId;
+    private String accountId;
 
     @XmlElement(required = true)
-    protected String screenName;
+    private String screenName;
 
     @XmlElement(required = true)
-    protected String userId;
+    private String userId;
 
     @XmlElement(required = true)
-    protected String tenantId;
+    private String tenantId;
 
     public String getAccountId() {
         return accountId;

@@ -15,19 +15,19 @@ import org.jspecify.annotations.NonNull;
 public class RolesList {
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long pageNum;
+    private long pageNum;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long pageSize;
+    private long pageSize;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long itemsInPage;
+    private long itemsInPage;
 
     @XmlSchemaType(name = "unsignedInt")
-    protected long totalItems;
+    private long totalItems;
 
     @XmlElement(required = true)
-    protected List<Role> role;
+    private List<Role> role;
 
     public long getPageNum() {
         return pageNum;

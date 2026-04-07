@@ -17,7 +17,7 @@ import org.jspecify.annotations.NonNull;
 public class PermissionsRolesList {
 
     @XmlElement(required = true)
-    protected List<PermissionRole> permissionRole;
+    private List<PermissionRole> permissionRole;
 
     @NonNull
     public List<PermissionRole> getPermissionRole() {

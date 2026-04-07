@@ -44,35 +44,35 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 public class Role {
 
     @XmlElement(required = true)
-    protected String displayName;
+    private String displayName;
 
     @XmlElement(required = true)
-    protected String roleName;
+    private String roleName;
 
-    protected String description;
+    private String description;
 
-    protected String roleGroup;
+    private String roleGroup;
 
     @XmlElement(name = "tenant_id", required = true)
-    protected String tenantId;
+    private String tenantId;
 
-    protected String metadataProtection;
+    private String metadataProtection;
 
-    protected String permsProtection;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private String permsProtection;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar updatedAt;
+    private XMLGregorianCalendar createdAt;
 
     @XmlElement(required = true)
-    protected List<PermissionValue> permission;
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
+
+    @XmlElement(required = true)
+    private List<PermissionValue> permission;
 
     @XmlAttribute(name = "csid")
-    protected String csid;
+    private String csid;
 
     @Basic
     @Column(name = "displayname", nullable = false, length = 200)

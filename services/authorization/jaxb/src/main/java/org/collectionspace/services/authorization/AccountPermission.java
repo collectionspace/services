@@ -14,10 +14,10 @@ import org.jspecify.annotations.NonNull;
 public class AccountPermission {
 
     @XmlElement(required = true)
-    protected List<AccountValue> account;
+    private List<AccountValue> account;
 
     @XmlElement(required = true)
-    protected List<PermissionValue> permission;
+    private List<PermissionValue> permission;
 
     @NonNull
     public List<AccountValue> getAccount() {

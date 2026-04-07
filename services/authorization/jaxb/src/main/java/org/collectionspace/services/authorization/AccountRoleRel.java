@@ -38,24 +38,24 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class AccountRoleRel {
 
-    protected String accountId;
+    private String accountId;
 
-    protected String screenName;
-
-    @XmlElement(required = true)
-    protected String userId;
+    private String screenName;
 
     @XmlElement(required = true)
-    protected String roleId;
+    private String userId;
 
-    protected String roleName;
+    @XmlElement(required = true)
+    private String roleId;
+
+    private String roleName;
 
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    private XMLGregorianCalendar createdAt;
 
     @XmlAttribute(name = "Hjid")
-    protected Long hjid;
+    private Long hjid;
 
     @Basic
     @Column(name = "account_id", nullable = false, length = 128)

@@ -13,13 +13,13 @@ import org.jspecify.annotations.NonNull;
 @XmlType(name = "account_role")
 public class AccountRole {
 
-    protected SubjectType subject;
+    private SubjectType subject;
 
     @XmlElement(required = true)
-    protected List<AccountValue> account;
+    private List<AccountValue> account;
 
     @XmlElement(required = true)
-    protected List<RoleValue> role;
+    private List<RoleValue> role;
 
     public SubjectType getSubject() {
         return subject;

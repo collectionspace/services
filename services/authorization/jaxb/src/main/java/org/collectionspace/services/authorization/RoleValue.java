@@ -9,19 +9,19 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "role_value")
 public class RoleValue {
 
-    protected String roleRelationshipId;
+    private String roleRelationshipId;
 
     @XmlElement(required = true)
-    protected String roleId;
+    private String roleId;
 
     @XmlElement(required = true)
-    protected String roleName;
+    private String roleName;
 
     @XmlElement(required = true)
-    protected String displayName;
+    private String displayName;
 
     @XmlElement(required = true)
-    protected String tenantId;
+    private String tenantId;
 
     public String getRoleRelationshipId() {
         return roleRelationshipId;

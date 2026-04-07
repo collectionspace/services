@@ -13,13 +13,13 @@ import org.jspecify.annotations.NonNull;
 @XmlType(name = "permission_role")
 public class PermissionRole {
 
-    protected SubjectType subject;
+    private SubjectType subject;
 
     @XmlElement(required = true)
-    protected List<PermissionValue> permission;
+    private List<PermissionValue> permission;
 
     @XmlElement(required = true)
-    protected List<RoleValue> role;
+    private List<RoleValue> role;
 
     public SubjectType getSubject() {
         return subject;
