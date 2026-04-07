@@ -75,8 +75,7 @@ public class PermissionsList {
         return permission;
     }
 
-    public PermissionsList setPermission(
-        List<Permission> permission) {
+    public PermissionsList setPermission(List<Permission> permission) {
         this.permission = permission;
         return this;
     }

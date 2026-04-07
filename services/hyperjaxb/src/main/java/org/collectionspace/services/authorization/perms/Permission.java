@@ -39,41 +39,65 @@ import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class Permission {
 
-    private String description;
-
-    @XmlElement(required = true)
-    private String resourceName;
-
-    private String attributeName;
-
-    private String actionGroup;
-
-    @XmlElement(required = true)
-    private List<PermissionAction> action;
-
-    @XmlElement(required = true)
-    private EffectType effect;
-
-    private String metadataProtection;
-
-    private String actionsProtection;
-
-    @XmlElement(name = "tenant_id", required = true)
-    private String tenantId;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
-
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar updatedAt;
-
+    @Id
+    @Column(name = "csid", nullable = false, length = 128)
     @XmlAttribute(name = "csid")
     private String csid;
 
     @Basic
-    @Column(name = "description", length = 255)
+    @Column(name = "description")
+    private String description;
+
+    @Basic
+    @Column(name = "resource_name", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String resourceName;
+
+    @Basic
+    @Column(name = "attribute_name", length = 128)
+    private String attributeName;
+
+    @Basic
+    @Column(name = "action_group", length = 128)
+    private String actionGroup;
+
+    @OneToMany(
+        targetEntity = PermissionAction.class,
+        cascade = {CascadeType.ALL}
+    )
+    @JoinColumn(name = "ACTION__PERMISSION_CSID")
+    @XmlElement(required = true)
+    private List<PermissionAction> action;
+
+    @Basic
+    @Column(name = "effect", nullable = false, length = 32)
+    @Enumerated(EnumType.STRING)
+    @XmlElement(required = true)
+    private EffectType effect;
+
+    @Basic
+    @Column(name = "metadata_protection")
+    private String metadataProtection;
+
+    @Basic
+    @Column(name = "actions_protection")
+    private String actionsProtection;
+
+    @Basic
+    @Column(name = "tenant_id", nullable = false, length = 128)
+    @XmlElement(name = "tenant_id", required = true)
+    private String tenantId;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar createdAt;
+
+    @Transient
+    @XmlElement(required = true)
+    @XmlSchemaType(name = "dateTime")
+    private XMLGregorianCalendar updatedAt;
+
     public String getDescription() {
         return description;
     }
@@ -83,8 +107,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "resource_name", nullable = false, length = 128)
     public String getResourceName() {
         return resourceName;
     }
@@ -94,8 +116,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "attribute_name", nullable = true, length = 128)
     public String getAttributeName() {
         return attributeName;
     }
@@ -105,8 +125,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "action_group", nullable = true, length = 128)
     public String getActionGroup() {
         return actionGroup;
     }
@@ -117,11 +135,6 @@ public class Permission {
     }
 
     @NonNull
-    @OneToMany(
-        targetEntity = PermissionAction.class,
-        cascade = {CascadeType.ALL}
-    )
-    @JoinColumn(name = "ACTION__PERMISSION_CSID")
     public List<PermissionAction> getAction() {
         if (action == null) {
             action = new ArrayList<>();
@@ -134,9 +147,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "effect", nullable = false, length = 32)
-    @Enumerated(EnumType.STRING)
     public EffectType getEffect() {
         return effect;
     }
@@ -146,8 +156,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "metadata_protection", nullable = true, length = 255)
     public String getMetadataProtection() {
         return metadataProtection;
     }
@@ -157,8 +165,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "actions_protection", nullable = true, length = 255)
     public String getActionsProtection() {
         return actionsProtection;
     }
@@ -168,8 +174,6 @@ public class Permission {
         return this;
     }
 
-    @Basic
-    @Column(name = "tenant_id", nullable = false, length = 128)
     public String getTenantId() {
         return tenantId;
     }
@@ -179,7 +183,6 @@ public class Permission {
         return this;
     }
 
-    @Transient
     public XMLGregorianCalendar getCreatedAt() {
         return createdAt;
     }
@@ -189,7 +192,6 @@ public class Permission {
         return this;
     }
 
-    @Transient
     public XMLGregorianCalendar getUpdatedAt() {
         return updatedAt;
     }
@@ -199,8 +201,6 @@ public class Permission {
         return this;
     }
 
-    @Id
-    @Column(name = "csid", nullable = false, length = 128)
     public String getCsid() {
         return csid;
     }

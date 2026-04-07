@@ -26,21 +26,28 @@ import jakarta.xml.bind.annotation.XmlType;
 @Inheritance(strategy = InheritanceType.JOINED)
 public class PermissionAction {
 
-    @XmlElement(required = true)
-    private ActionType name;
-
-    @XmlElement(required = true)
-    private String objectIdentity;
-
-    @XmlElement(required = true)
-    private String objectIdentityResource;
-
-    @XmlAttribute(name = "Hjid")
-    private Long hjid;
-
     @Basic
     @Column(name = "name", nullable = false, length = 128)
     @Enumerated(EnumType.STRING)
+    @XmlElement(required = true)
+    private ActionType name;
+
+    @Basic
+    @Column(name = "objectIdentity", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String objectIdentity;
+
+    @Basic
+    @Column(name = "objectIdentityResource", nullable = false, length = 128)
+    @XmlElement(required = true)
+    private String objectIdentityResource;
+
+    @Id
+    @Column(name = "HJID")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @XmlAttribute(name = "Hjid")
+    private Long hjid;
+
     public ActionType getName() {
         return name;
     }
@@ -50,8 +57,6 @@ public class PermissionAction {
         return this;
     }
 
-    @Basic
-    @Column(name = "objectIdentity", nullable = false, length = 128)
     public String getObjectIdentity() {
         return objectIdentity;
     }
@@ -61,8 +66,6 @@ public class PermissionAction {
         return this;
     }
 
-    @Basic
-    @Column(name = "objectIdentityResource", nullable = false, length = 128)
     public String getObjectIdentityResource() {
         return objectIdentityResource;
     }
@@ -72,9 +75,6 @@ public class PermissionAction {
         return this;
     }
 
-    @Id
-    @Column(name = "HJID")
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getHjid() {
         return hjid;
     }
