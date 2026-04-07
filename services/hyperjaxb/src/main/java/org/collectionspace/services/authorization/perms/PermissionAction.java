@@ -1,5 +1,10 @@
 package org.collectionspace.services.authorization.perms;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -12,12 +17,6 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Table;
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "permission_action")
@@ -91,8 +90,8 @@ public class PermissionAction {
         }
         PermissionAction that = (PermissionAction) o;
         return name == that.name
-               && Objects.equals(objectIdentity,that.objectIdentity)
-               && Objects.equals(objectIdentityResource, that.objectIdentityResource);
+                && Objects.equals(objectIdentity, that.objectIdentity)
+                && Objects.equals(objectIdentityResource, that.objectIdentityResource);
     }
 
     @Override

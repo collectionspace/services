@@ -6,7 +6,6 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlEnum
 @XmlType(name = "action_type")
 public enum ActionType {
-
     CREATE,
     READ,
     UPDATE,

@@ -1,5 +1,11 @@
 package org.collectionspace.services.authorization.perms;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,14 +26,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlSchemaType;
-import jakarta.xml.bind.annotation.XmlType;
-
 import org.jspecify.annotations.NonNull;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
 import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
@@ -62,9 +60,8 @@ public class Permission {
     private String actionGroup;
 
     @OneToMany(
-        targetEntity = PermissionAction.class,
-        cascade = {CascadeType.ALL}
-    )
+            targetEntity = PermissionAction.class,
+            cascade = {CascadeType.ALL})
     @JoinColumn(name = "ACTION__PERMISSION_CSID")
     @XmlElement(required = true)
     private List<PermissionAction> action;
@@ -239,21 +236,31 @@ public class Permission {
         }
         Permission that = (Permission) o;
         return Objects.equals(description, that.description)
-               && Objects.equals(resourceName, that.resourceName)
-               && Objects.equals(attributeName, that.attributeName)
-               && Objects.equals(actionGroup, that.actionGroup)
-               && effect == that.effect
-               && Objects.equals(metadataProtection, that.metadataProtection)
-               && Objects.equals(actionsProtection, that.actionsProtection)
-               && Objects.equals(tenantId, that.tenantId)
-               && Objects.equals(createdAt, that.createdAt)
-               && Objects.equals(updatedAt, that.updatedAt)
-               && Objects.equals(csid, that.csid);
+                && Objects.equals(resourceName, that.resourceName)
+                && Objects.equals(attributeName, that.attributeName)
+                && Objects.equals(actionGroup, that.actionGroup)
+                && effect == that.effect
+                && Objects.equals(metadataProtection, that.metadataProtection)
+                && Objects.equals(actionsProtection, that.actionsProtection)
+                && Objects.equals(tenantId, that.tenantId)
+                && Objects.equals(createdAt, that.createdAt)
+                && Objects.equals(updatedAt, that.updatedAt)
+                && Objects.equals(csid, that.csid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, resourceName, attributeName, actionGroup, effect, metadataProtection,
-                            actionsProtection, tenantId, createdAt, updatedAt, csid);
+        return Objects.hash(
+                description,
+                resourceName,
+                attributeName,
+                actionGroup,
+                effect,
+                metadataProtection,
+                actionsProtection,
+                tenantId,
+                createdAt,
+                updatedAt,
+                csid);
     }
 }
