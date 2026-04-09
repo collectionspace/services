@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
+      <artifactId>resteasy-client</artifactId>
       <!-- filter out unwanted jars -->
       <exclusions>
         <exclusion>

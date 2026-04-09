@@ -56,7 +56,7 @@
 
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
+            <artifactId>resteasy-client</artifactId>
             <exclusions>
                 <exclusion>
                     <groupId>tjws</groupId>
