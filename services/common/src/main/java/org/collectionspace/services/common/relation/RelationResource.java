@@ -41,7 +41,6 @@ import org.collectionspace.services.common.relation.nuxeo.RelationsUtils;
 import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -146,7 +145,7 @@ public class RelationResource extends NuxeoBasedResource {
 
     @DELETE
     public Response delete(@Context UriInfo uriInfo) {
-    	Response result = Response.status(HttpResponseCodes.SC_OK).build();
+    	Response result = Response.ok().build();
     	
     	List<String> csidList = new ArrayList<String>();
         try {
@@ -160,7 +159,7 @@ public class RelationResource extends NuxeoBasedResource {
 	        	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 	            getRepositoryClient(ctx).delete(ctx, csidList, handler);
 	    	} else {
-	            result = Response.status(HttpResponseCodes.SC_NOT_FOUND).build();
+	            result = Response.ok().build();
 	    	}
         } catch (Exception e) {
         	String separator = ", ";

@@ -29,7 +29,6 @@ import java.util.Random;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.slf4j.Logger;
@@ -92,7 +91,7 @@ public class PerformanceTest extends CollectionSpacePerformanceTest {
             Date startTime = new Date();
             response = collectionObjectClient.roundtrip(0);
             try {
-                Assert.assertEquals(response.getStatus(), HttpResponseCodes.SC_OK);
+                Assert.assertEquals(response.getStatus(), Response.Status.OK.getStatusCode());
             } finally {
                 response.close();
             }
