@@ -34,25 +34,15 @@
   <name>services.hyperjaxb</name>
 
   <dependencies>
-  <!--
-		<dependency>
-		  <groupId>com.sun.xml.bind</groupId>
-		  <artifactId>jaxb-impl</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>org.jvnet.jaxb2-commons</groupId>
-		  <artifactId>property-listener-injector</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics-runtime</artifactId>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
-    <!-- Dependencies for HyperJaxB -->
+    <dependency>
+      <groupId>org.jvnet.jaxb</groupId>
+      <artifactId>hyperjaxb3-ejb-runtime</artifactId>
+      <version>4.0.12</version>
+    </dependency>
 		<dependency>
 		    <groupId>javax.persistence</groupId>
 		    <artifactId>persistence-api</artifactId>
@@ -66,21 +56,16 @@
 			<groupId>org.dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 		</dependency>
-		
+    <dependency>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
 
   <build>
     <finalName>collectionspace-services-hyperjaxb</finalName>
     <defaultGoal>install</defaultGoal>
-
-    <plugins>
-    <!--
-      <plugin>
-       <groupId>org.jvnet.jaxb</groupId>
-       <artifactId>hyperjaxb3-ejb-plugin</artifactId>
-      </plugin>
-      -->
-    </plugins>
   </build>
 
 </project>
