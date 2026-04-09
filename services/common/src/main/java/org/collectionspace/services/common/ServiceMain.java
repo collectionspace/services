@@ -1219,7 +1219,7 @@ public class ServiceMain {
     public ResourceMap getJaxRSResourceMap() {
         ResourceMap result;
 
-        result = ResteasyProviderFactory.getContextData(ResourceMap.class);
+        result = ResteasyProviderFactory.getInstance().getContextData(ResourceMap.class);
 
         return result;
     }
