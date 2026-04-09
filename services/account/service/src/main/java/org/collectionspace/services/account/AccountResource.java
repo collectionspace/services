@@ -603,7 +603,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
     	if (contains(targetTenantID, accountListItem.getTenants()) == false) {
 			String errMsg = String.format("Could not send a password request email to user ID='%s'.  That account is not associated with the targeted tenant ID = '%s'.",
-					accountListItem.email, targetTenantID);
+					accountListItem.getEmail(), targetTenantID);
         	result = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
         	return result;
     	}
@@ -635,7 +635,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     		String status = EmailUtil.sendMessage(emailConfig, accountListItem.getEmail(), message);
     		if (status != null) {
     			String errMsg = String.format("Could not send email to %s: %s",
-    					accountListItem.email, status);
+    					accountListItem.getEmail(), status);
             	result = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
     		} else {
     			String okMsg = accountListItem.getEmail();
