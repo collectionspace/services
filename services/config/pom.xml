@@ -36,14 +36,6 @@
 			<version>2.12.2</version>
 			<scope>test</scope>
 		</dependency>
-    <!--
-		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics</artifactId>
-      <version>${jaxb2-basics.version}</version>
-		</dependency>
-		-->
-
 		<dependency>
 			<groupId>org.jvnet.jaxb</groupId>
 			<artifactId>jaxb-plugins-runtime</artifactId>
@@ -53,6 +45,11 @@
 			<artifactId>org.collectionspace.services.common-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+      <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
 
     <build>
