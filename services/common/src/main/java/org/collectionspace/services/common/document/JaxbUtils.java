@@ -31,11 +31,11 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class JaxbUtils {
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(o, sw);
-        } catch (javax.xml.bind.MarshalException e) {
+        } catch (jakarta.xml.bind.MarshalException e) {
         	//
         	// If the JAX-B object we're trying to marshal doesn't have an @XmlRootElement, then we need another
         	// approach.
