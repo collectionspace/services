@@ -34,6 +34,12 @@
   <name>services.hyperjaxb</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.collectionspace.services</groupId>
+      <artifactId>org.collectionspace.services.jaxb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>

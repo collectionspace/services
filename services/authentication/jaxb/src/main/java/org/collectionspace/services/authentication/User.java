@@ -11,8 +11,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -20,8 +18,8 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.collectionspace.services.jaxb.adapter.DateAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -46,20 +44,26 @@ public class User {
     @XmlElement(required = true)
     protected String salt;
 
-    @Transient
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar createdAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    protected Date createdAt;
 
-    @Transient
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar updatedAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    protected Date updatedAt;
 
-    @Transient
+    @Column(name = "lastLogin")
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar lastLogin;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    protected Date lastLogin;
 
     public String getUsername() {
         return username;
@@ -85,61 +89,36 @@ public class User {
         this.salt = salt;
     }
 
-    public XMLGregorianCalendar getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public XMLGregorianCalendar getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
     }
 
-    public XMLGregorianCalendar getLastLogin() {
+    public Date getLastLogin() {
         return lastLogin;
     }
 
-    public void setLastLogin(XMLGregorianCalendar lastLogin) {
+    public void setLastLogin(Date lastLogin) {
         this.lastLogin = lastLogin;
     }
 
-    @Basic
-    @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
-    }
-
     public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
-    }
-
-    @Basic
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getUpdatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
+        setCreatedAt(createdAt);
     }
 
     public void setUpdatedAtItem(Date updatedAt) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
-    }
-
-    @Basic
-    @Column(name = "lastLogin")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getLastLoginItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getLastLogin());
-    }
-
-    public void setLastLoginItem(Date lastLogin) {
-        setLastLogin(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, lastLogin));
+        setUpdatedAt(updatedAt);
     }
 
     @Override
