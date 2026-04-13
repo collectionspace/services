@@ -11,7 +11,7 @@
         <class>org.collectionspace.services.account.AccountsCommon</class>
         <class>org.collectionspace.services.account.Tenant</class>
         <class>org.collectionspace.services.account.AccountTenant</class>
-        <class>org.collectionspace.services.account.Status</class>        
+        <class>org.collectionspace.services.account.Status</class>
         <class>org.collectionspace.services.authentication.User</class>
         <class>org.collectionspace.services.authentication.Token</class>
         <class>org.collectionspace.services.authorization.perms.Permission</class>
@@ -30,6 +30,8 @@
             <property name="javax.persistence.jdbc.url" value="${db.jdbc.cspace.url.encoded}"/>
             <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider"/>
             <property name="hibernate.c3p0.max_size" value="8"/>
+            <!-- Same as auth-mgt import - disable XML Mapping so that javax.xml.bind classes are not loaded -->
+            <property name="hibernate.xml_mapping_enabled" value="false" />
         </properties>
 
     </persistence-unit>

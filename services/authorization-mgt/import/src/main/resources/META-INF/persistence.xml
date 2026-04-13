@@ -15,6 +15,8 @@
             <property name="javax.persistence.jdbc.user" value="@DB_CSPACE_USER@" />
             <property name="javax.persistence.jdbc.password" value="@DB_CSPACE_PASSWORD@" />
             <property name="hibernate.show_sql" value="true" />
+            <!-- Disable XML Mapping so that javax.xml.bind classes do not attempt to be loaded -->
+            <property name="hibernate.xml_mapping_enabled" value="false" />
         </properties>
     </persistence-unit>
 </persistence>
