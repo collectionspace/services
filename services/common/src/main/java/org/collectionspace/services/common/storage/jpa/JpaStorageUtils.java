@@ -23,18 +23,16 @@
  */
 package org.collectionspace.services.common.storage.jpa;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-
-import javax.persistence.PersistenceException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 import org.collectionspace.authentication.AuthN;
@@ -50,13 +48,12 @@ import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.common.api.Tools;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationRoleRel;
-import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.security.UnauthorizedException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.document.TransactionException;
 import org.collectionspace.services.common.security.SecurityUtils;
+import org.collectionspace.services.common.security.UnauthorizedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +61,6 @@ import org.slf4j.LoggerFactory;
  * Utilities for JpaStorage
  * @author
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class JpaStorageUtils {
 
     final private static Logger logger = LoggerFactory.getLogger(JpaStorageUtils.class);
