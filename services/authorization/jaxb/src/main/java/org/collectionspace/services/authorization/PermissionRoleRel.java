@@ -127,10 +127,6 @@ public class PermissionRoleRel {
         this.hjid = hjid;
     }
 
-    public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(createdAt);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

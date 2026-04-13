@@ -71,7 +71,7 @@ public class TokenStorageClient {
     		token.setTenantId(tenantId);
     		token.setExpireSeconds(expireSeconds);
     		token.setEnabled(true);
-    		token.setCreatedAtItem(new Date());
+    		token.setCreatedAt(new Date());
 
             em.getTransaction().begin();
     		em.persist(token);
@@ -98,7 +98,7 @@ public class TokenStorageClient {
         tokenFound = get((JPATransactionContext)transactionContext, id);
         if (tokenFound != null) {
             tokenFound.setEnabled(enabledFlag);
-            tokenFound.setUpdatedAtItem(new Date());
+            tokenFound.setUpdatedAt(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("Updated token=" + JaxbUtils.toString(tokenFound, Token.class));
             }

@@ -211,10 +211,6 @@ public class Permission {
         return this;
     }
 
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(target);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

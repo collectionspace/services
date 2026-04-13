@@ -256,14 +256,6 @@ public class AccountsCommon {
         this.csid = csid;
     }
 
-    public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(createdAt);
-    }
-
-    public void setUpdatedAtItem(Date updatedAt) {
-        setUpdatedAt(updatedAt);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

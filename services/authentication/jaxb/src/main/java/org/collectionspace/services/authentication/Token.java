@@ -125,18 +125,6 @@ public class Token {
         this.updatedAt = updatedAt;
     }
 
-    public Date getCreatedAtItem() {
-        return createdAt;
-    }
-
-    public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(createdAt);
-    }
-
-    public void setUpdatedAtItem(Date updatedAt) {
-        setUpdatedAt(updatedAt);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

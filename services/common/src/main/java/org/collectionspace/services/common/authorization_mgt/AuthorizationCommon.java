@@ -1,6 +1,5 @@
 package org.collectionspace.services.common.authorization_mgt;
 
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +18,6 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.AccountListItem;
-
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AuthZ;
 import org.collectionspace.services.authorization.CSpaceAction;
@@ -41,7 +39,6 @@ import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.client.RoleClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
-
 import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.context.ServiceBindingUtils;
@@ -52,17 +49,13 @@ import org.collectionspace.services.common.storage.DatabaseProductType;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.EmailConfig;
 import org.collectionspace.services.config.tenant.PasswordResetConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
-
 import org.collectionspace.services.lifecycle.Lifecycle;
 import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.lifecycle.TransitionDefList;
-
-//import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -189,7 +182,7 @@ public class AuthorizationCommon {
     public static Role createRole(String tenantId, String name, String description, boolean immutable) {
     	Role role = new Role();
 
-        role.setCreatedAtItem(new Date());
+        role.setCreatedAt(new Date());
         role.setDisplayName(name);
     	String roleName = AuthorizationCommon.getQualifiedRoleName(tenantId, name);
         role.setRoleName(roleName);
@@ -298,7 +291,7 @@ public class AuthorizationCommon {
         Permission perm = new Permission();
         perm.setCsid(id);
         perm.setDescription(description);
-        perm.setCreatedAtItem(new Date());
+        perm.setCreatedAt(new Date());
         perm.setResourceName(resourceName.toLowerCase().trim());
         perm.setEffect(EffectType.PERMIT);
         perm.setTenantId(tenantId);
@@ -1105,7 +1098,7 @@ public class AuthorizationCommon {
 	    		Role readonlyRole = AuthorizationCommon.getRole(jpaTransactionContext, tenantBinding.getId(), ROLE_TENANT_READER);
 
 	    		if (adminRole == null || readonlyRole == null) {
-	    			String msg = String.format("One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.");
+	    			String msg = "One or more of the required default CollectionSpace administrator roles is missing or was never created.  If you're setting up a new instance of CollectionSpace, shutdown the Tomcat server and run the 'ant import' command from the root/top level CollectionSpace 'Services' source directory.  Then try restarting Tomcat.";
 	    			logger.info(msg);
 	    			throw new RuntimeException("One or more of the required default CollectionSpace administrator roles is missing or was never created.");
 	    		}
@@ -1265,17 +1258,17 @@ public class AuthorizationCommon {
 
     }
 
-	public static boolean hasTokenExpired(EmailConfig emailConfig, Token token) throws NoSuchAlgorithmException {
+	public static boolean hasTokenExpired(EmailConfig emailConfig, Token token) {
 		boolean result = false;
 
 		int maxConfigSeconds = emailConfig.getPasswordResetConfig().getTokenExpirationSeconds().intValue();
 		int maxTokenSeconds = token.getExpireSeconds().intValue();
 
-		long createdTime = token.getCreatedAtItem().getTime();
-		long configExpirationTime = createdTime + maxConfigSeconds * 1000;		// the current tenant config for how long a token stays valid
-		long tokenDefinedExirationTime = createdTime + maxTokenSeconds * 1000;	// the tenant config for how long a token stays valid when the token was created.
+		long createdTime = token.getCreatedAt().getTime();
+		long configExpirationTime = createdTime + maxConfigSeconds * 1000L; // the current tenant config for how long a token stays valid
+		long tokenDefinedExpirationTime = createdTime + maxTokenSeconds * 1000L; // the tenant config for how long a token stays valid when the token was created.
 
-		if (configExpirationTime != tokenDefinedExirationTime) {
+		if (configExpirationTime != tokenDefinedExpirationTime) {
 			String msg = String.format("The configured expiration time for the token = '%s' changed from when the token was created.",
 					token.getId());
 			logger.warn(msg);

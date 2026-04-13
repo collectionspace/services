@@ -66,7 +66,7 @@ public class UserStorageClient {
         String salt = UUID.randomUUID().toString();
         user.setPasswd(getEncPassword(userId, password, salt));
         user.setSalt(salt);
-        user.setCreatedAtItem(new Date());
+        user.setCreatedAt(new Date());
         return user;
     }
 
@@ -112,13 +112,13 @@ public class UserStorageClient {
      * @param password
      */
     public void update(JPATransactionContext jpaTransactionContext, String userId, byte[] password)
-            throws DocumentNotFoundException, Exception {
+        throws DocumentNotFoundException, BadRequestException {
         User userFound = get(jpaTransactionContext, userId);
         if (userFound != null) {
             String salt = UUID.randomUUID().toString();
             userFound.setPasswd(getEncPassword(userId, password, salt));
             userFound.setSalt(salt);
-            userFound.setUpdatedAtItem(new Date());
+            userFound.setUpdatedAt(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
             }
