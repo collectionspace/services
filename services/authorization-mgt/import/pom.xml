@@ -47,6 +47,10 @@
 					<groupId>commons-codec</groupId>
 					<artifactId>commons-codec</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.jboss.resteasy</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -142,95 +146,37 @@
 		<dependency>
 			<groupId>ch.elca.el4j.modules</groupId>
 			<artifactId>module-xml_merge-common</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xml-apis</groupId>
-					<artifactId>xml-apis</artifactId>
-				</exclusion>
-			</exclusions>
+			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
-			<artifactId>
-        		org.collectionspace.services.authorization-mgt.service
-        	</artifactId>
+			<artifactId>org.collectionspace.services.common</artifactId>
 			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
-					<artifactId>nuxeo-core-query</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
+					<groupId>org.nuxeo.binary.metadata</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<artifactId>nuxeo-opencmis-bindings</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-runtime</artifactId>
-					<groupId>org.nuxeo.runtime</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-core-api</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-types-core</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>
-						nuxeo-platform-filemanager-api
-					</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-core-schema</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-mimetype-api</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-core-io</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-types-api</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-runtime-launcher</artifactId>
 					<groupId>org.nuxeo.lib.runtime</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<artifactId>nuxeo-core-storage-sql-ra</artifactId>
-					<groupId>org.nuxeo.ecm.core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-platform-imaging-core</artifactId>
 					<groupId>org.nuxeo.ecm.platform</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<artifactId>nuxeo-runtime-osgi</artifactId>
 					<groupId>org.nuxeo.runtime</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<artifactId>nuxeo-platform-imaging-api</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>nuxeo-core-convert</artifactId>
 					<groupId>org.nuxeo.ecm.core</groupId>
+					<artifactId>*</artifactId>
 				</exclusion>
 				<exclusion>
-					<artifactId>
-						nuxeo-platform-mimetype-core
-					</artifactId>
-					<groupId>org.nuxeo.ecm.platform</groupId>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
