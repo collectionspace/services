@@ -64,7 +64,6 @@ public class AccountRoleRel {
     @Column(name = "role_name")
     private String roleName;
 
-    @Basic
     @Column(name = "created_at", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)

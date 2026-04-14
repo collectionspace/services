@@ -61,7 +61,6 @@ public class Token {
     @XmlJavaTypeAdapter(DateAdapter.class)
     protected Date createdAt;
 
-    @Basic
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)

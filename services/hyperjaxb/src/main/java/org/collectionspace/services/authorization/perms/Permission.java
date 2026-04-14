@@ -91,7 +91,6 @@ public class Permission {
     @XmlJavaTypeAdapter(DateAdapter.class)
     private Date createdAt;
 
-    @Basic
     @Column(name = "updated_at")
     @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
