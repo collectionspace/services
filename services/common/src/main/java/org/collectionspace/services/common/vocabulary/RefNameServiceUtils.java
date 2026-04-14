@@ -140,7 +140,7 @@ public class RefNameServiceUtils {
                                     identifier.substring(URN_ID_PREFIX_LEN, closeParen));
                         }
                     } else {
-                        logger.error(method + ": bad or missing specifier!");
+                        logger.error("{}: bad or missing specifier!", method);
                         Response response = Response.status(Response.Status.BAD_REQUEST).entity(
                                 op + " failed on bad or missing Authority specifier").type(
                                 "text/plain").build();
@@ -545,7 +545,8 @@ public class RefNameServiceUtils {
                     break;
                 }
                 docsInCurrentPage = docList.size();
-                logger.debug("updateAuthorityRefDocs: current page=" + currentPage + " documents included in page=" + docsInCurrentPage);
+                logger.debug("updateAuthorityRefDocs: current page={} documents included in page={}", currentPage,
+                             docsInCurrentPage);
                 if (docsInCurrentPage == 0) {
                     logger.debug("updateAuthorityRefDocs: no more documents requiring refName updates could be found");
                     break;
@@ -574,11 +575,13 @@ public class RefNameServiceUtils {
 
             }
         } catch (Exception e) {
-            logger.error("Internal error updating the AuthorityRefDocs: " + e.getLocalizedMessage());
+            logger.error("Internal error updating the AuthorityRefDocs: {}", e.getLocalizedMessage());
             logger.debug(Tools.errorToString(e, true));
             throw e;
         }
-        logger.debug("updateAuthorityRefDocs replaced a total of " + nRefsFound + " authority references, within as many as " + docsScanned + " scanned document(s)");
+        logger.debug(
+            "updateAuthorityRefDocs replaced a total of {} authority references, within as many as {} scanned document(s)",
+            nRefsFound, docsScanned);
         return nRefsFound;
     }
 
@@ -923,19 +926,20 @@ public class RefNameServiceUtils {
                             additionalValues.put(UriTemplateFactory.ITEM_IDENTIFIER_VAR, csid);
                             uri = template.buildUri(additionalValues);
                         } catch (Exception e) {
-                            logger.warn("Could not extract inAuthority property from authority item record: " + e.getMessage());
+                            logger.warn("Could not extract inAuthority property from authority item record: {}",
+                                        e.getMessage());
                         }
                     } else if (template.getUriTemplateType() == UriTemplateFactory.CONTACT) {
                         // FIXME: Generating contact sub-resource URIs requires additional work,
                         // as a follow-on to CSPACE-5271 - ADR 2012-08-16
                         // Sets the default (empty string) value for uri, for now
                     } else {
-                        logger.warn("Unrecognized URI template type = " + template.getUriTemplateType());
+                        logger.warn("Unrecognized URI template type = {}", template.getUriTemplateType());
                         // Sets the default (empty string) value for uri
                     }
                 } else { // (if template == null)
-                    logger.warn("Could not retrieve URI template from registry via tenant ID "
-                            + tenantId + " and docType " + docType);
+                    logger.warn("Could not retrieve URI template from registry via tenant ID {} and docType {}",
+                                tenantId, docType);
                     // Sets the default (empty string) value for uri
                 }
                 ilistItem.setUri(uri);
@@ -943,7 +947,7 @@ public class RefNameServiceUtils {
                     ilistItem.setWorkflowState(docModel.getCurrentLifeCycleState());
                     ilistItem.setUpdatedAt(NuxeoDocumentModelHandler.getUpdatedAtAsString(docModel));
                 } catch (Exception e) {
-                    logger.error("Error getting core values for doc [" + csid + "]: " + e.getLocalizedMessage());
+                    logger.error("Error getting core values for doc [{}]: {}", csid, e.getLocalizedMessage());
                 }
                 ilistItem.setDocType(docType);
                 ilistItem.setDocNumber(
@@ -990,16 +994,12 @@ public class RefNameServiceUtils {
 	            			:refName.equals(docRefName)) {
                 		// We found the self for an item
                 		foundSelf = true;
-                		logger.trace("getAuthorityRefDocs: Result: "
-                						+ docType + " [" + NuxeoUtils.getCsid(docModel)
-                						+ "] appears to be self for: ["
-                						+ refName + "]");
+                        logger.trace("getAuthorityRefDocs: Result: {} [{}] appears to be self for: [{}]", docType,
+                                     NuxeoUtils.getCsid(docModel), refName);
                 	} else {
                 		nRefsFalsePositives++;
-                		logger.trace("getAuthorityRefDocs: Result: "
-                						+ docType + " [" + NuxeoUtils.getCsid(docModel)
-                						+ "] does not reference ["
-                						+ refName + "]");
+                        logger.trace("getAuthorityRefDocs: Result: {} [{}] does not reference [{}]", docType,
+                                     NuxeoUtils.getCsid(docModel), refName);
                 	}
                 }
             } catch (NuxeoException ce) {
@@ -1093,7 +1093,7 @@ public class RefNameServiceUtils {
                 Property prop = docModel.getProperty(arci.pathEls[0]);
                 findAuthRefPropertiesInProperty(authRefInfoList, prop, arci, 0, refNameToMatch, matchBaseOnly);
             } catch (Exception e) {
-                logger.error("Problem fetching property: " + arci.pathEls[0]);
+                logger.error("Problem fetching property: {}", arci.pathEls[0]);
             }
         }
         return authRefInfoList;
@@ -1123,8 +1123,8 @@ public class RefNameServiceUtils {
             for (Property listItemProp : propList) {
                 if (listItemProp instanceof StringProperty) {
                     if (arci.pathEls.length - pathStartIndex != 1) {
-                        logger.error("Configuration for authRefs does not match schema structure: "
-                                + arci.pathEls.toString());
+                        logger.error("Configuration for authRefs does not match schema structure: {}",
+                                     arci.pathEls.toString());
                         break;
                     } else {
                         addARIifMatches(refNameToMatch, matchBaseOnly, arci, listItemProp, authRefInfoList);
@@ -1135,8 +1135,8 @@ public class RefNameServiceUtils {
                     findAuthRefPropertiesInProperty(authRefInfoList, listItemProp, arci,
                             pathStartIndex + 2, refNameToMatch, matchBaseOnly);
                 } else {
-                    logger.error("Configuration for authRefs does not match schema structure: "
-                            + arci.pathEls.toString());
+                    logger.error("Configuration for authRefs does not match schema structure: {}",
+                                 arci.pathEls.toString());
                     break;
                 }
             }
@@ -1148,13 +1148,11 @@ public class RefNameServiceUtils {
                 findAuthRefPropertiesInProperty(authRefInfoList, localProp, arci,
                         pathStartIndex, refNameToMatch, matchBaseOnly);
             } catch (PropertyNotFoundException pnfe) {
-                logger.error("Could not find property: [" + localPropName + "] in path: "
-                        + arci.getFullPath());
+                logger.error("Could not find property: [{}] in path: {}", localPropName, arci.getFullPath());
                 // Fall through - ari will be null and we will continue...
             }
         } else {
-            logger.error("Configuration for authRefs does not match schema structure: "
-                    + arci.pathEls.toString());
+            logger.error("Configuration for authRefs does not match schema structure: {}", arci.pathEls.toString());
         }
 
         if (ari != null) {
@@ -1180,12 +1178,12 @@ public class RefNameServiceUtils {
 	            			:refNameToMatch.equals(value)))
                     || ((refNameToMatch == null) && Tools.notBlank(value))) {
                 // Found a match
-                logger.debug("Found a match on property: " + prop.getPath() + " with value: [" + value + "]");
+                logger.debug("Found a match on property: {} with value: [{}]", prop.getXPath(), value);
                 AuthRefInfo ari = new AuthRefInfo(arci, prop);
                 authRefInfoList.add(ari);
             }
         } catch (PropertyException pe) {
-            logger.debug("PropertyException on: " + prop.getPath() + pe.getLocalizedMessage());
+            logger.debug("PropertyException on: {}{}", prop.getXPath(), pe.getLocalizedMessage());
         }
     }
 

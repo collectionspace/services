@@ -768,9 +768,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return authRefList;
     }
 
-    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari, 
-    						List<AuthorityRefList.AuthorityRefItem> list)
-            throws Exception {
+    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari,
+                                         List<AuthorityRefList.AuthorityRefItem> list) {
     	String fieldName = ari.getQualifiedDisplayName();
     	try {
 	   		String refNameValue = (String)ari.getProperty().getValue();
@@ -780,12 +779,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 	   			return true;
 	   		}
     	} catch(PropertyException pe) {
-    		String msg = "PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage();
-    		if (logger.isDebugEnabled()) {
-    			logger.debug(msg, pe);
-    		} else {
-    			logger.error(msg);
-    		}
+            logger.error("PropertyException on: {} {}", ari.getProperty().getXPath(), pe.getLocalizedMessage(), pe);
     	}
     	return false;
     }
