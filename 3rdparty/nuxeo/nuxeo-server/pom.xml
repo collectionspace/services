@@ -17,26 +17,12 @@
   <repositories>
     <repository>
       <id>nuxeo-public-lts</id>
-      <url>https://packages.nuxeo.com/repositories/maven-public-lts</url>
+      <url>https://packages.nuxeo.com/repository/maven-public-lts</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>nuxeo-public-lts</id>
-      <url>https://packages.nuxeo.com/repositories/maven-public-lts</url>
-      <name>Nuxeo virtual release repository</name>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <!-- These come from nuxeo-nxr-server as it seemed to match closest to our distribution. A number of dependencies
        have been pruned off as they weren't being used previously. It's possible we could trim this down further but
