@@ -28,8 +28,6 @@
             <property name="javax.persistence.jdbc.user" value="${db.cspace.user}"/>
             <property name="javax.persistence.jdbc.password" value="${db.cspace.user.password}"/>
             <property name="javax.persistence.jdbc.url" value="${db.jdbc.cspace.url.encoded}"/>
-            <property name="hibernate.connection.provider_class" value="org.hibernate.connection.C3P0ConnectionProvider"/>
-            <property name="hibernate.c3p0.max_size" value="8"/>
             <!-- Same as auth-mgt import - disable XML Mapping so that javax.xml.bind classes are not loaded -->
             <property name="hibernate.xml_mapping_enabled" value="false" />
         </properties>
