@@ -521,7 +521,7 @@
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-jaxb-provider</artifactId>
-				<version>6.0.3.Final</version>
+        <version>${resteasy.version}</version>
 			</dependency>
 
 			<!-- Provided dependencies (for common-lib/cspace-service.war deployments) -->
@@ -1168,17 +1168,6 @@
 					<exclusion>
 						<groupId>org.apache.httpcomponents</groupId>
 						<artifactId>httpclient</artifactId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-jaxb-provider</artifactId>
-				<version>${resteasy.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>javax.xml.bind</groupId>
-						<artifactId>jaxb-api</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
