@@ -61,7 +61,7 @@ public class AccountTest {
         account.setStatus(Status.ACTIVE);
         id = UUID.randomUUID().toString();
         account.setCsid(id);
-        account.setCreatedAtItem(new Date());
+        account.setCreatedAt(new Date());
         AccountTenant tenant = new AccountTenant();
         tenant.setTenantId("123");
         List<AccountTenant> tList = new ArrayList<AccountTenant>();

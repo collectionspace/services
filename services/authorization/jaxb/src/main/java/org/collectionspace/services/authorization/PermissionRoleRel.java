@@ -13,9 +13,7 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -23,8 +21,8 @@ import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.collectionspace.services.jaxb.adapter.DateAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "permission_role_rel")
@@ -66,10 +64,12 @@ public class PermissionRoleRel {
     @Column(name = "role_name")
     private String roleName;
 
-    @Transient
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date createdAt;
 
     public String getPermissionId() {
         return permissionId;
@@ -111,11 +111,11 @@ public class PermissionRoleRel {
         this.roleName = roleName;
     }
 
-    public XMLGregorianCalendar getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
@@ -125,17 +125,6 @@ public class PermissionRoleRel {
 
     public void setHjid(Long hjid) {
         this.hjid = hjid;
-    }
-
-    @Basic
-    @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
-    }
-
-    public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
     }
 
     @Override

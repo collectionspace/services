@@ -76,7 +76,7 @@ public class TenantDocumentHandler
      */
     private Tenant merge(Tenant from, Tenant to) {
         Date now = new Date();
-        to.setUpdatedAtItem(now);
+        to.setUpdatedAt(now);
         // The only thing we allow changing at this point are the 'disabled' and 'authoritiesInitialized' flags
         to.setDisabled(from.isDisabled());
         to.setAuthoritiesInitialized(from.isAuthoritiesInitialized());

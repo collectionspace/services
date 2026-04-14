@@ -86,7 +86,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             //
             // Now add the account to the CSpace list of accounts
             //
-            account.setCreatedAtItem(new Date());
+            account.setCreatedAt(new Date());
             jpaConnectionContext.persist(account);        	
             //
             // Finish creating related resources -e.g., account-role relationships

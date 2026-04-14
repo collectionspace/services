@@ -95,7 +95,7 @@ public class JpaRelationshipStorageClient<T> extends JpaStorageClientImpl {
             DocumentWrapper<List<T>> wrapDoc = new DocumentWrapperImpl<List<T>>(relationshipList);
             handler.handle(Action.CREATE, wrapDoc);
             for (T relationship : relationshipList) {
-                JaxbUtils.setValue(relationship, "setCreatedAtItem", Date.class, new Date());
+                JaxbUtils.setValue(relationship, "setCreatedAt", Date.class, new Date());
                 jpaTransactionContext.persist(relationship);
             }
             handler.complete(Action.CREATE, wrapDoc);

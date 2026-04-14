@@ -1,11 +1,5 @@
 package org.collectionspace.services.authorization.perms;
 
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlAttribute;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlSchemaType;
-import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -24,11 +18,16 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.xml.datatype.XMLGregorianCalendar;
+
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlAttribute;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlSchemaType;
+import jakarta.xml.bind.annotation.XmlType;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.collectionspace.services.jaxb.adapter.DateAdapter;
 import org.jspecify.annotations.NonNull;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "permission")
@@ -85,15 +84,19 @@ public class Permission {
     @XmlElement(name = "tenant_id", required = true)
     private String tenantId;
 
-    @Transient
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date createdAt;
 
-    @Transient
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar updatedAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date updatedAt;
 
     public String getDescription() {
         return description;
@@ -180,20 +183,20 @@ public class Permission {
         return this;
     }
 
-    public XMLGregorianCalendar getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public Permission setCreatedAt(XMLGregorianCalendar createdAt) {
+    public Permission setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
         return this;
     }
 
-    public XMLGregorianCalendar getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public Permission setUpdatedAt(XMLGregorianCalendar updatedAt) {
+    public Permission setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
         return this;
     }
@@ -205,28 +208,6 @@ public class Permission {
     public Permission setCsid(String csid) {
         this.csid = csid;
         return this;
-    }
-
-    @Basic
-    @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
-    }
-
-    public void setCreatedAtItem(Date target) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
-    }
-
-    @Basic
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getUpdatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
-    }
-
-    public void setUpdatedAtItem(Date target) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, target));
     }
 
     @Override

@@ -34,18 +34,19 @@
   <name>services.hyperjaxb</name>
 
   <dependencies>
+    <dependency>
+      <groupId>org.collectionspace.services</groupId>
+      <artifactId>org.collectionspace.services.jaxb</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
 			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
-    <dependency>
-      <groupId>org.jvnet.jaxb</groupId>
-      <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-      <version>4.0.12</version>
-    </dependency>
 		<dependency>
 		    <groupId>javax.persistence</groupId>
-		    <artifactId>persistence-api</artifactId>
+		    <artifactId>javax.persistence-api</artifactId>
 		</dependency>
 		<dependency>
 		    <groupId>org.hibernate</groupId>

@@ -11,8 +11,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -20,8 +18,8 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
 import jakarta.xml.bind.annotation.XmlType;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XMLGregorianCalendarAsDateTime;
-import org.jvnet.hyperjaxb3.xml.bind.annotation.adapters.XmlAdapterUtils;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.collectionspace.services.jaxb.adapter.DateAdapter;
 
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -55,15 +53,19 @@ public class Tenant {
     @Column(name = "disabled", nullable = false)
     private boolean disabled;
 
-    @Transient
+    @Column(name = "created_at", nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar createdAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date createdAt;
 
-    @Transient
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     @XmlElement(required = true)
     @XmlSchemaType(name = "dateTime")
-    private XMLGregorianCalendar updatedAt;
+    @XmlJavaTypeAdapter(DateAdapter.class)
+    private Date updatedAt;
 
     public String getId() {
         return id;
@@ -105,42 +107,20 @@ public class Tenant {
         this.disabled = disabled;
     }
 
-    public XMLGregorianCalendar getCreatedAt() {
+    public Date getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(XMLGregorianCalendar createdAt) {
+    public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
 
-    public XMLGregorianCalendar getUpdatedAt() {
+    public Date getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(XMLGregorianCalendar updatedAt) {
+    public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
-    }
-
-    @Basic
-    @Column(name = "created_at", nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getCreatedAt());
-    }
-
-    public void setCreatedAtItem(Date createdAt) {
-        setCreatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, createdAt));
-    }
-
-    @Basic
-    @Column(name = "updated_at")
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getUpdatedAtItem() {
-        return XmlAdapterUtils.unmarshall(XMLGregorianCalendarAsDateTime.class, this.getUpdatedAt());
-    }
-
-    public void setUpdatedAtItem(Date updatedAt) {
-        setUpdatedAt(XmlAdapterUtils.marshall(XMLGregorianCalendarAsDateTime.class, updatedAt));
     }
 
     @Override
