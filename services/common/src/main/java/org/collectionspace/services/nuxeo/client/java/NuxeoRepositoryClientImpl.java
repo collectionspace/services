@@ -28,17 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.sql.rowset.CachedRowSet;
 import javax.ws.rs.core.MultivaluedMap;
 
-//
-// CSPACE-5036 - How to make CMISQL queries from Nuxeo
-//
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.apache.chemistry.opencmis.server.shared.TempStoreOutputStreamFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -104,12 +100,8 @@ import org.slf4j.LoggerFactory;
  */
 public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
 
-    /**
-     * The logger.
-     */
     private final Logger logger = LoggerFactory.getLogger(NuxeoRepositoryClientImpl.class);
-//    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
-//    private String foo = Profiler.createLogger();
+
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
     // FIXME: Get this value from an existing constant, if available
@@ -390,7 +382,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     @Override
     public boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
-            throws DocumentNotFoundException, TransactionException, DocumentException {
+            throws DocumentNotFoundException, DocumentException {
     	boolean result = false;
 
         if (handler == null) {
@@ -593,7 +585,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public DocumentWrapper<DocumentModel> getDoc(
     		CoreSessionInterface repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            String csid) throws DocumentNotFoundException, DocumentException {
+            String csid) throws DocumentNotFoundException {
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
@@ -608,8 +600,8 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
         } catch (IllegalArgumentException iae) {
             throw iae;
-        } catch (DocumentException de) {
-            throw de;
+        } catch (NuxeoException ne) {
+            throw ne;
         }
 
         return wrapDoc;
@@ -1209,7 +1201,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             logger.debug(String.format("Performing a CMIS query on Nuxeo repository named %s",
             		repoSession.getRepositoryName()));
 
-            ThresholdOutputStreamFactory streamFactory = ThresholdOutputStreamFactory.newInstance(
+            TempStoreOutputStreamFactory streamFactory = TempStoreOutputStreamFactory.newInstance(
                     null, THRESHOLD, -1, false);
             CallContextImpl callContext = new CallContextImpl(
                     CallContext.BINDING_LOCAL,
@@ -2284,9 +2276,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     @Override
     public void doWorkflowTransition(ServiceContext ctx, String id,
-            DocumentHandler handler, TransitionDef transitionDef)
-            throws BadRequestException, DocumentNotFoundException,
-            DocumentException {
+            DocumentHandler handler, TransitionDef transitionDef) {
         // This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
     }
 
@@ -2400,7 +2390,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      */
 	@Override
 	public boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
-			throws DocumentNotFoundException, DocumentException {
+			throws DocumentException {
 		throw new UnsupportedOperationException();
 	}
 }
