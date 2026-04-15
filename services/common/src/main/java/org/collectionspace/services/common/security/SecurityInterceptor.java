@@ -161,7 +161,7 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 			String tenantId = AuthN.get().getCurrentTenantId();
 			TenantBindingType tenantBindingType = ServiceMain.getInstance().getTenantBindingConfigReader().getTenantBinding(tenantId);
 			boolean tenantDisabled = tenantBindingType.isCreateDisabled();
-			if (tenantDisabled == true) {
+			if (tenantDisabled) {
 				String errMsg = String.format("The user %s's tenant '%s' is disabled.  Contact your CollectionSpace administrator.",
 						userId, tenantBindingType.getDisplayName());
 				Response response = Response.status(
@@ -236,29 +236,31 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 	}
 
     private void logLoginContext(LoginContext loginContext) {
-    	if (!logger.isTraceEnabled()) return;
+    	if (!logger.isTraceEnabled()) {
+			return;
+		}
 
-		logger.trace("CollectionSpace services now logged in to Nuxeo with LoginContext: "
-				+ loginContext);
+        logger.trace("CollectionSpace services now logged in to Nuxeo with LoginContext: {}", loginContext);
 		Subject subject = loginContext.getSubject();
 		Set<Principal> principals = subject.getPrincipals();
 		logger.trace("Nuxeo login performed with principals: ");
 		for (Principal principal : principals) {
-			logger.trace("[" + principal.getName() + "]");
+            logger.trace("[{}]", principal.getName());
 		}
     }
 
     private void logLogoutContext(LoginContext loginContext) {
-    	if (!logger.isTraceEnabled()) return;
+    	if (!logger.isTraceEnabled()) {
+			return;
+		}
 
     	if (loginContext != null) {
-			logger.trace("CollectionSpace services now logging out of Nuxeo with LoginContext: "
-					+ loginContext);
+            logger.trace("CollectionSpace services now logging out of Nuxeo with LoginContext: {}", loginContext);
 			Subject subject = loginContext.getSubject();
 			Set<Principal> principals = subject.getPrincipals();
 			logger.trace("Nuxeo logout performed with principals: ");
 			for (Principal principal : principals) {
-				logger.trace("[" + principal.getName() + "]");
+                logger.trace("[{}]", principal.getName());
 			}
     	} else {
     		logger.trace("Logged out.");
@@ -275,11 +277,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     	//
     	if (threadLocalLoginContext == null) {
     		threadLocalLoginContext = new ThreadLocal<LoginContext>();
-    		if (logger.isTraceEnabled() == true) {
-    			logger.trace(String.format("Thread ID %s: Created new ThreadLocal instance: %s)",
-    					Thread.currentThread(), threadLocalLoginContext));
-    		}
-    	}
+            logger.trace("Thread ID {}: Created new ThreadLocal instance: {})", Thread.currentThread(),
+                         threadLocalLoginContext);
+        }
 
     	LoginContext loginContext = threadLocalLoginContext.get();
 
@@ -287,11 +287,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     		loginContext = Framework.loginAs(user);
     		frameworkLogins++;
     		threadLocalLoginContext.set(loginContext);
-    		if (logger.isTraceEnabled() == true) {
-	        	logger.trace(String.format("Thread ID %s: Logged in with ThreadLocal instance %s - %s ",
-	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get()));
-    		}
-        	//
+            logger.trace("Thread ID {}: Logged in with ThreadLocal instance {} - {} ", Thread.currentThread(),
+                         threadLocalLoginContext, threadLocalLoginContext.get());
+            //
         	// Debug logging
         	//
    			logLoginContext(loginContext);
@@ -302,8 +300,8 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     		// use the Nuxeo default "system admin" context for ever request, regardless of the CollectionSpace user making
     		// the request.  In short, there's no real security vulnerability here -just bad bookkeeping of logins.
     		//
-    		logger.warn(String.format(String.format("Thread ID %s: Alreadyed logged in with ThreadLocal instance %s - %s ",
-	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get())));
+    		logger.warn("Thread ID {}: Already logged in with ThreadLocal instance {} - {} ", Thread.currentThread(),
+                        threadLocalLoginContext, threadLocalLoginContext.get());
     		frameworkLogins++;
     	}
     }
@@ -313,12 +311,10 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
         if (loginContext != null) {
    			logLogoutContext(loginContext);
             loginContext.logout();
-            threadLocalLoginContext.set(null); // We need to clear the login context from this thread, so the next request on this thread has to login again.
+            threadLocalLoginContext.remove(); // We need to clear the login context from this thread, so the next request on this thread has to login again.
             logLogoutContext(null);
             frameworkLogins--;
-            if (logger.isTraceEnabled()) {
-            	String.format("Framework logins: ", frameworkLogins);
-            }
+            logger.trace("Framework logins: {}", frameworkLogins);
         } else {
         	if (frameworkLogins > 0) {
         		logger.warn(ERROR_NUXEO_LOGOUT);  // If we get here, it means our login/logout bookkeeping has failed.
@@ -327,29 +323,16 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 
         if (frameworkLogins == 0) {
         	if (threadLocalLoginContext != null) {
-	        	logger.trace(String.format("Thread ID %s: Clearing ThreadLocal instance %s - %s ",
-	        			Thread.currentThread(), threadLocalLoginContext, threadLocalLoginContext.get()));
+	        	logger.trace("Thread ID {}: Clearing ThreadLocal instance {} - {} ", Thread.currentThread(),
+                             threadLocalLoginContext, threadLocalLoginContext.get());
         	}
         	threadLocalLoginContext = null; //Clear the ThreadLocal to void Tomcat warnings associated with thread pools.
         }
     }
 
-	/* (non-Javadoc)
-	 * @see org.jboss.resteasy.spi.interception.PreProcessInterceptor#preProcess(org.jboss.resteasy.spi.HttpRequest, org.jboss.resteasy.core.ResourceMethod)
-	@Override
-	public ServerResponse preProcess(HttpRequest request, ResourceMethodInvoker resourceMethodInvoker)
-			throws Failure, CSWebApplicationException {
-	}
-
-	@Override
-	public void postProcess(ServerResponse arg0) {
-	}
-	*/
-
 	@Override
 	public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 		Request request = containerRequestContext.getRequest();
-		// Method resourceMethod = resourceMethodInvoker.getMethod();
 
         try {
             if (isAnonymousRequest(containerRequestContext)) {
