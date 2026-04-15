@@ -32,10 +32,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Set;
-
-import org.jboss.resteasy.spi.Failure;
-import org.nuxeo.runtime.api.Framework;
-
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -43,6 +39,8 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.ResourceInfo;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -55,6 +53,7 @@ import org.collectionspace.services.authorization.URIResourceImpl;
 import org.collectionspace.services.client.index.IndexClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -62,6 +61,8 @@ import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.collectionspace.services.login.LoginClient;
 import org.collectionspace.services.logout.LogoutClient;
 import org.collectionspace.services.systeminfo.SystemInfoClient;
+import org.jboss.resteasy.spi.Failure;
+import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +95,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     private static final String ERROR_NUXEO_LOGOUT = "Attempt to logout when Nuxeo login context was null.";
     private static final String ERROR_UNBALANCED_LOGINS = "The number of Logins vs Logouts to the Nuxeo framework was unbalanced.";
 
+	@Context
+	private ResourceInfo resourceInfo;
+
     private boolean isAnonymousRequest(ContainerRequestContext requestContext) {
     	boolean result = false;
 
@@ -107,18 +111,15 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
             return true;
         }
 
-		/*
-		 * Todo: Figure out the condition which this returns true (only publicItem overrides allowAnonymousAccess)
-		Class<?> resourceClass = resourceMethodInvoker.getResourceClass();
+		Class<?> resourceClass = resourceInfo.getResourceClass();
 		try {
 			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
-			result = resourceInstance.allowAnonymousAccess(request, resourceClass);
+			result = resourceInstance.allowAnonymousAccess();
 		} catch (InstantiationException e) {
 			logger.error("isAnonymousRequest: ", e);
 		} catch (IllegalAccessException e) {
 			logger.error("isAnonymousRequest: ", e);
 		}
-		 */
 
     	return result;
     }
