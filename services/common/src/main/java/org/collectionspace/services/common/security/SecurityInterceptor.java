@@ -147,6 +147,117 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
         return result;
 	}
 
+	@Override
+	public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+		Request request = containerRequestContext.getRequest();
+
+		try {
+			if (isAnonymousRequest(containerRequestContext)) {
+				// We don't need to check credentials for anonymous requests.  Just login to Nuxeo and exit
+				nuxeoPreProcess();
+				return;
+			}
+
+			// HACK - this is configured in war, get this from tomcat instead
+			final String servicesResource = "/cspace-services/";
+			final int servicesResourceLen = servicesResource.length();
+			String httpMethod = request.getMethod();
+			String uriPath = containerRequestContext.getUriInfo().getPath();
+
+			if (logger.isDebugEnabled()) {
+				int servicesResourceIdx = uriPath.indexOf(servicesResource);
+				String relativeRequest =
+					(servicesResourceIdx <= 0) ? uriPath : uriPath.substring(servicesResourceIdx + servicesResourceLen);
+				logger.debug("received {}s on {}", httpMethod, relativeRequest);
+			}
+
+			String resName = SecurityUtils.getResourceName(containerRequestContext.getUriInfo());
+			String resEntity = SecurityUtils.getResourceEntity(resName);
+
+			//
+			// If the resource entity is acting as a proxy then all sub-resources will map to the resource itself.
+			// This essentially means sub-resources inherit all the authz permissions of the entity.
+			//
+			if (SecurityUtils.isResourceProxied(resName)) {
+				resName = resEntity;
+			} else {
+				//
+				// If our resName is not proxied, we may need to tweak it.
+				//
+				if (resName.equals(AuthZ.REPORTS_INVOKE) || resName.equals(AuthZ.BATCH_INVOKE)) {
+					resName = resName.replace("/*/", "/");
+				}
+			}
+			//
+			// Make sure the account of the user making the request is current and active
+			//
+			checkActive();
+
+			if (requiresAuthorization(resName)) { //see comment immediately above
+				AuthZ authZ = AuthZ.get();
+				CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
+				if (!authZ.isAccessAllowed(res)) {
+					logger.error("Access to {} is NOT allowed to  user={}", res.getId(), AuthN.get().getUserId());
+					Response response = Response.status(Response.Status.FORBIDDEN)
+												.entity(uriPath + " " + httpMethod)
+												.type("text/plain").build();
+					throw new CSWebApplicationException(response);
+				} else {
+					//
+					// They passed the first round of security checks, so now let's check to see if they're trying
+					// to perform a workflow state change or fulltext reindex and make sure they are allowed to this.
+					//
+					if (uriPath.contains(WorkflowClient.SERVICE_PATH)) {
+						String workflowProxyResource = SecurityUtils.getWorkflowResourceName(containerRequestContext);
+						res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowProxyResource, httpMethod);
+						if (!authZ.isAccessAllowed(res)) {
+							logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
+										 AuthN.get().getUserId());
+							Response response = Response.status(Response.Status.FORBIDDEN)
+														.entity(uriPath + " " + httpMethod)
+														.type("text/plain").build();
+							throw new CSWebApplicationException(response);
+						}
+					} else if (uriPath.contains(IndexClient.SERVICE_PATH)) {
+						String indexProxyResource = SecurityUtils.getIndexResourceName();
+						res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), indexProxyResource, httpMethod);
+						if (!authZ.isAccessAllowed(res)) {
+							logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
+										 AuthN.get().getUserId());
+							Response response = Response.status(Response.Status.FORBIDDEN)
+														.entity(uriPath + " " + httpMethod)
+														.type("text/plain").build();
+							throw new CSWebApplicationException(response);
+						}
+					}
+
+				}
+				//
+				// Login to Nuxeo
+				//
+				nuxeoPreProcess();
+
+				//
+				// We've passed all the checks.  Now just log the results
+				//
+				logger.trace("Access to {} is allowed to  user={} for tenant id={}", res.getId(),
+							 AuthN.get().getUserId(),
+							 AuthN.get().getCurrentTenantName());
+			}
+		} catch (RuntimeException t) {
+			logger.error("Error in SecurityInterceptor", t);
+			throw t;
+		}
+	}
+
+	@Override
+	public void filter(ContainerRequestContext containerRequestContext,
+					   ContainerResponseContext containerResponseContext) throws IOException {
+		//
+		// Log out of the Nuxeo framework
+		//
+		nuxeoPostProcess();
+	}
 
 	/**
 	 * checkActive check if account is active
@@ -330,115 +441,4 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
         }
     }
 
-	@Override
-	public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-		Request request = containerRequestContext.getRequest();
-
-        try {
-            if (isAnonymousRequest(containerRequestContext)) {
-                // We don't need to check credentials for anonymous requests.  Just login to Nuxeo and exit
-                nuxeoPreProcess();
-				return;
-            }
-
-			// HACK - this is configured in war, get this from tomcat instead
-            final String servicesResource = "/cspace-services/";
-            final int servicesResourceLen = servicesResource.length();
-            String httpMethod = request.getMethod();
-            String uriPath = containerRequestContext.getUriInfo().getPath();
-
-            if (logger.isDebugEnabled()) {
-                int servicesResourceIdx = uriPath.indexOf(servicesResource);
-                String relativeRequest =
-					(servicesResourceIdx <= 0) ? uriPath : uriPath.substring(servicesResourceIdx + servicesResourceLen);
-                logger.debug("received {}s on {}", httpMethod, relativeRequest);
-            }
-
-            String resName = SecurityUtils.getResourceName(containerRequestContext.getUriInfo());
-            String resEntity = SecurityUtils.getResourceEntity(resName);
-
-            //
-            // If the resource entity is acting as a proxy then all sub-resources will map to the resource itself.
-            // This essentially means sub-resources inherit all the authz permissions of the entity.
-            //
-            if (SecurityUtils.isResourceProxied(resName)) {
-                resName = resEntity;
-            } else {
-                //
-                // If our resName is not proxied, we may need to tweak it.
-                //
-                if (resName.equals(AuthZ.REPORTS_INVOKE) || resName.equals(AuthZ.BATCH_INVOKE)) {
-                    resName = resName.replace("/*/", "/");
-                }
-            }
-            //
-            // Make sure the account of the user making the request is current and active
-            //
-            checkActive();
-
-            if (requiresAuthorization(resName)) { //see comment immediately above
-                AuthZ authZ = AuthZ.get();
-                CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
-                if (!authZ.isAccessAllowed(res)) {
-                    logger.error("Access to {} is NOT allowed to  user={}", res.getId(), AuthN.get().getUserId());
-                    Response response = Response.status(Response.Status.FORBIDDEN)
-                                                .entity(uriPath + " " + httpMethod)
-                                                .type("text/plain").build();
-                    throw new CSWebApplicationException(response);
-                } else {
-                    //
-                    // They passed the first round of security checks, so now let's check to see if they're trying
-                    // to perform a workflow state change or fulltext reindex and make sure they are allowed to this.
-                    //
-                    if (uriPath.contains(WorkflowClient.SERVICE_PATH)) {
-                        String workflowProxyResource = SecurityUtils.getWorkflowResourceName(containerRequestContext);
-                        res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowProxyResource, httpMethod);
-                        if (!authZ.isAccessAllowed(res)) {
-                            logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
-                                         AuthN.get().getUserId());
-                            Response response = Response.status(Response.Status.FORBIDDEN)
-                                                        .entity(uriPath + " " + httpMethod)
-                                                        .type("text/plain").build();
-                            throw new CSWebApplicationException(response);
-                        }
-                    } else if (uriPath.contains(IndexClient.SERVICE_PATH)) {
-                        String indexProxyResource = SecurityUtils.getIndexResourceName();
-                        res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), indexProxyResource, httpMethod);
-                        if (!authZ.isAccessAllowed(res)) {
-                            logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
-                                         AuthN.get().getUserId());
-                            Response response = Response.status(Response.Status.FORBIDDEN)
-                                                        .entity(uriPath + " " + httpMethod)
-                                                        .type("text/plain").build();
-                            throw new CSWebApplicationException(response);
-                        }
-                    }
-
-                }
-                //
-                // Login to Nuxeo
-                //
-                nuxeoPreProcess();
-
-                //
-                // We've passed all the checks.  Now just log the results
-                //
-                logger.trace("Access to {} is allowed to  user={} for tenant id={}", res.getId(),
-                             AuthN.get().getUserId(),
-                             AuthN.get().getCurrentTenantName());
-            }
-        } catch (RuntimeException t) {
-            logger.error("Error in SecurityInterceptor", t);
-            throw t;
-        }
-	}
-
-	@Override
-	public void filter(ContainerRequestContext containerRequestContext,
-					   ContainerResponseContext containerResponseContext) throws IOException {
-		//
-		// Log out of the Nuxeo framework
-		//
-		nuxeoPostProcess();
-	}
 }
