@@ -293,7 +293,7 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 			//can't use JAXB here as this runs from the common jar which cannot
 			//depend upon the account service
 			String whereClause = "where userId = :userId";
-			HashMap<String, Object> params = new HashMap<String, Object>();
+			HashMap<String, Object> params = new HashMap<>();
 			params.put("userId", userId);
 
 			Object account = JpaStorageUtils.getEntity(
@@ -387,7 +387,7 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     	// Use a ThreadLocal instance to keep track of the Nuxeo login context
     	//
     	if (threadLocalLoginContext == null) {
-    		threadLocalLoginContext = new ThreadLocal<LoginContext>();
+    		threadLocalLoginContext = new ThreadLocal<>();
             logger.trace("Thread ID {}: Created new ThreadLocal instance: {})", Thread.currentThread(),
                          threadLocalLoginContext);
         }
