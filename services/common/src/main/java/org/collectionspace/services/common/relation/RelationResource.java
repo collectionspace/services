@@ -43,8 +43,6 @@ import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsCommonList.RelationListItem;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,9 +61,8 @@ import javax.ws.rs.core.UriInfo;
 @Consumes("application/xml")
 @Produces("application/xml")
 public class RelationResource extends NuxeoBasedResource {
-	public final static String serviceName = "relations";
-	final Logger logger = LoggerFactory.getLogger(RelationResource.class);
-	
+	public static final String serviceName = "relations";
+
 	@Override
 	protected String getVersionString() {
 		final String lastChangeRevision = "$LastChangedRevision$";
@@ -79,7 +76,7 @@ public class RelationResource extends NuxeoBasedResource {
     public Class<RelationsCommon> getCommonPartClass() {
     	return RelationsCommon.class;
     }
-	
+
 	@Override
 	@GET
 	@Produces("application/xml")
@@ -90,11 +87,11 @@ public class RelationResource extends NuxeoBasedResource {
 	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx) {
 		return this.getList(parentCtx, parentCtx.getUriInfo());
 	}
-	
+
 	@Override
 	public RelationsCommonList getList(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx, UriInfo uriInfo) {
 		MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-		
+
 		String subjectCsid = queryParams.getFirst(IRelationsManager.SUBJECT_QP);
 		String subjectType = queryParams.getFirst(IRelationsManager.SUBJECT_TYPE_QP);
 		String predicate = queryParams.getFirst(IRelationsManager.PREDICATE_QP);
@@ -103,7 +100,7 @@ public class RelationResource extends NuxeoBasedResource {
 		String viceVersaValue = queryParams.getFirst(IRelationsManager.RECIPROCAL_QP);
 
 		RelationsCommonList resultList = this.getRelationList(parentCtx, uriInfo, subjectCsid, subjectType, predicate, objectCsid, objectType, Tools.isTrue(viceVersaValue));
-		
+
 		return resultList;
 	}
 
@@ -124,7 +121,7 @@ public class RelationResource extends NuxeoBasedResource {
             if (parentCtx != null && parentCtx.getCurrentRepositorySession() != null) { // If the parent context has a non-null and open repository session then use it
             	ctx.setCurrentRepositorySession(parentCtx.getCurrentRepositorySession());
             }
-            
+
             DocumentHandler handler = createDocumentHandler(ctx);
             String relationClause = RelationsUtils.buildWhereClause(subjectCsid, subjectType, predicate, objectCsid, objectType, viceVersa);
             handler.getDocumentFilter().appendWhereClause(relationClause, IQueryManager.SEARCH_QUALIFIER_AND);
@@ -132,11 +129,11 @@ public class RelationResource extends NuxeoBasedResource {
             // Handle keyword clause
             //
             String keywords = uriInfo.getQueryParameters().getFirst(IQueryManager.SEARCH_TYPE_KEYWORDS_KW);
-            if (keywords != null && keywords.isEmpty() == false) {
+            if (keywords != null && !keywords.isEmpty()) {
             	String keywordClause = QueryManager.createWhereClauseFromKeywords(keywords);
             	handler.getDocumentFilter().appendWhereClause(keywordClause, IQueryManager.SEARCH_QUALIFIER_AND);
             }
-            
+
             return (RelationsCommonList)finish_getList(ctx, handler);
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.LIST_FAILED);
@@ -146,15 +143,15 @@ public class RelationResource extends NuxeoBasedResource {
     @DELETE
     public Response delete(@Context UriInfo uriInfo) {
     	Response result = Response.ok().build();
-    	
-    	List<String> csidList = new ArrayList<String>();
+
+    	List<String> csidList = new ArrayList<>();
         try {
 	    	RelationsCommonList relationsList = this.getList(null, uriInfo);
 	    	for (RelationListItem relation : relationsList.getRelationListItem()) {
 	    		csidList.add(relation.getCsid());
 	    	}
-	    	
-	    	if (csidList.isEmpty() == false) {
+
+	    	if (!csidList.isEmpty()) {
 	            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext();
 	        	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 	            getRepositoryClient(ctx).delete(ctx, csidList, handler);
@@ -164,7 +161,7 @@ public class RelationResource extends NuxeoBasedResource {
         } catch (Exception e) {
         	String separator = ", ";
     		String payloadDescription = "unknown";
-        	if (csidList.isEmpty() == false) {
+        	if (!csidList.isEmpty()) {
         		StringBuffer tempStr = new StringBuffer();
         		for (String csid : csidList) {
         			tempStr.append(csid);
@@ -179,4 +176,3 @@ public class RelationResource extends NuxeoBasedResource {
     }
 
 }
-

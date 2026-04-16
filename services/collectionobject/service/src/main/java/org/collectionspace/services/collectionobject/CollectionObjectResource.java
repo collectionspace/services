@@ -35,16 +35,12 @@ import javax.ws.rs.core.Response;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.NuxeoBasedResource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @Path(CollectionObjectClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class CollectionObjectResource extends NuxeoBasedResource {
-    
-    final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
     @Override
     public String getVersionString() {
@@ -56,7 +52,7 @@ public class CollectionObjectResource extends NuxeoBasedResource {
     public String getServiceName() {
         return CollectionObjectClient.SERVICE_PATH_COMPONENT;
     }
-    
+
     @Override
     public Class<CollectionobjectsCommon> getCommonPartClass() {
     	return CollectionobjectsCommon.class;
@@ -77,12 +73,12 @@ public class CollectionObjectResource extends NuxeoBasedResource {
     public Response roundtrip(
     		@PathParam("ms") String ms) {
     	Response result = null;
-    	
+
     	Profiler profiler = new Profiler("roundtrip():", 1);
     	profiler.start();
 		result = Response.ok().build();
 		profiler.stop();
-		
+
 		return result;
     }
 
