@@ -147,6 +147,21 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
         return result;
 	}
 
+	private void checkAccessAllowed(final AuthZ authZ,
+									final CSpaceResource resource,
+									final String resourceName,
+									final String uriPath,
+									final String httpMethod) throws CSWebApplicationException {
+		if (!authZ.isAccessAllowed(resource)) {
+			logger.error("Access to {}:{} is NOT allowed to  user={}", resourceName, resource.getId(),
+						 AuthN.get().getUserId());
+			final Response response = Response.status(Response.Status.FORBIDDEN)
+											  .entity(uriPath + " " + httpMethod)
+											  .type(MediaType.TEXT_PLAIN_TYPE).build();
+			throw new CSWebApplicationException(response);
+		}
+	}
+
 	@Override
 	public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 		Request request = containerRequestContext.getRequest();
@@ -193,46 +208,26 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 			//
 			checkActive();
 
-			if (requiresAuthorization(resName)) { //see comment immediately above
+			if (requiresAuthorization(resName)) {
 				AuthZ authZ = AuthZ.get();
 				CSpaceResource res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), resName, httpMethod);
-				if (!authZ.isAccessAllowed(res)) {
-					logger.error("Access to {} is NOT allowed to  user={}", res.getId(), AuthN.get().getUserId());
-					Response response = Response.status(Response.Status.FORBIDDEN)
-												.entity(uriPath + " " + httpMethod)
-												.type("text/plain").build();
-					throw new CSWebApplicationException(response);
-				} else {
-					//
-					// They passed the first round of security checks, so now let's check to see if they're trying
-					// to perform a workflow state change or fulltext reindex and make sure they are allowed to this.
-					//
-					if (uriPath.contains(WorkflowClient.SERVICE_PATH)) {
-						String workflowProxyResource = SecurityUtils.getWorkflowResourceName(containerRequestContext);
-						res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowProxyResource, httpMethod);
-						if (!authZ.isAccessAllowed(res)) {
-							logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
-										 AuthN.get().getUserId());
-							Response response = Response.status(Response.Status.FORBIDDEN)
-														.entity(uriPath + " " + httpMethod)
-														.type("text/plain").build();
-							throw new CSWebApplicationException(response);
-						}
-					} else if (uriPath.contains(IndexClient.SERVICE_PATH)) {
-						String indexProxyResource = SecurityUtils.getIndexResourceName();
-						res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), indexProxyResource, httpMethod);
-						if (!authZ.isAccessAllowed(res)) {
-							logger.error("Access to {}:{} is NOT allowed to  user={}", resName, res.getId(),
-										 AuthN.get().getUserId());
-							Response response = Response.status(Response.Status.FORBIDDEN)
-														.entity(uriPath + " " + httpMethod)
-														.type("text/plain").build();
-							throw new CSWebApplicationException(response);
-						}
-					}
+				checkAccessAllowed(authZ, res, resName, uriPath, httpMethod);
 
-				}
-				//
+                //
+                // They passed the first round of security checks, so now let's check to see if they're trying
+                // to perform a workflow state change or fulltext reindex and make sure they are allowed to this.
+                //
+                if (uriPath.contains(WorkflowClient.SERVICE_PATH)) {
+                    String workflowProxyResource = SecurityUtils.getWorkflowResourceName(containerRequestContext);
+                    res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), workflowProxyResource, httpMethod);
+					checkAccessAllowed(authZ, res, resName, uriPath, httpMethod);
+                } else if (uriPath.contains(IndexClient.SERVICE_PATH)) {
+                    String indexProxyResource = SecurityUtils.getIndexResourceName();
+                    res = new URIResourceImpl(AuthN.get().getCurrentTenantId(), indexProxyResource, httpMethod);
+					checkAccessAllowed(authZ, res, resName, uriPath, httpMethod);
+                }
+
+                //
 				// Login to Nuxeo
 				//
 				nuxeoPreProcess();
