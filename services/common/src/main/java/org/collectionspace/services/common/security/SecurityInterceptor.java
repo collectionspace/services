@@ -270,8 +270,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 			if (tenantDisabled) {
 				String errMsg = String.format("The user %s's tenant '%s' is disabled.  Contact your CollectionSpace administrator.",
 						userId, tenantBindingType.getDisplayName());
-				Response response = Response.status(
-						Response.Status.CONFLICT).entity(errMsg).type("text/plain").build();
+				Response response = Response.status(Response.Status.CONFLICT)
+											.entity(errMsg)
+											.type(MediaType.TEXT_PLAIN_TYPE).build();
 				throw new CSWebApplicationException(response);
 			}
 		} catch (IllegalStateException ise) {
@@ -279,8 +280,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 			// Note the RFC on return types:
 			// If the request already included Authorization credentials, then the 401 response
 			// indicates that authorization has been refused for those credentials.
-			Response response = Response.status(
-					Response.Status.UNAUTHORIZED).entity(errMsg).type("text/plain").build();
+			Response response = Response.status(Response.Status.UNAUTHORIZED)
+										.entity(errMsg)
+										.type(MediaType.TEXT_PLAIN_TYPE).build();
 			throw new CSWebApplicationException(ise, response);
 		}
 
@@ -295,8 +297,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 					"org.collectionspace.services.account.AccountsCommon", whereClause, params);
 			if (account == null) {
 				String msg = "User's account not found, userId=" + userId;
-				Response response = Response.status(
-						Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
+				Response response = Response.status(Response.Status.FORBIDDEN)
+											.entity(msg)
+											.type(MediaType.TEXT_PLAIN_TYPE).build();
 				throw new CSWebApplicationException(response);
 			}
 			Object status = JaxbUtils.getValue(account, "getStatus");
@@ -304,16 +307,18 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 				String value = (String) JaxbUtils.getValue(status, "value");
 				if ("INACTIVE".equalsIgnoreCase(value)) {
 					String msg = "User's account is inactive, userId=" + userId;
-					Response response = Response.status(
-							Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
+					Response response = Response.status(Response.Status.FORBIDDEN)
+												.entity(msg)
+												.type(MediaType.TEXT_PLAIN_TYPE).build();
 					throw new CSWebApplicationException(response);
 				}
 			}
 		}
 		catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			String msg = "User's account is in invalid state, userId=" + userId;
-			Response response = Response.status(
-					Response.Status.FORBIDDEN).entity(msg).type("text/plain").build();
+			Response response = Response.status(Response.Status.FORBIDDEN)
+										.entity(msg)
+										.type(MediaType.TEXT_PLAIN_TYPE).build();
 			throw new CSWebApplicationException(e, response);
 		}
 	}
