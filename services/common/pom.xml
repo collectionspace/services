@@ -279,12 +279,6 @@
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>org.nuxeo.ecm.core</groupId>
-			<artifactId>nuxeo-core-io</artifactId>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-convert</artifactId>
@@ -320,6 +314,11 @@
 				<exclusion>
 					<groupId>javax.xml.bind</groupId>
 					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<!-- the woodstox-core-asl dependency was moved to woodstox-core which is provided elsewhere -->
+				<exclusion>
+					<groupId>org.codehaus.woodstox</groupId>
+					<artifactId>woodstox-core-asl</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

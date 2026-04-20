@@ -40,6 +40,7 @@
 		<log4j.version>2.17.1</log4j.version>
 		<nuxeo.general.release>2023.39</nuxeo.general.release>
 		<slf4j.version>1.7.32</slf4j.version>
+		<stax2-api.version>4.2.2</stax2-api.version>
 
 		<!-- Spring -->
 		<spring.version>5.3.28</spring.version>
@@ -808,7 +809,7 @@
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>stax2-api</artifactId>
-				<version>3.1.4</version>
+				<version>${stax2-api.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.santuario</groupId>
