@@ -61,7 +61,6 @@ import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.binary.metadata.api.BinaryMetadataService;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.PropertyException;
@@ -511,7 +510,7 @@ public class NuxeoBlobUtils {
 					        ThumbnailConstants.THUMBNAIL_FILENAME_PROPERTY_NAME);
 					Blob thumbnailBlob = (Blob)documentModel.getProperty(ThumbnailConstants.THUMBNAIL_SCHEMA_NAME,
 					        ThumbnailConstants.THUMBNAIL_PROPERTY_NAME);
-				} catch (ClientException e) {
+				} catch (NuxeoException e) {
 					errorMsg = "Could not extract the name of the thumbnail preview image file.";
 					if (logger.isDebugEnabled()) {
 						logger.debug(errorMsg, e);
@@ -530,7 +529,7 @@ public class NuxeoBlobUtils {
 	}
 
     static private Blob checkMimeType(Blob blob, String fullname)
-            throws ClientException {
+            throws NuxeoException {
         final String mimeType = blob.getMimeType();
         if (mimeType != null && !mimeType.equals("application/octet-stream")
                 && !mimeType.equals("application/octetstream")) {
@@ -540,7 +539,7 @@ public class NuxeoBlobUtils {
         try {
             blob = getMimeService().updateMimetype(blob, filename);
         } catch (MimetypeDetectionException e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
         return blob;
     }
@@ -549,16 +548,16 @@ public class NuxeoBlobUtils {
 	 * Gets the type service.  Not in use, but please keep for future reference
 	 *
 	 * @return the type service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static TypeManager getTypeService() throws ClientException {
+	private static TypeManager getTypeService() throws NuxeoException {
 		TypeManager typeService = null;
 
 		try {
 			typeService = Framework.getService(TypeManager.class);
 		} catch (Exception e) {
-			throw new ClientException(e);
+			throw new NuxeoException(e);
 		}
 
 		return typeService;
@@ -579,10 +578,10 @@ public class NuxeoBlobUtils {
 	 * Gets Nuxeo's file manager service.
 	 *
 	 * @return the file manager service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static FileManager getFileManager() throws ClientException {
+	private static FileManager getFileManager() throws NuxeoException {
 		FileManager result = null;
 
 		try {
@@ -590,7 +589,7 @@ public class NuxeoBlobUtils {
 		} catch (Exception e) {
 			String msg = "Unable to get Nuxeo's FileManager service.";
 			logger.error(msg, e);
-			throw new ClientException("msg", e);
+			throw new NuxeoException("msg", e);
 		}
 
 		return result;
@@ -600,10 +599,10 @@ public class NuxeoBlobUtils {
 	 * Gets Nuxeo's file manager service.
 	 *
 	 * @return the file manager service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static FileManagerService getFileManagerService() throws ClientException {
+	private static FileManagerService getFileManagerService() throws NuxeoException {
 		FileManagerService result = null;
 
 		try {
@@ -611,7 +610,7 @@ public class NuxeoBlobUtils {
 		} catch (Exception e) {
 			String msg = "Unable to get Nuxeo's FileManager service.";
 			logger.error(msg, e);
-			throw new ClientException("msg", e);
+			throw new NuxeoException("msg", e);
 		}
 
 		return result;
@@ -639,13 +638,13 @@ public class NuxeoBlobUtils {
 		nuxeoClient.releaseRepositorySession(ctx, repoSession);
 	}
 
-    static private MimetypeRegistry getMimeService() throws ClientException {
+    static private MimetypeRegistry getMimeService() throws NuxeoException {
     	MimetypeRegistry result = null;
 
         try {
         	result = Framework.getService(MimetypeRegistry.class);
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
 
         return result;
@@ -1204,11 +1203,11 @@ public class NuxeoBlobUtils {
  *
  * protected FileManager fileManager;
  *
- * protected FileManager getFileManagerService() throws ClientException { if
+ * protected FileManager getFileManagerService() throws NuxeoException { if
  * (fileManager == null) { try { fileManager =
  * Framework.getService(FileManager.class); } catch (Exception e) {
  * log.error("Unable to get FileManager service ", e); throw new
- * ClientException("Unable to get FileManager service ", e); } } return
+ * NuxeoException("Unable to get FileManager service ", e); } } return
  * fileManager; }
  */
 
@@ -1229,7 +1228,7 @@ public class NuxeoBlobUtils {
 /*
  * RepositoryInstance.getStreamURI()
  *
- * String getStreamURI(String blobPropertyId) throws ClientException
+ * String getStreamURI(String blobPropertyId) throws NuxeoException
  *
  * Returns an URI identifying the stream given the blob property id. This method
  * should be used by a client to download the data of a blob property.
@@ -1241,7 +1240,7 @@ public class NuxeoBlobUtils {
  * After the client has called this method, it will be able to download the
  * stream using streaming server API.
  *
- * Returns: an URI identifying the remote stream Throws: ClientException
+ * Returns: an URI identifying the remote stream Throws: NuxeoException
  */
 
 /*

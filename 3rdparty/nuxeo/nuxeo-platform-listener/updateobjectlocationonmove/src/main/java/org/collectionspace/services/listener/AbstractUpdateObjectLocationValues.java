@@ -16,7 +16,7 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -222,13 +222,13 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      *
      * @param movementCsid the CSID of a Movement record.
      * @param coreSession a repository session.
-     * @throws ClientException
+     * @throws NuxeoException
      * @return the CSIDs of the CollectionObject records, if any, which are
      * related to the Movement record.
      * @throws DocumentException 
      */
     private Set<String> getCollectionObjectCsidsRelatedToMovement(String movementCsid,
-            CoreSessionInterface coreSession) throws ClientException {
+            CoreSessionInterface coreSession) throws NuxeoException {
 
         Set<String> csids = new HashSet<>();
 
@@ -323,14 +323,14 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * deletion, or of a Movement record referenced by a Relation record slated
      * for deletion. This record should be filtered out, prior to returning the
      * most recent Movement record.
-     * @throws ClientException
+     * @throws NuxeoException
      * @return the most recent Movement record related to the CollectionObject
      * identified by the supplied CSID.
      * @throws DocumentException 
      */
     protected DocumentModel getMostRecentMovement(Event event,
         CoreSessionInterface session, String collectionObjectCsid,
-        boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws ClientException {
+        boolean isAboutToBeRemovedEvent, String eventMovementCsid) throws NuxeoException {
 		DocumentModel result = null;
 		
         //
@@ -568,7 +568,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @param relationDocModel a document model for a Relation record.
      * @param desiredDocType a desired document type.
      * @param relatedDocType a related document type.
-     * @throws ClientException
+     * @throws NuxeoException
      * 
      * @return the CSID from the desired document type in the relation. Returns
      * null if the Relation record does not involve both the desired
@@ -600,7 +600,7 @@ public abstract class AbstractUpdateObjectLocationValues extends AbstractCSEvent
      * @param movementDocModel a document model for a Movement record.
      * @return a potentially updated document model for the CollectionObject
      * record.
-     * @throws ClientException
+     * @throws NuxeoException
      */
     protected abstract boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
     		DocumentModel movementDocModel,

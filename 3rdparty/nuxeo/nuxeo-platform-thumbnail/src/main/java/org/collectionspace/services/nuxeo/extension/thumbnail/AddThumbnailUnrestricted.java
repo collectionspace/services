@@ -10,7 +10,7 @@ import java.util.GregorianCalendar;
 
 import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.UnrestrictedSessionRunner;
@@ -49,7 +49,7 @@ public class AddThumbnailUnrestricted extends UnrestrictedSessionRunner {
      * to the document blob.
      */
     @Override
-    public void run() throws ClientException {
+    public void run() throws NuxeoException {
     	String errMsg = "Error while adding preview thumbnail.";
     	String documentId = doc.getId();
 

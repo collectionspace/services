@@ -66,13 +66,12 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.vocabulary.VocabularyItemJAXBSchema;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//import org.collectionspace.services.common.authority.AuthorityItemRelations;
 /**
  * AuthorityItemDocumentModelHandler
  *
@@ -253,7 +252,7 @@ public abstract class AuthorityItemDocumentModelHandler<AICommon>
 			try {
 				inAuthority = (String) docModel.getProperty(authorityItemCommonSchemaName,
 					AuthorityItemJAXBSchema.IN_AUTHORITY);
-			} catch (ClientException pe) {
+			} catch (NuxeoException pe) {
 				throw new RuntimeException("Could not get parent specifier for item!");
 			}
 		}

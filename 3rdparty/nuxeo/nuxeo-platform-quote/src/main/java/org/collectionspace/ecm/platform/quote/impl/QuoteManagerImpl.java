@@ -33,7 +33,7 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 import org.nuxeo.common.utils.IdUtils;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.ClientRuntimeException;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -102,25 +102,25 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     protected CoreSession openCoreSession(String repositoryName)
-            throws ClientException {
+            throws NuxeoException {
     	CoreSession result = null;
 
         try {
         	result = CoreInstance.openCoreSession(repositoryName);
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
 
         return result;
     }
 
     protected void closeCoreSession(LoginContext loginContext,
-    		CoreSession session) throws ClientException {
+    		CoreSession session) throws NuxeoException {
         if (loginContext != null) {
             try {
                 loginContext.logout();
             } catch (LoginException e) {
-                throw new ClientException(e);
+                throw new NuxeoException(e);
             }
         }
         if (session != null) {
@@ -133,19 +133,19 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     public List<DocumentModel> getQuotes(DocumentModel docModel)
-            throws ClientException {
+            throws NuxeoException {
         RelationManager relationManager;
         Map<String, Object> ctxMap = new HashMap<String, Object>();
         ctxMap.put(ResourceAdapter.CORE_SESSION_CONTEXT_KEY, docModel.getSessionId());
         try {
             relationManager = getRelationManager();
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
         Resource docResource = relationManager.getResource(
                 config.documentNamespace, docModel, ctxMap);
         if (docResource == null) {
-            throw new ClientException(
+            throw new NuxeoException(
                     "Could not adapt document model to relation resource ; "
                             + "check the service relation adapters configuration");
         }
@@ -189,7 +189,7 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     public DocumentModel createQuote(DocumentModel docModel, String comment,
-            String author) throws ClientException {
+            String author) throws NuxeoException {
         LoginContext loginContext = null;
         CoreSession session = null;
         try {
@@ -206,14 +206,14 @@ public class QuoteManagerImpl implements QuoteManager {
 
             return commentDM;
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         } finally {
             closeCoreSession(loginContext, session);
         }
     }
 
     public DocumentModel createQuote(DocumentModel docModel, String quote)
-            throws ClientException {
+            throws NuxeoException {
         String author = getCurrentUser(docModel);
         return createQuote(docModel, quote, author);
     }
@@ -224,10 +224,10 @@ public class QuoteManagerImpl implements QuoteManager {
      *
      * @param docModel The document model that holds the session id
      * @param comment The comment to update
-     * @throws ClientException
+     * @throws NuxeoException
      */
     private static String updateAuthor(DocumentModel docModel,
-            DocumentModel comment) throws ClientException {
+            DocumentModel comment) throws NuxeoException {
         // update the author if not set
         String author = (String) comment.getProperty("comment", "author");
         if (author == null) {
@@ -239,7 +239,7 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     public DocumentModel createQuote(DocumentModel docModel,
-            DocumentModel comment) throws ClientException {
+            DocumentModel comment) throws NuxeoException {
         LoginContext loginContext = null;
         CoreSession session = null;
         try {
@@ -249,7 +249,7 @@ public class QuoteManagerImpl implements QuoteManager {
             session.save();
             return doc;
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         } finally {
             closeCoreSession(loginContext, session);
         }
@@ -257,7 +257,7 @@ public class QuoteManagerImpl implements QuoteManager {
 
     protected DocumentModel internalCreateQuote(CoreSession session,
             DocumentModel docModel, DocumentModel comment, String path)
-            throws ClientException {
+            throws NuxeoException {
         String author = updateAuthor(docModel, comment);
         DocumentModel createdComment;
 
@@ -274,7 +274,7 @@ public class QuoteManagerImpl implements QuoteManager {
                     config.documentNamespace, docModel, null);
 
             if (commentRes == null || documentRes == null) {
-                throw new ClientException(
+                throw new NuxeoException(
                         "Could not adapt document model to relation resource ; "
                                 + "check the service relation adapters configuration");
             }
@@ -286,7 +286,7 @@ public class QuoteManagerImpl implements QuoteManager {
             statementList.add(stmt);
             relationManager.add(config.graphName, statementList);
         } catch (Exception e) {
-            throw new ClientException("failed to create comment", e);
+            throw new NuxeoException("failed to create comment", e);
         }
 
         NuxeoPrincipal principal = null;
@@ -304,7 +304,7 @@ public class QuoteManagerImpl implements QuoteManager {
 
     private DocumentModel createQuoteDocModel(CoreSession mySession,
             DocumentModel docModel, DocumentModel comment, String path)
-            throws ClientException {
+            throws NuxeoException {
 
         String domainPath;
         updateAuthor(docModel, comment);
@@ -373,7 +373,7 @@ public class QuoteManagerImpl implements QuoteManager {
 
     private static void notifyEvent(CoreSession session, DocumentModel docModel, String eventType,
             DocumentModel parent, DocumentModel child, NuxeoPrincipal principal)
-            throws ClientException {
+            throws NuxeoException {
 
         DocumentEventContext ctx = new DocumentEventContext(session, principal, docModel);
         Map<String, Serializable> props = new HashMap<String, Serializable>();
@@ -411,7 +411,7 @@ public class QuoteManagerImpl implements QuoteManager {
         acp.addACL(acl);
         try {
             dm.setACP(acp, true);
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             throw new ClientRuntimeException(e);
         }
     }
@@ -426,7 +426,7 @@ public class QuoteManagerImpl implements QuoteManager {
         acp.addACL(acl);
         try {
             dm.setACP(acp, true);
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             throw new ClientRuntimeException(e);
         }
     }
@@ -448,18 +448,18 @@ public class QuoteManagerImpl implements QuoteManager {
      */
     @Deprecated
     private static String getCurrentUser(DocumentModel target)
-            throws ClientException {
+            throws NuxeoException {
         String sid = target.getSessionId();
         CoreSession userSession = getUserSession(sid);
         if (userSession == null) {
-            throw new ClientException(
+            throw new NuxeoException(
                     "userSession is null, do not invoke this method when the user is not local");
         }
         return userSession.getPrincipal().getName();
     }
 
     private String getQuoteName(DocumentModel target, DocumentModel comment)
-            throws ClientException {
+            throws NuxeoException {
         String author = (String) comment.getProperty("comment", "author");
         if (author == null) {
             author = getCurrentUser(target);
@@ -474,7 +474,7 @@ public class QuoteManagerImpl implements QuoteManager {
         try {
             creationDate = (Calendar) comment.getProperty("dublincore",
                     "created");
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             creationDate = null;
         }
         if (creationDate == null) {
@@ -484,7 +484,7 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     public void deleteQuote(DocumentModel docModel, DocumentModel comment)
-            throws ClientException {
+            throws NuxeoException {
         LoginContext loginContext = null;
         CoreSession session = null;
         try {
@@ -492,13 +492,13 @@ public class QuoteManagerImpl implements QuoteManager {
             session = openCoreSession(docModel.getRepositoryName());
 
             if (session == null) {
-                throw new ClientException(
+                throw new NuxeoException(
                         "Unable to acess repository for comment: "
                                 + comment.getId());
             }
             DocumentRef ref = comment.getRef();
             if (!session.exists(ref)) {
-                throw new ClientException("Comment Document does not exist: "
+                throw new NuxeoException("Comment Document does not exist: "
                         + comment.getId());
             }
 
@@ -512,14 +512,14 @@ public class QuoteManagerImpl implements QuoteManager {
 
         } catch (Throwable e) {
             log.error("failed to delete comment", e);
-            throw new ClientException("failed to delete comment", e);
+            throw new NuxeoException("failed to delete comment", e);
         } finally {
             closeCoreSession(loginContext, session);
         }
     }
 
     public DocumentModel createQuote(DocumentModel docModel,
-            DocumentModel parent, DocumentModel child) throws ClientException {
+            DocumentModel parent, DocumentModel child) throws NuxeoException {
         LoginContext loginContext = null;
         CoreSession session = null;
         try {
@@ -540,7 +540,7 @@ public class QuoteManagerImpl implements QuoteManager {
             return newComment;
 
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         } finally {
             closeCoreSession(loginContext, session);
         }
@@ -559,31 +559,31 @@ public class QuoteManagerImpl implements QuoteManager {
     }
 
     public List<DocumentModel> getQuotes(DocumentModel docModel,
-            DocumentModel parent) throws ClientException {
+            DocumentModel parent) throws NuxeoException {
         try {
             //loginContext = Framework.login();
             //session = openCoreSession(docModel.getRepositoryName());
             //DocumentModel parentDocModel = session.getDocument(parent.getRef());
             return getQuotes(parent);
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
     }
 
     public List<DocumentModel> getDocumentsForQuote(DocumentModel comment)
-            throws ClientException {
+            throws NuxeoException {
         RelationManager relationManager;
         Map<String, Object> ctxMap = new HashMap<String, Object>();
         ctxMap.put(ResourceAdapter.CORE_SESSION_CONTEXT_KEY, comment.getSessionId());
         try {
             relationManager = getRelationManager();
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
         Resource commentResource = relationManager.getResource(
                 config.commentNamespace, comment, ctxMap);
         if (commentResource == null) {
-            throw new ClientException(
+            throw new NuxeoException(
                     "Could not adapt document model to relation resource ; "
                             + "check the service relation adapters configuration");
         }
@@ -621,7 +621,7 @@ public class QuoteManagerImpl implements QuoteManager {
 
     }
     public DocumentModel createLocatedQuote(DocumentModel docModel,
-            DocumentModel comment, String path) throws ClientException {
+            DocumentModel comment, String path) throws NuxeoException {
         LoginContext loginContext = null;
         CoreSession session = null;
         DocumentModel createdComment;
@@ -631,7 +631,7 @@ public class QuoteManagerImpl implements QuoteManager {
             createdComment = internalCreateQuote(session, docModel, comment, path);
             session.save();
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         } finally {
             closeCoreSession(loginContext, session);
         }

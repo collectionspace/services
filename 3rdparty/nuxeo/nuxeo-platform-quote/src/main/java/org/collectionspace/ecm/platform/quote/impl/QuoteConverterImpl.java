@@ -22,7 +22,7 @@ package org.collectionspace.ecm.platform.quote.impl;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DataModel;
 import org.nuxeo.ecm.core.api.DataModelMap;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -47,7 +47,7 @@ public class QuoteConverterImpl implements QuoteConverter {
         return "Comment";
     }
 
-    /*public Comment getComment(DocumentModel docModel) throws ClientException {
+    /*public Comment getComment(DocumentModel docModel) throws NuxeoException {
         CommentImpl comment;
         try {
             comment = (CommentImpl) getCommentClass().newInstance();
@@ -76,7 +76,7 @@ public class QuoteConverterImpl implements QuoteConverter {
 
             }
         } catch (Exception e) {
-            throw new ClientException("failed to create comment", e);
+            throw new NuxeoException("failed to create comment", e);
         }
         return comment;
     }*/
@@ -91,7 +91,7 @@ public class QuoteConverterImpl implements QuoteConverter {
             String schema = dataModel.getSchema();
             try {
                 docModel.setProperties(schema, new HashMap<String, Object>(dataModel.getMap()));
-            } catch (ClientException e) {
+            } catch (NuxeoException e) {
                 continue;
             }
             /*if(docModel.hasSchema(schema)) {

@@ -91,7 +91,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DataModelImpl;
 import org.nuxeo.ecm.core.api.model.DocumentPart;
 import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.api.model.impl.ScalarProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,7 +251,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
@@ -353,7 +353,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
 
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
@@ -768,9 +768,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return authRefList;
     }
 
-    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari, 
-    						List<AuthorityRefList.AuthorityRefItem> list)
-            throws Exception {
+    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari,
+                                         List<AuthorityRefList.AuthorityRefItem> list) {
     	String fieldName = ari.getQualifiedDisplayName();
     	try {
 	   		String refNameValue = (String)ari.getProperty().getValue();
@@ -780,12 +779,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 	   			return true;
 	   		}
     	} catch(PropertyException pe) {
-    		String msg = "PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage();
-    		if (logger.isDebugEnabled()) {
-    			logger.debug(msg, pe);
-    		} else {
-    			logger.error(msg);
-    		}
+            logger.error("PropertyException on: {} {}", ari.getProperty().getXPath(), pe.getLocalizedMessage(), pe);
     	}
     	return false;
     }

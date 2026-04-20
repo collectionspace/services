@@ -80,6 +80,7 @@ public class AccountsCommon {
     @XmlElement(required = true)
     private String userId;
 
+    @Transient
     private byte[] password;
 
     @Basic

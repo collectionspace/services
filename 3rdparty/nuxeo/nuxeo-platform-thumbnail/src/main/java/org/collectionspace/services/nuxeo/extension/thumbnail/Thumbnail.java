@@ -1,7 +1,7 @@
 package org.collectionspace.services.nuxeo.extension.thumbnail;
 
 import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class Thumbnail {
@@ -11,7 +11,7 @@ public class Thumbnail {
 		docModel = doc;
 	}
 	
-	public String getDigest() throws ClientException {
+	public String getDigest() throws NuxeoException {
 		String result = null;
 		
 		if (docModel != null) {

@@ -64,8 +64,6 @@
 			<artifactId>org.collectionspace.services.publicitem.jaxb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.collectionspace.services</groupId> <artifactId>org.collectionspace.services.3rdparty.nuxeo.quote-api</artifactId>
-			<version>${project.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -140,10 +138,16 @@
 			<version>2.0.1</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-dbcp</groupId>
-			<artifactId>commons-dbcp</artifactId>
-			<version>1.3-RC1</version>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-dbcp2</artifactId>
+			<version>2.13.0</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>jakarta.transaction</groupId>
+					<artifactId>jakarta.transaction-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
@@ -230,40 +234,24 @@
 		</dependency>
 		<!-- nuxeo -->
 		<dependency>
-			<groupId>org.nuxeo.binary.metadata</groupId>
+			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-binary-metadata</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.lib.runtime</groupId>
 			<artifactId>nuxeo-runtime-launcher</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-types-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-types-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<artifactId>nuxeo-platform-types</artifactId>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-imaging-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-filemanager-api</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.common</groupId>
@@ -281,7 +269,7 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-query</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -291,12 +279,6 @@
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-storage-sql</artifactId>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>org.nuxeo.ecm.core</groupId>
-			<artifactId>nuxeo-core-io</artifactId>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
 			<artifactId>nuxeo-core-convert</artifactId>
@@ -304,7 +286,7 @@
 		<dependency>
 			<groupId>org.nuxeo.runtime</groupId>
 			<artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.nuxeo.ecm.core</groupId>
@@ -328,6 +310,15 @@
 				<exclusion>
 					<groupId>com.sun.xml.ws</groupId>
 					<artifactId>jaxws-rt</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>javax.xml.bind</groupId>
+					<artifactId>jaxb-api</artifactId>
+				</exclusion>
+				<!-- the woodstox-core-asl dependency was moved to woodstox-core which is provided elsewhere -->
+				<exclusion>
+					<groupId>org.codehaus.woodstox</groupId>
+					<artifactId>woodstox-core-asl</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

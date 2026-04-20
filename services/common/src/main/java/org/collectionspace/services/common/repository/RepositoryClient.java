@@ -26,8 +26,6 @@ package org.collectionspace.services.common.repository;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -41,7 +39,7 @@ import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 // All of these Nuxeo specific classes should not be here.  This is supposed to be
 // a repository-neutral interface.
 //
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -115,7 +113,7 @@ public interface RepositoryClient<IT, OT> extends StorageClient {
     		String csid)
             throws Exception;
 
-    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException;
+    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws NuxeoException;
 
     /**
      * Find wrapped documentModel from the Nuxeo repository

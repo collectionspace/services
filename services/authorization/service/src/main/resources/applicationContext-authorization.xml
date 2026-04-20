@@ -41,7 +41,7 @@
     </bean>
      -->
     
-	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+	<bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
         <property name="driverClassName" value="${db.jdbc.driver.class}"/>
         <property name="url" value="${db.jdbc.cspace.url.encoded}"/>
         <property name="username" value="${db.cspace.user}"/>
