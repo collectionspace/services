@@ -19,13 +19,13 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
-import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.collectionspace.services.jaxb.adapter.DateAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "account_role_rel")
+@XmlRootElement(name = "account_role_rel")
 @Entity(name = "AccountRoleRel")
 @Table(name = "accounts_roles", uniqueConstraints = {
     @UniqueConstraint(columnNames = {
