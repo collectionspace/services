@@ -35,6 +35,7 @@ import org.collectionspace.services.heldintrust.HeldInTrustResource;
 import org.collectionspace.services.id.IDResource;
 import org.collectionspace.services.insurance.InsuranceResource;
 import org.collectionspace.services.iterationreport.IterationreportResource;
+import org.collectionspace.services.jaxrs.provider.JakartaJAXBProvider;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.intake.IntakeResource;
@@ -109,8 +110,8 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  */
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
 
-    private Set<Object> singletons = new HashSet<Object>();
-    private Set<Class<?>> empty = new HashSet<Class<?>>();
+    private Set<Object> singletons = new HashSet<>();
+    private Set<Class<?>> empty = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
@@ -119,6 +120,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         // Instantiate all our JaxRS resources
         //
         singletons.add(new SecurityInterceptor());
+        singletons.add(new JakartaJAXBProvider<>());
 
         singletons.add(new AccountResource());
         singletons.add(new TenantResource());
