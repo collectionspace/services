@@ -28,7 +28,6 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * <p>
@@ -77,7 +76,8 @@ public class XmlToJsonFilter implements Filter {
 
             chain.doFilter(requestWrapper, responseWrapper);
 
-            if (StringUtils.equals(responseWrapper.getContentType(), MediaType.APPLICATION_XML)) {
+            final var contentType = response.getContentType();
+            if (contentType != null && contentType.startsWith(MediaType.APPLICATION_XML)) {
                 // Got an XML response. Translate it to JSON.
 
                 response.setContentType(MediaType.APPLICATION_JSON);
