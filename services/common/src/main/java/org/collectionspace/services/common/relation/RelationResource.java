@@ -156,7 +156,7 @@ public class RelationResource extends NuxeoBasedResource {
 	        	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
 	            getRepositoryClient(ctx).delete(ctx, csidList, handler);
 	    	} else {
-	            result = Response.ok().build();
+	            result = Response.status(Response.Status.NOT_FOUND).build();
 	    	}
         } catch (Exception e) {
         	String separator = ", ";

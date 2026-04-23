@@ -97,7 +97,7 @@ public abstract class NuxeoBasedResource
             @PathParam("csid") String csid,
             @PathParam("indexid") String indexid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
-       	Response result = Response.status(Response.Status.OK).entity("Reindex complete.").type("text/plain").build();
+       	Response result = Response.ok().entity("Reindex complete.").type("text/plain").build();
        	boolean success = false;
        	
         ensureCSID(csid, READ);
@@ -307,7 +307,7 @@ public abstract class NuxeoBasedResource
             throws Exception {
     	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
         getRepositoryClient(ctx).delete(ctx, csid, handler);
-        return Response.status(Response.Status.OK).build();
+        return Response.ok().build();
     }
     
     public Response deleteWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,
