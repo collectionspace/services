@@ -12,10 +12,6 @@
     <name>services.jaxrs.provider</name>
     <packaging>war</packaging>
 
-    <properties>
-        <cs.release>0.5</cs.release>
-    </properties>
-
     <dependencies>
     	<dependency>
     		<groupId>commons-collections</groupId>
@@ -487,16 +483,6 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>jaxb-impl</artifactId>
-            		<groupId>com.sun.xml.bind</groupId>
-            	</exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-multipart-provider</artifactId>
         </dependency>
         <dependency>
@@ -941,7 +927,7 @@
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
                             <Package>${project.groupId}</Package>
-                            <Release>${cs.release}</Release>
+                            <Release>${project.version</Release>
                         </manifestEntries>
                     </archive>
                 </configuration>
