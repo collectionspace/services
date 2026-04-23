@@ -32,9 +32,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Set;
+import javax.annotation.Priority;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -70,6 +72,7 @@ import org.slf4j.LoggerFactory;
  * RESTeasy interceptor for access control
  * @version $Revision: 1 $
  */
+@Priority(Priorities.AUTHENTICATION)
 @Provider
 public class SecurityInterceptor implements ContainerRequestFilter, ContainerResponseFilter {
 
