@@ -76,34 +76,26 @@
         <finalName>cspace-services-account-client</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>subs-hibernate-config</id>
-                        <phase>generate-test-resources</phase>
+                        <phase>process-test-resources</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
                         <configuration>
-                            <tasks>
+                            <target>
                                 <property name="runtime-classpath" refid="maven.runtime.classpath"/>
                                 <ant target="setup_hibernate.cfg" inheritRefs="true"/>
-                            </tasks>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
-		<filters>
-			<filter>../../../build.properties</filter>
-		</filters>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-
     </build>
 
 </project>

@@ -33,7 +33,6 @@ import org.collectionspace.services.workflow.WorkflowCommon;
 import org.collectionspace.services.client.DimensionClient;
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.dimension.DimensionsCommon;
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
