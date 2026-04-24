@@ -61,7 +61,7 @@ import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateNotFoundException;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountStorageClient;
