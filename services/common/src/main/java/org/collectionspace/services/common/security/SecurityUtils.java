@@ -43,6 +43,7 @@ import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.spring.CSpacePasswordEncoderFactory;
 
+import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
@@ -50,7 +51,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.jboss.resteasy.spi.HttpRequest;
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.schema.XSAny;
 import org.opensaml.core.xml.schema.XSString;
@@ -132,10 +132,10 @@ public class SecurityUtils {
         }
     }
 
-    public static String getWorkflowResourceName(HttpRequest request) {
+    public static String getWorkflowResourceName(ContainerRequestContext requestContext) {
     	String result = null;
 
-    	UriInfo uriInfo = request.getUri();
+    	UriInfo uriInfo = requestContext.getUriInfo();
     	String workflowSubResName = SecurityUtils.getResourceName(uriInfo);
     	String resEntity = SecurityUtils.getResourceEntity(workflowSubResName);
 
@@ -151,35 +151,14 @@ public class SecurityUtils {
     	return result;
     }
 
-    public static String getIndexResourceName(HttpRequest request) {
-    	String result = null;
-
-    	UriInfo uriInfo = request.getUri();
-    	String indexSubResName = SecurityUtils.getResourceName(uriInfo);
-    	String resEntity = SecurityUtils.getResourceEntity(indexSubResName);
-
-		MultivaluedMap<String, String> pathParams = uriInfo.getPathParameters();
-		String indexId = pathParams.getFirst(IndexClient.INDEX_ID_PARAM);
-		if (indexId != null  && pathParams.containsKey("csid")) {
-			// e.g., intakes/*/index/fulltext
-	    	result = resEntity + "/*/" + IndexClient.SERVICE_NAME + "/" + indexId;
-		} else if (indexId != null) {
-			// e.g., intakes/index/fulltext
-	    	result = resEntity + "/" + IndexClient.SERVICE_NAME + "/" + indexId;
-		} else {
-			// e.g., intakes
-			result = resEntity;
-		}
-
-		//
+    public static String getIndexResourceName() {
+        //
 		// Overriding the result from above.
 		//
 		// Until we build out more permissions for the index resource,
 		// we're just going to return the index resource name.
 		//
-		result = IndexClient.SERVICE_NAME;
-
-    	return result;
+        return IndexClient.SERVICE_NAME;
     }
 
 	/**
