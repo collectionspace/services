@@ -18,9 +18,7 @@ import org.collectionspace.services.work.WorkTermGroup;
 import org.collectionspace.services.work.WorkTermGroupList;
 import org.collectionspace.services.work.WorkauthoritiesCommon;
 import org.collectionspace.services.work.WorksCommon;
-
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

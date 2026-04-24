@@ -37,7 +37,6 @@ import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.CSWebApplicationException;
 
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -211,7 +210,7 @@ public class RoleResource extends SecurityResourceBase<Role, Role> {
         	ctx.closeConnection();
         }
         
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
 
     @POST
@@ -313,7 +312,7 @@ public class RoleResource extends SecurityResourceBase<Role, Role> {
                     new PermissionRoleSubResource(PermissionRoleSubResource.ROLE_PERMROLE_SERVICE);
             //delete all relationships for a permission
             subResource.deletePermissionRole((ServiceContext<Role, Role>)null, roleCsid, SubjectType.PERMISSION, input);
-            result = Response.status(HttpResponseCodes.SC_OK).build();
+            result = Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }
@@ -344,6 +343,6 @@ public class RoleResource extends SecurityResourceBase<Role, Role> {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, roleCsid);
         }
         
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
 }

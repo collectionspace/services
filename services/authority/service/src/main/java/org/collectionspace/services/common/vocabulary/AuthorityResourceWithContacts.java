@@ -35,7 +35,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -49,11 +48,9 @@ import org.collectionspace.services.common.StoredValuesUriTemplate;
 import org.collectionspace.services.common.UriInfoWrapper;
 import org.collectionspace.services.common.UriTemplateFactory;
 import org.collectionspace.services.common.UriTemplateRegistryKey;
-import org.collectionspace.services.common.vocabulary.AuthorityResource;
 import org.collectionspace.services.common.context.JaxRsContext;
 import org.collectionspace.services.common.context.RemoteServiceContext;
 import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
@@ -65,10 +62,8 @@ import org.collectionspace.services.contact.nuxeo.ContactConstants;
 import org.collectionspace.services.contact.nuxeo.ContactDocumentModelHandler;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 /**
  * The Class AuthorityResourceWithContacts.
@@ -429,7 +424,7 @@ public abstract class AuthorityResourceWithContacts<AuthCommon, AuthItemHandler>
             ctx = createServiceContext(getContactServiceName());
             DocumentHandler handler = createDocumentHandler(ctx);
             getRepositoryClient(ctx).delete(ctx, csid, handler);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, "DELETE failed, the requested Contact CSID:" + csid
                     + ": or one of the specifiers for authority:" + parentspecifier

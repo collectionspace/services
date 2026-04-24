@@ -23,9 +23,6 @@
  */
 package org.collectionspace.services.authorization;
 
-import org.collectionspace.services.authorization.PermissionRole;
-import org.collectionspace.services.authorization.PermissionRoleRel;
-import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
@@ -50,11 +47,8 @@ import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -334,7 +328,7 @@ public class PermissionResource extends SecurityResourceBase<Permission, Permiss
         	ctx.closeConnection();
         }
         
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
     
 	@POST
@@ -433,7 +427,7 @@ public class PermissionResource extends SecurityResourceBase<Permission, Permiss
             // Delete all role relationships for a permission
             //
             subResource.deletePermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE, input);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, permCsid);
         }
@@ -451,7 +445,7 @@ public class PermissionResource extends SecurityResourceBase<Permission, Permiss
                     new PermissionRoleSubResource(PermissionRoleSubResource.PERMISSION_PERMROLE_SERVICE);
             //delete all relationships for a permission
             subResource.deletePermissionRole((ServiceContext<Permission, Permission>)null, permCsid, SubjectType.ROLE);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, permCsid);
         }

@@ -579,8 +579,7 @@ public abstract class AbstractCollectionSpaceResourceImpl<IT, OT>
     }
     
 	@Override
-	public boolean allowAnonymousAccess(HttpRequest request,
-			Class<?> resourceClass) {
+	public boolean allowAnonymousAccess() {
 		return false;
 	}
 	

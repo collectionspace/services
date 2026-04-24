@@ -23,58 +23,6 @@
  */
 package org.collectionspace.services.account;
 
-import org.apache.chemistry.opencmis.commons.impl.UrlBuilder;
-import org.apache.commons.lang3.StringUtils;
-import org.collectionspace.authentication.AuthN;
-import org.collectionspace.services.account.storage.AccountStorageClient;
-import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
-import org.collectionspace.services.authentication.Passwordreset;
-import org.collectionspace.services.authentication.Token;
-import org.collectionspace.services.authorization.AccountPermission;
-import org.collectionspace.services.authorization.AccountRole;
-import org.collectionspace.services.authorization.AccountRoleRel;
-import org.collectionspace.services.authorization.RoleValue;
-import org.collectionspace.services.authorization.SubjectType;
-import org.collectionspace.services.client.AccountClient;
-import org.collectionspace.services.client.PayloadOutputPart;
-import org.collectionspace.services.client.RoleClient;
-import org.collectionspace.services.common.CSWebApplicationException;
-import org.collectionspace.services.common.EmailUtil;
-import org.collectionspace.services.common.SecurityResourceBase;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.UriInfoWrapper;
-import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
-import org.collectionspace.services.common.config.ConfigUtils;
-import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
-import org.collectionspace.services.common.context.RemoteServiceContextFactory;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.context.ServiceContextFactory;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.query.UriInfoImpl;
-import org.collectionspace.services.common.storage.StorageClient;
-import org.collectionspace.services.common.storage.TransactionContext;
-import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-import org.collectionspace.services.config.ServiceConfig;
-import org.collectionspace.services.config.tenant.EmailConfig;
-import org.collectionspace.services.config.tenant.TenantBindingType;
-
-import org.jboss.resteasy.util.HttpResponseCodes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.web.csrf.CsrfToken;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import freemarker.core.ParseException;
-import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -87,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
-
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -106,7 +52,52 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import jakarta.xml.bind.DatatypeConverter;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.core.ParseException;
+import freemarker.template.Configuration;
+import freemarker.template.MalformedTemplateNameException;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
+import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.lang3.StringUtils;
+import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.account.storage.AccountStorageClient;
+import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
+import org.collectionspace.services.authentication.Passwordreset;
+import org.collectionspace.services.authentication.Token;
+import org.collectionspace.services.authorization.AccountPermission;
+import org.collectionspace.services.authorization.AccountRole;
+import org.collectionspace.services.authorization.AccountRoleRel;
+import org.collectionspace.services.authorization.RoleValue;
+import org.collectionspace.services.authorization.SubjectType;
+import org.collectionspace.services.client.AccountClient;
+import org.collectionspace.services.client.PayloadOutputPart;
+import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.common.EmailUtil;
+import org.collectionspace.services.common.SecurityResourceBase;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.UriInfoWrapper;
+import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.config.ConfigUtils;
+import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.context.RemoteServiceContextFactory;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.context.ServiceContextFactory;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.query.UriInfoImpl;
+import org.collectionspace.services.common.storage.StorageClient;
+import org.collectionspace.services.common.storage.TransactionContext;
+import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
+import org.collectionspace.services.config.ServiceConfig;
+import org.collectionspace.services.config.tenant.EmailConfig;
+import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.web.csrf.CsrfToken;
 
 
 /** AccountResource provides RESTful interface to the account service  */
@@ -695,7 +686,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }
 
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
 
 	@POST
@@ -826,7 +817,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
 
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
 
     @DELETE
@@ -859,7 +850,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, accCsid);
         }
 
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
 
     }
 }

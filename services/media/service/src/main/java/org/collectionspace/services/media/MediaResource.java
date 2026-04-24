@@ -38,7 +38,6 @@ import org.collectionspace.services.common.blob.BlobInput;
 import org.collectionspace.services.common.blob.BlobUtil;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -425,7 +424,7 @@ public class MediaResource extends NuxeoBasedResource {
         	if (blobCsid != null && !blobCsid.isEmpty()) {
         		Response response = getBlobResource().delete(blobCsid);
         		if (logger.isDebugEnabled() == true) {
-        			if (response.getStatus() != HttpResponseCodes.SC_OK) {
+        			if (response.getStatus() != Response.Status.OK.getStatusCode()) {
         				logger.debug("Problem deleting related blob record of Media record: " +
         						"Media CSID=" + csid + " " +
         						"Blob CSID=" + blobCsid);
