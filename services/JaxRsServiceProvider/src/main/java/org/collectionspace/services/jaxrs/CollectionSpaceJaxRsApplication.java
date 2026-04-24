@@ -67,6 +67,7 @@ import org.collectionspace.services.advancedsearch.AdvancedSearch;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.structureddate.StructuredDateResource;
+import org.collectionspace.services.systeminfo.HealthResource;
 import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
@@ -129,6 +130,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         singletons.add(new ExportResource());
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
+        singletons.add(new HealthResource());
         singletons.add(new IndexResource());
         singletons.add(new LoginResource());
         singletons.add(new LogoutResource());
