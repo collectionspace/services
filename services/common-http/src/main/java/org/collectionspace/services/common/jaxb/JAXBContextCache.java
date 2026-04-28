@@ -30,16 +30,18 @@ public class JAXBContextCache {
         return INSTANCE;
     }
 
-    public JAXBContext getCachedJAXBContext(Class<?> type) throws JAXBException {
-        // skip computeIsAbsent b/c newInstance can throw an exception
+    public JAXBContext getCachedJAXBContext(final Class<?> type) throws JAXBException {
         final var packageName = type.getPackageName();
+        return getCachedJAXBContext(packageName);
+    }
+
+    public JAXBContext getCachedJAXBContext(final String packageName) throws JAXBException {
+        // avoid computeIfAbsent b/c newInstance can throw an exception
         JAXBContext context = contextCache.get(packageName);
         if (context == null) {
             context = JAXBContext.newInstance(packageName);
             contextCache.putIfAbsent(packageName, context);
         }
-
         return context;
     }
-
 }

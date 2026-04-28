@@ -44,6 +44,7 @@ import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.config.service.ServiceBindingType;
@@ -499,7 +500,7 @@ public class AuthorizationGen {
     private void toFile(Object o, Class jaxbClass, String fileName) {
         File f = new File(fileName);
         try {
-            JAXBContext jc = JAXBContext.newInstance(jaxbClass);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(o, f);

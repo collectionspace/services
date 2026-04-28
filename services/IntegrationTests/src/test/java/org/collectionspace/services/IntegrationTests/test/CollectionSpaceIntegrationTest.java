@@ -31,8 +31,6 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
 
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -185,25 +183,6 @@ public abstract class CollectionSpaceIntegrationTest {
 	 */
 	void verbose(String msg) {
 		System.out.println(msg);
-	}
-
-	/**
-	 * Verbose.
-	 * 
-	 * @param msg the msg
-	 * @param o the o
-	 * @param clazz the clazz
-	 */
-	void verbose(String msg, Object o, Class clazz) {
-		try {
-			verbose(msg);
-			JAXBContext jc = JAXBContext.newInstance(clazz);
-			Marshaller m = jc.createMarshaller();
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal(o, System.out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	/**

@@ -53,6 +53,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -88,7 +89,7 @@ import org.collectionspace.services.common.api.FileTools;
 @SuppressWarnings("rawtypes")
 public abstract class BaseServiceTest<CLT> {
 	//A default MIME type result
-    static protected final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
+    protected static final String DEFAULT_MIME = "application/octet-stream; charset=ISO-8859-1";
     //Maven's base directory -i.e., the one containing the current pom.xml
     protected static final String MAVEN_BASEDIR_PROPERTY = "maven.basedir";
     /** The Constant logger. */
@@ -114,7 +115,7 @@ public abstract class BaseServiceTest<CLT> {
     /* Use this to track authority items */
     protected Map<String, String> allResourceItemIdsCreated = new HashMap<String, String>(); /* itemCsid, parentCsid */
     /* A runtime/command-line parameter to indicate if we should delete all the test related resource objects */
-    static private final String NO_TEST_CLEANUP = "noTestCleanup";
+    private static final String NO_TEST_CLEANUP = "noTestCleanup";
     /* A random number generator */
     protected static final Random random = new Random(System.currentTimeMillis());
     
@@ -153,7 +154,7 @@ public abstract class BaseServiceTest<CLT> {
     // Ж : Cyrillic capital letter Zhe with breve (U+04C1)
     // Ŵ : Latin capital letter W with circumflex (U+0174)
     // Ω : Greek capital letter Omega (U+03A9)
-    private final static String UTF8_DATA_FRAGMENT = "utf-8-data-fragment:"
+    private static final String UTF8_DATA_FRAGMENT = "utf-8-data-fragment:"
             + '\u0394' + '\u04C1' + '\u0174' +'\u03A9';
     //
     // Status constants
@@ -222,7 +223,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the client
      * @throws Exception 
      */
-	abstract protected CollectionSpaceClient getClientInstance() throws Exception;
+    protected abstract CollectionSpaceClient getClientInstance() throws Exception;
 
     /**
      * Gets the client.
@@ -230,7 +231,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the client
      * @throws Exception 
      */
-    abstract protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception;
+    protected abstract CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception;
 
     /*
      * Subclasses can override this method to return their AbstractCommonList subclass
@@ -460,7 +461,7 @@ public abstract class BaseServiceTest<CLT> {
      * @param res the res
      * @return the string
      */
-    static protected String extractId(Response res) {
+    protected static String extractId(Response res) {
         return CollectionSpaceClientUtils.extractId(res);
     }
     
@@ -509,7 +510,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the object
      * @throws Exception the exception
      */
-	static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz) throws Exception {
+    protected static Object extractPart(PoxPayloadIn input, String label, Class<?> clazz) throws Exception {
 		Object result = null;
 		
 		PayloadInputPart payloadInputPart = input.getPart(label);
@@ -522,7 +523,7 @@ public abstract class BaseServiceTest<CLT> {
 		return result;
 	}
 	
-	static protected Object extractPart(PoxPayloadOut output, String label, Class<?> clazz) throws Exception {
+	protected static Object extractPart(PoxPayloadOut output, String label, Class<?> clazz) throws Exception {
 		Object result = null;
 		
 		PayloadOutputPart payloadOutPart = output.getPart(label);
@@ -545,9 +546,9 @@ public abstract class BaseServiceTest<CLT> {
      * @throws JAXBException the jAXB exception
      */
     @Deprecated
-    static protected Object getPartObject(String partStr, Class<?> clazz)
+    protected static Object getPartObject(String partStr, Class<?> clazz)
             throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(clazz);
+        JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
         ByteArrayInputStream bais = null;
         Object obj = null;
         try {
@@ -575,11 +576,11 @@ public abstract class BaseServiceTest<CLT> {
      * @param clazz the clazz
      * @return the string
      */
-	static protected String objectAsXmlString(Object o, Class<?> clazz) {
+    protected static String objectAsXmlString(Object o, Class<?> clazz) {
 		StringWriter sw = new StringWriter();
 		JAXBContext jc;
 		try {
-			jc = JAXBContext.newInstance(clazz);
+			jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
 			Marshaller m = jc.createMarshaller();
 			try {
 				m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
@@ -599,7 +600,7 @@ public abstract class BaseServiceTest<CLT> {
 		return sw.toString();
 	}
     
-    static protected String objectAsXmlString(Object o) {
+    protected static String objectAsXmlString(Object o) {
         return objectAsXmlString(o, o.getClass());
     }
 
@@ -610,7 +611,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return
      * @throws Exception
      */
-    static protected Object getObjectFromFile(Class<?> jaxbClass, String fileName)
+    protected static Object getObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
     	Object result = null;
     	
@@ -626,7 +627,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the xml document
      * @throws Exception the exception
      */
-    static protected Document getXmlDocument(String fileName) throws Exception {
+    protected static Document getXmlDocument(String fileName) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         File f = new File(fileName);
         if (!f.exists()) {
@@ -643,7 +644,7 @@ public abstract class BaseServiceTest<CLT> {
      * @return the xml document as string
      * @throws Exception the exception
      */
-    static protected String getXmlDocumentAsString(String fileName) throws Exception {
+    protected static String getXmlDocumentAsString(String fileName) throws Exception {
         String result = FileUtils.readFileToString(new File(fileName), "UTF8");
         return result;
     }

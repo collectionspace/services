@@ -13,6 +13,11 @@
 
     <dependencies>
 <!-- CollectionSpace dependencies -->
+      <dependency>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>common-http</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
         <dependency>
             <groupId>org.collectionspace.services</groupId>
