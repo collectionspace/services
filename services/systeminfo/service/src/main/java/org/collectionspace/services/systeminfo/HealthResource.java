@@ -56,17 +56,12 @@ public class HealthResource {
         root.put("checks", checks);
 
         try {
+            String cspaceInstanceId = getServiceId();
+
             root.put("description", DESCRIPTION);
             root.put("version", getApplicationVersion());
             root.put("releaseId", readGitCommitId());
-            root.put("serviceId", getServiceId());
-
-            String cspaceInstanceId = null;
-            try {
-                cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
-            } catch (Exception e) {
-                logger.debug("Could not get instance id", e);
-            }
+            root.put("serviceId", cspaceInstanceId);
 
             List<String> repoNames = resolveAllRepositoryNames();
             String firstRepoName = repoNames.isEmpty() ? null : repoNames.get(0);
@@ -74,14 +69,16 @@ public class HealthResource {
             boolean hasWarn = false;
 
             // Check: database:cspace (required)
-            Map<String, Object> cspaceCheck = checkDatabaseCspace();
+            Map<String, Object> cspaceCheck = checkDatabaseByDatasource(JDBCTools.CSPACE_DATASOURCE_NAME, false, null,
+                    null);
             checks.put("database:cspace", cspaceCheck);
             if ("fail".equals(cspaceCheck.get("status"))) {
                 requiredFailed = true;
             }
 
             // Check: database:csadmin (optional)
-            Map<String, Object> csadminCheck = checkDatabaseCsadmin();
+            Map<String, Object> csadminCheck = checkDatabaseByDatasource(JDBCTools.CSADMIN_DATASOURCE_NAME, true, null,
+                    null);
             checks.put("database:csadmin", csadminCheck);
             if ("fail".equals(csadminCheck.get("status"))) {
                 hasWarn = true;
@@ -96,7 +93,8 @@ public class HealthResource {
                 hasWarn = true;
             } else {
                 for (String repoName : repoNames) {
-                    Map<String, Object> nuxeoDbCheck = checkDatabaseNuxeo(repoName, cspaceInstanceId);
+                    Map<String, Object> nuxeoDbCheck = checkDatabaseByDatasource(JDBCTools.NUXEO_DATASOURCE_NAME, false,
+                            repoName, cspaceInstanceId);
                     checks.put("database:nuxeo:" + repoName, nuxeoDbCheck);
                     if ("fail".equals(nuxeoDbCheck.get("status"))) {
                         requiredFailed = true;
@@ -121,7 +119,8 @@ public class HealthResource {
 
             // Check: database:nuxeo_reader per repository (optional)
             for (String repoName : repoNames) {
-                Map<String, Object> readerCheck = checkDatabaseNuxeoReader(repoName, cspaceInstanceId);
+                Map<String, Object> readerCheck = checkDatabaseByDatasource(JDBCTools.NUXEO_READER_DATASOURCE_NAME,
+                        true, repoName, cspaceInstanceId);
                 checks.put("database:nuxeo_reader:" + repoName, readerCheck);
                 if ("fail".equals(readerCheck.get("status"))) {
                     hasWarn = true;
@@ -130,7 +129,8 @@ public class HealthResource {
 
             // Check: database:csadmin_nuxeo per repository (optional)
             for (String repoName : repoNames) {
-                Map<String, Object> csadminNuxeoCheck = checkDatabaseCsadminNuxeo(repoName, cspaceInstanceId);
+                Map<String, Object> csadminNuxeoCheck = checkDatabaseByDatasource(
+                        JDBCTools.CSADMIN_NUXEO_DATASOURCE_NAME, true, repoName, cspaceInstanceId);
                 checks.put("database:csadmin_nuxeo:" + repoName, csadminNuxeoCheck);
                 if ("fail".equals(csadminNuxeoCheck.get("status"))) {
                     hasWarn = true;
@@ -201,11 +201,6 @@ public class HealthResource {
         } catch (Exception e) {
             return "unknown";
         }
-    }
-
-    private String resolveFirstRepositoryName() {
-        List<String> all = resolveAllRepositoryNames();
-        return all.isEmpty() ? null : all.get(0);
     }
 
     /**
@@ -279,36 +274,19 @@ public class HealthResource {
         return check;
     }
 
-    private Map<String, Object> checkDatabaseCspace() {
-        return checkDatabase(() -> {
-            DataSource ds = JDBCTools.getDataSource(JDBCTools.CSPACE_DATASOURCE_NAME);
+    private Map<String, Object> checkDatabaseByDatasource(String datasourceName, boolean namingExceptionAsDisabled,
+            String repositoryName, String cspaceInstanceId) {
+        return checkDatabase(() -> getConnectionForDatasource(datasourceName, repositoryName, cspaceInstanceId),
+                namingExceptionAsDisabled);
+    }
+
+    private Connection getConnectionForDatasource(String datasourceName, String repositoryName, String cspaceInstanceId)
+            throws Exception {
+        if (repositoryName == null || cspaceInstanceId == null) {
+            DataSource ds = JDBCTools.getDataSource(datasourceName);
             return ds.getConnection();
-        }, false);
-    }
-
-    private Map<String, Object> checkDatabaseCsadmin() {
-        return checkDatabase(() -> {
-            DataSource ds = JDBCTools.getDataSource(JDBCTools.CSADMIN_DATASOURCE_NAME);
-            return ds.getConnection();
-        }, true);
-    }
-
-    private Map<String, Object> checkDatabaseNuxeo(String repositoryName, String cspaceInstanceId) {
-        return checkDatabase(
-                () -> JDBCTools.getConnection(JDBCTools.NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId),
-                false);
-    }
-
-    private Map<String, Object> checkDatabaseNuxeoReader(String repositoryName, String cspaceInstanceId) {
-        return checkDatabase(
-                () -> JDBCTools.getConnection(JDBCTools.NUXEO_READER_DATASOURCE_NAME, repositoryName, cspaceInstanceId),
-                true);
-    }
-
-    private Map<String, Object> checkDatabaseCsadminNuxeo(String repositoryName, String cspaceInstanceId) {
-        return checkDatabase(
-                () -> JDBCTools.getConnection(JDBCTools.CSADMIN_NUXEO_DATASOURCE_NAME, repositoryName, cspaceInstanceId),
-                true);
+        }
+        return JDBCTools.getConnection(datasourceName, repositoryName, cspaceInstanceId);
     }
 
     private Map<String, Object> checkNuxeoRepository(String repoName) {
