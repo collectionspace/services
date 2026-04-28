@@ -28,6 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
@@ -40,10 +41,9 @@ import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.provider.JakartaJAXBProvider;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,8 +159,6 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     		throw new RuntimeException(e.getMessage());
     	}
     	
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
         setProxy();
     }
 
@@ -489,8 +487,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      */
     @Override
 	public void setProxy() {
-        // todo: Switch from RestEasyClient -> Client?
-    	ResteasyClient client = null;
+    	Client client = null;
         String urlString = url.toString();
     	Class<P> proxyClass = this.getProxyClass();
 
@@ -498,15 +495,16 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         if (useAuth()) {
             String user = properties.getProperty(USER_PROPERTY);
             String password = properties.getProperty(PASSWORD_PROPERTY);
-            client = (ResteasyClient) ClientBuilder.newBuilder()
-                                                   .register(new Authenticator(user, password))
-                                                   .build();
+            client = ClientBuilder.newBuilder()
+                                  .register(new Authenticator(user, password))
+                                  .register(new JakartaJAXBProvider<>())
+                                  .build();
         } else {
-
-            client = (ResteasyClient) ClientBuilder.newBuilder().build();
+            client = ClientBuilder.newBuilder().register(new JakartaJAXBProvider<>()).build();
         }
 
-        proxy = client.target(urlString).proxy(proxyClass);
+        ResteasyWebTarget target = (ResteasyWebTarget) client.target(urlString);
+        proxy = target.proxy(proxyClass);
     }
 
     @Override
