@@ -29,6 +29,7 @@
     -->
 	<modules>
 		<module>config</module>
+		<module>common-http</module>
 		<module>common-api</module>
 		<module>authentication</module>
 		<module>authorization-common</module>

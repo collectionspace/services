@@ -1,4 +1,4 @@
-package org.collectionspace.services.jaxrs.provider;
+package org.collectionspace.services.common.provider;
 
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
 
@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -19,11 +18,10 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.xml.transform.stream.StreamSource;
 
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlType;
-import org.collectionspace.services.common.CSWebApplicationException;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,11 +43,6 @@ public class JakartaJAXBProvider<T> implements MessageBodyWriter<T>, MessageBody
 
     private static final Logger logger = LoggerFactory.getLogger(JakartaJAXBProvider.class);
 
-    /**
-     * Store a cache of JAXBContexts so that the namespace does not get polluted when marshalling
-     */
-    private final ConcurrentHashMap<Class<?>, JAXBContext> contextCache = new ConcurrentHashMap<>();
-
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type.isAnnotationPresent(XmlRootElement.class);
@@ -60,29 +53,18 @@ public class JakartaJAXBProvider<T> implements MessageBodyWriter<T>, MessageBody
         return type.isAnnotationPresent(XmlRootElement.class);
     }
 
-    private JAXBContext getCachedJAXBContext(Class<?> type) throws JAXBException {
-        // skip computeIsAbsent b/c newInstance can throw an exception
-        JAXBContext context = contextCache.get(type);
-        if (context == null) {
-            context = JAXBContext.newInstance(type);
-            contextCache.put(type, context);
-        }
-
-        return context;
-    }
-
     @Override
     public void writeTo(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
                         MultivaluedMap<String, Object> multivaluedMap, OutputStream outputStream)
         throws WebApplicationException {
         try {
-            final var context = getCachedJAXBContext(type);
+            final var context = JAXBContextCache.getInstance().getCachedJAXBContext(type);
             final var marshaller = context.createMarshaller();
             marshaller.marshal(t, outputStream);
         } catch (JAXBException e) {
             logger.error("Unable to marshal JAXB Object {}", type.getSimpleName(), e);
             final var response = Response.status(INTERNAL_SERVER_ERROR).build();
-            throw new CSWebApplicationException(response);
+            throw new WebApplicationException(response);
         }
     }
 
@@ -92,7 +74,7 @@ public class JakartaJAXBProvider<T> implements MessageBodyWriter<T>, MessageBody
         throws WebApplicationException {
         try {
             StreamSource source;
-            final var context = getCachedJAXBContext(type);
+            final var context = JAXBContextCache.getInstance().getCachedJAXBContext(type);
             final var unmarshaller = context.createUnmarshaller();
             if (mediaType != null && mediaType.getParameters().get("charset") == null) {
                 source = new StreamSource(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
@@ -103,7 +85,7 @@ public class JakartaJAXBProvider<T> implements MessageBodyWriter<T>, MessageBody
         } catch (JAXBException e) {
             logger.error("Unable to unmarshal JAXB Object {}", type.getSimpleName(), e);
             final var response = Response.status(INTERNAL_SERVER_ERROR).build();
-            throw new CSWebApplicationException(response);
+            throw new WebApplicationException(response);
         }
     }
 }
