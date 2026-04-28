@@ -105,7 +105,7 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     private boolean isAnonymousRequest(ContainerRequestContext requestContext) {
     	boolean result = false;
 
-		String resName = SecurityUtils.getResourceName(request.getUri()).toLowerCase();
+		String resName = SecurityUtils.getResourceName(requestContext.getUriInfo());
 		switch (resName) {
 			case AuthZ.PASSWORD_RESET:
 			case AuthZ.PROCESS_PASSWORD_RESET:
