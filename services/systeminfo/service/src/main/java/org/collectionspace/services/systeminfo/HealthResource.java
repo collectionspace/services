@@ -48,6 +48,7 @@ public class HealthResource {
 
     private static final Logger logger = LoggerFactory.getLogger(HealthResource.class);
     private static final String DESCRIPTION = "CollectionSpace Services";
+    private static final String INCLUDE_OBSERVED_VALUE_PROPERTY = "cspace.health.includeObservedValue";
 
     @GET
     public Response get() {
@@ -250,7 +251,7 @@ public class HealthResource {
             String product = meta.getDatabaseProductName();
             String version = meta.getDatabaseProductVersion();
             check.put("status", "pass");
-            check.put("observedValue", product + " " + version);
+            putObservedValueIfEnabled(check, product + " " + version);
         } catch (NamingException e) {
             if (namingExceptionAsDisabled) {
                 check.put("status", "disabled");
@@ -298,7 +299,7 @@ public class HealthResource {
             session = connector.getClient().openRepository(repoName, ServiceContext.DEFAULT_TX_TIMEOUT);
             session.getRepositoryName();
             check.put("status", "pass");
-            check.put("observedValue", repoName);
+            putObservedValueIfEnabled(check, repoName);
         } catch (Exception e) {
             check.put("status", "fail");
             check.put("output", e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
@@ -347,5 +348,11 @@ public class HealthResource {
             }
         }
         return "health check failed";
+    }
+
+    private void putObservedValueIfEnabled(Map<String, Object> check, String observedValue) {
+        if (Framework.isBooleanPropertyTrue(INCLUDE_OBSERVED_VALUE_PROPERTY)) {
+            check.put("observedValue", observedValue);
+        }
     }
 }
