@@ -751,9 +751,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         roleToUpdate.setDescription("updated role description");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
-            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
-                    Role.class));
+            logger.debug(objectAsXmlString(roleToUpdate, Role.class));
         }
         RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
@@ -859,9 +857,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
 	    	Assert.assertNotNull(roleUpdated);
 	        if (logger.isDebugEnabled()) {
 	            logger.debug(testName + "Updated role: ");
-	            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
-	            logger.debug(objectAsXmlString(objectFactory.createRole(roleUpdated),
-	                    Role.class));            
+	            logger.debug(objectAsXmlString(roleUpdated, Role.class));
 	        }
 	
 	    	Assert.assertFalse(RoleClient.IMMUTABLE.equalsIgnoreCase(roleUpdated.getMetadataProtection()),
@@ -887,9 +883,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         roleToUpdate.setDisplayName("UPDATED-ROLE_USERS_TEST");
         if (logger.isDebugEnabled()) {
             logger.debug("updated object");
-            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
-            logger.debug(objectAsXmlString(objectFactory.createRole(roleToUpdate),
-                    Role.class));
+            logger.debug(objectAsXmlString(roleToUpdate, Role.class));
         }
         RoleClient client = new RoleClient();
         // Submit the request to the service and store the response.
@@ -1063,9 +1057,7 @@ public class RoleServiceTest extends AbstractServiceTestImpl<RolesList, Role, Ro
         
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, role");
-            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();            
-            logger.debug(objectAsXmlString(objectFactory.createRole(role),
-                    Role.class));
+            logger.debug(objectAsXmlString(role, Role.class));
         }
         
         return role;
