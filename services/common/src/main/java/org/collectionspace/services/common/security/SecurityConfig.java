@@ -411,6 +411,9 @@ public class SecurityConfig {
 						// Exclude the resource path to request system info.
 						.requestMatchers("/systeminfo").permitAll()
 
+						// Exclude the resource path for health check (load balancers).
+						.requestMatchers("/health").permitAll()
+
 						// Handle CORS (preflight OPTIONS requests must be anonymous).
 						.requestMatchers(HttpMethod.OPTIONS).permitAll()
 
