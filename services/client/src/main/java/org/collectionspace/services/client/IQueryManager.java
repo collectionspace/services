@@ -30,93 +30,91 @@ import java.util.List;
 
 public interface IQueryManager {
 
-	final static String SEARCH_COMBINE_QUERY_PARAM = "combine";
-	final static String SEARCH_COMBINE_AND = "and";
-	final static String SEARCH_COMBINE_OR = "or";
-	final static String SEARCH_GROUP_OPEN = "(";
-	final static String SEARCH_GROUP_CLOSE = ")";
-	final static String SEARCH_TERM_SEPARATOR = " ";
-	final static String SEARCH_LIKE = " LIKE ";
-	final static String SEARCH_ILIKE = " ILIKE ";
-	final static String SEARCH_TYPE_KEYWORDS = "keywords";
-	final static String SEARCH_TYPE_KEYWORDS_KW = "kw";
-	final static String SEARCH_TYPE_KEYWORDS_AS = "as";
-	final static String SEARCH_TYPE_PARTIALTERM = "pt";
-	final static String SEARCH_TYPE_DOCTYPE = "doctype";
-	final static String SEARCH_TYPE_FILENAME = "filename";
-	final static String SEARCH_TYPE_CLASS_NAME = "classname";
-	final static String SEARCH_TYPE_INVOCATION_MODE = "mode";
-	final static String SEARCH_TYPE_INVOCATION = "inv";
-	final static String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
-	final static String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
-	final static String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
-	final static String CSID_QUERY_PARAM = "csid";
-	final static String TAG_QUERY_PARAM = "servicetag";
+	String SEARCH_COMBINE_QUERY_PARAM = "combine";
+	String SEARCH_COMBINE_AND = "and";
+	String SEARCH_COMBINE_OR = "or";
+	String SEARCH_GROUP_OPEN = "(";
+	String SEARCH_GROUP_CLOSE = ")";
+	String SEARCH_TERM_SEPARATOR = " ";
+	String SEARCH_LIKE = " LIKE ";
+	String SEARCH_ILIKE = " ILIKE ";
+	String SEARCH_TYPE_KEYWORDS = "keywords";
+	String SEARCH_TYPE_KEYWORDS_KW = "kw";
+	String SEARCH_TYPE_KEYWORDS_AS = "as";
+	String SEARCH_TYPE_PARTIALTERM = "pt";
+	String SEARCH_TYPE_DOCTYPE = "doctype";
+	String SEARCH_TYPE_FILENAME = "filename";
+	String SEARCH_TYPE_CLASS_NAME = "classname";
+	String SEARCH_TYPE_INVOCATION_MODE = "mode";
+	String SEARCH_TYPE_INVOCATION = "inv";
+	String SEARCH_QUALIFIER_AND = SEARCH_TERM_SEPARATOR + "AND" + SEARCH_TERM_SEPARATOR;
+	String SEARCH_QUALIFIER_OR = SEARCH_TERM_SEPARATOR + "OR" + SEARCH_TERM_SEPARATOR;
+	String DEFAULT_SELECT_CLAUSE = "SELECT * FROM ";
+	String CSID_QUERY_PARAM = "csid";
+	String TAG_QUERY_PARAM = "servicetag";
 
 
 	//
 	// Nuxeo pseudo-values (and filters) for special document properties.
 	//
-	final static String NUXEO_UUID = "ecm:uuid";
-	final static String NUXEO_IS_PROXY = "ecm:isProxy";
-	final static String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
-	final static String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
-	final static String NUXEO_IS_VERSION_FILTER = NUXEO_IS_VERSION + " = 0";
+    String NUXEO_UUID = "ecm:uuid";
+	String NUXEO_IS_PROXY = "ecm:isProxy";
+	String NUXEO_IS_PROXY_FILTER = NUXEO_IS_PROXY + " = 0";
+	String NUXEO_IS_VERSION = "ecm:isCheckedInVersion";
+	String NUXEO_IS_VERSION_FILTER = NUXEO_IS_VERSION + " = 0";
 	// In the CMIS context, the prefix is nuxeo, not ecm
-	final static String NUXEO_CMIS_IS_VERSION = "nuxeo:isVersion";
-	final static String NUXEO_CMIS_IS_VERSION_FILTER = NUXEO_CMIS_IS_VERSION + " = false";
+    String NUXEO_CMIS_IS_VERSION = "nuxeo:isVersion";
+	String NUXEO_CMIS_IS_VERSION_FILTER = NUXEO_CMIS_IS_VERSION + " = false";
 
 	//
 	// Query params for CMIS queries on the relationship (Relation) table.
 	//
-	final static String SEARCH_RELATED_TO_CSID_AS_SUBJECT = "rtSbj";
-	final static String SEARCH_RELATED_TO_CSID_AS_OBJECT = "rtObj";
-	final static String SEARCH_RELATED_PREDICATE = "rtPredicate";
+    String SEARCH_RELATED_TO_CSID_AS_SUBJECT = "rtSbj";
+	String SEARCH_RELATED_TO_CSID_AS_OBJECT = "rtObj";
+	String SEARCH_RELATED_PREDICATE = "rtPredicate";
 
-	final static String SEARCH_RELATED_TO_CSID_AS_EITHER = "rtSbjOrObj";
-	final static String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
-	final static String SELECT_DOC_TYPE_FIELD = "selectDocType";
+	String SEARCH_RELATED_TO_CSID_AS_EITHER = "rtSbjOrObj";
+	String SEARCH_RELATED_MATCH_OBJ_DOCTYPES = "rtObjDocTypes";
+	String SELECT_DOC_TYPE_FIELD = "selectDocType";
 
-	final static String MARK_RELATED_TO_CSID_AS_SUBJECT = "mkRtSbj";
-	final static String MARK_RELATED_TO_CSID_AS_EITHER = "mkRtSbjOrObj";
+	String MARK_RELATED_TO_CSID_AS_SUBJECT = "mkRtSbj";
+	String MARK_RELATED_TO_CSID_AS_EITHER = "mkRtSbjOrObj";
 
 	//
 	// Generic CMIS property mapping constants
 	//
-	final static String CMIS_OBJECT_ID = "cmis:objectId";
-	final static String CMIS_NUXEO_PATHSEGMENT = "nuxeo:pathSegment";
+    String CMIS_OBJECT_ID = "cmis:objectId";
+	String CMIS_NUXEO_PATHSEGMENT = "nuxeo:pathSegment";
 	//
 	// Nuxeo related CMIS property mapping constants
-	final static String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
-	final static String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
-	final static String CMIS_NUXEO_TITLE = "dc:title";
-	final static String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" +
-			CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
+    String CMIS_NUXEO_ID = CMIS_OBJECT_ID;
+	String CMIS_NUXEO_NAME = CMIS_NUXEO_PATHSEGMENT;
+	String CMIS_NUXEO_TITLE = "dc:title";
+	String CMIS_CS_UPDATED_AT = CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA + ":" +
+                                      CollectionSpaceClient.COLLECTIONSPACE_CORE_UPDATED_AT;
 
 	// CollectionSpace CMIS property mapping constants
-	final static String CMIS_TARGET_PREFIX = "DOC";
-	final static String CMIS_CORESCHEMA_PREFIX = "CORE";
+    String CMIS_TARGET_PREFIX = "DOC";
+	String CMIS_CORESCHEMA_PREFIX = "CORE";
 	// Relations CMIS property mapping constants
-	final static String CMIS_RELATIONS_PREFIX = "REL";
+    String CMIS_RELATIONS_PREFIX = "REL";
 
-	final static String CMIS_JOIN_NUXEO_IS_VERSION_FILTER =
+	String CMIS_JOIN_NUXEO_IS_VERSION_FILTER =
 			IQueryManager.CMIS_TARGET_PREFIX + "." + IQueryManager.NUXEO_CMIS_IS_VERSION_FILTER;
-	final static String CMIS_JOIN_TENANT_ID_FILTER =
+	String CMIS_JOIN_TENANT_ID_FILTER =
 			IQueryManager.CMIS_RELATIONS_PREFIX + "." + CollectionSpaceClient.CORE_TENANTID;
 
-	final static String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
-	final static String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
-	final static String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
-	final static String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
-	final static String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
+	String CMIS_TARGET_NUXEO_ID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_ID;
+	String CMIS_TARGET_CSID = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	String CMIS_TARGET_TITLE = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_TITLE;
+	String CMIS_TARGET_NAME = CMIS_TARGET_PREFIX + "." + CMIS_NUXEO_NAME;
+	String CMIS_TARGET_UPDATED_AT = CMIS_TARGET_PREFIX + "." + CMIS_CS_UPDATED_AT;
 
-	final static String TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM = "ptStartingWildcard";
-        final static String MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES = "maxListItemsReturnedLimitOnJdbcQueries";
-        final static String JDBC_QUERIES_ARE_TENANT_ID_RESTRICTED = "jdbcQueriesAreTenantIdRestricted";
+	String TENANT_USES_STARTING_WILDCARD_FOR_PARTIAL_TERM = "ptStartingWildcard";
+        String MAX_LIST_ITEMS_RETURNED_LIMIT_ON_JDBC_QUERIES = "maxListItemsReturnedLimitOnJdbcQueries";
+        String JDBC_QUERIES_ARE_TENANT_ID_RESTRICTED = "jdbcQueriesAreTenantIdRestricted";
 
-	public void execQuery(String queryString);
-
-	public String getDatasourceName();
+	String getDatasourceName();
 
 	/**
 	 * Creates the where clause from keywords.
@@ -128,10 +126,10 @@ public interface IQueryManager {
 	 */
     String createWhereClauseFromKeywords(String keywords, boolean clean);
 
-	public String createWhereClauseFromAdvancedSearch(String advancedSearch);
+	String createWhereClauseFromAdvancedSearch(String advancedSearch);
 
-	final static boolean FILTER_EXCLUDE = true;
-	final static boolean FILTER_INCLUDE = false;
+	boolean FILTER_EXCLUDE = true;
+	boolean FILTER_INCLUDE = false;
 
 	/**
 	 * Creates a query to filter a qualified (string) field according to a list of string values.
@@ -141,7 +139,7 @@ public interface IQueryManager {
 	 * 					If false, will require qualifiedField does match one of the filters strings.
 	 * @return queryString
 	 */
-	public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude);
+    String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude);
 
 	/**
 	 * Creates the where clause for partial term match.
@@ -151,12 +149,12 @@ public interface IQueryManager {
 	 *
 	 * @return the string
 	 */
-	public String createWhereClauseForPartialMatch(String dataSourceName,
-			String repositoryName,
-			String cspaceInstanceId,
-			String field,
-			boolean startingWildcard,
-			String partialTerm);
+    String createWhereClauseForPartialMatch(String dataSourceName,
+                                            String repositoryName,
+                                            String cspaceInstanceId,
+                                            String field,
+                                            boolean startingWildcard,
+                                            String partialTerm);
 
 	/**
 	 * Creates a filtering where clause from docType, for invocables.
@@ -166,7 +164,7 @@ public interface IQueryManager {
 	 *
 	 * @return the string
 	 */
-	public String createWhereClauseForInvocableByDocType(String schema, String docType);
+    String createWhereClauseForInvocableByDocType(String schema, String docType);
 
 
 	/**
@@ -176,7 +174,7 @@ public interface IQueryManager {
 	 * @param docType the filename
 	 * @return        the where clause
 	 */
-	public String createWhereClauseForInvocableByFilename(String schema, String filename);
+    String createWhereClauseForInvocableByFilename(String schema, String filename);
 
 	/**
 	 * Creates a filtering where clause from class name, for invocables.
@@ -185,7 +183,7 @@ public interface IQueryManager {
 	 * @param docType the class name
 	 * @return        the where clause
 	 */
-	public String createWhereClauseForInvocableByClassName(String schema, String className);
+    String createWhereClauseForInvocableByClassName(String schema, String className);
 
 	/**
 	 * Creates a filtering where clause from invocation mode, for invocables.
@@ -195,13 +193,13 @@ public interface IQueryManager {
 	 *
 	 * @return the string
 	 */
-	public String createWhereClauseForInvocableByMode(String schema, String mode);
+    String createWhereClauseForInvocableByMode(String schema, String mode);
 
-	public String createWhereClauseForInvocableByMode(String schema, List<String> modes);
+	String createWhereClauseForInvocableByMode(String schema, List<String> modes);
 
 	/*
 	 *
 	 */
-	public String createWhereClauseFromCsid(String csid);
+    String createWhereClauseFromCsid(String csid);
 
 }
