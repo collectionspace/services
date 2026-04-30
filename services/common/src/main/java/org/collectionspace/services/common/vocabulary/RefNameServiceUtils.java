@@ -775,22 +775,21 @@ public class RefNameServiceUtils {
         // we compute actual matches.
         AuthorityTermInfo authTermInfo = RefNameUtils.parseAuthorityTermInfo(refName);
 
-        // Example refname: urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
-        // Corresponding phrase: "urn cspace pahma cspace berkeley edu personauthorities name person item name ReneRichie1586477168934
+        // As of Nuxeo LTS 2019, fulltext no longer has punctuation removed and as such when looking for authority
+        // references we want to provide a search string with the authority name, authority vocabulary name, and the
+        // short ID of the authority
+        // e.g.
+        // urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
+        // becomes
+        // personauthorities person ReneRichie1586477168934
+        // We also no longer need a phrase search because we would be required to retain punctuation
+        final var refnameQuery = authTermInfo.inAuthority.resource
+                                 + " " + authTermInfo.inAuthority.name
+                                 + " " + authTermInfo.name;
 
-        String refnamePhrase = String.format("urn cspace %s %s name %s item name %s",
-        		RefNameUtils.domainToPhrase(authTermInfo.inAuthority.domain),
-        		authTermInfo.inAuthority.resource,
-        		authTermInfo.inAuthority.name,
-        		authTermInfo.name
-        		);
-        refnamePhrase = String.format("\"%s\"", refnamePhrase); // surround the phase in double quotes to indicate this is a NXQL phrase search
+        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(refnameQuery, false);
 
-        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(refnamePhrase);
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("The 'where' clause to find refObjs is: ", refnamePhrase);
-        }
+        logger.trace("The 'where' clause to find refObjs is: {}", refnameQuery);
 
         return whereClauseStr;
     }
