@@ -122,10 +122,11 @@ public interface IQueryManager {
 	 * Creates the where clause from keywords.
 	 *
 	 * @param keywords the keywords
+	 * @param clean if punctuation should be removed from the keywords
 	 *
 	 * @return the string
 	 */
-	public String createWhereClauseFromKeywords(String keywords);
+    String createWhereClauseFromKeywords(String keywords, boolean clean);
 
 	public String createWhereClauseFromAdvancedSearch(String advancedSearch);
 

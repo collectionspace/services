@@ -50,7 +50,11 @@ public class QueryManager {
 		return queryManager.createWhereClauseFromKeywords(keywords);
 	}
 
-	static public String createWhereClauseFromAdvancedSearch(String keywords) {
+	public static String createWhereClauseFromKeywords(String keywords, boolean clean) {
+		return queryManager.createWhereClauseFromKeywords(keywords, clean);
+	}
+
+	public static String createWhereClauseFromAdvancedSearch(String keywords) {
 		return queryManager.createWhereClauseFromAdvancedSearch(keywords);
 	}
 

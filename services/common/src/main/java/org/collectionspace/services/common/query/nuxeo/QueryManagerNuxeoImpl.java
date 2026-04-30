@@ -125,10 +125,10 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 	 * createWhereClauseFromKeywords(java.lang.String)
 	 */
 	@Override
-	public String createWhereClauseFromKeywords(String keywords) {
-		StringBuffer fullTextWhereClause = new StringBuffer();
+	public String createWhereClauseFromKeywords(String keywords, boolean clean) {
+		StringBuilder fullTextWhereClause = new StringBuilder();
 
-		String cleanKeywords = kwdSearchProblemChars.matcher(keywords).replaceAll(" ").trim();
+		String cleanKeywords = clean ? kwdSearchProblemChars.matcher(keywords).replaceAll(" ").trim() : keywords;
 		Matcher regexMatcher = kwdTokenizer.matcher(cleanKeywords);
 
 		boolean addNOT = false;
