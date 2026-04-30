@@ -37,7 +37,7 @@ import org.collectionspace.services.common.query.nuxeo.QueryManagerNuxeoImpl;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 
 public class QueryManager {
-	static private final IQueryManager queryManager = new QueryManagerNuxeoImpl();
+	private static final IQueryManager queryManager = new QueryManagerNuxeoImpl();
 
 	/**
 	 * Creates the where clause from keywords.
@@ -46,8 +46,8 @@ public class QueryManager {
 	 *
 	 * @return the string
 	 */
-	static public String createWhereClauseFromKeywords(String keywords) {
-		return queryManager.createWhereClauseFromKeywords(keywords);
+    public static String createWhereClauseFromKeywords(String keywords) {
+		return queryManager.createWhereClauseFromKeywords(keywords, true);
 	}
 
 	public static String createWhereClauseFromKeywords(String keywords, boolean clean) {
@@ -58,7 +58,7 @@ public class QueryManager {
 		return queryManager.createWhereClauseFromAdvancedSearch(keywords);
 	}
 
-	static public String createWhereClauseFromCsid(String csid) {
+	public static String createWhereClauseFromCsid(String csid) {
 		return queryManager.createWhereClauseFromCsid(csid);
 	}
 
@@ -70,7 +70,7 @@ public class QueryManager {
 	 *
 	 * @return the string
 	 */
-	static public String createWhereClauseForPartialMatch(ServiceContext ctx,
+    public static String createWhereClauseForPartialMatch(ServiceContext ctx,
 			String field,
 			String partialTerm) throws Exception {
 		String cspaceInstanceId = ServiceMain.getInstance().getCspaceInstanceId();
@@ -96,7 +96,7 @@ public class QueryManager {
 	 * 					If false, will require qualifiedField does match one of the filters strings.
 	 * @return queryString
 	 */
-	static public String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
+    public static String createWhereClauseToFilterFromStringList(String qualifiedField, String[] filterTerms, boolean fExclude) {
 		return queryManager.createWhereClauseToFilterFromStringList(qualifiedField, filterTerms, fExclude);
 	}
 
@@ -109,7 +109,7 @@ public class QueryManager {
 	 *
 	 * @return the string
 	 */
-	static public String createWhereClauseForInvocableByDocType(String schema, String docType) {
+    public static String createWhereClauseForInvocableByDocType(String schema, String docType) {
 		return queryManager.createWhereClauseForInvocableByDocType(schema, docType);
 	}
 
@@ -120,7 +120,7 @@ public class QueryManager {
 	 * @param docType the filename
 	 * @return        the where clause
 	 */
-	static public String createWhereClauseForInvocableByFilename(String schema, String filename) {
+    public static String createWhereClauseForInvocableByFilename(String schema, String filename) {
 		return queryManager.createWhereClauseForInvocableByFilename(schema, filename);
 	}
 
@@ -131,7 +131,7 @@ public class QueryManager {
 	 * @param docType the class name
 	 * @return        the where clause
 	 */
-	static public String createWhereClauseForInvocableByClassName(String schema, String className) {
+    public static String createWhereClauseForInvocableByClassName(String schema, String className) {
 		return queryManager.createWhereClauseForInvocableByClassName(schema, className);
 	}
 
@@ -143,11 +143,11 @@ public class QueryManager {
 	 *
 	 * @return the string
 	 */
-	static public String createWhereClauseForInvocableByMode(String schema, String mode) {
+    public static String createWhereClauseForInvocableByMode(String schema, String mode) {
 		return queryManager.createWhereClauseForInvocableByMode(schema, mode);
 	}
 
-	static public String createWhereClauseForInvocableByMode(String schema, List<String> modes) {
+	public static String createWhereClauseForInvocableByMode(String schema, List<String> modes) {
 		return queryManager.createWhereClauseForInvocableByMode(schema, modes);
 	}
 }
