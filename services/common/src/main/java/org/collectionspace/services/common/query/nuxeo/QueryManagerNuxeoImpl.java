@@ -46,8 +46,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryManagerNuxeoImpl implements IQueryManager {
 
-	private static String ECM_FULLTEXT_LIKE = "ecm:fulltext"
-			+ SEARCH_TERM_SEPARATOR + IQueryManager.SEARCH_LIKE;
+	private static String ECM_FULLTEXT_LIKE = "ecm:fulltext" + SEARCH_TERM_SEPARATOR + IQueryManager.SEARCH_LIKE;
 	private static String SEARCH_LIKE_FORM = null;
 
 	private final Logger logger = LoggerFactory
@@ -82,22 +81,6 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		return JDBCTools.NUXEO_DATASOURCE_NAME;
 	}
 
-	// TODO: This is currently just an example fixed query. This should
-	// eventually be
-	// removed or replaced with a more generic method.
-	/*
-	 * (non-Javadoc)
-	 *
-	 * @see
-	 * org.collectionspace.services.common.query.IQueryManager#execQuery(java
-	 * .lang.String)
-	 */
-	@Override
-	@Deprecated
-	public void execQuery(String queryString) {
-		// Intentionally left blank
-	}
-
 	@Override
 	public String createWhereClauseFromAdvancedSearch(String advancedSearch) {
 		String result = null;
@@ -105,14 +88,12 @@ public class QueryManagerNuxeoImpl implements IQueryManager {
 		// Process search term.  FIXME: REM - Do we need to perform any string filtering here?
 		//
 		if (advancedSearch != null && !advancedSearch.isEmpty()) {
-                        // Filtering of advanced searches on a single '%' char, per CSPACE-5828
-                    	Matcher regexMatcher = advSearchSqlWildcard.matcher(advancedSearch.trim());
-                        if (regexMatcher.matches()) {
-                            return "";
-                        }
-			StringBuffer advancedSearchWhereClause = new StringBuffer(
-					advancedSearch);
-			result = advancedSearchWhereClause.toString();
+			// Filtering of advanced searches on a single '%' char, per CSPACE-5828
+			Matcher regexMatcher = advSearchSqlWildcard.matcher(advancedSearch.trim());
+			if (regexMatcher.matches()) {
+				return "";
+			}
+			result = advancedSearch;
 		}
 
 		return result;
