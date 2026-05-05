@@ -36,6 +36,7 @@ import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import org.collectionspace.services.common.api.JEEServerDeployment;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -148,7 +149,7 @@ public abstract class AbstractConfigReaderImpl<T> implements ConfigReader<T> {
 			throws JAXBException {
 		Object result = null;
 
-		JAXBContext jc = JAXBContext.newInstance(clazz);
+		JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
 		Unmarshaller um = jc.createUnmarshaller();
 		result = um.unmarshal(configFileStream);
 

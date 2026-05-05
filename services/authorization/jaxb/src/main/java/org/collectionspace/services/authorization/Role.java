@@ -20,14 +20,14 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlAttribute;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSchemaType;
-import jakarta.xml.bind.annotation.XmlType;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.collectionspace.services.jaxb.adapter.DateAdapter;
 import org.jspecify.annotations.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "role")
+@XmlRootElement(name = "role")
 @Entity(name = "Role")
 @Table(name = "roles", uniqueConstraints = {
     @UniqueConstraint(columnNames = {

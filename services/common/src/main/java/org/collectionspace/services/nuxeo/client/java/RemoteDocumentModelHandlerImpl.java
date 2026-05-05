@@ -404,7 +404,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     private void addAccountPermissionsPart() throws Exception {
     	Profiler profiler = new Profiler("addAccountPermissionsPart():", 1);
     	profiler.start();
-    	
+
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         String currentServiceName = ctx.getServiceName();
         String workflowSubResource = "/";
@@ -417,12 +417,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
         AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
         		currentServiceName, workflowSubResource);
-        org.collectionspace.services.authorization.ObjectFactory objectFactory =
-        	new org.collectionspace.services.authorization.ObjectFactory();
-        JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
-        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap); // REM - "account_permission" should be using a constant and not a literal
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
         ctx.addOutputPart(accountPermissionPart);
-        
+
         profiler.stop();
     }
 

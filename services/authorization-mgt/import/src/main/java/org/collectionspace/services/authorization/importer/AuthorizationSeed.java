@@ -34,6 +34,7 @@ import org.collectionspace.services.authorization.PermissionsRolesList;
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,20 +143,12 @@ public class AuthorizationSeed {
     */
 
     static Object fromFile(Class jaxbClass, String fileName) throws Exception {
-        InputStream is = new FileInputStream(fileName);
-        try {
-            JAXBContext context = JAXBContext.newInstance(jaxbClass);
+        try (InputStream is = new FileInputStream(fileName)) {
+            JAXBContext context = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
             Unmarshaller unmarshaller = context.createUnmarshaller();
             //note: setting schema to null will turn validator off
             unmarshaller.setSchema(null);
             return jaxbClass.cast(unmarshaller.unmarshal(is));
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (Exception e) {
-                }
-            }
         }
     }
 }

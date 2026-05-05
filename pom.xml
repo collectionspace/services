@@ -23,7 +23,7 @@
     <jvnet.jaxb.version>4.0.12</jvnet.jaxb.version>
 		<opensaml.version>3.4.6</opensaml.version>
 		<postgres.driver.version>42.3.9</postgres.driver.version>
-		<resteasy.version>3.0.20.Final</resteasy.version>
+		<resteasy.version>5.0.10.Final</resteasy.version>
 		<xml-bind.version>3.0.1</xml-bind.version>
 
 		<!-- Dependencies shared with Nuxeo -->
@@ -510,6 +510,14 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-bom</artifactId>
+				<version>${resteasy.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<!-- Provided dependencies (for common-lib/cspace-service.war deployments) -->
 			<!-- Logging dependencies (slf4j, log4j) -->
 			<dependency>
@@ -1159,19 +1167,14 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-jaxb-provider</artifactId>
+				<artifactId>resteasy-multipart-provider</artifactId>
 				<version>${resteasy.version}</version>
 				<exclusions>
 					<exclusion>
-						<groupId>javax.xml.bind</groupId>
-						<artifactId>jaxb-api</artifactId>
+						<groupId>org.jboss.resteasy</groupId>
+						<artifactId>resteasy-jaxb-provider</artifactId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-multipart-provider</artifactId>
-				<version>${resteasy.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>

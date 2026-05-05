@@ -19,6 +19,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -368,7 +369,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 
 				if (StringUtils.isNotEmpty(namespace.getURI())) {
 					String thePackage = getPackage(namespace);
-					JAXBContext jc = JAXBContext.newInstance(thePackage);
+					logger.info("Searching for JAXBContext instance for {}", thePackage);
+					JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(thePackage);
 					Unmarshaller um = jc.createUnmarshaller();
 
 					result = um.unmarshal(new StreamSource(new StringReader(elementInput.asXML())));
@@ -376,7 +378,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 			} catch (Exception e) {
 				if (logger.isInfoEnabled()) {
 					String msg = String.format("Could not unmarshal XML element '%s' into a JAXB object.", elementInput.getName());
-					logger.info(msg);
+					logger.error(msg, e);
 				}
 			}
 
@@ -399,7 +401,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     			JAXBElement jaxbElement = (JAXBElement)jaxbObject;
     			thePackage = jaxbElement.getValue().getClass().getPackage().getName();
     		}
-	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
+	    	JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(thePackage);
 	    	//Create marshaller
 	    	Marshaller m = jc.createMarshaller();
 	    	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -410,9 +412,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
-    		String msg = String.format("Could not marshal JAXB object '%s' to an XML element.",
-    				jaxbObject.toString());
-    		logger.error(msg);
+    		logger.error("Could not marshal JAXB object '{}' to an XML element.", jaxbObject, e);
     	}
 
     	return result;
