@@ -660,18 +660,23 @@ public class NuxeoBlobUtils {
 		DocumentModel result = null;
 
 		boolean createdFromAdaptor = false;
-		if (useNuxeoAdaptors == true) try {
-			//
-			// Use Nuxeo's high-level create method which looks for plugin adapters that match the MIME type.  For example,
-			// for image blobs, Nuxeo's file manager will pick a special image plugin that will automatically generate
-			// image derivatives.
-			//
-			result = getFileManager().createDocumentFromBlob(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName);
-			createdFromAdaptor = true;
-		} catch (NuxeoException ne) {
-			logger.warn(String.format("Tried but failed to use Nuxeo import adaptor to download '%s'.  Falling back to generic file importer",
-					blobName));
+		if (useNuxeoAdaptors) {
+			try {
+				//
+				// Use Nuxeo's high-level create method which looks for plugin adapters that match the MIME type.  For example,
+				// for image blobs, Nuxeo's file manager will pick a special image plugin that will automatically generate
+				// image derivatives.
+				//
+				final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
+													   .overwrite(overwrite)
+													   .fileName(blobName)
+													   .build();
+				result = getFileManager().createOrUpdateDocument(context);
+				createdFromAdaptor = true;
+			} catch (NuxeoException ne) {
+				logger.warn("Tried but failed to use Nuxeo import adaptor to download '{}'. " +
+							"Falling back to generic file importer", blobName);
+			}
 		}
 
 		if (createdFromAdaptor == false) {
