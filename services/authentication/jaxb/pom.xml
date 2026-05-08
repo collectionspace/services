@@ -13,12 +13,6 @@
     <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
     <name>services.authentication.jaxb</name>
 
-    <!-- todo: check for deletion of these + test resources -->
-    <properties>
-        <sql.file>authentication.sql</sql.file>
-        <sql.dir>src/main/resources/db/mysql</sql.dir>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
