@@ -84,20 +84,20 @@ import org.collectionspace.services.nuxeo.util.NuxeoUtils;
  */
 public class RefNameServiceUtils {
 
-    public static enum SpecifierForm {
+    public enum SpecifierForm {
         CSID, URN_NAME // Either a CSID or a short ID
-    };
+    }
 
     public static class Specifier {
         //
         // URN statics for things like urn:cspace:name(grover)
         //
-        final static String URN_PREFIX = "urn:cspace:";
-        final static int URN_PREFIX_LEN = URN_PREFIX.length();
-        final static String URN_PREFIX_NAME = "name(";
-        final static int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
-        final static String URN_PREFIX_ID = "id(";
-        final static int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
+        static final String URN_PREFIX = "urn:cspace:";
+        static final int URN_PREFIX_LEN = URN_PREFIX.length();
+        static final String URN_PREFIX_NAME = "name(";
+        static final int URN_NAME_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_NAME.length();
+        static final String URN_PREFIX_ID = "id(";
+        static final int URN_ID_PREFIX_LEN = URN_PREFIX_LEN + URN_PREFIX_ID.length();
 
         public SpecifierForm form;
         public String value;
@@ -379,7 +379,7 @@ public class RefNameServiceUtils {
 	public static List<AuthRefConfigInfo> getConfiguredAuthorityRefs(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
 		List<String> authRefFields = ((AbstractServiceContextImpl) ctx).getAllPartsPropertyValues(
 				ServiceBindingUtils.AUTH_REF_PROP, ServiceBindingUtils.QUALIFIED_PROP_NAMES);
-		ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>(authRefFields.size());
+		ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<>(authRefFields.size());
 		for (String spec : authRefFields) {
 			AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
 			authRefsInfo.add(arci);
@@ -405,8 +405,8 @@ public class RefNameServiceUtils {
         List<AuthorityRefDocList.AuthorityRefDocItem> list =
                 wrapperList.getAuthorityRefDocItem();
 
-        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
+        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<>();
+        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<>();
 
         NuxeoRepositoryClientImpl nuxeoRepoClient = (NuxeoRepositoryClientImpl) repoClient;
         try {
@@ -485,7 +485,7 @@ public class RefNameServiceUtils {
 
     private static ArrayList<String> getRefNameServiceTypes() {
         if (refNameServiceTypes == null) {
-            refNameServiceTypes = new ArrayList<String>();
+            refNameServiceTypes = new ArrayList<>();
             refNameServiceTypes.add(ServiceBindingUtils.SERVICE_TYPE_AUTHORITY);
             refNameServiceTypes.add(ServiceBindingUtils.SERVICE_TYPE_OBJECT);
             refNameServiceTypes.add(ServiceBindingUtils.SERVICE_TYPE_PROCEDURE);
@@ -504,8 +504,8 @@ public class RefNameServiceUtils {
             String oldRefName,
             String newRefName,
             String refPropName) throws Exception {
-        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<String, ServiceBindingType>();
-        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<String, List<AuthRefConfigInfo>>();
+        Map<String, ServiceBindingType> queriedServiceBindings = new HashMap<>();
+        Map<String, List<AuthRefConfigInfo>> authRefFieldsByService = new HashMap<>();
 
         int docsScanned = 0;
         int nRefsFound = 0;
@@ -642,7 +642,7 @@ public class RefNameServiceUtils {
         // Filter the list for current user rights
         servicebindings = SecurityUtils.getReadableServiceBindingsForCurrentUser(servicebindings);
 
-        ArrayList<String> docTypes = new ArrayList<String>();
+        ArrayList<String> docTypes = new ArrayList<>();
 
         String query = computeWhereClauseForAuthorityRefDocs(refName, refPropName, docTypes, servicebindings, // REM - Side effect that docTypes, authRefFieldsByService, and queriedServiceBindings get set/change.  Any others?
                 queriedServiceBindings, authRefFieldsByService);
@@ -671,7 +671,7 @@ public class RefNameServiceUtils {
         return docList;
     }
 
-    private static final DocumentModelList findDocs(
+    private static DocumentModelList findDocs(
     		RepositoryClient<PoxPayloadIn, PoxPayloadOut> repoClient,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
             CoreSessionInterface repoSession,
@@ -755,7 +755,7 @@ public class RefNameServiceUtils {
             if (authRefFieldPaths.isEmpty()) {
                 continue;
             }
-            ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<AuthRefConfigInfo>();
+            ArrayList<AuthRefConfigInfo> authRefsInfo = new ArrayList<>();
             for (String spec : authRefFieldPaths) {
                 AuthRefConfigInfo arci = new AuthRefConfigInfo(spec);
                 authRefsInfo.add(arci);
@@ -775,22 +775,21 @@ public class RefNameServiceUtils {
         // we compute actual matches.
         AuthorityTermInfo authTermInfo = RefNameUtils.parseAuthorityTermInfo(refName);
 
-        // Example refname: urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
-        // Corresponding phrase: "urn cspace pahma cspace berkeley edu personauthorities name person item name ReneRichie1586477168934
+        // As of Nuxeo LTS 2019, fulltext no longer has punctuation removed and as such when looking for authority
+        // references we want to provide a search string with the authority name, authority vocabulary name, and the
+        // short ID of the authority
+        // e.g.
+        // urn:cspace:pahma.cspace.berkeley.edu:personauthorities:name(person):item:name(ReneRichie1586477168934)
+        // becomes
+        // personauthorities person ReneRichie1586477168934
+        // We also no longer need a phrase search because we would be required to retain punctuation
+        final var refnameQuery = authTermInfo.inAuthority.resource
+                                 + " " + authTermInfo.inAuthority.name
+                                 + " " + authTermInfo.name;
 
-        String refnamePhrase = String.format("urn cspace %s %s name %s item name %s",
-        		RefNameUtils.domainToPhrase(authTermInfo.inAuthority.domain),
-        		authTermInfo.inAuthority.resource,
-        		authTermInfo.inAuthority.name,
-        		authTermInfo.name
-        		);
-        refnamePhrase = String.format("\"%s\"", refnamePhrase); // surround the phase in double quotes to indicate this is a NXQL phrase search
+        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(refnameQuery, false);
 
-        String whereClauseStr = QueryManager.createWhereClauseFromKeywords(refnamePhrase);
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("The 'where' clause to find refObjs is: ", refnamePhrase);
-        }
+        logger.trace("The 'where' clause to find refObjs is: {}", refnameQuery);
 
         return whereClauseStr;
     }
@@ -915,7 +914,7 @@ public class RefNameServiceUtils {
                 UriTemplateRegistryKey key = new UriTemplateRegistryKey(tenantId, docType);
                 StoredValuesUriTemplate template = registry.get(key);
                 if (template != null) {
-                    Map<String, String> additionalValues = new HashMap<String, String>();
+                    Map<String, String> additionalValues = new HashMap<>();
                     if (template.getUriTemplateType() == UriTemplateFactory.RESOURCE) {
                         additionalValues.put(UriTemplateFactory.IDENTIFIER_VAR, csid);
                         uri = template.buildUri(additionalValues);
@@ -963,7 +962,7 @@ public class RefNameServiceUtils {
                         "getAuthorityRefDocs: internal logic error: can't fetch authRefFields for DocType.");
             }
 
-            ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<RefNameServiceUtils.AuthRefInfo>();
+            ArrayList<RefNameServiceUtils.AuthRefInfo> foundProps = new ArrayList<>();
             try {
                 findAuthRefPropertiesInDoc(docModel, matchingAuthRefFields, refName, matchBaseOnly, foundProps); // REM - side effect that foundProps is set
                 if(!foundProps.isEmpty()) {
