@@ -47,13 +47,6 @@
 						<artifactId>postgresql</artifactId>
             <scope>test</scope>
 				</dependency>
-         <!-- <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-            <type>test-jar</type>
-        </dependency> -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
@@ -85,7 +78,7 @@
                         <configuration>
                             <target>
                                 <property name="runtime-classpath" refid="maven.runtime.classpath"/>
-                                <ant target="setup_hibernate.cfg" inheritRefs="true"/>
+                                <ant target="setup_persistence.xml" inheritRefs="true"/>
                             </target>
                         </configuration>
                     </execution>
