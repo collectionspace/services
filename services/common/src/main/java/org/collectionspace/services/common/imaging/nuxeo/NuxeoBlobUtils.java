@@ -690,14 +690,16 @@ public class NuxeoBlobUtils {
 
 			FileManagerService fileManagerService = getFileManagerService();
 			inputStreamBlob = checkMimeType(inputStreamBlob, blobName);
-
+			final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
+												   .overwrite(overwrite)
+												   .fileName(blobName)
+												   .build();
 			FileImporter defaultFileImporter = fileManagerService.getPluginByName("DefaultFileImporter");
-			result = defaultFileImporter.create(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName, getTypeService());
+			result = defaultFileImporter.createOrUpdate(context);
 		}
 
 		// Compute the views now instead of relying on Nuxeo to populate them
-		if (isBlobAnImage(inputStreamBlob)) {
+		if (isBlobAnImage(inputStreamBlob) && createdFromAdaptor) {
 			computeViews(result, inputStreamBlob);
 		}
 
