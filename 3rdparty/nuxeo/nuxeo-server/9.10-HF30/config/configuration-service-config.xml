@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<component name="org.nuxeo.ecm.platform.imaging.properties">
-
-  <extension target="org.nuxeo.runtime.ConfigurationService" point="configuration">
-  	<property name="nuxeo.picture.views.empty.picture.view">img/empty.png</property>
-  </extension>
-
-</component>

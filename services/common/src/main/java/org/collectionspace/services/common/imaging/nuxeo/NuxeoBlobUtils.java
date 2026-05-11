@@ -29,9 +29,12 @@ package org.collectionspace.services.common.imaging.nuxeo;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -693,7 +696,41 @@ public class NuxeoBlobUtils {
 					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName, getTypeService());
 		}
 
+		// Compute the views now instead of relying on Nuxeo to populate them
+		if (isBlobAnImage(inputStreamBlob)) {
+			computeViews(result, inputStreamBlob);
+		}
+
 		return result;
+	}
+
+	/**
+	 * Compute the derivative views and add them to our document. This assumes the view list is not populated and in the
+	 * future we might need to clear existing views before setting the value.
+	 *
+	 * @param doc The Blob's document
+	 * @param blob The Blob
+	 */
+	private static void computeViews(DocumentModel doc, Blob blob) {
+		final var convert = true;
+		final var imagingService = Framework.getService(ImagingService.class);
+		if (imagingService == null) {
+			return;
+		}
+
+		final var views = new ArrayList<Map<String, Serializable>>();
+		final var imageInfo = imagingService.getImageInfo(blob);
+        try {
+			final var computedViews = imagingService.computeViewsFor(doc, blob, imageInfo, convert);
+			for (var view : computedViews) {
+				views.add(view.asMap());
+			}
+			doc.setPropertyValue(VIEWS_PROPERTY, views);
+		} catch (PropertyException e) {
+			logger.error("Unable to set view property for document {}", doc.getName(), e);
+		} catch (IOException e) {
+			logger.error("Unable to set compute views for document {}", doc.getName(), e);
+		}
 	}
 
 	public static BlobsCommon createBlobInRepository(
