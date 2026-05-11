@@ -715,6 +715,7 @@ public class NuxeoBlobUtils {
 		final var convert = true;
 		final var imagingService = Framework.getService(ImagingService.class);
 		if (imagingService == null) {
+			logger.warn("Unable to compute views for {}, ImagingService not found", blob.getFilename());
 			return;
 		}
 
@@ -727,9 +728,9 @@ public class NuxeoBlobUtils {
 			}
 			doc.setPropertyValue(VIEWS_PROPERTY, views);
 		} catch (PropertyException e) {
-			logger.error("Unable to set view property for document {}", doc.getName(), e);
+			logger.error("Unable to set view property for document {}", blob.getFilename(), e);
 		} catch (IOException e) {
-			logger.error("Unable to set compute views for document {}", doc.getName(), e);
+			logger.error("Unable to compute views for document {}", blob.getFilename(), e);
 		}
 	}
 
