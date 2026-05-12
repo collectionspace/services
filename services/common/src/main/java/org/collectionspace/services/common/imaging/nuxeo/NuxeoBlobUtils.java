@@ -699,6 +699,11 @@ public class NuxeoBlobUtils {
 
 		final var views = new ArrayList<Map<String, Serializable>>();
 		final var imageInfo = imagingService.getImageInfo(blob);
+		if (imageInfo == null) {
+			logger.warn("Unable to generate imageInfo for {}, skipping derivative generation", blob.getFilename());
+			return;
+		}
+
         try {
 			final var computedViews = imagingService.computeViewsFor(doc, blob, imageInfo, convert);
 			for (var view : computedViews) {
