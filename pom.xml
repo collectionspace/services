@@ -15,7 +15,7 @@
 		<cspace.services.version>${revision}</cspace.services.version>
 		<cspace.services.client.version>${revision}</cspace.services.client.version>
 		<java.version>17</java.version>
-		<tomcat.version>8.5.40</tomcat.version>
+		<tomcat.version>9.0.99</tomcat.version>
 
 		<!-- CSpace managed dependencies -->
 		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
