@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.stream.defaultConfig" version="1.0">
+
+  <require>org.nuxeo.ecm.core.bulk.config</require>
+  <extension target="org.nuxeo.runtime.stream.service" point="logConfig">
+    <logConfig name="default" type="mem" default="true" />
+  </extension>
+</component>
