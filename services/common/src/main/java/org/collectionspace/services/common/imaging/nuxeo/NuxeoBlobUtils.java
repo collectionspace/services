@@ -661,45 +661,21 @@ public class NuxeoBlobUtils {
             boolean useNuxeoAdaptors) throws Exception {
 		DocumentModel result = null;
 
-		boolean createdFromAdaptor = false;
-		if (useNuxeoAdaptors) {
-			try {
-				//
-				// Use Nuxeo's high-level create method which looks for plugin adapters that match the MIME type.  For example,
-				// for image blobs, Nuxeo's file manager will pick a special image plugin that will automatically generate
-				// image derivatives.
-				//
-				final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
-													   .overwrite(overwrite)
-													   .fileName(blobName)
-													   .build();
-				result = getFileManager().createOrUpdateDocument(context);
-				createdFromAdaptor = true;
-			} catch (NuxeoException ne) {
-				logger.warn("Tried but failed to use Nuxeo import adaptor to download '{}'. " +
-							"Falling back to generic file importer", blobName);
-			}
-		}
-
-		if (!createdFromAdaptor) {
-			//
-			// User Nuxeo's default file importer/adapter explicitly.  This avoids specialized functionality from happening like
-			// image derivative creation.
-			//
-			String digestAlgorithm = getFileManager().getDigestAlgorithm(); // Only call this because we seem to need some way of initializing Nuxeo's FileManager with a call.
-
-			FileManagerService fileManagerService = getFileManagerService();
+		// useNuxeoAdaptors is kind of a misnomer because we always use Nuxeo to create the Blob document
+		// instead now it's more used to show where the call has come from (PublicItem vs BlobDocumentModelHandler)
+		// and to determine if we want to generate derivatives or not
+		if (!useNuxeoAdaptors) {
 			inputStreamBlob = checkMimeType(inputStreamBlob, blobName);
-			final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
-												   .overwrite(overwrite)
-												   .fileName(blobName)
-												   .build();
-			FileImporter defaultFileImporter = fileManagerService.getPluginByName("DefaultFileImporter");
-			result = defaultFileImporter.createOrUpdate(context);
 		}
+
+		final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
+											   .overwrite(overwrite)
+											   .fileName(blobName)
+											   .build();
+		result = getFileManager().createOrUpdateDocument(context);
 
 		// Compute the views now instead of relying on Nuxeo to populate them
-		if (isBlobAnImage(inputStreamBlob) && createdFromAdaptor) {
+		if (result != null && isBlobAnImage(inputStreamBlob) && useNuxeoAdaptors) {
 			computeViews(result, inputStreamBlob);
 		}
 
