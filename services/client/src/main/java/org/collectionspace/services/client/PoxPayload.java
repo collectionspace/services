@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,6 +16,9 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.FileUtils;
@@ -29,6 +33,7 @@ import org.dom4j.io.SAXReader;
 import org.glassfish.jaxb.core.api.impl.NameConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * The Class PoxPayload.
@@ -80,8 +85,19 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		return validRootElementLabels;
 	}
 
-	private void setDomDocument(Document dom) throws DocumentException {
-		this.domDocument = dom;
+	private void setDomDocument(final String xmlPayload) throws DocumentException {
+		SAXReader reader = new SAXReader();
+		try {
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+		} catch (SAXException saxException) {
+			final var error = "Unable to disable Doctype features, aborting document read";
+			logger.error(error, saxException);
+			throw new DocumentException(error);
+		}
+
+        this.domDocument = reader.read(new StringReader(xmlPayload));
 		this.parts = null;
 
 		String label = domDocument.getRootElement().getName().toLowerCase();
@@ -140,13 +156,11 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 	 * Instantiates a new PoxPayload by parsing the payload into a DOM4j
 	 * Document instance
 	 *
-	 * @param payloadName the payload name
+	 * @param xmlPayload the payload
 	 */
 	protected PoxPayload(String xmlPayload) throws DocumentException {
 		this.xmlPayload = xmlPayload;
-		SAXReader reader = new SAXReader();
-		Document dom  = reader.read(new StringReader(xmlPayload));
-		setDomDocument(dom);
+		setDomDocument(xmlPayload);
 	}
 
     /**
@@ -157,10 +171,8 @@ public abstract class PoxPayload<PT extends PayloadPart> {
      * @throws IOException Signals that an I/O exception has occurred.
      */
     protected PoxPayload(File file) throws DocumentException, IOException {
-    	this.xmlPayload = FileUtils.readFileToString(file);
-        SAXReader reader = new SAXReader();
-        Document dom = reader.read(file);
-		setDomDocument(dom);
+    	this.xmlPayload = FileUtils.readFileToString(file, Charset.defaultCharset());
+		setDomDocument(xmlPayload);
     }
 
 	/**
@@ -364,22 +376,24 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 		public static Object toObject(Element elementInput) {
 			Object result = null;
 
+
 			try {
+				final XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+				xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+				xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
 				Namespace namespace = elementInput.getNamespace();
 
 				if (StringUtils.isNotEmpty(namespace.getURI())) {
 					String thePackage = getPackage(namespace);
-					logger.info("Searching for JAXBContext instance for {}", thePackage);
 					JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(thePackage);
 					Unmarshaller um = jc.createUnmarshaller();
 
-					result = um.unmarshal(new StreamSource(new StringReader(elementInput.asXML())));
+					XMLStreamReader xmlStream = xmlInputFactory.createXMLStreamReader(
+						new StreamSource(new StringReader(elementInput.asXML())));
+					result = um.unmarshal(xmlStream);
 				}
 			} catch (Exception e) {
-				if (logger.isInfoEnabled()) {
-					String msg = String.format("Could not unmarshal XML element '%s' into a JAXB object.", elementInput.getName());
-					logger.error(msg, e);
-				}
+				logger.error("Could not unmarshal XML element '{}' into a JAXB object.", elementInput.getName(), e);
 			}
 
 			return result;

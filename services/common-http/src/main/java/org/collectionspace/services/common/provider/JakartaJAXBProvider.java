@@ -16,6 +16,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import jakarta.xml.bind.JAXBException;
@@ -73,17 +76,26 @@ public class JakartaJAXBProvider<T> implements MessageBodyWriter<T>, MessageBody
                       MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
         throws WebApplicationException {
         try {
-            StreamSource source;
+            final var xmlInputFactory = XMLInputFactory.newFactory();
+            xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+            final XMLStreamReader xmlStream;
             final var context = JAXBContextCache.getInstance().getCachedJAXBContext(type);
             final var unmarshaller = context.createUnmarshaller();
             if (mediaType != null && mediaType.getParameters().get("charset") == null) {
-                source = new StreamSource(new InputStreamReader(entityStream, StandardCharsets.UTF_8));
+                xmlStream = xmlInputFactory.createXMLStreamReader(new StreamSource(
+                    new InputStreamReader(entityStream, StandardCharsets.UTF_8)));
             } else {
-                source = new StreamSource(entityStream);
+                xmlStream = xmlInputFactory.createXMLStreamReader(new StreamSource(entityStream));
             }
-            return (T) unmarshaller.unmarshal(source);
+            return (T) unmarshaller.unmarshal(xmlStream);
         } catch (JAXBException e) {
             logger.error("Unable to unmarshal JAXB Object {}", type.getSimpleName(), e);
+            final var response = Response.status(INTERNAL_SERVER_ERROR).build();
+            throw new WebApplicationException(response);
+        } catch (XMLStreamException e) {
+            logger.error("Unable to create XMLStreamReader for JAXB Object {}", type.getSimpleName(), e);
             final var response = Response.status(INTERNAL_SERVER_ERROR).build();
             throw new WebApplicationException(response);
         }
