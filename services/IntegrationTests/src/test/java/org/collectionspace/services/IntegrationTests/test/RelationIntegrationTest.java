@@ -29,9 +29,10 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -94,10 +95,10 @@ public class RelationIntegrationTest extends CollectionSpaceIntegrationTest {
      * @param clazz the clazz
      * @return the string
      */
-    static protected String objectAsXmlString(Object o, Class<?> clazz) {
+    protected static String objectAsXmlString(Object o, Class<?> clazz) {
         StringWriter sw = new StringWriter();
         try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);

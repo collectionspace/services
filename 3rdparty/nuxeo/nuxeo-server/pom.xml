@@ -16,47 +16,13 @@
 
   <repositories>
     <repository>
-      <id>nuxeo-public-releases</id>
-      <url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-
-    <repository>
-      <id>nuxeo-vendor-releases</id>
-      <url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
+      <id>nuxeo-public-lts</id>
+      <url>https://packages.nuxeo.com/repository/maven-public-lts</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>internal-releases</id>
-      <url>https://mavenin.nuxeo.com/nexus/content/groups/internal-releases</url>
-      <name>Nuxeo virtual release repository</name>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>internal-snapshots</id>
-      <url>https://mavenin.nuxeo.com/nexus/content/groups/internal-snapshots</url>
-      <name>Nuxeo virtual snapshot repository</name>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <updatePolicy>always</updatePolicy>
-        <enabled>true</enabled>
-      </snapshots>
-    </pluginRepository>
-  </pluginRepositories>
 
   <!-- These come from nuxeo-nxr-server as it seemed to match closest to our distribution. A number of dependencies
        have been pruned off as they weren't being used previously. It's possible we could trim this down further but
@@ -126,7 +92,7 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-dmk-adaptor</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -212,13 +178,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-types-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-types-core</artifactId>
+        <artifactId>nuxeo-platform-types</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -236,19 +196,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-filemanager-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-filemanager-core</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-filemanager-core-listener</artifactId>
+        <artifactId>nuxeo-platform-filemanager</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -258,12 +206,14 @@
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
+      <!-- TODO: Verify what happened to this dependency
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-login-default</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
+      -->
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-login-token</artifactId>
@@ -313,7 +263,7 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo</groupId>
+        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-lang-ext</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -332,7 +282,7 @@
         <scope>runtime</scope>
       </dependency>
       <dependency>
-        <groupId>org.nuxeo.binary.metadata</groupId>
+        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-binary-metadata</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -389,13 +339,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-tag-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-tag-core</artifactId>
+        <artifactId>nuxeo-platform-tag</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
         <!-- The audit core dependency attempts to start the nuxeo audit service which we don't make use of -->
@@ -408,13 +352,7 @@
       </dependency>
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-url-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-url-core</artifactId>
+        <artifactId>nuxeo-platform-url</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
       </dependency>
@@ -478,20 +416,6 @@
 
       <dependency>
         <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-imaging-api</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
-        <artifactId>nuxeo-platform-imaging-convert</artifactId>
-        <version>${nuxeo.general.release}</version>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.nuxeo.ecm.platform</groupId>
         <artifactId>nuxeo-platform-imaging-core</artifactId>
         <version>${nuxeo.general.release}</version>
         <scope>runtime</scope>
@@ -537,7 +461,7 @@
       <artifactId>nuxeo-core-mimetype</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.ecm.platform</groupId>
       <artifactId>nuxeo-dmk-adaptor</artifactId>
     </dependency>
     <dependency>
@@ -614,11 +538,7 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-types-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-types-core</artifactId>
+      <artifactId>nuxeo-platform-types</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
@@ -630,23 +550,11 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-filemanager-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-filemanager-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-filemanager-core-listener</artifactId>
+      <artifactId>nuxeo-platform-filemanager</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
       <artifactId>nuxeo-platform-login</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-login-default</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
@@ -681,7 +589,7 @@
       <artifactId>nuxeo-platform-lang</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo</groupId>
+      <groupId>org.nuxeo.ecm.platform</groupId>
       <artifactId>nuxeo-platform-lang-ext</artifactId>
     </dependency>
     <dependency>
@@ -693,7 +601,7 @@
       <artifactId>nuxeo-automation-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.nuxeo.binary.metadata</groupId>
+      <groupId>org.nuxeo.ecm.platform</groupId>
       <artifactId>nuxeo-binary-metadata</artifactId>
     </dependency>
     <dependency>
@@ -722,19 +630,11 @@
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-tag-api</artifactId>
+      <artifactId>nuxeo-platform-tag</artifactId>
     </dependency>
     <dependency>
       <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-tag-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-url-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-url-core</artifactId>
+      <artifactId>nuxeo-platform-url</artifactId>
     </dependency>
 
     <!-- CMIS -->
@@ -750,16 +650,6 @@
     <dependency>
       <groupId>org.nuxeo.ecm.core</groupId>
       <artifactId>nuxeo-core-management-jtajca</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-imaging-api</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.nuxeo.ecm.platform</groupId>
-      <artifactId>nuxeo-platform-imaging-convert</artifactId>
     </dependency>
 
     <dependency>

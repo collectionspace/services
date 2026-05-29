@@ -23,12 +23,16 @@
  */
 package org.collectionspace.services.common.api;
 
-//  This class is designed to avoid dependencies, so it does not include logging, or apache commons.
-//  There is another cspace utility class, called
-//       org.collectionspace.services.common.FileUtils
-//  albeit with different functions, which does have dependencies.
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,15 +40,19 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ *
+ * This class is designed to avoid dependencies, so it does not include logging, or apache commons.
+ * There is another cspace utility class, called org.collectionspace.services.common.FileUtils
+ * albeit with different functions, which does have dependencies.
+ *
  * @author Laramie Crocker
  * $LastChangedRevision:  $
  * $LastChangedDate:  $
@@ -64,18 +72,17 @@ public class FileTools {
      * @return
      * @throws Exception
      */
-    static protected Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
+    protected static Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
+        JAXBContext context = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         //note: setting schema to null will turn validator off
         unmarshaller.setSchema(null);
         return jaxbClass.cast(unmarshaller.unmarshal(is));
     }
 
-    static public Object getJaxbObjectFromFile(Class<?> jaxbClass, String fileName)
+    public static Object getJaxbObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
-
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
+        JAXBContext context = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         //note: setting schema to null will turn validator off
         unmarshaller.setSchema(null);

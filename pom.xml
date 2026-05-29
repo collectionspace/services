@@ -14,26 +14,39 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<cspace.services.version>${revision}</cspace.services.version>
 		<cspace.services.client.version>${revision}</cspace.services.client.version>
-		<tomcat.version>8.5.40</tomcat.version>
+		<java.version>17</java.version>
+		<tomcat.version>9.0.99</tomcat.version>
 
-		<!-- Managed Dependency Versions -->
-		<aspectj.version>1.7.4</aspectj.version>
-		<chemistry.opencmis.version.nx>0.12.0-NX2</chemistry.opencmis.version.nx>
-		<jackson.version>2.14.3</jackson.version>
-		<jaxb.version>2.2.11</jaxb.version>
-		<jaxb2-basics.version>0.6.2</jaxb2-basics.version>
-		<log4j.version>2.17.1</log4j.version>
-		<nuxeo.general.release>9.10-HF30</nuxeo.general.release>
-		<nuxeo.shell.version>${nuxeo.general.release}</nuxeo.shell.version>
-		<nuxeo.platform.version>${nuxeo.general.release}</nuxeo.platform.version>
-		<nuxeo.core.version>${nuxeo.general.release}</nuxeo.core.version>
+		<!-- CSpace managed dependencies -->
+		<jaxb2-basics.version>2.0.14</jaxb2-basics.version>
+		<jaxb-runtime.version>3.0.2</jaxb-runtime.version>
+    <jvnet.jaxb.version>4.0.12</jvnet.jaxb.version>
 		<opensaml.version>3.4.6</opensaml.version>
 		<postgres.driver.version>42.3.9</postgres.driver.version>
-		<resteasy.version>3.0.20.Final</resteasy.version>
+		<resteasy.version>5.0.10.Final</resteasy.version>
+		<xml-bind.version>3.0.1</xml-bind.version>
+
+		<!-- Dependencies shared with Nuxeo -->
+		<aspectj.version>1.7.4</aspectj.version>
+		<commons-codec.version>1.18.0</commons-codec.version>
+		<commons-io.version>2.19.0</commons-io.version>
+		<commons-lang3.version>3.18.0</commons-lang3.version>
+		<chemistry.opencmis.version.nx>1.1.1-NX01</chemistry.opencmis.version.nx>
+		<groovy.version>2.4.21</groovy.version>
+		<guava.version>32.1.3-jre</guava.version>
+    <hibernate.version>5.6.15.Final</hibernate.version>
+		<jackson.version>2.19.4</jackson.version>
+		<jaxb.version>2.2.11</jaxb.version>
+		<log4j.version>2.17.1</log4j.version>
+		<nuxeo.general.release>2023.39</nuxeo.general.release>
 		<slf4j.version>1.7.32</slf4j.version>
+		<stax2-api.version>4.2.2</stax2-api.version>
+
+		<!-- Spring -->
 		<spring.version>5.3.28</spring.version>
 		<spring.security.version>5.8.4</spring.security.version>
 		<spring.security.authorization.server.version>0.4.3</spring.security.authorization.server.version>
+		<net.ehcache.version>2.10.9.2</net.ehcache.version>
 	</properties>
 
 	<distributionManagement>
@@ -73,22 +86,6 @@
 			</snapshots>
 		</repository>
 
-		<!-- <repository>
-			<id>nuxeo-public-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/public-releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository> -->
-
-		<!-- <repository>
-			<id>nuxeo-vendor-releases</id>
-			<url>https://maven-eu.nuxeo.org/nexus/content/repositories/vendor-releases</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository> -->
-
 		<!-- CSpace copy of nuxeo-public-releases repo. -->
 		<repository>
 			<id>cspace-nuxeo-public-releases</id>
@@ -124,6 +121,13 @@
 			</releases>
 			<snapshots>
 				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>nuxeo-public-lts</id>
+			<url>https://packages.nuxeo.com/repository/maven-public-lts</url>
+			<snapshots>
+				<enabled>false</enabled>
 			</snapshots>
 		</repository>
 
@@ -198,8 +202,8 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.1</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -209,7 +213,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.1.1</version>
+					<version>3.4.0</version>
 					<configuration>
 						<warSourceExcludes>WEB-INF/lib/*.jar</warSourceExcludes>
 						<archive>
@@ -461,11 +465,59 @@
 					</files>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.6.2</version>
+				<executions>
+					<execution>
+						<id>enforce-banned-dependencies</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<!-- Configure banned dependencies to try and make Nuxeo/Hibernate/RESTEasy work together. This can be
+										 updated as needed depending on what versions we end up targeting. e.g. Hibernate will also pull
+										 in javax.activation.
+								-->
+								<bannedDependencies>
+									<excludes>
+										<exclude>jakarta.inject:jakarta.inject-api</exclude>
+										<exclude>jakarta.mail:jakarta.mail-api</exclude>
+										<exclude>jakarta.persistence:jakarta.persistence-api</exclude>
+										<exclude>jakarta.servlet:jakarta.servlet-api</exclude>
+										<exclude>jakarta.transaction:jakarta.transaction-api</exclude>
+										<exclude>jakarta.ws.rs:jakarta.ws.rs-api</exclude>
+										<exclude>jakarta.xml.soap:jakarta.xml.soap-api</exclude>
+									</excludes>
+									<message>Only jakarta activation, annotation, xml bind, and validation apis should be used</message>
+								</bannedDependencies>
+								<bannedDependencies>
+									<excludes>
+										<exclude>javax.xml.bind:jaxb-api</exclude>
+									</excludes>
+									<message>Do not use javax JAXB API</message>
+								</bannedDependencies>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>org.jboss.resteasy</groupId>
+				<artifactId>resteasy-bom</artifactId>
+				<version>${resteasy.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<!-- Provided dependencies (for common-lib/cspace-service.war deployments) -->
 			<!-- Logging dependencies (slf4j, log4j) -->
 			<dependency>
@@ -532,12 +584,12 @@
 			<dependency>
 				<groupId>org.nuxeo.lib.runtime</groupId>
 				<artifactId>nuxeo-runtime-launcher</artifactId>
-				<version>9.10-HF30</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.lib.runtime</groupId>
 				<artifactId>nuxeo-runtime-tomcat-adapter</artifactId>
-				<version>9.10-HF30</version>
+				<version>${nuxeo.general.release}</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -760,12 +812,12 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.10</version>
+				<version>${commons-codec.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.woodstox</groupId>
 				<artifactId>stax2-api</artifactId>
-				<version>3.1.4</version>
+				<version>${stax2-api.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.santuario</groupId>
@@ -809,7 +861,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.2.1</version>
+				<version>${commons-lang3.version}</version>
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
@@ -835,13 +887,13 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
-				<version>2.4.12</version>
+				<version>${groovy.version}</version>
 				<scope>compile</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>20.0</version>
+				<version>${guava.version}</version>
 				<scope>compile</scope>
 			</dependency>
 
@@ -915,7 +967,7 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.automation</groupId>
 				<artifactId>nuxeo-automation-io</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
@@ -943,7 +995,7 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
@@ -963,7 +1015,7 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-api</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
@@ -974,12 +1026,12 @@
 			<dependency>
 				<groupId>org.nuxeo.common</groupId>
 				<artifactId>nuxeo-common</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.platform</groupId>
 				<artifactId>nuxeo-platform-imaging-core</artifactId>
-				<version>${nuxeo.platform.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
@@ -1004,17 +1056,17 @@
 			<dependency>
 				<groupId>org.nuxeo.runtime</groupId>
 				<artifactId>nuxeo-runtime</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-schema</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-storage-sql</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
@@ -1025,12 +1077,12 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-storage-sql-ra</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-io</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
 					<exclusion>
@@ -1042,7 +1094,7 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-core-convert</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>com.sun.jersey</groupId>
@@ -1053,56 +1105,22 @@
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-opencmis-impl</artifactId>
-				<version>${nuxeo.core.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-server</artifactId>
-					</exclusion>
-					<exclusion>
-						<artifactId>jersey-servlet</artifactId>
-						<groupId>com.sun.jersey</groupId>
-					</exclusion>
-					<exclusion>
-						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j12</artifactId>
-					</exclusion>
-					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
-					<exclusion>
-						<groupId>dom4j</groupId>
-						<artifactId>dom4j</artifactId>
-					</exclusion>
-				</exclusions>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.ecm.core</groupId>
 				<artifactId>nuxeo-opencmis-bindings</artifactId>
-				<version>${nuxeo.core.version}</version>
-				<exclusions>
-					<exclusion>
-						<groupId>com.sun.jersey</groupId>
-						<artifactId>jersey-core</artifactId>
-					</exclusion>
-					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
-					<exclusion>
-						<groupId>dom4j</groupId>
-						<artifactId>dom4j</artifactId>
-					</exclusion>
-				</exclusions>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.runtime</groupId>
 				<artifactId>nuxeo-runtime-jtajca</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.nuxeo.runtime</groupId>
 				<artifactId>nuxeo-runtime-datasource</artifactId>
-				<version>${nuxeo.core.version}</version>
+				<version>${nuxeo.general.release}</version>
 			</dependency>
 			<!-- End of Nuxeo dependencies -->
 
@@ -1127,25 +1145,11 @@
 			</dependency>
 
 			<dependency>
-				<groupId>net.java.dev.jaxb2-commons</groupId>
-				<artifactId>jaxb-fluent-api</artifactId>
-				<version>2.0.2</version>
+				<groupId>org.jvnet.jaxb</groupId>
+				<artifactId>jaxb-plugins-runtime</artifactId>
+				<version>${jvnet.jaxb.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.jvnet.jaxb2_commons</groupId>
-				<artifactId>jaxb2-basics</artifactId>
-				<version>${jaxb2-basics.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jvnet.jaxb2-commons</groupId>
-				<artifactId>property-listener-injector</artifactId>
-				<version>1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jvnet.jaxb2_commons</groupId>
-				<artifactId>jaxb2-basics-runtime</artifactId>
-				<version>${jaxb2-basics.version}</version>
-			</dependency>
+
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-jaxrs</artifactId>
@@ -1163,13 +1167,14 @@
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.resteasy</groupId>
-				<artifactId>resteasy-jaxb-provider</artifactId>
-				<version>${resteasy.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.resteasy</groupId>
 				<artifactId>resteasy-multipart-provider</artifactId>
 				<version>${resteasy.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.jboss.resteasy</groupId>
+						<artifactId>resteasy-jaxb-provider</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>commons-httpclient</groupId>
@@ -1179,56 +1184,57 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.7</version>
+				<version>${commons-io.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-cli</groupId>
 				<artifactId>commons-cli</artifactId>
 				<version>1.2</version>
 			</dependency>
+
 			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-core</artifactId>
-				<version>${jaxb.version}</version>
+				<groupId>org.glassfish.jaxb</groupId>
+				<artifactId>jaxb-runtime</artifactId>
+				<version>${jaxb-runtime.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-impl</artifactId>
-				<version>${jaxb.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.xml.bind</groupId>
-				<artifactId>jaxb-api</artifactId>
-				<version>${jaxb.version}</version>
+				<groupId>jakarta.xml.bind</groupId>
+				<artifactId>jakarta.xml.bind-api</artifactId>
+				<version>${xml-bind.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
-				<artifactId>persistence-api</artifactId>
-				<version>1.0</version>
+				<artifactId>javax.persistence-api</artifactId>
+				<version>2.2</version>
+			</dependency>
+			<dependency>
+				<groupId>org.hibernate</groupId>
+				<artifactId>hibernate-core</artifactId>
+				<version>${hibernate.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.hibernate</groupId>
 				<artifactId>hibernate-entitymanager</artifactId>
-				<version>3.4.0.GA</version>
+				<version>${hibernate.version}</version>
 				<exclusions>
 					<!-- Exclude dom4j:dom4j so we can upgrade to org.dom4j:dom4j. -->
 					<exclusion>
 						<groupId>dom4j</groupId>
 						<artifactId>dom4j</artifactId>
 					</exclusion>
+					<exclusion>
+						<groupId>javax.xml.bind</groupId>
+						<artifactId>jaxb-api</artifactId>
+					</exclusion>
 				</exclusions>
 			</dependency>
-			<dependency>
-				<groupId>org.hibernate</groupId>
-				<artifactId>hibernate-c3p0</artifactId>
-				<version>3.6.10.Final</version>
-			</dependency>
-			<dependency>
-				<groupId>org.jvnet.hyperjaxb3</groupId>
-				<!-- for time type adapters -->
-				<artifactId>hyperjaxb3-ejb-runtime</artifactId>
-				<version>0.6.0</version>
-			</dependency>
+
 			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>

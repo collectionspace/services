@@ -12,8 +12,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;

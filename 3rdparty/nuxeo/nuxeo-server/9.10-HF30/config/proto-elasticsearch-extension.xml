@@ -56,9 +56,9 @@
               "type": "path_hierarchy"
             },
             "ngram_tokenizer": {
-              "type": "nGram",
+              "type": "ngram",
               "min_gram": 3,
-              "max_gram": 12
+              "max_gram": 3
             }
           },
           "analyzer": {
@@ -137,9 +137,6 @@
         // index as small as possible. We may want to turn this on in the future, to support arbitrary
         // searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
         "dynamic": false,
-        "_all": {
-          "enabled": false
-        },
         "properties": {
           "all_field": {
             "type": "text",

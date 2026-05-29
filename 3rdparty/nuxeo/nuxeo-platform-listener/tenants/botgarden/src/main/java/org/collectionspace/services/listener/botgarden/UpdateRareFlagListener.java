@@ -205,7 +205,7 @@ public class UpdateRareFlagListener extends AbstractCSEventSyncListenerImpl {
 	}
 
 	private UpdateRareFlagBatchJob createUpdater(DocumentEventContext context) throws Exception {
-		ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+		ResourceMap resourceMap = ResteasyProviderFactory.getInstance().getContextData(ResourceMap.class);
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
 		ServiceContext<PoxPayloadIn, PoxPayloadOut> serviceContext = batchResource.createServiceContext(batchResource.getServiceName());
 

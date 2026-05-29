@@ -18,7 +18,7 @@ package org.collectionspace.ecm.platform.quote.workflow.services;
 
 import java.util.ArrayList;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -30,11 +30,11 @@ public interface QuotesModerationService {
      * @param session the coreSession
      * @param document the document were the comment is posted
      * @param commentId the commentId
-     * @throws ClientException
+     * @throws NuxeoException
      */
     void startModeration(CoreSession session, DocumentModel document,
             String commentId, ArrayList<String> moderators)
-            throws ClientException;
+            throws NuxeoException;
 
     /**
      * Gets the moderation process for the given Comment posted on a documentModel.
@@ -42,12 +42,12 @@ public interface QuotesModerationService {
      * @param session the coreSession
      * @param document the document were the comment is posted
      * @param commentId the commentId
-     * @throws ClientException
+     * @throws NuxeoException
      */
     /**
     ProcessInstance getModerationProcess(JbpmService jbpmService,
             CoreSessionInterface session, DocumentModel doc, String commentId)
-            throws ClientException;
+            throws NuxeoException;
             **/
 
     /**
@@ -56,10 +56,10 @@ public interface QuotesModerationService {
      * @param session the coreSession
      * @param document the document were the comment is posted
      * @param commentId the commentId
-     * @throws ClientException
+     * @throws NuxeoException
      */
     void approveQuote(CoreSession session, DocumentModel document,
-            String commentId) throws ClientException;
+            String commentId) throws NuxeoException;
 
     /**
      * Reject the comment with the given commentId.
@@ -67,19 +67,19 @@ public interface QuotesModerationService {
      * @param session the coreSession
      * @param document the document were the comment is posted
      * @param commentId the commentId
-     * @throws ClientException
+     * @throws NuxeoException
      */
     void rejectQuote(CoreSession session, DocumentModel document,
-            String commentId) throws ClientException;
+            String commentId) throws NuxeoException;
 
     /**
      * Publish the given comment.
      *
      * @param session the coreSession
      * @param comment the comment to publish
-     * @throws ClientException
+     * @throws NuxeoException
      */
     void publishQuote(CoreSession session, DocumentModel comment)
-            throws ClientException;
+            throws NuxeoException;
 
 }

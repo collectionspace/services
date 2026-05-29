@@ -142,7 +142,7 @@ public class AccountDocumentHandler
      */
     private AccountsCommon merge(AccountsCommon from, AccountsCommon to) {
         Date now = new Date();
-        to.setUpdatedAtItem(now);
+        to.setUpdatedAt(now);
         if (from.getEmail() != null) {
             to.setEmail(from.getEmail());
         }

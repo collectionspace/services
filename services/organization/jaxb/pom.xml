@@ -15,15 +15,6 @@
     <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.common</artifactId>
-            </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.authority.jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -34,8 +25,8 @@
         <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>jaxb-maven-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -44,3 +35,4 @@
         </plugins>
     </build>
 </project>
+

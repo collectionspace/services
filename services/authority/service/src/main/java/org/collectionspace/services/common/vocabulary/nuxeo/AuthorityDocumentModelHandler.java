@@ -71,7 +71,7 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentModelHandler;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.dom4j.Element;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -757,7 +757,7 @@ public abstract class AuthorityDocumentModelHandler<AuthCommon> extends NuxeoDoc
 				throw new DocumentNotFoundException(String.format("Could not find authority resource with CSID='%s'.", authCSID));
 			}
 			shortIdentifier = (String) docModel.getProperty(schemaName, AuthorityJAXBSchema.SHORT_IDENTIFIER);
-		} catch (ClientException ce) {
+		} catch (NuxeoException ce) {
 			throw new RuntimeException("AuthorityDocHandler Internal Error: cannot get shortId!", ce);
 		} finally {
 			if (repoSession != null) {

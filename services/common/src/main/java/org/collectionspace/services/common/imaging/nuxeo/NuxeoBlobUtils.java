@@ -29,9 +29,12 @@ package org.collectionspace.services.common.imaging.nuxeo;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,63 +43,61 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.nuxeo.runtime.api.Framework;
-import org.nuxeo.ecm.platform.picture.api.ImageInfo;
-import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
-import org.nuxeo.ecm.platform.picture.api.ImagingService;
-import org.nuxeo.ecm.platform.picture.api.PictureView;
-import org.nuxeo.ecm.platform.mimetype.MimetypeDetectionException;
-import org.nuxeo.ecm.platform.mimetype.interfaces.MimetypeRegistry;
-import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
-import org.nuxeo.ecm.platform.filemanager.api.FileManager;
-import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
-import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
-import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
-import org.nuxeo.ecm.platform.types.TypeManager;
-import org.nuxeo.ecm.core.api.IdRef;
-import org.nuxeo.ecm.core.api.NuxeoException;
-import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
-import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
-import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
-import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.binary.metadata.api.BinaryMetadataService;
-import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ClientException;
-import org.nuxeo.ecm.core.api.DocumentModel;
-import org.nuxeo.ecm.core.api.DocumentRef;
-import org.nuxeo.ecm.core.api.PropertyException;
-import org.nuxeo.ecm.core.blob.BlobManager;
-import org.nuxeo.ecm.core.blob.BlobProvider;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.apache.commons.io.IOUtils;
-
-import org.collectionspace.services.client.PoxPayloadIn;
-import org.collectionspace.services.client.PoxPayloadOut;
-import org.collectionspace.services.common.FileUtilities;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.blob.BlobInput;
-import org.collectionspace.services.common.context.ServiceContext;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.document.DocumentNotFoundException;
-import org.collectionspace.services.common.document.TransactionException;
-import org.collectionspace.services.common.repository.RepositoryClient;
-import org.collectionspace.services.common.api.CommonAPI;
-import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
-import org.collectionspace.services.common.blob.BlobOutput;
 import org.collectionspace.services.blob.BlobsCommon;
 import org.collectionspace.services.blob.DimensionSubGroup;
 import org.collectionspace.services.blob.DimensionSubGroupList;
 import org.collectionspace.services.blob.MeasuredPartGroup;
 import org.collectionspace.services.blob.MeasuredPartGroupList;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.FileUtilities;
+import org.collectionspace.services.common.ServiceMain;
+import org.collectionspace.services.common.api.CommonAPI;
+import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
+import org.collectionspace.services.common.blob.BlobInput;
+import org.collectionspace.services.common.blob.BlobOutput;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentNotFoundException;
+import org.collectionspace.services.common.document.TransactionException;
+import org.collectionspace.services.common.repository.RepositoryClient;
+import org.collectionspace.services.config.service.ListResultField;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
-import org.collectionspace.services.config.service.ListResultField;
+import org.nuxeo.binary.metadata.api.BinaryMetadataService;
+import org.nuxeo.ecm.core.api.Blob;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.IdRef;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.PropertyException;
+import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
+import org.nuxeo.ecm.core.api.blobholder.DocumentBlobHolder;
+import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
+import org.nuxeo.ecm.core.api.model.Property;
+import org.nuxeo.ecm.core.blob.BlobManager;
+import org.nuxeo.ecm.core.blob.BlobProvider;
+import org.nuxeo.ecm.platform.filemanager.api.FileImporterContext;
+import org.nuxeo.ecm.platform.filemanager.api.FileManager;
+import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
+import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
+import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
+import org.nuxeo.ecm.platform.mimetype.MimetypeDetectionException;
+import org.nuxeo.ecm.platform.mimetype.interfaces.MimetypeRegistry;
+import org.nuxeo.ecm.platform.picture.api.ImageInfo;
+import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
+import org.nuxeo.ecm.platform.picture.api.ImagingService;
+import org.nuxeo.ecm.platform.picture.api.PictureView;
+import org.nuxeo.ecm.platform.picture.api.adapters.PictureBlobHolder;
+import org.nuxeo.ecm.platform.types.TypeManager;
+import org.nuxeo.runtime.api.Framework;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Use Nuxeo's FileBlob class to create a temporary file that Nuxeo manages.
@@ -227,13 +228,13 @@ public class NuxeoBlobUtils {
 		return strBuffer.toString();
 	}
 
-	static private String getDerivativeUri(String uri, String derivativeName) {
+	private static String getDerivativeUri(String uri, String derivativeName) {
 		return uri + derivativeName + "/" + BlobInput.URI_CONTENT_PATH;
 	}
 
-	static private HashMap<String, Object> createBlobListItem(Blob blob,
-			String uri,
-			String derivativeName) {
+	private static HashMap<String, Object> createBlobListItem(Blob blob,
+                                                              String uri,
+                                                              String derivativeName) {
 		HashMap<String, Object> item = new HashMap<String, Object>();
 
 		String value = getDerivativeUri(uri, derivativeName);
@@ -263,14 +264,14 @@ public class NuxeoBlobUtils {
 		return item;
 	}
 
-	static public String getSanizitedFilename(File srcFile) throws Exception {
+	public static String getSanizitedFilename(File srcFile) throws Exception {
 		return getSanizitedFilename(srcFile.getName());
 	}
 
 	/*
 	 * Valid Nuxeo file names are a subset of *nix and Windows filenames, so we need to check.
 	 */
-	static public String getSanizitedFilename(String fileName) throws Exception {
+    public static String getSanizitedFilename(String fileName) throws Exception {
 		String result = fileName;
 
 		if (fileName != null && fileName.matches(NUXEO_FILENAME_VALID_STRING) == false) {
@@ -285,7 +286,7 @@ public class NuxeoBlobUtils {
 
 		if (result != null && logger.isDebugEnabled() == true) {
 			if (result.equals(fileName) == false) {
-				logger.debug(String.format("The file name '%s' was sanizitized to '%s'.", fileName, result));
+				logger.debug("The file name '{}' was sanizitized to '{}'.", fileName, result);
 			}
 		}
 
@@ -337,8 +338,8 @@ public class NuxeoBlobUtils {
 		commonList.setItemsInPage(total);
 	}
 
-	static public CommonList getBlobDerivatives(CoreSessionInterface repoSession,
-			String repositoryId, List<ListResultField> resultsFields, String uri)
+	public static CommonList getBlobDerivatives(CoreSessionInterface repoSession,
+                                                String repositoryId, List<ListResultField> resultsFields, String uri)
 			throws Exception {
 		CommonList commonList = new CommonList();
 		int nFields = resultsFields.size() + 2;
@@ -383,7 +384,7 @@ public class NuxeoBlobUtils {
         return binaryMetadataService.readMetadata(nuxeoBlob, false);
     }
 
-	static private MeasuredPartGroupList getDimensions(
+	private static MeasuredPartGroupList getDimensions(
 			DocumentModel documentModel, Blob nuxeoBlob) {
 		MeasuredPartGroupList result = null;
 
@@ -456,19 +457,19 @@ public class NuxeoBlobUtils {
 
 	// FIXME: Add error checking here, as none of these calls return an
 	// Exception
-	static private BigDecimal intToBigDecimal(int i) {
+    private static BigDecimal intToBigDecimal(int i) {
 		BigInteger bigint = BigInteger.valueOf(i);
 		BigDecimal bigdec = new BigDecimal(bigint);
 		return bigdec;
 	}
 
-	static private BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
-			Blob nuxeoBlob) {
+	private static BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
+                                                 Blob nuxeoBlob) {
 		return createBlobsCommon(ctx, documentModel, nuxeoBlob, false);
 	}
 
-	static private BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
-			Blob nuxeoBlob, Boolean getContentFlag) {
+	private static BlobsCommon createBlobsCommon(ServiceContext ctx, DocumentModel documentModel,
+                                                 Blob nuxeoBlob, Boolean getContentFlag) {
 		BlobsCommon result = new BlobsCommon();
 
 		if (documentModel != null && nuxeoBlob != null) {
@@ -484,7 +485,7 @@ public class NuxeoBlobUtils {
 			        BlobProvider bp = blobManager.getBlobProvider(ctx.getRepositoryName());
 			        digest = bp.getBinaryManager().getBinary(nuxeoBlob).getDigest();
 				} catch (Exception e) {
-					logger.warn(String.format("Could not compute digest value for uploaded media '%s'.", nuxeoBlob.getFilename()));
+					logger.warn("Could not compute digest value for uploaded media '{}'.", nuxeoBlob.getFilename());
 				}
 			}
 			result.setDigest(digest);
@@ -511,7 +512,7 @@ public class NuxeoBlobUtils {
 					        ThumbnailConstants.THUMBNAIL_FILENAME_PROPERTY_NAME);
 					Blob thumbnailBlob = (Blob)documentModel.getProperty(ThumbnailConstants.THUMBNAIL_SCHEMA_NAME,
 					        ThumbnailConstants.THUMBNAIL_PROPERTY_NAME);
-				} catch (ClientException e) {
+				} catch (NuxeoException e) {
 					errorMsg = "Could not extract the name of the thumbnail preview image file.";
 					if (logger.isDebugEnabled()) {
 						logger.debug(errorMsg, e);
@@ -529,8 +530,8 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-    static private Blob checkMimeType(Blob blob, String fullname)
-            throws ClientException {
+    private static Blob checkMimeType(Blob blob, String fullname)
+            throws NuxeoException {
         final String mimeType = blob.getMimeType();
         if (mimeType != null && !mimeType.equals("application/octet-stream")
                 && !mimeType.equals("application/octetstream")) {
@@ -540,7 +541,7 @@ public class NuxeoBlobUtils {
         try {
             blob = getMimeService().updateMimetype(blob, filename);
         } catch (MimetypeDetectionException e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
         return blob;
     }
@@ -549,16 +550,16 @@ public class NuxeoBlobUtils {
 	 * Gets the type service.  Not in use, but please keep for future reference
 	 *
 	 * @return the type service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static TypeManager getTypeService() throws ClientException {
+	private static TypeManager getTypeService() throws NuxeoException {
 		TypeManager typeService = null;
 
 		try {
 			typeService = Framework.getService(TypeManager.class);
 		} catch (Exception e) {
-			throw new ClientException(e);
+			throw new NuxeoException(e);
 		}
 
 		return typeService;
@@ -579,10 +580,10 @@ public class NuxeoBlobUtils {
 	 * Gets Nuxeo's file manager service.
 	 *
 	 * @return the file manager service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static FileManager getFileManager() throws ClientException {
+	private static FileManager getFileManager() throws NuxeoException {
 		FileManager result = null;
 
 		try {
@@ -590,7 +591,7 @@ public class NuxeoBlobUtils {
 		} catch (Exception e) {
 			String msg = "Unable to get Nuxeo's FileManager service.";
 			logger.error(msg, e);
-			throw new ClientException("msg", e);
+			throw new NuxeoException("msg", e);
 		}
 
 		return result;
@@ -600,10 +601,10 @@ public class NuxeoBlobUtils {
 	 * Gets Nuxeo's file manager service.
 	 *
 	 * @return the file manager service
-	 * @throws ClientException
+	 * @throws NuxeoException
 	 *             the client exception
 	 */
-	private static FileManagerService getFileManagerService() throws ClientException {
+	private static FileManagerService getFileManagerService() throws NuxeoException {
 		FileManagerService result = null;
 
 		try {
@@ -611,15 +612,15 @@ public class NuxeoBlobUtils {
 		} catch (Exception e) {
 			String msg = "Unable to get Nuxeo's FileManager service.";
 			logger.error(msg, e);
-			throw new ClientException("msg", e);
+			throw new NuxeoException("msg", e);
 		}
 
 		return result;
 	}
 
 
-	static private CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient) {
+	private static CoreSessionInterface getRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+                                                             RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient) {
 		CoreSessionInterface result = null;
 		NuxeoRepositoryClientImpl nuxeoClient = (NuxeoRepositoryClientImpl)repositoryClient;
 
@@ -632,20 +633,20 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-	static private void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
-			CoreSessionInterface repoSession) throws TransactionException {
+	private static void releaseRepositorySession(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+                                                 RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
+                                                 CoreSessionInterface repoSession) throws TransactionException {
 		NuxeoRepositoryClientImpl nuxeoClient = (NuxeoRepositoryClientImpl)repositoryClient;
 		nuxeoClient.releaseRepositorySession(ctx, repoSession);
 	}
 
-    static private MimetypeRegistry getMimeService() throws ClientException {
+    private static MimetypeRegistry getMimeService() throws NuxeoException {
     	MimetypeRegistry result = null;
 
         try {
         	result = Framework.getService(MimetypeRegistry.class);
         } catch (Exception e) {
-            throw new ClientException(e);
+            throw new NuxeoException(e);
         }
 
         return result;
@@ -660,40 +661,63 @@ public class NuxeoBlobUtils {
             boolean useNuxeoAdaptors) throws Exception {
 		DocumentModel result = null;
 
-		boolean createdFromAdaptor = false;
-		if (useNuxeoAdaptors == true) try {
-			//
-			// Use Nuxeo's high-level create method which looks for plugin adapters that match the MIME type.  For example,
-			// for image blobs, Nuxeo's file manager will pick a special image plugin that will automatically generate
-			// image derivatives.
-			//
-			result = getFileManager().createDocumentFromBlob(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName);
-			createdFromAdaptor = true;
-		} catch (NuxeoException ne) {
-			logger.warn(String.format("Tried but failed to use Nuxeo import adaptor to download '%s'.  Falling back to generic file importer",
-					blobName));
+		// useNuxeoAdaptors is kind of a misnomer because we always use Nuxeo to create the Blob document
+		// instead now it's more used to show where the call has come from (PublicItem vs BlobDocumentModelHandler)
+		// and to determine if we want to generate derivatives or not
+		if (!useNuxeoAdaptors) {
+			inputStreamBlob = checkMimeType(inputStreamBlob, blobName);
 		}
 
-		if (createdFromAdaptor == false) {
-			//
-			// User Nuxeo's default file importer/adapter explicitly.  This avoids specialized functionality from happening like
-			// image derivative creation.
-			//
-			String digestAlgorithm = getFileManager().getDigestAlgorithm(); // Only call this because we seem to need some way of initializing Nuxeo's FileManager with a call.
+		final var context = FileImporterContext.builder(repoSession.getCoreSession(), inputStreamBlob, blobLocation)
+											   .overwrite(overwrite)
+											   .fileName(blobName)
+											   .build();
+		result = getFileManager().createOrUpdateDocument(context);
 
-			FileManagerService fileManagerService = getFileManagerService();
-			inputStreamBlob = checkMimeType(inputStreamBlob, blobName);
-
-			FileImporter defaultFileImporter = fileManagerService.getPluginByName("DefaultFileImporter");
-			result = defaultFileImporter.create(
-					repoSession.getCoreSession(), inputStreamBlob, blobLocation, overwrite, blobName, getTypeService());
+		// Compute the views now instead of relying on Nuxeo to populate them
+		if (result != null && isBlobAnImage(inputStreamBlob) && useNuxeoAdaptors) {
+			computeViews(result, inputStreamBlob);
 		}
 
 		return result;
 	}
 
-	static public BlobsCommon createBlobInRepository(
+	/**
+	 * Compute the derivative views and add them to our document. This assumes the view list is not populated and in the
+	 * future we might need to clear existing views before setting the value.
+	 *
+	 * @param doc The Blob's document
+	 * @param blob The Blob
+	 */
+	private static void computeViews(DocumentModel doc, Blob blob) {
+		final var convert = true;
+		final var imagingService = Framework.getService(ImagingService.class);
+		if (imagingService == null) {
+			logger.warn("Unable to compute views for {}, ImagingService not found", blob.getFilename());
+			return;
+		}
+
+		final var views = new ArrayList<Map<String, Serializable>>();
+		final var imageInfo = imagingService.getImageInfo(blob);
+		if (imageInfo == null) {
+			logger.warn("Unable to generate imageInfo for {}, skipping derivative generation", blob.getFilename());
+			return;
+		}
+
+        try {
+			final var computedViews = imagingService.computeViewsFor(doc, blob, imageInfo, convert);
+			for (var view : computedViews) {
+				views.add(view.asMap());
+			}
+			doc.setPropertyValue(VIEWS_PROPERTY, views);
+		} catch (PropertyException e) {
+			logger.error("Unable to set view property for document {}", blob.getFilename(), e);
+		} catch (IOException e) {
+			logger.error("Unable to compute views for document {}", blob.getFilename(), e);
+		}
+	}
+
+	public static BlobsCommon createBlobInRepository(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
 			InputStream inputStream,
@@ -768,8 +792,9 @@ public class NuxeoBlobUtils {
 			if (sanitizedName.equals(originalFile.getName()) == false) {
 				targetFile = FileUtilities.createTmpFile(originalFile, sanitizedName);
 				if (logger.isDebugEnabled() == true) {
-					logger.debug(String.format("The file '%s''s name has characters that Nuxeo can't deal with.  Rather than renaming the file, we created a new temp file at '%s'",
-							originalFile.getName(), targetFile.getAbsolutePath()));
+					logger.debug(
+                        "The file '{}''s name has characters that Nuxeo can't deal with.  Rather than renaming the file, we created a new temp file at '{}'",
+                        originalFile.getName(), targetFile.getAbsolutePath());
 				}
 			}
 
@@ -802,7 +827,7 @@ public class NuxeoBlobUtils {
 			//
 			if (targetFile.equals(originalFile) == false) {
 				if (targetFile.delete() == false) {
-					logger.warn(String.format("Attempt to delete temporary file '%s' failed.", targetFile.getAbsolutePath()));
+					logger.warn("Attempt to delete temporary file '{}' failed.", targetFile.getAbsolutePath());
 				}
 			}
 		}
@@ -814,7 +839,7 @@ public class NuxeoBlobUtils {
 	 * Find out if this document's blob/file-contents are allowed to be purged.  For instance, we currently
 	 * only want to allow the purging the contents of Nuxeo "Picture" documents.
 	 */
-	static private boolean isPurgeAllowed(DocumentModel docModel) {
+    private static boolean isPurgeAllowed(DocumentModel docModel) {
 		boolean result = false;
 
 		if (docModel.hasFacet(ImagingDocumentConstants.PICTURE_FACET) == true) {
@@ -839,7 +864,7 @@ public class NuxeoBlobUtils {
 	 *            the mime type
 	 * @return the string
 	 */
-	static private BlobsCommon createBlobInRepository(ServiceContext ctx,
+    private static BlobsCommon createBlobInRepository(ServiceContext ctx,
 			CoreSessionInterface nuxeoSession,
 			DocumentModel blobLocation,
 			boolean purgeOriginal,
@@ -877,8 +902,9 @@ public class NuxeoBlobUtils {
 					String source = (String)documentModel.getProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME,
 							CommonAPI.NUXEO_DUBLINCORE_SOURCE);
 					if (source != null) {
-						logger.warn(String.format("The Nuxeo dublin core property '%s' is set to '%s'.  We expected it to be empty. See JIRA issue CSPACE-6679 for details.",
-								CommonAPI.NUXEO_DUBLINCORE_SOURCE, source));
+						logger.warn(
+                            "The Nuxeo dublin core property '{}' is set to '{}'.  We expected it to be empty. See JIRA issue CSPACE-6679 for details.",
+                            CommonAPI.NUXEO_DUBLINCORE_SOURCE, source);
 					}
 					documentModel.setProperty(CommonAPI.NUXEO_DUBLINCORE_SCHEMANAME,
 							CommonAPI.NUXEO_DUBLINCORE_SOURCE, CommonAPI.URL_SOURCED_PICTURE);
@@ -948,10 +974,10 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-	static public BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-			RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
-			String repositoryId,
-			StringBuffer outMimeType) throws TransactionException, DocumentNotFoundException {
+	public static BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+                                           RepositoryClient<PoxPayloadIn, PoxPayloadOut> repositoryClient,
+                                           String repositoryId,
+                                           StringBuffer outMimeType) throws TransactionException, DocumentNotFoundException {
 		BlobOutput result = null;
 
 		boolean repoSessionCleanup = false;
@@ -987,7 +1013,7 @@ public class NuxeoBlobUtils {
 	//  If the blob is not too big, we return a ByteArrayInputStream.  Otherwise, we return Nuxeo's InputStream
 	//  which is usually a FileInputStream.
 	//
-	static private InputStream getInputStream(BlobsCommon blobsCommon, Blob blob) {
+    private static InputStream getInputStream(BlobsCommon blobsCommon, Blob blob) {
 		InputStream result = null;
 
 		if (blob != null) {
@@ -1002,13 +1028,14 @@ public class NuxeoBlobUtils {
 					result = blobStream; // The blob is too large to put into a ByteArrayStream.
 				}
 			} catch (Exception e) {
-				logger.error(String.format("Error getting the InputStream content for file %s.", blobsCommon.getName()), e);
+				logger.error("Error getting the InputStream content for file {}.", blobsCommon.getName(), e);
 				if (result != null) {
 					try {
 						result.close();
 						result = null;
 					} catch (Exception x) {
-						logger.debug(String.format("Exception encountered during InputStream cleanup of file %s", blobsCommon.getName()), x);
+						logger.debug("Exception encountered during InputStream cleanup of file {}",
+                                     blobsCommon.getName(), x);
 					}
 				}
 			}
@@ -1017,7 +1044,7 @@ public class NuxeoBlobUtils {
 		return result;
 	}
 
-    static public Set<String> getPictureViewNameSet(CoreSessionInterface repoSession, String repositoryId) throws PropertyException {
+    public static Set<String> getPictureViewNameSet(CoreSessionInterface repoSession, String repositoryId) throws PropertyException {
         Set<String> result = null;
 
         DocumentModel docModel = repoSession.getDocument(new IdRef(repositoryId));
@@ -1044,7 +1071,7 @@ public class NuxeoBlobUtils {
 	 * @return the image
 	 * @throws DocumentNotFoundException
 	 */
-	static public BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
+    public static BlobOutput getBlobOutput(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			CoreSessionInterface repoSession,
 			String repositoryId,
 			String derivativeTerm,
@@ -1204,11 +1231,11 @@ public class NuxeoBlobUtils {
  *
  * protected FileManager fileManager;
  *
- * protected FileManager getFileManagerService() throws ClientException { if
+ * protected FileManager getFileManagerService() throws NuxeoException { if
  * (fileManager == null) { try { fileManager =
  * Framework.getService(FileManager.class); } catch (Exception e) {
  * log.error("Unable to get FileManager service ", e); throw new
- * ClientException("Unable to get FileManager service ", e); } } return
+ * NuxeoException("Unable to get FileManager service ", e); } } return
  * fileManager; }
  */
 
@@ -1229,7 +1256,7 @@ public class NuxeoBlobUtils {
 /*
  * RepositoryInstance.getStreamURI()
  *
- * String getStreamURI(String blobPropertyId) throws ClientException
+ * String getStreamURI(String blobPropertyId) throws NuxeoException
  *
  * Returns an URI identifying the stream given the blob property id. This method
  * should be used by a client to download the data of a blob property.
@@ -1241,7 +1268,7 @@ public class NuxeoBlobUtils {
  * After the client has called this method, it will be able to download the
  * stream using streaming server API.
  *
- * Returns: an URI identifying the remote stream Throws: ClientException
+ * Returns: an URI identifying the remote stream Throws: NuxeoException
  */
 
 /*

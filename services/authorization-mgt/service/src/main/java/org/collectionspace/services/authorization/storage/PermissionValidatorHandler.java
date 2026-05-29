@@ -26,7 +26,7 @@ package org.collectionspace.services.authorization.storage;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.perms.PermissionAction;
@@ -117,12 +117,8 @@ public class PermissionValidatorHandler implements ValidatorHandler<Permission, 
 		} else {
 			if (action.equals(Action.CREATE)) {
 				result = false;
-				org.collectionspace.services.authorization.perms.ObjectFactory objectFactory = 
-						new org.collectionspace.services.authorization.perms.ObjectFactory();
-				JAXBElement<Permission> permJaxbElement = objectFactory.createPermission(permission);
-				String msg = String.format("Either (or both) the 'action' or 'actiongroup' element needs to be set: %s",
-						JaxbUtils.toString(permJaxbElement, Permission.class));			
-				logger.error(msg);
+				logger.error("Either (or both) the 'action' or 'actiongroup' element needs to be set: {}",
+                             JaxbUtils.toString(permission, Permission.class));
 			}
 		}
 		

@@ -9,13 +9,12 @@
     $LastChangedDate$
 -->
 
-<xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:ns="http://collectionspace.org/publicitem/"
-    xmlns="http://collectionspace.org/publicitem/"
-    targetNamespace="http://collectionspace.org/publicitem/"
-    version="0.1">
-    
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://collectionspace.org/publicitem/"
+	targetNamespace="http://collectionspace.org/publicitem/"
+	version="0.1">
+
 	<xs:element name="itemNumber" type="xs:string" />				<!-- An identifier for the publicitem (different than the CSID) -->
 	<xs:element name="contentName" type="xs:string" />				<!-- A name for the publicitem's content  -->
 	<xs:element name="contentId" type="xs:string" />				<!-- The the ID of the content blob in the back-end repository -->

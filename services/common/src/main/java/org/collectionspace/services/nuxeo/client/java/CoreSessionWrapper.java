@@ -14,12 +14,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.collectionspace.services.common.document.DocumentException;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.Filter;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
 import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -96,11 +96,11 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * Gets the root document of this repository.
      *
      * @return the root document. cannot be null
-     * @throws ClientException
+     * @throws NuxeoException
      * @throws SecurityException
      */
 	@Override
-    public DocumentModel getRootDocument() throws ClientException {
+    public DocumentModel getRootDocument() throws NuxeoException {
     	return repoSession.getRootDocument();
     }
     
@@ -171,7 +171,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
 	@Override
 	public IterableQueryResult queryAndFetch(String query, String queryType,
-            Object... params) throws ClientException, DocumentException {
+            Object... params) throws NuxeoException, DocumentException {
 		query = localizeTimestamps(query);
 		logQuery(query, queryType);
 		return repoSession.queryAndFetch(query, queryType, params);
@@ -179,21 +179,21 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
 	@Override
 	public DocumentModelList query(String query, Filter filter, long limit,
-            long offset, boolean countTotal) throws ClientException, DocumentException {
+            long offset, boolean countTotal) throws NuxeoException, DocumentException {
 		query = localizeTimestamps(query);
 		logQuery(query, filter, limit, offset, countTotal);
 		return repoSession.query(query, filter, limit, offset, countTotal);
 	}
 
 	@Override
-    public DocumentModelList query(String query, int max) throws ClientException, DocumentException {
+    public DocumentModelList query(String query, int max) throws NuxeoException, DocumentException {
 		query = localizeTimestamps(query);
 		logQuery(query);
     	return repoSession.query(query, max);
     }
     
 	@Override
-	public DocumentModelList query(String query) throws ClientException, DocumentException {
+	public DocumentModelList query(String query) throws NuxeoException, DocumentException {
 		query = localizeTimestamps(query);
 		logQuery(query);
 		return repoSession.query(query);
@@ -216,16 +216,16 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      *
      * @param docRef the document reference
      * @return the document
-     * @throws ClientException
+     * @throws NuxeoException
      * @throws SecurityException
      */
     @Override
-    public DocumentModel getDocument(DocumentRef docRef) throws ClientException {
+    public DocumentModel getDocument(DocumentRef docRef) throws NuxeoException {
 	    return repoSession.getDocument(docRef);
     }
 
     @Override
-    public DocumentModel saveDocument(DocumentModel docModel) throws ClientException {
+    public DocumentModel saveDocument(DocumentModel docModel) throws NuxeoException {
     	DocumentModel result = null;
     	
     	try {
@@ -244,7 +244,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     }
 
     @Override
-    public void save() throws ClientException {
+    public void save() throws NuxeoException {
     	try {
     		if (isTransactionMarkedForRollbackOnly() == false) {
     			repoSession.save();
@@ -262,10 +262,10 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * Bulk document saving.
      *
      * @param docModels the document models that needs to be saved
-     * @throws ClientException
+     * @throws NuxeoException
      */
     @Override
-    public void saveDocuments(DocumentModel[] docModels) throws ClientException {
+    public void saveDocuments(DocumentModel[] docModels) throws NuxeoException {
     	try {
 	    	if (isTransactionMarkedForRollbackOnly() == false) {
 	    		repoSession.saveDocuments(docModels);
@@ -283,10 +283,10 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * Removes this document and all its children, if any.
      *
      * @param docRef the reference to the document to remove
-     * @throws ClientException
+     * @throws NuxeoException
      */
     @Override
-    public void removeDocument(DocumentRef docRef) throws ClientException {
+    public void removeDocument(DocumentRef docRef) throws NuxeoException {
     	repoSession.removeDocument(docRef);
     }
 
@@ -303,11 +303,11 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * @param id
      * @param typeName
      * @return the initial document model
-     * @throws ClientException
+     * @throws NuxeoException
      */
     @Override
     public DocumentModel createDocumentModel(String parentPath, String id,
-            String typeName) throws ClientException {
+            String typeName) throws NuxeoException {
     	return repoSession.createDocumentModel(parentPath, id, typeName);
     }
     
@@ -320,10 +320,10 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      *
      * @param model the document model to use for initialization
      * @return the created document
-     * @throws ClientException
+     * @throws NuxeoException
      */
     @Override
-    public DocumentModel createDocument(DocumentModel model) throws ClientException {
+    public DocumentModel createDocument(DocumentModel model) throws NuxeoException {
     	return repoSession.createDocument(model);
     }
     
@@ -333,10 +333,10 @@ public class CoreSessionWrapper implements CoreSessionInterface {
      * @param parent the parent reference
      * @return the children if any, an empty list if no children or null if the
      *         specified parent document is not a folder
-     * @throws ClientException
+     * @throws NuxeoException
      */
     @Override
-    public DocumentModelList getChildren(DocumentRef parent) throws ClientException {
+    public DocumentModelList getChildren(DocumentRef parent) throws NuxeoException {
     	return repoSession.getChildren(parent);
     }
 

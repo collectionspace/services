@@ -13,52 +13,25 @@
     <artifactId>org.collectionspace.services.authentication.jaxb</artifactId>
     <name>services.authentication.jaxb</name>
 
-    <properties>
-        <sql.file>authentication.sql</sql.file>
-        <sql.dir>src/main/resources/db/mysql</sql.dir>
-    </properties>
-
     <dependencies>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jaxb2-commons</groupId>
-            <artifactId>property-listener-injector</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <artifactId>javax.persistence-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hyperjaxb3</groupId>
-            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-        </dependency>
-
     </dependencies>
 
     <build>
         <finalName>collectionspace-services-authentication-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
-        <plugins>
-            <plugin>
-                <!-- maven-hyperjaxb3-plugin generates jaxb + jpa bindings -->
-                <groupId>org.jvnet.hyperjaxb3</groupId>
-                <artifactId>maven-hyperjaxb3-plugin</artifactId>
-            </plugin>
-
-        </plugins>
     </build>
 
 </project>
-

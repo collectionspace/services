@@ -100,7 +100,7 @@ public class RoleResource extends SecurityResourceBase<Role, Role> {
                     //
                     // Replace the generic error message with a Role-specific error message
                     //
-                    String msg = String.format("There is already a role with the name '%s'.  Please choose a different name.", input.displayName);
+                    String msg = String.format("There is already a role with the name '%s'.  Please choose a different name.", input.getDisplayName());
                     throw bigReThrow(new DocumentException(msg, de, de.getErrorCode()), msg);
                 }
             }

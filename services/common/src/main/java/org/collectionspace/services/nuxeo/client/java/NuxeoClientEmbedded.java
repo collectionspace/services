@@ -23,24 +23,20 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.security.Principal;
+import javax.transaction.TransactionManager;
 
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.repository.RepositoryInstanceWrapperAdvice;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
-import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.CoreInstance;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.NuxeoPrincipal;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
+import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.jtajca.NuxeoContainer;
 import org.nuxeo.runtime.transaction.TransactionHelper;
-
-import javax.transaction.TransactionManager;
-import javax.transaction.UserTransaction;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.ProxyFactory;
@@ -278,9 +274,8 @@ public final class NuxeoClientEmbedded {
     	return result;
     }
     
-	private Principal getSystemPrincipal() {
-		NuxeoPrincipal principal = new SystemPrincipal(null);
-		return principal;
+	private NuxeoPrincipal getSystemPrincipal() {
+        return new SystemPrincipal(null);
 	}
 
     /*
@@ -291,31 +286,30 @@ public final class NuxeoClientEmbedded {
      */
     private CoreSessionInterface getCoreSessionWrapper(Repository repository) {
     	CoreSessionInterface result = null;
-    	    	
+
     	CoreSession coreSession = null;
     	try {
-    		coreSession = CoreInstance.openCoreSession(repository.getName(), getSystemPrincipal());  // A Nuxeo repo instance handler proxy
+			// A Nuxeo repo instance handler proxy
+    		coreSession = CoreInstance.getCoreSession(repository.getName(), getSystemPrincipal());
     	} catch (Exception e) {
-    		logger.warn(String.format("Could not open a session to the '%s' repository.  The current request to the CollectionSpace services API will fail.",
-    				repository != null ? repository.getName() : "not specified"), e);
+    		logger.warn(
+                "Could not open a session to the '{}' repository.  The current request to the CollectionSpace services API will fail.",
+                repository != null ? repository.getName() : "not specified", e);
     	}
-    	
+
         if (coreSession != null) {
         	result = this.getAOPProxy(coreSession);  // This is our AOP proxy
         	if (result != null) {
 		    	String key = result.getSessionId();
 		        repositoryInstances.put(key, result);
         	} else {
-        		//
-        		// Since we couldn't get an AOP proxy, we need to close the core session.
-        		//
-        		CoreInstance.closeCoreSession(coreSession);
-        		String errMsg = String.format("Could not instantiate a Spring AOP proxy for class '%s'.",
-        				CoreSessionWrapper.class.getName());
-        		logger.error(errMsg);
+        		// This is now a no-op and probably isn't necessary
+        		coreSession.close();
+        		logger.error("Could not instantiate a Spring AOP proxy for class '{}'.",
+							 CoreSessionWrapper.class.getName());
         	}
         }
-    	
+
     	return result;
     }
 

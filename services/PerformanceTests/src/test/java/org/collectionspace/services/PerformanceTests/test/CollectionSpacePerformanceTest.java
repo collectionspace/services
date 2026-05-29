@@ -28,12 +28,9 @@ package org.collectionspace.services.PerformanceTests.test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.TitleGroup;
@@ -194,38 +191,7 @@ public abstract class CollectionSpacePerformanceTest {
 //		System.out.println(msg);
 	}
 
-	/**
-	 * Verbose.
-	 * 
-	 * @param msg the msg
-	 * @param o the o
-	 * @param clazz the clazz
-	 */
-	void verbose(String msg, Object o, Class clazz) {
-		try {
-			verbose(msg);
-			JAXBContext jc = JAXBContext.newInstance(clazz);
-			Marshaller m = jc.createMarshaller();
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			m.marshal(o, System.out);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Verbose map.
-	 * 
-	 * @param map the map
-	 */
-	void verboseMap(MultivaluedMap map) {
-		for (Object entry : map.entrySet()) {
-			MultivaluedMap.Entry mentry = (MultivaluedMap.Entry) entry;
-			verbose("  name=" + mentry.getKey() + " value=" + mentry.getValue());
-		}
-	}
-
-        boolean isEnabled() {
+	boolean isEnabled() {
             return Boolean.getBoolean("cspace.perf");
         }
 

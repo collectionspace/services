@@ -15,7 +15,7 @@ import org.collectionspace.services.config.service.ServiceObjectType;
 import org.collectionspace.services.config.types.PropertyItemType;
 import org.collectionspace.services.config.types.PropertyType;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 import java.lang.IndexOutOfBoundsException;
@@ -218,7 +218,7 @@ public class ServiceBindingUtils {
 			logger.trace("SBUtils.getMappedField caught OOB exc, for Prop: "
 					+ propName + " in: " + docModel.getDocumentType().getName()
 					+ " csid: " + NuxeoUtils.getCsid(docModel));
-		} catch (ClientException ce) {
+		} catch (NuxeoException ce) {
 			throw new RuntimeException(
 					"getMappedFieldInDoc: Problem fetching: " + propName
 							+ " logicalfieldName: " + logicalFieldName

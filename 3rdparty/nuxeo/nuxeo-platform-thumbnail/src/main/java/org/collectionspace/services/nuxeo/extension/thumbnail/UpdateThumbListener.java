@@ -7,7 +7,7 @@ import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerIm
 import org.collectionspace.services.nuxeo.util.ThumbnailConstants;
 
 import org.nuxeo.ecm.core.api.Blob;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.blobholder.BlobHolder;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -25,7 +25,7 @@ public class UpdateThumbListener extends AbstractCSEventSyncListenerImpl {
         return ec instanceof DocumentEventContext;
     }
     
-    public void handleCSEvent(Event event) throws ClientException {
+    public void handleCSEvent(Event event) throws NuxeoException {
         EventContext ec = event.getContext();
         if (ec instanceof DocumentEventContext) {
             DocumentEventContext context = (DocumentEventContext) ec;

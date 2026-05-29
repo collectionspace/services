@@ -21,7 +21,7 @@ package org.collectionspace.ecm.platform.quote.api;
 
 import java.util.List;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -31,10 +31,10 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 public interface QuoteManager {
 
     List<DocumentModel> getQuotes(DocumentModel docModel)
-            throws ClientException;
+            throws NuxeoException;
 
     List<DocumentModel> getQuotes(DocumentModel docModel, DocumentModel parent)
-            throws ClientException;
+            throws NuxeoException;
 
     /**
      * @deprecated CommentManager cannot find the author if invoked remotely so
@@ -42,7 +42,7 @@ public interface QuoteManager {
      */
     @Deprecated
     DocumentModel createQuote(DocumentModel docModel, String quote)
-            throws ClientException;
+            throws NuxeoException;
 
     /**
      * Creates a comment document model, filling its properties with given info
@@ -52,29 +52,29 @@ public interface QuoteManager {
      * @param comment the comment content
      * @param author the comment author
      * @return the comment document model.
-     * @throws ClientException
+     * @throws NuxeoException
      */
     DocumentModel createQuote(DocumentModel docModel, String comment,
-            String author) throws ClientException;
+            String author) throws NuxeoException;
 
     DocumentModel createQuote(DocumentModel docModel, DocumentModel comment)
-            throws ClientException;
+            throws NuxeoException;
 
     DocumentModel createQuote(DocumentModel docModel, DocumentModel parent,
-            DocumentModel child) throws ClientException;
+            DocumentModel child) throws NuxeoException;
 
     void deleteQuote(DocumentModel docModel, DocumentModel comment)
-            throws ClientException;
+            throws NuxeoException;
 
     /**
      * Gets documents in relation with a particular comment.
      *
      * @param quote the comment
      * @return the list of documents
-     * @throws ClientException
+     * @throws NuxeoException
      */
     List<DocumentModel> getDocumentsForQuote(DocumentModel quote)
-            throws ClientException;
+            throws NuxeoException;
 
     /**
      * Creates a comment document model. It gives opportunity to save the comments in a
@@ -84,9 +84,9 @@ public interface QuoteManager {
      * @param quote the comment content
      * @param path the location path
      * @return the comment document model.
-     * @throws ClientException
+     * @throws NuxeoException
      */
     DocumentModel createLocatedQuote(DocumentModel docModel,
-            DocumentModel quote, String path) throws ClientException;
+            DocumentModel quote, String path) throws NuxeoException;
 
 }

@@ -12,10 +12,6 @@
     <name>services.jaxrs.provider</name>
     <packaging>war</packaging>
 
-    <properties>
-        <cs.release>0.5</cs.release>
-    </properties>
-
     <dependencies>
     	<dependency>
     		<groupId>commons-collections</groupId>
@@ -54,7 +50,11 @@
   		</dependency>
 
 		<!-- CollectionSpace dependencies -->
-
+    <dependency>
+      <groupId>org.collectionspace.services</groupId>
+      <artifactId>common-http</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 		<dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.authorization.service</artifactId>
@@ -483,17 +483,7 @@
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <exclusions>
-            	<exclusion>
-            		<artifactId>jaxb-impl</artifactId>
-            		<groupId>com.sun.xml.bind</groupId>
-            	</exclusion>
-            </exclusions>
+            <artifactId>resteasy-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -689,7 +679,7 @@
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
             <artifactId>nuxeo-core-query</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.ecm.core</groupId>
@@ -714,14 +704,9 @@
 			<artifactId>nuxeo-runtime-datasource</artifactId>
         </dependency>
         <dependency>
-			<groupId>org.nuxeo.ecm.platform</groupId>
-			<artifactId>nuxeo-platform-usermanager-api</artifactId>
-			<version>${nuxeo.core.version}</version>
-        </dependency>
-        <dependency>
     		<groupId>org.nuxeo.ecm.platform</groupId>
           	<artifactId>nuxeo-platform-commandline-executor</artifactId>
-            <version>${nuxeo.core.version}</version>
+            <version>${nuxeo.general.release}</version>
             <scope>provided</scope>
             <exclusions>
             	<exclusion>
@@ -733,27 +718,27 @@
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-login</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
-			<version>${nuxeo.platform.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-audit-api</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <dependency>
             <groupId>org.nuxeo.runtime</groupId>
             <artifactId>nuxeo-runtime-osgi</artifactId>
-			<version>${nuxeo.core.version}</version>
+			<version>${nuxeo.general.release}</version>
         </dependency>
         <!-- Needed by nuxeo-core and nuxeo-platform-imaging-core, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
         <dependency>
@@ -946,7 +931,7 @@
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
                             <Package>${project.groupId}</Package>
-                            <Release>${cs.release}</Release>
+                            <Release>${project.version</Release>
                         </manifestEntries>
                     </archive>
                 </configuration>

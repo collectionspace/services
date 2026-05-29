@@ -14,14 +14,8 @@
 
     <dependencies>
 
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jaxb2-commons</groupId>
-            <artifactId>property-listener-injector</artifactId>
-        </dependency>
+        
+        
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
@@ -35,10 +29,7 @@
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.jvnet.hyperjaxb3</groupId>
-            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-        </dependency>
+        
         <dependency>
 			<groupId>org.collectionspace.services</groupId>
 			<artifactId>org.collectionspace.services.jaxb</artifactId>
@@ -55,11 +46,12 @@
         <finalName>collectionspace-services-authorization-mgt-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
         <plugins>
+<!--
             <plugin>
-                <!-- maven-hyperjaxb3-plugin generates jaxb + jpa bindings -->
-                <groupId>org.jvnet.hyperjaxb3</groupId>
-                <artifactId>maven-hyperjaxb3-plugin</artifactId>
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>hyperjaxb3-ejb-plugin</artifactId>
             </plugin>
+ -->
         </plugins>
     </build>
 

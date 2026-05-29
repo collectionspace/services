@@ -118,7 +118,7 @@ public class AuthorizationStore {
             //by the caller
             em.getTransaction().begin();
             if (JaxbUtils.getValue(entity, "getCreatedAt") == null) {
-                JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+                JaxbUtils.setValue(entity, "setCreatedAt", Date.class, new Date());
             }
             em.persist(entity);
             em.getTransaction().commit();
@@ -201,7 +201,7 @@ public class AuthorizationStore {
     	}
     	 */
         if (JaxbUtils.getValue(entity, "getCreatedAt") == null) {
-            JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+            JaxbUtils.setValue(entity, "setCreatedAt", Date.class, new Date());
         }
         
         if (entityExists == true) {

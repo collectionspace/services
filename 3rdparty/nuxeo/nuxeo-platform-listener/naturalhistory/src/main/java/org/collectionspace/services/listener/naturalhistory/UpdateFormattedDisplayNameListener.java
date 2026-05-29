@@ -114,7 +114,7 @@ public class UpdateFormattedDisplayNameListener extends AbstractCSEventSyncListe
 	}
 
 	/*
-	private Set<String> getDisplayNames(DocumentModel doc) throws ClientException {
+	private Set<String> getDisplayNames(DocumentModel doc) throws NuxeoException {
 		Set<String> displayNames = new HashSet<String>();
 		List<Map<String, Object>> termGroupList = (List<Map<String, Object>>) doc.getProperty(TaxonConstants.DISPLAY_NAME_SCHEMA_NAME, TERM_GROUP_LIST_FIELD_NAME);
 

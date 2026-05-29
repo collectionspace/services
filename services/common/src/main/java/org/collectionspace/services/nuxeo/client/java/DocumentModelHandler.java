@@ -54,10 +54,10 @@ import org.collectionspace.services.common.repository.RepositoryClientFactory;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.AuthRefConfigInfo;
 import org.collectionspace.services.common.vocabulary.RefNameServiceUtils.Specifier;
 import org.collectionspace.services.lifecycle.Lifecycle;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,7 +264,7 @@ public abstract class DocumentModelHandler<T, TL>
 	}
 
     private void handleCoreValues(DocumentWrapper<DocumentModel> docWrapper, 
-    		Action action)  throws ClientException {
+    		Action action)  throws NuxeoException {
     	DocumentModel documentModel = docWrapper.getWrappedObject();
         String now = GregorianCalendarDateTimeUtils.timestampUTC();
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
@@ -352,7 +352,7 @@ public abstract class DocumentModelHandler<T, TL>
     	return result;
     }
     
-    protected void handleRefNameChanges(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws ClientException {
+    protected void handleRefNameChanges(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws NuxeoException {
     	// First get the old refName
     	this.oldRefNameOnUpdate = (String)docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
             		CollectionSpaceClient.COLLECTIONSPACE_CORE_REFNAME);

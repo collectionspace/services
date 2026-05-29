@@ -7,8 +7,8 @@ import static org.collectionspace.services.client.CollectionSpaceClient.PART_COM
 import static org.collectionspace.services.client.CollectionSpaceClient.PART_LABEL_SEPARATOR;
 
 import java.util.Map;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.MediaJAXBSchema;
 import org.collectionspace.services.advancedsearch.AdvancedsearchCommonList.AdvancedsearchListItem;

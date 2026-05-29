@@ -19,7 +19,7 @@
 		<dependency>
 		  <groupId>org.nuxeo.ecm.core</groupId>
 		  <artifactId>nuxeo-core-api</artifactId>
-		  <version>${nuxeo.core.version}</version>
+		  <version>${nuxeo.general.release}</version>
 		</dependency>
 	</dependencies>
 

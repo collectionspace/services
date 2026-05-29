@@ -13,6 +13,11 @@
 
     <dependencies>
 <!-- CollectionSpace dependencies -->
+      <dependency>
+        <groupId>org.collectionspace.services</groupId>
+        <artifactId>common-http</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -53,11 +58,7 @@
   		</dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
+            <artifactId>resteasy-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -78,12 +79,7 @@
             <version>1.0.01</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-		    <groupId>com.sun.xml.bind</groupId>
-		    <artifactId>jaxb-core</artifactId>
-		    <type>jar</type>
-		    <scope>compile</scope>
-		</dependency>
+        
         <dependency>
             <groupId>org.dom4j</groupId>
             <artifactId>dom4j</artifactId>
