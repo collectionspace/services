@@ -17,6 +17,7 @@ import org.collectionspace.services.advancedsearch.model.AgentModel;
 import org.collectionspace.services.advancedsearch.model.BriefDescriptionListModel;
 import org.collectionspace.services.advancedsearch.model.ContentConceptListModel;
 import org.collectionspace.services.advancedsearch.model.FieldCollectionModel;
+import org.collectionspace.services.advancedsearch.model.HomeLocationListModel;
 import org.collectionspace.services.advancedsearch.model.MaterialModel;
 import org.collectionspace.services.advancedsearch.model.NAGPRACategoryModel;
 import org.collectionspace.services.advancedsearch.model.ObjectNameListModel;
@@ -111,6 +112,7 @@ public class CollectionObjectMapper {
             item.setBriefDescription(BriefDescriptionListModel.briefDescriptionListToDisplayString(
                     collectionObject.getBriefDescriptions()));
             item.setComputedCurrentLocation(collectionObject.getComputedCurrentLocation());
+            item.setHomeLocations(HomeLocationListModel.homeLocationList(collectionObject));
 
             item.setTitle(TitleGroupListModel.titleGroupListToDisplayString(collectionObject.getTitleGroupList()));
             item.setResponsibleDepartment(
