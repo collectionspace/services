@@ -1,5 +1,11 @@
 # CollectionSpace Services Changelog
 
+## 8.3.2
+
+### Bug Fixes
+
+* Fix Nuxeo embedded server failing to start (ZipException / missing hibernate-core) by pointing the nuxeo-server module at the cspace S3 Maven mirror instead of the legacy maven-eu.nuxeo.org repo
+
 ## 8.3.0
 
 * Add new endpoint for returning search results
