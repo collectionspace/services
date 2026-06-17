@@ -192,7 +192,7 @@ public class SecurityConfig {
 		if (relyingPartyRegistrationRepository != null && this.samlCorsConfigurations == null) {
 			// Automatically add SAML providers as allowed origins for SAML response endpoints.
 
-			this.samlCorsConfigurations = samlCorsConfigurations(relyingPartyRegistrationRepository, allowedOrigins, maxAge);
+			this.samlCorsConfigurations = samlCorsConfigurations(relyingPartyRegistrationRepository, maxAge);
 		}
 	}
 
@@ -254,7 +254,6 @@ public class SecurityConfig {
 	 */
 	private Map<String, CorsConfiguration> samlCorsConfigurations(
 		RelyingPartyRegistrationRepository relyingPartyRegistrationRepository,
-		List<String> allowedOrigins,
 		Duration maxAge)
 	{
 		ServiceConfig serviceConfig = ServiceMain.getInstance().getServiceConfig();
@@ -262,8 +261,6 @@ public class SecurityConfig {
 		Map<String, CorsConfiguration> corsConfigurations = new LinkedHashMap<>();
 
 		if (relyingPartiesConfig != null) {
-			List<String> providerOrigins = new ArrayList<>();
-
 			for (final SAMLRelyingPartyType relyingPartyConfig : relyingPartiesConfig) {
 				String id = relyingPartyConfig.getId();
 				RelyingPartyRegistration registration = relyingPartyRegistrationRepository.findByRegistrationId(id);
@@ -282,20 +279,16 @@ public class SecurityConfig {
 				if (providerUrl != null) {
 					CorsConfiguration configuration = new CorsConfiguration();
 					String responseUrl = "/login/saml2/sso/" + id;
-					String providerOrigin = providerUrl.getProtocol() + "://" + providerUrl.getAuthority();
 
-					providerOrigins.add(providerOrigin);
-
-					configuration.setAllowedOrigins(allowedOrigins);
-					configuration.addAllowedOrigin(providerOrigin);
+					// allow all origins for the sso login in order to let the idp control the cors settings
+					// and send a different origin if it is configured to
+					configuration.addAllowedOrigin("*");
 
 					if (maxAge != null) {
 						configuration.setMaxAge(maxAge);
 					}
 
-					configuration.setAllowedMethods(Arrays.asList(
-						HttpMethod.POST.toString()
-					));
+					configuration.setAllowedMethods(Arrays.asList(HttpMethod.POST.toString()));
 
 					corsConfigurations.put(responseUrl, configuration);
 				}
@@ -305,19 +298,14 @@ public class SecurityConfig {
 					CorsConfiguration configuration = new CorsConfiguration();
 					String responseUrl = "/logout/saml2/slo";
 
-					configuration.setAllowedOrigins(allowedOrigins);
-
-					for (String providerOrigin : providerOrigins) {
-						configuration.addAllowedOrigin(providerOrigin);
-					}
+					// same as for login
+					configuration.addAllowedOrigin("*");
 
 					if (maxAge != null) {
 						configuration.setMaxAge(maxAge);
 					}
 
-					configuration.setAllowedMethods(Arrays.asList(
-						HttpMethod.POST.toString()
-					));
+					configuration.setAllowedMethods(Arrays.asList(HttpMethod.POST.toString()));
 
 					corsConfigurations.put(responseUrl, configuration);
 			}
