@@ -4,7 +4,12 @@
 
 ### Bug Fixes
 
-* Fix Nuxeo embedded server failing to start (ZipException / missing hibernate-core) by pointing the nuxeo-server module at the cspace S3 Maven mirror instead of the legacy maven-eu.nuxeo.org repo
+* Fix Nuxeo embedded server failing to start (ZipException / missing hibernate-core) by pointing the nuxeo-server module at the cspace S3 Maven mirror instead of the legacy maven-eu.nuxeo.org repo.
+
+## 8.3.1
+
+### Security
+* Disable Doctype declaration on XML preventing external entities from being loaded.
 
 ## 8.3.0
 
