@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="org.nuxeo.mail.override">
+  <require>org.nuxeo.mail.MailServiceComponent</require>
+
+  <!-- Add the default java Mail JNDI Name to prevent startup errors -->
+  <extension
+    target="org.nuxeo.ecm.platform.ec.notification.service.NotificationService"
+    point="generalSettings">
+    <settings>
+      <mailSessionJndiName>java:comp/env/Mail</mailSessionJndiName>
+    </settings>
+  </extension>
+
+  <extension target="org.nuxeo.mail.MailServiceComponent" point="senders">
+    <sender class="org.nuxeo.mail.SMTPMailSender" name="default">
+      <property name="mail.from">noreply@collectionspace.org</property>
+    </sender>
+  </extension>
+</component>
+
