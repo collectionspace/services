@@ -1,5 +1,8 @@
 # CollectionSpace Services Changelog
 
+## 9.0.0
+* Add home location to collectionobject schema and advanced search
+
 ## 8.3.0
 
 * Add new endpoint for returning search results

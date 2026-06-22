@@ -49,6 +49,7 @@
                 <xs:element name="titleGroupList" type="titleGroupList"/>
                 <xs:element name="recordStatus" type="xs:string"/>
                 <xs:element name="computedCurrentLocation" type="xs:string"/>
+                <xs:element name="homeLocationGroupList" type="homeLocationGroupList"/>
 
                 <!-- Object Description Information -->
                 <xs:element name="age" type="xs:integer"/>
@@ -460,6 +461,19 @@
     <xs:complexType name="formList">
         <xs:sequence>
             <xs:element name="form" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="homeLocationGroupList">
+        <xs:sequence>
+            <xs:element name="homeLocationGroup" type="homeLocationGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="homeLocationGroup">
+        <xs:sequence>
+            <xs:element name="homeLocation" type="xs:string"/>
+            <xs:element name="homeLocationNote" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
