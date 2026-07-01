@@ -51,6 +51,7 @@
 			<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="passwordComplexityConfig" type="PasswordComplexityConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="uiConfig" type="UIConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchDocumentWriter" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
@@ -121,6 +122,92 @@
 			<xs:element name="from" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="smtpConfig" type="SMTPConfig" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="passwordResetConfig" type="PasswordResetConfig" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="PasswordComplexityConfig">
+		<!-- Example:
+			<tenant:passwordComplexity>
+				<tenant:allowWhitespace>false</tenant:allowWhitespace>
+				<tenant:minLength>6</tenant:minLength>
+				<tenant:characterRules/>
+				<tenant:characterClassRules/>
+				<tenant:illegalSequences/>
+			</tenant:passwordComplexity>
+		-->
+		<xs:annotation>
+			<xs:documentation>Configuration for how password restriction in a tenant</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="enabled" type="xs:boolean" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="minLength" type="xs:int" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="allowWhitespace" type="xs:boolean" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="characterRules" type="CharacterRules" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="characterClassRules" type="CharacterClassRules" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="illegalSequences" type="IllegalSequences" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="CharacterRules">
+		<!-- Example:
+			<tenant:characterRules>
+				<tenant:minLowerCase>1</tenant:minLowerCase>
+				<tenant:minUpperCase>1</tenant:minUpperCase>
+				<tenant:minDigits>1</tenant:minDigits>
+				<tenant:minSpecial>1</tenant:minSpecial>
+			</tenant:characterRules>
+		-->
+		<xs:annotation>
+			<xs:documentation>Config for specific character constraints, e.g. 1 lower case letter</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="minLowerCase" type="xs:int" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="minUpperCase" type="xs:int" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="minDigits" type="xs:int" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="minSpecial" type="xs:int" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="CharacterClassRules">
+		<!-- Example:
+			<tenant:characterClassRules>
+				<tenant:minClassesRequired>3</tenant:minClassesRequired>
+				<tenant:classesRequired>lowercase,uppercase,digit,special</tenant:classesRequired>
+			</tenant:characterClassRules>
+		-->
+		<xs:annotation>
+			<xs:documentation>Config for required character classes</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="minClassesRequired" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="classesRequired" type="xs:string" minOccurs="1" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IllegalSequences">
+		<!-- Example:
+			<tenant:illegalSequences/>
+				<tenant:illegalSequence/>
+			</tenant:illegalSequences>
+		-->
+		<xs:sequence>
+			<xs:element name="illegalSequence" type="IllegalSequence" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IllegalSequence">
+		<!-- Example:
+			<tenant:illegalSequence>
+				<tenant:characterClass>alphabetical</tenant:characterClass>
+				<tenant:length>5</tenant:length>
+			</tenant:illegalSequence>
+		-->
+		<xs:annotation>
+			<xs:documentation>Config for illegal sequences of characters</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="length" type="xs:int" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="characterClass" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 

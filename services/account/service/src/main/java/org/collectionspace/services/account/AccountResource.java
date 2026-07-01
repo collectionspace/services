@@ -48,24 +48,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.core.ParseException;
 import freemarker.template.Configuration;
-import freemarker.template.MalformedTemplateNameException;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
 import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
+import org.collectionspace.services.account.validator.ValidationResult;
 import org.collectionspace.services.authentication.Passwordreset;
 import org.collectionspace.services.authentication.Token;
 import org.collectionspace.services.authorization.AccountPermission;
@@ -172,7 +169,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     private UriInfo createUriInfo(String queryString) throws URISyntaxException {
         URI absolutePath = new URI("");
         URI baseUri = new URI("");
-        return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.<PathSegment>emptyList());
+        return new UriInfoImpl(absolutePath, baseUri, "", queryString, Collections.emptyList());
     }
 
     /**
@@ -216,7 +213,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     		AccountRole accountRole = getAccountRole(accountCsid);
     		if (accountRole != null && accountRole.getRole() != null) {
     			List<RoleValue> roleValueList = accountRole.getRole();
-    			if (roleValueList.isEmpty() == false) {
+    			if (!roleValueList.isEmpty()) {
     				result = new ArrayList<String>();
     				for (RoleValue roleValue: roleValueList) {
     					if (roleValue != null) {
@@ -250,7 +247,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     @GET
     @Path(AccountClient.PROCESS_PASSWORD_RESET_PATH_COMPONENT)
     @Produces(MediaType.TEXT_HTML)
-    public String processPasswordResetForm(@Context HttpServletRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+    public String processPasswordResetForm(@Context HttpServletRequest request) throws
+        IOException, TemplateException {
         String tokenId = request.getParameter(AccountClient.PASSWORD_RESET_TOKEN_QP);
         Token token = null;
 
@@ -324,7 +322,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
      */
     @POST
     @Path(AccountClient.PROCESS_PASSWORD_RESET_PATH_COMPONENT)
-    synchronized public Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) {
+    public synchronized Response processPasswordReset(Passwordreset passwordreset, @Context UriInfo ui) {
     	Response response = null;
 
     	//
@@ -338,15 +336,19 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         //
         String tokenId = passwordreset.getToken();
         if (tokenId == null || tokenId.trim().isEmpty()) {
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(
-        			"The query parameter 'token' is missing or contains no value.").type("text/plain").build();
+        	response = Response.status(Response.Status.BAD_REQUEST)
+                               .entity("The query parameter 'token' is missing or contains no value.")
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
         	return response;
         }
 
         String base64EncodedPassword = passwordreset.getPassword();
         if (base64EncodedPassword == null || base64EncodedPassword.trim().isEmpty()) {
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(
-        			"The query parameter 'password' is missing or contains no value.").type("text/plain").build();
+        	response = Response.status(Response.Status.BAD_REQUEST)
+                               .entity("The query parameter 'password' is missing or contains no value.")
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
         	return response;
         }
         String password = new String(DatatypeConverter.parseBase64Binary(base64EncodedPassword), StandardCharsets.UTF_8);
@@ -357,13 +359,15 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         Token token;
 		try {
 			token = TokenStorageClient.get(tokenId);
-			if (token != null && token.isEnabled() == false) {
+			if (token != null && !token.isEnabled()) {
 				throw new DocumentNotFoundException();
 			}
 		} catch (DocumentNotFoundException e1) {
-    		String errMsg = String.format("The token '%s' is not valid or does not exist.",
-    				tokenId);
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+    		String errMsg = String.format("The token '%s' is not valid or does not exist.", tokenId);
+        	response = Response.status(Response.Status.BAD_REQUEST)
+                               .entity(errMsg)
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
         	return response;
 		}
 
@@ -371,9 +375,11 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 		// Make sure the token is not null
 		//
         if (token == null) {
-    		String errMsg = String.format("The token '%s' is not valid.",
-    				tokenId);
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+    		String errMsg = String.format("The token '%s' is not valid.", tokenId);
+        	response = Response.status(Response.Status.BAD_REQUEST)
+                               .entity(errMsg)
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
         	return response;
         }
 
@@ -385,21 +391,41 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         if (targetAccount == null) {
     		String errMsg = String.format("The token '%s' is not valid.  The account it was created for no longer exists.",
     				tokenId);
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+        	response = Response.status(Response.Status.BAD_REQUEST)
+                               .entity(errMsg)
+                               .type(MediaType.TEXT_PLAIN)
+                               .build();
         	return response;
         }
+
+        final String tenantId = token.getTenantId();
+        TenantBindingType tenantBindingType = ServiceMain.getInstance()
+                                                         .getTenantBindingConfigReader()
+                                                         .getTenantBinding(tenantId);
+
+        // Validate that the password meets any complexity requirements
+        final ValidationResult validationResult =
+            CSpacePasswordValidator.validatePasswordForTenant(tenantBindingType, password);
+
+        if (!validationResult.isValid()) {
+            StringBuilder error = new StringBuilder("The password does not meet complexity requirements: ");
+            validationResult.errors().forEach(errorCode -> error.append(errorCode).append("\n"));
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity(error.toString())
+                .type(MediaType.TEXT_PLAIN)
+                .build();
+        }
+
         //
         // Finally, try to update the account with the new password.
         //
-        String tenantId = token.getTenantId();
-    	TenantBindingType tenantBindingType = ServiceMain.getInstance().getTenantBindingConfigReader().getTenantBinding(tenantId);
     	EmailConfig emailConfig = tenantBindingType.getEmailConfig();
     	if (emailConfig != null) {
     		try {
-	    		ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, ui);
+	    		ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(null, AccountsCommon.class, ui);
 	            TransactionContext transactionCtx = ctx.openConnection();
 	    		try {
-					if (AuthorizationCommon.hasTokenExpired(emailConfig, token) == false) {
+					if (!AuthorizationCommon.hasTokenExpired(emailConfig, token)) {
 						transactionCtx.beginTransaction();
 						AccountsCommon accountUpdate = new AccountsCommon();
 						accountUpdate.setUserId(targetAccount.getUserId());
@@ -411,30 +437,32 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 						// Success!
 						//
 						String msg = String.format("Successfully reset password using token ID='%s'.", token.getId());
-			        	response = Response.status(Response.Status.OK).entity(msg).type("text/plain").build();
+			        	response = Response.status(Response.Status.OK).entity(msg).type(MediaType.TEXT_PLAIN).build();
 			        } else {
 			        	String errMsg = String.format("Could not reset password using token with ID='%s'. Password reset token has expired.",
 								token.getId());
-			        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
+			        	response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type(MediaType.TEXT_PLAIN).build();
 			        }
 				} catch (Throwable t) {
 					transactionCtx.markForRollback();
 					transactionCtx.close(); // https://jira.ets.berkeley.edu/jira/browse/CC-241
-					String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
-							t.getMessage(), token.getId());
-		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+					String errMsg = String.format(
+                        "Could not reset password using token ID='%s'. Error: '%s'",
+                        t.getMessage(),
+                        token.getId());
+		        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type(MediaType.TEXT_PLAIN).build();
 				} finally {
 					ctx.closeConnection();
 				}
     		} catch (Exception e) {
 				String errMsg = String.format("Could not reset password using token ID='%s'. Error: '%s'",
 						e.getMessage(), token.getId());
-	        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+	        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type(MediaType.TEXT_PLAIN).build();
 			}
     	} else {
     		String errMsg = String.format("The email configuration for tenant ID='%s' is missing.  Please ask your CollectionSpace administrator to check the configuration.",
     				tenantId);
-        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type("text/plain").build();
+        	response = Response.status(Response.Status.BAD_REQUEST).entity(errMsg).type(MediaType.TEXT_PLAIN).build();
     	}
 
     	return response;
@@ -443,7 +471,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     @GET
     @Path(AccountClient.PASSWORD_RESET_PATH_COMPONENT)
     @Produces(MediaType.TEXT_HTML)
-    public String requestPasswordResetForm(@Context HttpServletRequest request) throws TemplateNotFoundException, MalformedTemplateNameException, ParseException, IOException, TemplateException {
+    public String requestPasswordResetForm(@Context HttpServletRequest request) throws IOException, TemplateException {
         Map<String, Object> uiConfig = new HashMap<>();
 
         CsrfToken csrfToken = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
@@ -592,10 +620,13 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     private Response requestPasswordReset(UriInfo ui, String targetTenantID, AccountListItem accountListItem) throws Exception {
     	Response result = null;
 
-    	if (contains(targetTenantID, accountListItem.getTenants()) == false) {
+    	if (!contains(targetTenantID, accountListItem.getTenants())) {
 			String errMsg = String.format("Could not send a password request email to user ID='%s'.  That account is not associated with the targeted tenant ID = '%s'.",
 					accountListItem.getEmail(), targetTenantID);
-        	result = Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(errMsg).type("text/plain").build();
+        	result = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                             .entity(errMsg)
+                             .type(MediaType.TEXT_PLAIN)
+                             .build();
         	return result;
     	}
 
@@ -612,15 +643,12 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         	//
         	// Configuring (via config files) the base URL is not supported as of CSpace v5.0.  Log a warning if we find config for it.
         	//
-        	if (deprecatedConfigBaseUrl != null) {
-        		if (deprecatedConfigBaseUrl.equalsIgnoreCase(baseUrl) == false) {
-	        		String warnMsg = String.format("Ignoring deprecated 'baseurl' email config value '%s'.  Using '%s' instead.",
-	        				deprecatedConfigBaseUrl, baseUrl);
-	        		logger.warn(warnMsg);
-        		}
-        	}
+        	if (deprecatedConfigBaseUrl != null && !deprecatedConfigBaseUrl.equalsIgnoreCase(baseUrl)) {
+	        		logger.warn("Ignoring deprecated 'baseurl' email config value '{}'.  Using '{}' instead.",
+                                deprecatedConfigBaseUrl, baseUrl);
+            }
 
-        	Token token = TokenStorageClient.create(accountListItem.getCsid(), targetTenantID,
+            Token token = TokenStorageClient.create(accountListItem.getCsid(), targetTenantID,
         			emailConfig.getPasswordResetConfig().getTokenExpirationSeconds());
     		String message = AuthorizationCommon.generatePasswordResetEmailMessage(emailConfig, accountListItem, token);
     		String status = EmailUtil.sendMessage(emailConfig, accountListItem.getEmail(), message);
@@ -661,8 +689,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
             // We need to delete the account and the account/role relationships in a
             // single transaction
             //
-            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
-                    AccountsCommon.class, uriInfo);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(null,
+                                                                                      AccountsCommon.class, uriInfo);
             TransactionContext transactionContext = ctx.openConnection();
             try {
             	transactionContext.beginTransaction();
@@ -713,7 +741,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
                 return response;
             }
 
-            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, uriInfo);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(null, AccountsCommon.class, uriInfo);
             ctx.openConnection();
             try {
 	            AccountRoleSubResource subResource =
@@ -802,8 +830,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
                 return response;
             }
 
-            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null,
-                    AccountsCommon.class, (UriInfo) null);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(null,
+                                                                                      AccountsCommon.class, null);
             ctx.openConnection();
             try {
 	            AccountRoleSubResource subResource =
@@ -836,7 +864,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
                 return response;
             }
 
-            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext((AccountsCommon) null, AccountsCommon.class, uriInfo);
+            ServiceContext<AccountsCommon, AccountsCommon> ctx = createServiceContext(null, AccountsCommon.class, uriInfo);
             ctx.openConnection();
             try {
 	            AccountRoleSubResource subResource =
