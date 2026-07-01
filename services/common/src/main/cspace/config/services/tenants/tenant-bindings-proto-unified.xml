@@ -1201,6 +1201,7 @@
 							"collectionobjects_common:objectStatusList",
 							"collectionobjects_common:otherNumberList",
 							"collectionobjects_common:ownersContributionNote",
+							"collectionobjects_common:priorityImageList",
 							"collectionobjects_common:publishedRelatedLinkGroupList",
 							"collectionobjects_common:publishToList",
 							"collectionobjects_common:responsibleDepartments",
@@ -1416,6 +1417,35 @@
 						"collectionobjects_common:responsibleDepartments": {
 							"type": "keyword",
 							"copy_to": "all_field"
+						},
+						"collectionobjects_common:priorityImageList": {
+							"type": "keyword",
+							"copy_to": "all_field",
+							"fields": {
+								"displayName": {
+									"type": "keyword",
+									"normalizer": "refname_displayname_normalizer"
+								}
+							}
+						},
+						"collectionspace_denorm:priorityImageList": {
+							"type": "object",
+							"properties": {
+								"csid": {
+									"type": "keyword"
+								},
+								"blobCsid": {
+									"type": "keyword"
+								},
+								"title": {
+									"type": "text",
+									"copy_to": "all_field"
+								},
+								"altText": {
+									"type": "text",
+									"copy_to": "all_field"
+								}
+							}
 						},
 						"collectionobjects_common:contentConcepts": {
 							"type": "keyword",
