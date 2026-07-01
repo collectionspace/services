@@ -2,6 +2,7 @@
 
 ## 9.0.0
 * Add home location to collectionobject schema and advanced search
+* Denormalize priority image list
 
 ## 8.3.0
 
