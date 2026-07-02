@@ -17,7 +17,7 @@
   <repositories>
     <repository>
       <id>cspace-nuxeo-public-releases</id>
-      <url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/nuxeo/public-releases</url>
+      <url>https://cspace-maven.collectionspace.org/nuxeo/public-releases</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -25,7 +25,7 @@
 
     <repository>
       <id>cspace-nuxeo-vendor-releases</id>
-      <url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/nuxeo/vendor-releases</url>
+      <url>https://cspace-maven.collectionspace.org/nuxeo/vendor-releases</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

@@ -76,7 +76,7 @@
 		<!-- CSpace copy of nuxeo-public-releases repo. -->
 		<repository>
 			<id>cspace-nuxeo-public-releases</id>
-			<url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/nuxeo/public-releases</url>
+			<url>https://cspace-maven.collectionspace.org/nuxeo/public-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -85,7 +85,7 @@
 		<!-- CSpace copy of nuxeo-vendor-releases repo. -->
 		<repository>
 			<id>cspace-nuxeo-vendor-releases</id>
-			<url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/nuxeo/vendor-releases</url>
+			<url>https://cspace-maven.collectionspace.org/nuxeo/vendor-releases</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -94,7 +94,7 @@
 		<repository>
 			<id>cspace-libs-release-local</id>
 			<name>cspace-libs-release-local</name>
-			<url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/libs-release-local</url>
+			<url>https://cspace-maven.collectionspace.org/libs-release-local</url>
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
@@ -102,7 +102,7 @@
 		<repository>
 			<id>cspace-libs-snapshot-local</id>
 			<name>cspace-libs-snapshot-local</name>
-			<url>https://cspace-program-production-cdn-cspace-maven.s3-us-west-2.amazonaws.com/libs-snapshot-local</url>
+			<url>https://cspace-maven.collectionspace.org/libs-snapshot-local</url>
 			<releases>
 				<enabled>false</enabled>
 			</releases>
