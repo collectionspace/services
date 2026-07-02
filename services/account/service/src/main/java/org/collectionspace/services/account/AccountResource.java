@@ -92,6 +92,7 @@ import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.collectionspace.services.config.ServiceConfig;
 import org.collectionspace.services.config.tenant.EmailConfig;
+import org.collectionspace.services.config.tenant.PasswordRequirementConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -164,8 +165,9 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     }
 
     @GET
+    @Produces("application/xml")
     @Path(AccountClient.PASSWORD_COMPLEXITY_PATH)
-    public Response getPasswordComplexity(@Context UriInfo uriInfo) {
+    public PasswordRequirementConfig getPasswordComplexity(@Context UriInfo uriInfo) {
         ServiceContext<AccountsCommon, AccountsCommon> ctx;
         try {
             ctx = createServiceContext(null, AccountsCommon.class, uriInfo);
@@ -175,12 +177,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
         final var tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
         final var tenantBinding = tenantBindingConfigReader.getTenantBinding(ctx.getTenantId());
-        final var passwordComplexityConfig = tenantBinding.getPasswordComplexityConfig();
-        if (passwordComplexityConfig != null) {
-            return Response.ok(passwordComplexityConfig, MediaType.APPLICATION_XML).build();
-        }
 
-        return Response.noContent().build();
+        return tenantBinding.getPasswordRequirementConfig();
     }
 
     protected UriInfo createUriInfo() throws URISyntaxException {
