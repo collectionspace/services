@@ -159,7 +159,7 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     	if(logger.isTraceEnabled()) {
         	PayloadOutputPart ppo = new PayloadOutputPart(AccountsCommonList.class.getSimpleName(),
         			result);
-    		System.out.println(ppo.asXML());
+    		logger.trace("{}", ppo.asXML());
     	}
     	return result;
     }
@@ -300,6 +300,18 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
         uiConfig.put("token", tokenId);
         uiConfig.put("tenantId", tenantId);
         uiConfig.put("tenantLoginUrl", ConfigUtils.getUILoginSuccessUrl(tenantBinding));
+
+        PasswordRequirementConfig passwordRequirementConfig = tenantBinding.getPasswordRequirementConfig();
+        if (passwordRequirementConfig != null && passwordRequirementConfig.isEnabled()) {
+            uiConfig.put("passwordRequirements", Map.of(
+                "minLength", passwordRequirementConfig.getMinLength(),
+                "requireLowerCase", passwordRequirementConfig.isRequireLowerCase(),
+                "requireUpperCase", passwordRequirementConfig.isRequireUpperCase(),
+                "requireDigit", passwordRequirementConfig.isRequireDigit(),
+                "requireSpecial", passwordRequirementConfig.isRequireSpecial()));
+        } else {
+            uiConfig.put("passwordRequirements", Map.of());
+        }
 
         String uiConfigJS;
 
