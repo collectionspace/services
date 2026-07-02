@@ -49,6 +49,7 @@ public class AccountClient extends AbstractServiceClientImpl<AccountsCommonList,
 	public static final String PASSWORD_RESET_TOKEN_QP = "token";
 	public static final String PASSWORD_RESET_PASSWORD_QP = "password";
 	public static final String INCLUDE_ROLES_QP = "showRoles";
+    public static final String PASSWORD_COMPLEXITY_PATH = "/passwordrequirements";
     public static final String PASSWORD_RESET_PATH_COMPONENT = "/requestpasswordreset";
     public static final String PASSWORD_RESET_PATH = SERVICE_PATH + PASSWORD_RESET_PATH_COMPONENT;
     public static final String PROCESS_PASSWORD_RESET_PATH_COMPONENT = "/processpasswordreset";

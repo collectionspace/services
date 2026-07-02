@@ -73,6 +73,7 @@ import org.collectionspace.services.authorization.SubjectType;
 import org.collectionspace.services.client.AccountClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.client.RoleClient;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.EmailUtil;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMain;
@@ -160,6 +161,26 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
     		System.out.println(ppo.asXML());
     	}
     	return result;
+    }
+
+    @GET
+    @Path(AccountClient.PASSWORD_COMPLEXITY_PATH)
+    public Response getPasswordComplexity(@Context UriInfo uriInfo) {
+        ServiceContext<AccountsCommon, AccountsCommon> ctx;
+        try {
+            ctx = createServiceContext(null, AccountsCommon.class, uriInfo);
+        } catch (Exception e) {
+            throw new CSWebApplicationException(e);
+        }
+
+        final var tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        final var tenantBinding = tenantBindingConfigReader.getTenantBinding(ctx.getTenantId());
+        final var passwordComplexityConfig = tenantBinding.getPasswordComplexityConfig();
+        if (passwordComplexityConfig != null) {
+            return Response.ok(passwordComplexityConfig, MediaType.APPLICATION_XML).build();
+        }
+
+        return Response.noContent().build();
     }
 
     protected UriInfo createUriInfo() throws URISyntaxException {
