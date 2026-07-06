@@ -27,8 +27,10 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.collectionspace.services.account.AccountsCommon;
+import org.collectionspace.services.account.CSpacePasswordValidator;
 import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
+import org.collectionspace.services.common.ServiceMain;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentException;
@@ -42,7 +44,6 @@ import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageClientImpl;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,19 +68,25 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             DocumentHandler handler) throws BadRequestException,
             DocumentException {
     	String result = null;
-    	
+
     	AccountsCommon account = null;
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();    	
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
         try {
             account = (AccountsCommon) handler.getCommonPart();
+            // Set a boolean here to indicate we need to validate password requirements because we want to skip
+            // when an account is being set up for sso and will have a generated password
+            boolean requiresValidation = account.getPassword() != null;
             handler.prepare(Action.CREATE);
-            DocumentWrapper<AccountsCommon> wrapDoc = new DocumentWrapperImpl<AccountsCommon>(account);
+            DocumentWrapper<AccountsCommon> wrapDoc = new DocumentWrapperImpl<>(account);
             handler.handle(Action.CREATE, wrapDoc);
             jpaConnectionContext.beginTransaction();
             //
             // If userid and password are given, add to default ID provider -i.e., add it to the Spring Security account list
             //
             if (account.getUserId() != null && isForCSpaceIdentityProvider(account.getPassword())) {
+                if (requiresValidation) {
+                    validatePasswordRequirements(ctx, new String(account.getPassword()));
+                }
                 User user = userStorageClient.create(account.getUserId(), account.getPassword());
 	            jpaConnectionContext.persist(user);
             }
@@ -87,7 +94,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             // Now add the account to the CSpace list of accounts
             //
             account.setCreatedAt(new Date());
-            jpaConnectionContext.persist(account);        	
+            jpaConnectionContext.persist(account);
             //
             // Finish creating related resources -e.g., account-role relationships
             //
@@ -164,10 +171,8 @@ public class AccountStorageClient extends JpaStorageClientImpl {
 
     @Override
     public void update(ServiceContext ctx, String id, DocumentHandler handler)
-            throws BadRequestException, DocumentNotFoundException,
-            DocumentException {
-
-    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();        
+            throws BadRequestException, DocumentException {
+    	JPATransactionContext jpaConnectionContext = (JPATransactionContext)ctx.openConnection();
         try {
             jpaConnectionContext.beginTransaction();
 
@@ -179,26 +184,37 @@ public class AccountStorageClient extends JpaStorageClientImpl {
             // Note that this ignores the immutable flag, as we allow
             // password changes.
             if (accountReceived.getUserId() != null && isForCSpaceIdentityProvider(accountReceived.getPassword())) {
+                validatePasswordRequirements(ctx, new String(accountReceived.getPassword()));
                 userStorageClient.update(jpaConnectionContext,
                         accountReceived.getUserId(),
                         accountReceived.getPassword());
             }
-            DocumentWrapper<AccountsCommon> wrapDoc =
-            		new DocumentWrapperImpl<AccountsCommon>(accountFound);
+            DocumentWrapper<AccountsCommon> wrapDoc = new DocumentWrapperImpl<>(accountFound);
             handler.handle(Action.UPDATE, wrapDoc);
             handler.complete(Action.UPDATE, wrapDoc); 
             jpaConnectionContext.commitTransaction();
-        } catch (BadRequestException bre) {
+        } catch (BadRequestException | DocumentException bre) {
         	jpaConnectionContext.markForRollback();
             throw bre;
-        } catch (DocumentException de) {
-        	jpaConnectionContext.markForRollback();
-            throw de;
         } catch (Exception e) {
         	jpaConnectionContext.markForRollback();
             throw new DocumentException(e);
         } finally {
             ctx.closeConnection();
+        }
+    }
+
+    private void validatePasswordRequirements(final ServiceContext ctx, String password) throws BadRequestException {
+        final var tenantId = ctx.getTenantId();
+        final var tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
+        final var tenantBinding = tenantBindingConfigReader.getTenantBinding(tenantId);
+
+        final var result = CSpacePasswordValidator.validatePasswordForTenant(tenantBinding, password);
+
+        if (!result.isValid()) {
+            StringBuilder error = new StringBuilder("The password does not meet complexity requirements: ");
+            result.errors().forEach(errorCode -> error.append(errorCode).append("\n"));
+            throw new BadRequestException(error.toString());
         }
     }
 
@@ -260,7 +276,7 @@ public class AccountStorageClient extends JpaStorageClientImpl {
     }
 
     /**
-     * isForCSIdP deteremines if the create/update is also needed for CS IdP
+     * isForCSIdP determines if the create/update is also needed for CS IdP
      * @param bpass
      * @return
      */
