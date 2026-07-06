@@ -27,7 +27,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import org.collectionspace.services.account.AccountsCommon;
-import org.collectionspace.services.account.CSpacePasswordValidator;
+import org.collectionspace.services.account.validator.CSpacePasswordValidator;
 import org.collectionspace.services.account.storage.csidp.UserStorageClient;
 import org.collectionspace.services.authentication.User;
 import org.collectionspace.services.common.ServiceMain;

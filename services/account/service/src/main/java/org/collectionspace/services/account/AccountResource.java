@@ -62,6 +62,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.account.storage.AccountStorageClient;
 import org.collectionspace.services.account.storage.csidp.TokenStorageClient;
+import org.collectionspace.services.account.validator.CSpacePasswordValidator;
 import org.collectionspace.services.account.validator.ValidationResult;
 import org.collectionspace.services.authentication.Passwordreset;
 import org.collectionspace.services.authentication.Token;

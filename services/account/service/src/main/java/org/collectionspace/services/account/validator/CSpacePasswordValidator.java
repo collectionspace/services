@@ -1,12 +1,8 @@
-package org.collectionspace.services.account;
+package org.collectionspace.services.account.validator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.collectionspace.services.account.validator.MinLengthValidator;
-import org.collectionspace.services.account.validator.PasswordValidator;
-import org.collectionspace.services.account.validator.RegexValidator;
-import org.collectionspace.services.account.validator.ValidationResult;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 
 /**

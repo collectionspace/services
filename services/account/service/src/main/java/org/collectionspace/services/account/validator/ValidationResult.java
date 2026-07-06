@@ -7,7 +7,7 @@ import java.util.List;
  * Result of a Password Validation. Success is inferred by checking that the errors tracked are empty. Multiple results
  * can be merged to form an aggregation of multiple validators (non-deduplicated).
  *
- * See {@link org.collectionspace.services.account.CSpacePasswordValidator} for usage and how multiple results are
+ * See {@link CSpacePasswordValidator} for usage and how multiple results are
  * aggregated.
  * @since 9.0.0
  */

@@ -1,12 +1,11 @@
-package org.collectionspace.services.account;
+package org.collectionspace.services.account.validator;
 
-import static org.collectionspace.services.account.CSpacePasswordValidator.validatePasswordForTenant;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.collectionspace.services.account.validator.CSpacePasswordValidator.validatePasswordForTenant;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
-import org.collectionspace.services.account.validator.ValidationErrorCode;
 import org.collectionspace.services.config.tenant.PasswordRequirementConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.testng.annotations.Test;
