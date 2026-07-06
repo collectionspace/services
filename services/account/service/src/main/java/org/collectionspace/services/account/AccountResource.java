@@ -167,8 +167,8 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
     @GET
     @Produces("application/xml")
-    @Path(AccountClient.PASSWORD_COMPLEXITY_PATH)
-    public PasswordRequirementConfig getPasswordComplexity(@Context UriInfo uriInfo) {
+    @Path(AccountClient.PASSWORD_REQUIREMENT_PATH)
+    public PasswordRequirementConfig getPasswordRequirementConfig(@Context UriInfo uriInfo) {
         ServiceContext<AccountsCommon, AccountsCommon> ctx;
         try {
             ctx = createServiceContext(null, AccountsCommon.class, uriInfo);
