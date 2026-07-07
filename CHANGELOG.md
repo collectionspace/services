@@ -2,6 +2,7 @@
 
 ## 9.0.0
 * Add home location to collectionobject schema and advanced search
+* Enable strict checksum verification so that builds fail on corrupted Maven artifact downloads
 
 ## 8.3.0
 
