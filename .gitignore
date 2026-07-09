@@ -24,4 +24,5 @@ bin
 *.diff
 logged_schemas
 logs
-.mvn
+.mvn/*
+!.mvn/maven.config
