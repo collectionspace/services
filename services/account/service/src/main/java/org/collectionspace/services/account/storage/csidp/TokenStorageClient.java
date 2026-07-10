@@ -36,11 +36,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 import org.collectionspace.services.authentication.Token;
-import org.collectionspace.services.common.document.BadRequestException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.document.TransactionException;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -179,15 +177,4 @@ public class TokenStorageClient {
         }
     }
 
-    private String getEncPassword(String userId, byte[] password) throws BadRequestException {
-        //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
-        //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
-        try {
-            SecurityUtils.validatePassword(new String(password));
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
-        String secEncPasswd = SecurityUtils.createPasswordHash(new String(password));
-        return secEncPasswd;
-    }
 }
