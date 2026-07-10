@@ -35,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -304,12 +306,16 @@ public class AccountResource extends SecurityResourceBase<AccountsCommon, Accoun
 
         PasswordRequirementConfig passwordRequirementConfig = tenantBinding.getPasswordRequirementConfig();
         if (passwordRequirementConfig != null && passwordRequirementConfig.isEnabled()) {
-            uiConfig.put("passwordRequirements", Map.of(
-                "minLength", passwordRequirementConfig.getMinLength(),
-                "requireLowerCase", passwordRequirementConfig.isRequireLowerCase(),
-                "requireUpperCase", passwordRequirementConfig.isRequireUpperCase(),
-                "requireDigit", passwordRequirementConfig.isRequireDigit(),
-                "requireSpecial", passwordRequirementConfig.isRequireSpecial()));
+            // build our requirements for the ui to use - most are primitive types except minLength
+            final HashMap<String, Object> requirements = new HashMap<>();
+            requirements.put("requireLowerCase", passwordRequirementConfig.isRequireLowerCase());
+            requirements.put("requireUpperCase", passwordRequirementConfig.isRequireUpperCase());
+            requirements.put("requireDigit", passwordRequirementConfig.isRequireDigit());
+            requirements.put("requireSpecial", passwordRequirementConfig.isRequireSpecial());
+            if (passwordRequirementConfig.getMinLength() != null) {
+                requirements.put("minLength", passwordRequirementConfig.getMinLength());
+            }
+            uiConfig.put("passwordRequirements", requirements);
         } else {
             uiConfig.put("passwordRequirements", Map.of());
         }
