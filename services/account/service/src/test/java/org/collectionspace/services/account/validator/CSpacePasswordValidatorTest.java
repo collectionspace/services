@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.util.List;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.collectionspace.services.config.tenant.PasswordRequirementConfig;
 import org.collectionspace.services.config.tenant.TenantBindingType;
 import org.testng.annotations.Test;
@@ -36,6 +37,22 @@ public class CSpacePasswordValidatorTest {
 
         assertTrue(validatePasswordForTenant(binding, LONG_PASS).isValid());
         runInvalidCheck(SHORT_PASS, List.of(ValidationErrorCode.ERR_TOO_SHORT), binding);
+    }
+
+    @Test
+    public void testMaxLength() {
+        final var binding = genBinding(true);
+
+        final var validAscii = RandomStringUtils.insecure().nextAscii(MaxLengthValidator.MAX_LENGTH);
+        final var invalidAscii = RandomStringUtils.insecure().nextAscii(MaxLengthValidator.MAX_LENGTH + 1);
+        assertTrue(validatePasswordForTenant(binding, validAscii).isValid());
+        runInvalidCheck(invalidAscii, List.of(ValidationErrorCode.ERR_TOO_LONG), binding);
+
+        // test Unicode passwords using a 4 byte character
+        int maxReps = (MaxLengthValidator.MAX_LENGTH / 4);
+        final var unicode = "\uD801\uDC5C";
+        assertTrue(validatePasswordForTenant(binding, unicode.repeat(maxReps)).isValid());
+        runInvalidCheck(unicode.repeat(maxReps + 1), List.of(ValidationErrorCode.ERR_TOO_LONG), binding);
     }
 
     @Test
@@ -93,7 +110,8 @@ public class CSpacePasswordValidatorTest {
 
         assertTrue(validatePasswordForTenant(binding, SPECIAL_PASS).isValid());
 
-        final var expected = List.of(ValidationErrorCode.ERR_MISSING_LOWERCASE, ValidationErrorCode.ERR_MISSING_SPECIAL);
+        final var expected = List.of(ValidationErrorCode.ERR_MISSING_LOWERCASE,
+                                     ValidationErrorCode.ERR_MISSING_SPECIAL);
         runInvalidCheck(UPPER_CASE_PASS, expected, binding);
         runInvalidCheck(DIGIT_PASS, expected, binding);
     }

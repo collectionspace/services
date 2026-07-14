@@ -28,6 +28,7 @@ public class CSpacePasswordValidator {
         final var config = binding.getPasswordRequirementConfig();
 
         final var validators = new ArrayList<PasswordValidator>();
+        validators.add(new MaxLengthValidator());
         if (config != null && config.isEnabled()) {
             final var minLength = config.getMinLength();
             if (minLength != null) {
