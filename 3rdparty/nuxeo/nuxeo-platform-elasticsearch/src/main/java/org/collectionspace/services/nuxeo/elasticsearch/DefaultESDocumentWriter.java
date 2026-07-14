@@ -59,7 +59,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormConceptFields(doc, denormValues);
 			denormMaterialFields(doc, denormValues);
 			denormObjectNameFields(doc, denormValues);
-			denormPriorityImageList(doc, session, tenantId, denormValues);
+			denormMediaPriorityList(doc, session, tenantId, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -212,7 +212,7 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 
 	/**
 	 * Denormalize the csid, blob csid, title, and alt text of each media record referenced by
-	 * the priorityImageList field of a collectionobject, so that the priority/sort
+	 * the mediaPriorityList field of a collectionobject, so that the priority/sort
 	 * order set by the user can be displayed and searched.
 	 *
 	 * @param doc the collectionobject document
@@ -220,17 +220,17 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 	 * @param tenantId the tenant id
 	 * @param denormValues the json node for denormalized fields
 	 */
-	private void denormPriorityImageList(DocumentModel doc, CoreSession session, String tenantId, ObjectNode denormValues) {
-		List<String> priorityImageList = (List<String>) doc.getProperty("collectionobjects_common", "priorityImageList");
-		List<JsonNode> priorityImages = new ArrayList<>();
+	private void denormMediaPriorityList(DocumentModel doc, CoreSession session, String tenantId, ObjectNode denormValues) {
+		List<String> mediaPriorityList = (List<String>) doc.getProperty("collectionobjects_common", "mediaPriorityList");
+		List<JsonNode> mediaPriorityNodes = new ArrayList<>();
 
-		if (priorityImageList != null) {
-			for (String priorityImage : priorityImageList) {
-				if (StringUtils.isNotEmpty(priorityImage)) {
+		if (mediaPriorityList != null) {
+			for (String mediaPriority : mediaPriorityList) {
+				if (StringUtils.isNotEmpty(mediaPriority)) {
 					String mediaCsid = null;
 
 					try {
-						mediaCsid = RefNameUtils.parseAuthorityInfo(priorityImage).csid;
+						mediaCsid = RefNameUtils.parseAuthorityInfo(mediaPriority).csid;
 					} catch (IllegalArgumentException e) {
 						// Not a parseable refName; nothing to denormalize for this entry.
 					}
@@ -243,21 +243,21 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 							String title = (String) mediaDoc.getProperty("media_common", "title");
 							String altText = (String) mediaDoc.getProperty("media_common", "altText");
 
-							ObjectNode priorityImageNode = objectMapper.createObjectNode();
+							ObjectNode mediaPriorityNode = objectMapper.createObjectNode();
 
-							priorityImageNode.put("csid", mediaCsid);
-							priorityImageNode.put("blobCsid", blobCsid);
-							priorityImageNode.put("title", title);
-							priorityImageNode.put("altText", altText);
+							mediaPriorityNode.put("csid", mediaCsid);
+							mediaPriorityNode.put("blobCsid", blobCsid);
+							mediaPriorityNode.put("title", title);
+							mediaPriorityNode.put("altText", altText);
 
-							priorityImages.add(priorityImageNode);
+							mediaPriorityNodes.add(mediaPriorityNode);
 						}
 					}
 				}
 			}
 		}
 
-		denormValues.putArray("priorityImageList").addAll(priorityImages);
+		denormValues.putArray("mediaPriorityList").addAll(mediaPriorityNodes);
 	}
 
 	/**

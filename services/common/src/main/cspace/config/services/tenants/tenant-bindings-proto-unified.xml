@@ -1201,7 +1201,7 @@
 							"collectionobjects_common:objectStatusList",
 							"collectionobjects_common:otherNumberList",
 							"collectionobjects_common:ownersContributionNote",
-							"collectionobjects_common:priorityImageList",
+							"collectionobjects_common:mediaPriorityList",
 							"collectionobjects_common:publishedRelatedLinkGroupList",
 							"collectionobjects_common:publishToList",
 							"collectionobjects_common:responsibleDepartments",
@@ -1418,7 +1418,7 @@
 							"type": "keyword",
 							"copy_to": "all_field"
 						},
-						"collectionobjects_common:priorityImageList": {
+						"collectionobjects_common:mediaPriorityList": {
 							"type": "keyword",
 							"copy_to": "all_field",
 							"fields": {
@@ -1428,7 +1428,7 @@
 								}
 							}
 						},
-						"collectionspace_denorm:priorityImageList": {
+						"collectionspace_denorm:mediaPriorityList": {
 							"type": "object",
 							"properties": {
 								"csid": {
