@@ -1,7 +1,10 @@
 # CollectionSpace Services Changelog
 
 ## 9.0.0
+
 * Add home location to collectionobject schema and advanced search
+* Add password complexity requirements to tenant bindings
+* Add password validators which verify passwords meet requirements set by tenants
 
 ## 8.3.0
 
