@@ -88,6 +88,14 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String HEALTH = "health";
 	private static final String NUXEO_ADMIN = null;
+
+	private static final Set<String> ANONYMOUS_RESOURCES = Set.of(
+		AuthZ.PASSWORD_RESET,
+		AuthZ.PROCESS_PASSWORD_RESET,
+		AuthZ.PASSWORD_COMPLEXITY_REQS,
+		LOGIN, LOGOUT,
+		SYSTEM_INFO, HEALTH);
+
     //
     // Use this thread specific member instance to hold our login context with Nuxeo
     //
@@ -106,16 +114,9 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
     	boolean result = false;
 
 		String resName = SecurityUtils.getResourceName(requestContext.getUriInfo()).toLowerCase();
-		switch (resName) {
-			case AuthZ.PASSWORD_RESET:
-			case AuthZ.PROCESS_PASSWORD_RESET:
-			case LOGIN:
-			case LOGOUT:
-			case SYSTEM_INFO:
-			case HEALTH:
-			case "":
-				return true;
-		}
+        if (ANONYMOUS_RESOURCES.contains(resName) || resName.isEmpty()) {
+            return true;
+        }
 
 		Class<?> resourceClass = resourceInfo.getResourceClass();
 		try {
