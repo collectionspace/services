@@ -29,12 +29,8 @@ public class CSpacePasswordValidator {
 
         final var validators = new ArrayList<PasswordValidator>();
         validators.add(new MaxLengthValidator());
+        validators.add(new MinLengthValidator(config));
         if (config != null && config.isEnabled()) {
-            final var minLength = config.getMinLength();
-            if (minLength != null) {
-                validators.add(new MinLengthValidator(minLength));
-            }
-
             if (config.isRequireLowerCase()) {
                 validators.add(RegexValidator.LOWER_CASE_VALIDATOR);
             }
