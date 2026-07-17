@@ -59,6 +59,7 @@ public class DefaultESDocumentWriter extends JsonESDocumentWriter {
 			denormConceptFields(doc, denormValues);
 			denormMaterialFields(doc, denormValues);
 			denormObjectNameFields(doc, denormValues);
+			denormMediaPriorityList(doc, session, tenantId, denormValues);
 
 			// Compute the title of the record for the public browser, and store it so that it can
 			// be used for sorting ES query results.
@@ -208,6 +209,56 @@ private void denormExhibitionRecords(CoreSession session, String csid, String te
 
 	denormValues.putArray("exhibition").addAll(exhibitions);
 }
+
+	/**
+	 * Denormalize the csid, blob csid, title, and alt text of each media record referenced by
+	 * the mediaPriorityList field of a collectionobject, so that the priority/sort
+	 * order set by the user can be displayed and searched.
+	 *
+	 * @param doc the collectionobject document
+	 * @param session the current session
+	 * @param tenantId the tenant id
+	 * @param denormValues the json node for denormalized fields
+	 */
+	private void denormMediaPriorityList(DocumentModel doc, CoreSession session, String tenantId, ObjectNode denormValues) {
+		List<String> mediaPriorityList = (List<String>) doc.getProperty("collectionobjects_common", "mediaPriorityList");
+		List<JsonNode> mediaPriorityNodes = new ArrayList<>();
+
+		if (mediaPriorityList != null) {
+			for (String mediaPriority : mediaPriorityList) {
+				if (StringUtils.isNotEmpty(mediaPriority)) {
+					String mediaCsid = null;
+
+					try {
+						mediaCsid = RefNameUtils.parseAuthorityInfo(mediaPriority).csid;
+					} catch (IllegalArgumentException e) {
+						// Not a parseable refName; nothing to denormalize for this entry.
+					}
+
+					if (mediaCsid != null) {
+						DocumentModel mediaDoc = getRecordByCsid(session, tenantId, "Media", mediaCsid);
+
+						if (mediaDoc != null && isMediaPublished(mediaDoc)) {
+							String blobCsid = (String) mediaDoc.getProperty("media_common", "blobCsid");
+							String title = (String) mediaDoc.getProperty("media_common", "title");
+							String altText = (String) mediaDoc.getProperty("media_common", "altText");
+
+							ObjectNode mediaPriorityNode = objectMapper.createObjectNode();
+
+							mediaPriorityNode.put("csid", mediaCsid);
+							mediaPriorityNode.put("blobCsid", blobCsid);
+							mediaPriorityNode.put("title", title);
+							mediaPriorityNode.put("altText", altText);
+
+							mediaPriorityNodes.add(mediaPriorityNode);
+						}
+					}
+				}
+			}
+		}
+
+		denormValues.putArray("mediaPriorityList").addAll(mediaPriorityNodes);
+	}
 
 	/**
 	 * Denormalize the material group list for a collectionobject in order to index the controlled or uncontrolled term
