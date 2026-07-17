@@ -67,8 +67,6 @@ public class SecurityUtils {
     private static final Logger logger = LoggerFactory.getLogger(SecurityUtils.class);
 
     public static final String URI_PATH_SEPARATOR = "/";
-    public static final int MIN_PASSWORD_LENGTH = 8;
-    public static final int MAX_PASSWORD_LENGTH = 24;
 
     public static final String BASE64_ENCODING = "BASE64";
     public static final String BASE16_ENCODING = "HEX";
@@ -111,25 +109,6 @@ public class SecurityUtils {
         PasswordEncoder encoder = CSpacePasswordEncoderFactory.createDefaultPasswordEncoder();
 
         return encoder.encode(password);
-    }
-
-    /**
-     * validatePassword validates password per configured password policy
-     * @param password
-     */
-    public static void validatePassword(String password) {
-        if (password == null) {
-            String msg = "Password missing ";
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
-        if (password.length() < MIN_PASSWORD_LENGTH
-        		|| password.length() > MAX_PASSWORD_LENGTH) {
-            String msg = "Bad password: '"+password+"': length should be >= "
-            		+ MIN_PASSWORD_LENGTH + " and <= " + MAX_PASSWORD_LENGTH;
-            logger.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
     }
 
     public static String getWorkflowResourceName(ContainerRequestContext requestContext) {

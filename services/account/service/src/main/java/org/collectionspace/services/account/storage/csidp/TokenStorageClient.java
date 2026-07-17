@@ -36,12 +36,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 
 import org.collectionspace.services.authentication.Token;
-import org.collectionspace.services.common.document.BadRequestException;
-import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentNotFoundException;
 import org.collectionspace.services.common.document.JaxbUtils;
 import org.collectionspace.services.common.document.TransactionException;
-import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.TransactionContext;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
 import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
@@ -49,9 +46,12 @@ import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class manages db access for Token associated with a password reset request
+ */
 public class TokenStorageClient {
 
-    static private final Logger logger = LoggerFactory.getLogger(TokenStorageClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(TokenStorageClient.class);
 
     /**
      * create user with given userId and password
@@ -59,7 +59,7 @@ public class TokenStorageClient {
      * @param password
      * @return user
      */
-    static public Token create(String accountCsid, String tenantId, BigInteger expireSeconds) {
+    public static Token create(String accountCsid, String tenantId, BigInteger expireSeconds) {
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
 	    Token token = new Token();
 
@@ -92,7 +92,7 @@ public class TokenStorageClient {
      * @param enabledFlag
      * @throws TransactionException
      */
-    static public void update(TransactionContext transactionContext, String id, boolean enabledFlag) throws DocumentNotFoundException, TransactionException {
+    public static void update(TransactionContext transactionContext, String id, boolean enabledFlag) throws DocumentNotFoundException, TransactionException {
         Token tokenFound = null;
 
         tokenFound = get((JPATransactionContext)transactionContext, id);
@@ -126,7 +126,7 @@ public class TokenStorageClient {
         return tokenFound;
     }
 
-    static public Token get(String id) throws DocumentNotFoundException {
+    public static Token get(String id) throws DocumentNotFoundException {
         Token tokenFound = null;
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
 
@@ -152,7 +152,7 @@ public class TokenStorageClient {
      * @param id
      * @throws Exception if user for given userId not found
      */
-    static public void delete(String id) throws DocumentNotFoundException {
+    public static void delete(String id) throws DocumentNotFoundException {
         EntityManagerFactory emf = JpaStorageUtils.getEntityManagerFactory();
 
         try {
@@ -177,15 +177,4 @@ public class TokenStorageClient {
         }
     }
 
-    private String getEncPassword(String userId, byte[] password) throws BadRequestException {
-        //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
-        //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
-        try {
-            SecurityUtils.validatePassword(new String(password));
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
-        String secEncPasswd = SecurityUtils.createPasswordHash(new String(password));
-        return secEncPasswd;
-    }
 }
