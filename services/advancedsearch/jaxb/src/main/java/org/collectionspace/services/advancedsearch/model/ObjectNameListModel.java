@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;
 import org.collectionspace.services.collectionobject.ObjectNameGroup;
-import org.collectionspace.services.common.api.RefNameUtils;
 
 public class ObjectNameListModel {
+	private ObjectNameListModel() {}
 
 	/**
 	 * @param collectionObject The CollectionObject Common part
@@ -18,11 +18,8 @@ public class ObjectNameListModel {
 		if (collectionObject != null && collectionObject.getObjectNameList() != null) {
 			final List<ObjectNameGroup> objectNameGroups = collectionObject.getObjectNameList().getObjectNameGroup();
 			if (!objectNameGroups.isEmpty()) {
-				final ObjectNameGroup objectNameGroup = objectNameGroups.get(0);
-				try {
-					objectNameControlled = RefNameUtils.getDisplayName(objectNameGroup.getObjectNameControlled());
-				} catch (IllegalArgumentException ignored) {
-				}
+				final ObjectNameGroup objectNameGroup = objectNameGroups.getFirst();
+				objectNameControlled = objectNameGroup.getObjectNameControlled();
 			}
 		}
 
@@ -38,7 +35,7 @@ public class ObjectNameListModel {
 		if (collectionObject!= null && collectionObject.getObjectNameList() != null) {
 			final List<ObjectNameGroup> objectNameGroups = collectionObject.getObjectNameList().getObjectNameGroup();
 			if (!objectNameGroups.isEmpty()) {
-				final ObjectNameGroup objectNameGroup = objectNameGroups.get(0);
+				final ObjectNameGroup objectNameGroup = objectNameGroups.getFirst();
 				objectName = objectNameGroup.getObjectName();
 			}
 		}

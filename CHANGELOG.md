@@ -7,6 +7,7 @@
 * Add password complexity requirements to tenant bindings
 * Add password validators which verify passwords meet requirements set by tenants
 * Enable strict checksum verification so that builds fail on corrupted Maven artifact downloads
+* Remove de-urning of objectNameControlled refname in the AdvancedSearch API
 
 ## 8.3.0
 
