@@ -4,10 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.Principal;
-import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.regex.Matcher;
@@ -32,24 +31,24 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
 	private CoreSession repoSession;
 	private boolean transactionSetForRollback = false;
-	
+
     /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(CoreSessionWrapper.class);
-    
+
     private void logQuery(String query) {
     	logger.debug(String.format("NXQL: %s", query));
     }
-    
+
     private void logQuery(String query, String queryType) {
     	logger.debug(String.format("Query Type: '%s' NXQL: %s", queryType, query));
     }
-    
+
     private void logQuery(String query, Filter filter, long limit,
     		long offset, boolean countTotal) {
     	logger.debug(String.format("Filter: '%s', Limit: '%d', Offset: '%d', Count Total?: %b, NXQL: %s",
     			filter != null ? filter.toString() : "none", limit, offset, countTotal, query));
     }
-    
+
 	public CoreSessionWrapper(CoreSession repoSession) {
 		this.repoSession = repoSession;
 	}
@@ -62,7 +61,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 		TransactionHelper.setTransactionRollbackOnly();
     	transactionSetForRollback = true;
     }
-	
+
 	@Override
     public boolean isTransactionMarkedForRollbackOnly() {
 		if (transactionSetForRollback != TransactionHelper.isTransactionMarkedRollback()) {
@@ -71,17 +70,17 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 		}
     	return transactionSetForRollback;
     }
-	
+
 	@Override
 	public 	CoreSession getCoreSession() {
 		return repoSession;
 	}
-	
+
 	@Override
     public String getSessionId() {
     	return repoSession.getSessionId();
     }
-    
+
     @Override
     public void close() throws Exception {
     	try {
@@ -103,7 +102,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     public DocumentModel getRootDocument() throws NuxeoException {
     	return repoSession.getRootDocument();
     }
-    
+
     /**
      * Returns the repository name against which this core session is bound.
      *
@@ -113,7 +112,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     public String getRepositoryName() {
 		return repoSession.getRepositoryName();
 	}
-    
+
     /**
      * Gets the principal that created the client session.
      *
@@ -123,56 +122,57 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 	public Principal getPrincipal() {
 		return repoSession.getPrincipal();
 	}
-	
-	private String toLocalTimestamp(String utcTime, boolean base64Encoded) throws DocumentException {
+
+	private String toUtcTimestamp(String time, boolean base64Encoded) throws DocumentException {
 		String result = null;
 
 		try {
 			if (base64Encoded == true) {
-				utcTime = URLDecoder.decode(utcTime, java.nio.charset.StandardCharsets.UTF_8.name());
+				time = URLDecoder.decode(time, java.nio.charset.StandardCharsets.UTF_8.name());
 			}
-			LocalDateTime localTime;
+			String utcTime;
 			try {
-				Instant instant = Instant.parse(utcTime);
-				ZonedDateTime localInstant = instant.atZone(ZoneId.systemDefault()); // DateTimeFormatter.ISO_LOCAL_DATE_TIME
-				localTime = localInstant.toLocalDateTime();
+				// Zone-qualified values (Zulu formatted or with an explicit offset)
+				utcTime = OffsetDateTime.parse(time).toInstant().toString();
 			} catch (DateTimeParseException e) {
-				localTime = LocalDateTime.parse(utcTime, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+				// Unqualified values are in server local time
+				utcTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+						.atZone(ZoneId.systemDefault()).toInstant().toString();
 			}
-			result = localTime.toString();
+			result = utcTime;
 			if (base64Encoded == true) {
 				result = URLEncoder.encode(result, java.nio.charset.StandardCharsets.UTF_8.name());
 			}
 		} catch (UnsupportedEncodingException e) {
 			throw new DocumentException(e);
 		}
-		
+
 		return result;
 	}
-	
-	private String localizeTimestamps(String query) throws DocumentException {
+
+	private String normalizeTimestampsToUtc(String query) throws DocumentException {
 		String result = query;
-		
+
 		if (query.contains("TIMESTAMP")) {
 			StringBuffer stringBuffer = new StringBuffer();
 			Pattern pattern = Pattern.compile("\\sTIMESTAMP\\s\"(.+?)\"");
 			Matcher matcher = pattern.matcher(query);
 			while (matcher.find()) {
 				String time = matcher.group(1);
-				String localizedTime = toLocalTimestamp(time, false);
-				matcher.appendReplacement(stringBuffer, String.format(" TIMESTAMP \"%s\"", localizedTime));
+				String normalizedTime = toUtcTimestamp(time, false);
+				matcher.appendReplacement(stringBuffer, String.format(" TIMESTAMP \"%s\"", normalizedTime));
 			}
 			matcher.appendTail(stringBuffer);
 			result = stringBuffer.toString();
 		}
-		
+
 		return result;
 	}
 
 	@Override
 	public IterableQueryResult queryAndFetch(String query, String queryType,
             Object... params) throws NuxeoException, DocumentException {
-		query = localizeTimestamps(query);
+		query = normalizeTimestampsToUtc(query);
 		logQuery(query, queryType);
 		return repoSession.queryAndFetch(query, queryType, params);
 	}
@@ -180,28 +180,28 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 	@Override
 	public DocumentModelList query(String query, Filter filter, long limit,
             long offset, boolean countTotal) throws NuxeoException, DocumentException {
-		query = localizeTimestamps(query);
+		query = normalizeTimestampsToUtc(query);
 		logQuery(query, filter, limit, offset, countTotal);
 		return repoSession.query(query, filter, limit, offset, countTotal);
 	}
 
 	@Override
     public DocumentModelList query(String query, int max) throws NuxeoException, DocumentException {
-		query = localizeTimestamps(query);
+		query = normalizeTimestampsToUtc(query);
 		logQuery(query);
     	return repoSession.query(query, max);
     }
-    
+
 	@Override
 	public DocumentModelList query(String query) throws NuxeoException, DocumentException {
-		query = localizeTimestamps(query);
+		query = normalizeTimestampsToUtc(query);
 		logQuery(query);
 		return repoSession.query(query);
 	}
-	
+
 	@Override
 	public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) throws DocumentException {
-		query = localizeTimestamps(query);
+		query = normalizeTimestampsToUtc(query);
 		return repoSession.query(query, workflowStateFilter);
 	}
 
@@ -227,7 +227,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     @Override
     public DocumentModel saveDocument(DocumentModel docModel) throws NuxeoException {
     	DocumentModel result = null;
-    	
+
     	try {
     		if (isTransactionMarkedForRollbackOnly() == false) {
     			result = repoSession.saveDocument(docModel);
@@ -239,7 +239,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     		setTransactionRollbackOnly();
     		throw t;
     	}
-    	
+
     	return result;
     }
 
@@ -310,7 +310,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
             String typeName) throws NuxeoException {
     	return repoSession.createDocumentModel(parentPath, id, typeName);
     }
-    
+
     /**
      * Creates a document using given document model for initialization.
      * <p>
@@ -326,7 +326,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     public DocumentModel createDocument(DocumentModel model) throws NuxeoException {
     	return repoSession.createDocument(model);
     }
-    
+
     /**
      * Gets the children of the given parent.
      *
@@ -340,6 +340,6 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     	return repoSession.getChildren(parent);
     }
 
-    
-	
+
+
 }
