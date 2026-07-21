@@ -23,18 +23,32 @@ public class CSpacePasswordValidatorTest {
     @Test
     public void testNoConfig() {
         final var binding = genBinding(false);
-        assertTrue(validatePasswordForTenant(binding, SHORT_PASS).isValid());
+        assertTrue(validatePasswordForTenant(binding, LONG_PASS).isValid());
         assertTrue(validatePasswordForTenant(binding, LOWER_CASE_PASS).isValid());
         assertTrue(validatePasswordForTenant(binding, UPPER_CASE_PASS).isValid());
         assertTrue(validatePasswordForTenant(binding, DIGIT_PASS).isValid());
         assertTrue(validatePasswordForTenant(binding, SPECIAL_PASS).isValid());
+
+        // Min and Max length checks are enabled by default, just check minimum here
+        runInvalidCheck(SHORT_PASS, List.of(ValidationErrorCode.ERR_TOO_SHORT), binding);
     }
 
     @Test
     public void testMinLength() {
         final var binding = genBinding(true);
-        binding.getPasswordRequirementConfig().setMinLength(10);
 
+        // short passwords can be allowed
+        binding.getPasswordRequirementConfig().setMinLength(3);
+        assertTrue(validatePasswordForTenant(binding, SHORT_PASS).isValid());
+        assertTrue(validatePasswordForTenant(binding, LONG_PASS).isValid());
+
+        // short passwords can be disallowed
+        binding.getPasswordRequirementConfig().setMinLength(LONG_PASS.length() + 1);
+        runInvalidCheck(LONG_PASS, List.of(ValidationErrorCode.ERR_TOO_SHORT), binding);
+        runInvalidCheck(SHORT_PASS, List.of(ValidationErrorCode.ERR_TOO_SHORT), binding);
+
+        // validate null values do not cause exceptions
+        binding.getPasswordRequirementConfig().setMinLength(null);
         assertTrue(validatePasswordForTenant(binding, LONG_PASS).isValid());
         runInvalidCheck(SHORT_PASS, List.of(ValidationErrorCode.ERR_TOO_SHORT), binding);
     }
