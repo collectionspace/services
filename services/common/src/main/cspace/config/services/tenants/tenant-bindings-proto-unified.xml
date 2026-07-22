@@ -29,6 +29,9 @@
 			<tenant:eventListenerConfig id="UpdateRelationsOnDelete">
 				<tenant:className>org.collectionspace.services.listener.UpdateRelationsOnDelete</tenant:className>
 			</tenant:eventListenerConfig>
+			<tenant:eventListenerConfig id="UpdateMediaPriorityOnDelete">
+				<tenant:className>org.collectionspace.services.listener.UpdateMediaPriorityOnDelete</tenant:className>
+			</tenant:eventListenerConfig>
 			<tenant:eventListenerConfig id="ReindexSupport">
 				<tenant:className>org.collectionspace.services.listener.ReindexSupport</tenant:className>
 			</tenant:eventListenerConfig>

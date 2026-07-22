@@ -7,5 +7,13 @@
             <event>lifecycle_transition_event</event>
         </listener>
     </extension>
-    
+
+    <extension target="org.nuxeo.ecm.core.event.EventServiceComponent" point="listener">
+        <listener name="updatemediapriorityondeletelistener" async="false" postCommit="false"
+                          class="org.collectionspace.services.listener.UpdateMediaPriorityOnDelete">
+            <event>aboutToRemove</event>
+            <event>lifecycle_transition_event</event>
+        </listener>
+    </extension>
+
 </component>
