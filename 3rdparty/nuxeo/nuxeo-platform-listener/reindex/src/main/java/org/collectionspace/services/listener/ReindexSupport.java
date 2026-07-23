@@ -146,6 +146,22 @@ public class ReindexSupport extends AbstractCSEventSyncListenerImpl {
 					String collectionObjectCsid = (String) doc.getProperty("relations_common", "objectCsid");
 
 					eventContext.setProperty(Reindex.PREV_RELATED_COLLECTION_OBJECT_CSID_KEY, (Serializable) Arrays.asList(collectionObjectCsid));
+
+					if (subjectDocumentType.equals("Media")) {
+						String mediaCsid = (String) doc.getProperty("relations_common", "subjectCsid");
+
+						eventContext.setProperty(Reindex.PREV_RELATED_MEDIA_CSID_KEY, (Serializable) Arrays.asList(mediaCsid));
+					}
+				}
+				else if (
+					subjectDocumentType.equals("CollectionObject")
+					&& objectDocumentType.equals("Media")
+				) {
+					String collectionObjectCsid = (String) doc.getProperty("relations_common", "subjectCsid");
+					String mediaCsid = (String) doc.getProperty("relations_common", "objectCsid");
+
+					eventContext.setProperty(Reindex.PREV_RELATED_COLLECTION_OBJECT_CSID_KEY, (Serializable) Arrays.asList(collectionObjectCsid));
+					eventContext.setProperty(Reindex.PREV_RELATED_MEDIA_CSID_KEY, (Serializable) Arrays.asList(mediaCsid));
 				}
 			}
 		}

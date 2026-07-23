@@ -43,6 +43,7 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 	public static final String PREV_EXH_CURATORIAL_NOTE_KEY = "Reindex.PREV_EXH_CURATORIAL_NOTE";
 	public static final String PREV_EXH_PUBLISH_TO_KEY = "Reindex.PREV_EXH_PUBLISH_TO";
 	public static final String PREV_RELATED_COLLECTION_OBJECT_CSID_KEY = "Reindex.PREV_RELATED_COLLECTION_OBJECT_CSID";
+	public static final String PREV_RELATED_MEDIA_CSID_KEY = "Reindex.PREV_RELATED_MEDIA_CSID";
 	public static final String ELASTICSEARCH_ENABLED_PROP = "elasticsearch.enabled";
 
 	@Override
@@ -200,10 +201,27 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 					String collectionObjectCsid = (String) doc.getProperty("relations_common", "objectCsid");
 
 					reindexCollectionObject(doc.getRepositoryName(), collectionObjectCsid);
+
+					if (subjectDocumentType.equals("Media")) {
+						String mediaCsid = (String) doc.getProperty("relations_common", "subjectCsid");
+
+						reindexMedia(doc.getRepositoryName(), mediaCsid);
+					}
+				}
+				else if (
+					subjectDocumentType.equals("CollectionObject")
+					&& objectDocumentType.equals("Media")
+				) {
+					String collectionObjectCsid = (String) doc.getProperty("relations_common", "subjectCsid");
+					String mediaCsid = (String) doc.getProperty("relations_common", "objectCsid");
+
+					reindexCollectionObject(doc.getRepositoryName(), collectionObjectCsid);
+					reindexMedia(doc.getRepositoryName(), mediaCsid);
 				}
 			}
 			else if (eventName.equals(DocumentEventTypes.DOCUMENT_REMOVED)) {
 				reindexPrevRelatedCollectionObjects(eventContext);
+				reindexPrevRelatedMedia(eventContext);
 			}
 		}
 	}
@@ -261,12 +279,33 @@ public class Reindex extends AbstractCSEventPostCommitListenerImpl {
 		}
 	}
 
+	private void reindexPrevRelatedMedia(DocumentEventContext eventContext) {
+		List<String> prevRelatedMediaCsids = (List<String>) eventContext.getProperty(PREV_RELATED_MEDIA_CSID_KEY);
+
+		if (prevRelatedMediaCsids != null) {
+			for (String prevRelatedMediaCsid : prevRelatedMediaCsids) {
+				reindexMedia(eventContext.getRepositoryName(), prevRelatedMediaCsid);
+			}
+		}
+	}
+
 	private void reindexCollectionObject(String repositoryName, String csid) {
 		if (StringUtils.isEmpty(csid)) {
 			return;
 		}
 
 		String query = String.format("SELECT ecm:uuid FROM CollectionObject WHERE ecm:name = '%s'", csid);
+
+		ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
+		es.runReindexingWorker(repositoryName, query);
+	}
+
+	private void reindexMedia(String repositoryName, String csid) {
+		if (StringUtils.isEmpty(csid)) {
+			return;
+		}
+
+		String query = String.format("SELECT ecm:uuid FROM Media WHERE ecm:name = '%s'", csid);
 
 		ElasticSearchComponent es = (ElasticSearchComponent) Framework.getService(ElasticSearchService.class);
 		es.runReindexingWorker(repositoryName, query);

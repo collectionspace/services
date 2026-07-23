@@ -9,6 +9,10 @@
 * Enable strict checksum verification so that builds fail on corrupted Maven artifact downloads
 * Remove de-urning of objectNameControlled refname in the AdvancedSearch API
 
+### Bug Fixes
+
+* Fix es indexing of Media records when relating/unrelating to Collection Objects
+
 ## 8.3.0
 
 * Add new endpoint for returning search results
