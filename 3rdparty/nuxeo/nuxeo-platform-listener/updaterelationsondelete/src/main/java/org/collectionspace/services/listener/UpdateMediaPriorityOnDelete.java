@@ -7,11 +7,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionWrapper;
 import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerImpl;
-import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.event.DocumentEventTypes;
@@ -35,6 +33,8 @@ public class UpdateMediaPriorityOnDelete extends AbstractCSEventSyncListenerImpl
     final static String COLLECTIONOBJECTS_COMMON_SCHEMA = "collectionobjects_common";
     final static String SUBJECT_CSID_PROPERTY = "subjectCsid";
     final static String OBJECT_CSID_PROPERTY = "objectCsid";
+    final static String SUBJECT_REFNAME_PROPERTY = "subjectRefName";
+    final static String OBJECT_REFNAME_PROPERTY = "objectRefName";
     final static String SUBJECT_DOCTYPE_PROPERTY = "subjectDocumentType";
     final static String OBJECT_DOCTYPE_PROPERTY = "objectDocumentType";
     final static String MEDIA_PRIORITY_LIST_FIELD = "mediaPriorityList";
@@ -65,14 +65,14 @@ public class UpdateMediaPriorityOnDelete extends AbstractCSEventSyncListenerImpl
         String subjectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_DOCTYPE_PROPERTY);
         String objectDocType = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_DOCTYPE_PROPERTY);
 
-        String mediaCsid;
+        String mediaRefName;
         String collectionObjectCsid;
 
         if (MEDIA_DOCTYPE.equals(subjectDocType) && COLLECTIONOBJECT_DOCTYPE.equals(objectDocType)) {
-            mediaCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
+            mediaRefName = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_REFNAME_PROPERTY);
             collectionObjectCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
         } else if (MEDIA_DOCTYPE.equals(objectDocType) && COLLECTIONOBJECT_DOCTYPE.equals(subjectDocType)) {
-            mediaCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_CSID_PROPERTY);
+            mediaRefName = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, OBJECT_REFNAME_PROPERTY);
             collectionObjectCsid = (String) relationDocModel.getProperty(RELATIONS_COMMON_SCHEMA, SUBJECT_CSID_PROPERTY);
         } else {
             // Not a media/collectionobject relation.
@@ -96,7 +96,7 @@ public class UpdateMediaPriorityOnDelete extends AbstractCSEventSyncListenerImpl
 
         List<String> updatedList = new ArrayList<>(mediaPriorityList);
 
-        if (!updatedList.removeIf(refName -> mediaCsid.equals(RefNameUtils.parseAuthorityInfo(refName).csid))) {
+        if (!updatedList.removeAll(List.of(mediaRefName))) {
             // The media record was not in the priority list.
             return;
         }
@@ -106,7 +106,7 @@ public class UpdateMediaPriorityOnDelete extends AbstractCSEventSyncListenerImpl
         session.saveDocument(collectionObjectDocModel);
 
         logger.info("Removed media record {} from the media priority list of collectionobject {}",
-                mediaCsid, NuxeoUtils.getCsid(collectionObjectDocModel));
+                mediaRefName, collectionObjectCsid);
     }
 
     @Override
