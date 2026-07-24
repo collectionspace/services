@@ -4,6 +4,7 @@
 
 * Add home location to collectionobject schema and advanced search
 * Denormalize media priority list
+* Use the top media priority record for the thumbnail in advanced search results
 * Add password complexity requirements to tenant bindings
 * Add password validators which verify passwords meet requirements set by tenants
 * Enable strict checksum verification so that builds fail on corrupted Maven artifact downloads
