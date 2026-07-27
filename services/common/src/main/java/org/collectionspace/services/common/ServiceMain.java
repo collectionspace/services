@@ -1293,18 +1293,17 @@ public class ServiceMain {
 		Hashtable<String, TenantBindingType> tenantBindingTypeMap = tenantBindingConfigReader.getTenantBindings();
 		for (TenantBindingType tbt : tenantBindingTypeMap.values()) {
 			List<String> repositoryNameList = ConfigUtils.getRepositoryNameList(tbt);
-			logger.debug("Getting repository name(s) for tenant " + tbt.getName());
+			logger.debug("Getting repository name(s) for tenant {}", tbt.getName());
 
-			if (repositoryNameList == null || repositoryNameList.isEmpty() == true) {
-				logger.error(String.format("Could not get repository name(s) for tenant %s", tbt.getName()));
-				continue; // break out of loop and go to the next tenant binding
+			if (repositoryNameList == null || repositoryNameList.isEmpty()) {
+				logger.error("Could not get repository name(s) for tenant {}", tbt.getName());
 			} else {
 				for (String repositoryName : repositoryNameList) {
 					if (Tools.isBlank(repositoryName)) {
-						logger.error(String.format("Repository name(s) for tenant %s was empty.", tbt.getName()));
+						logger.error("Repository name(s) for tenant {} was empty", tbt.getName());
 						continue;
 					}
-					logger.debug(String.format("Repository name is %s", repositoryName));
+					logger.trace("Repository name is {}", repositoryName);
 					//
 					// Clone the prototype copy of the Nuxeo datasource config file,
 					// thus creating a separate config file for the current repository.
@@ -1313,12 +1312,12 @@ public class ServiceMain {
 					// Update this config file by inserting values pertinent to the
 					// current repository.
 					datasourceConfigDoc = updateRepositoryDatasourceDoc(datasourceConfigDoc, repositoryName, tbt.getRepositoryDomain(), this.getCspaceInstanceId());
-					logger.debug("Updated Nuxeo datasource config file contents=\n" + datasourceConfigDoc.asXML());
 
 					// Write this config file to the Nuxeo server config directory.
 					File repofile = new File(getNuxeoConfigDir() + File.separator + repositoryName
 							+ JEEServerDeployment.NUXEO_DATASOURCE_CONFIG_FILENAME_SUFFIX);
-					logger.debug(String.format("Attempting to write Nuxeo datasource config file to %s", repofile.getAbsolutePath()));
+					logger.debug("Writing Nuxeo datasource config for repository {} into {}", repositoryName,
+								 repofile.getAbsolutePath());
 					XmlTools.xmlDocumentToFile(datasourceConfigDoc, repofile);
 				}
 			}

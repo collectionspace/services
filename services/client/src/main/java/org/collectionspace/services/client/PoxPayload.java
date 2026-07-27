@@ -393,7 +393,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 					result = um.unmarshal(xmlStream);
 				}
 			} catch (Exception e) {
-				logger.error("Could not unmarshal XML element '{}' into a JAXB object.", elementInput.getName(), e);
+				logger.debug("Could not unmarshal XML element '{}' into a JAXB object.", elementInput.getName(), e);
 			}
 
 			return result;
@@ -426,7 +426,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
-    		logger.error("Could not marshal JAXB object '{}' to an XML element.", jaxbObject, e);
+    		logger.debug("Could not marshal JAXB object '{}' to an XML element.", jaxbObject, e);
     	}
 
     	return result;
