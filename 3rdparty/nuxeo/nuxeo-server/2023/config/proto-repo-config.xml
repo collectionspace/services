@@ -37,17 +37,26 @@
 			<pathOptimizations enabled="true"/>
 			<idType>varchar</idType>
 			<indexing>
-			<fulltext disabled="false" analyzer="public.cspace_english">
-			  <index name="default">
-				<!-- all props implied -->
-			  </index>
-			  <index name="title">
-				<field>dc:title</field>
-			  </index>
-			  <index name="description">
-				<field>dc:description</field>
-			  </index>
-			</fulltext>
+				<excludedTypes>
+					<type>Root</type>
+					<type>Workspace</type>
+					<type>WorkspaceRoot</type>
+					<type>AdministrativeStatus</type>
+					<type>AdministrativeStatusContainer</type>
+					<type>Domain</type>
+				</excludedTypes>
+				<fulltext disabled="false" analyzer="public.cspace_english">
+					<index name="default">
+						<!-- exclude core fields -->
+						<excludeField>collectionspace_core:uri</excludeField>
+						<excludeField>collectionspace_core:refName</excludeField>
+						<excludeField>collectionspace_core:tenantId</excludeField>
+						<excludeField>collectionspace_core:createdAt</excludeField>
+						<excludeField>collectionspace_core:updatedAt</excludeField>
+						<excludeField>collectionspace_core:createdBy</excludeField>
+						<excludeField>collectionspace_core:updatedBy</excludeField>
+					</index>
+				</fulltext>
 			</indexing>
 			<usersSeparator key="," />
 			<property name="ServerName">@DB_SERVER_HOSTNAME@</property>
