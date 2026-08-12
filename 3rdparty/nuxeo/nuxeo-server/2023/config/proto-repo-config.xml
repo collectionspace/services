@@ -55,6 +55,11 @@
 						<excludeField>collectionspace_core:updatedAt</excludeField>
 						<excludeField>collectionspace_core:createdBy</excludeField>
 						<excludeField>collectionspace_core:updatedBy</excludeField>
+						<!-- exclude dublin core -->
+						<excludeField>dc:title</excludeField>
+						<excludeField>dc:creator</excludeField>
+						<excludeField>dc:contributors</excludeField>
+						<excludeField>dc:lastContributor</excludeField>
 					</index>
 				</fulltext>
 			</indexing>
