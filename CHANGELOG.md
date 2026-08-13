@@ -8,11 +8,12 @@
 * Add password complexity requirements to tenant bindings
 * Add password validators which verify passwords meet requirements set by tenants
 * Enable strict checksum verification so that builds fail on corrupted Maven artifact downloads
-* Remove de-urning of objectNameControlled refname in the AdvancedSearch API
+* Add database trigger for the fulltext index to strip punctuation
 
 ### Bug Fixes
 
 * Fix es indexing of Media records when relating/unrelating to Collection Objects
+* Remove de-urning of objectNameControlled refname in the AdvancedSearch API
 
 ## 8.3.0
 
