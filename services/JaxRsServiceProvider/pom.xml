@@ -931,11 +931,15 @@
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
                             <Package>${project.groupId}</Package>
-                            <Release>${project.version</Release>
+                            <Release>${project.version}</Release>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+          </plugin>
         </plugins>
     </build>
 </project>
