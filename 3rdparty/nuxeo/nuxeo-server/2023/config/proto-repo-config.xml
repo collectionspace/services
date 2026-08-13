@@ -51,8 +51,6 @@
 						<excludeField>collectionspace_core:uri</excludeField>
 						<excludeField>collectionspace_core:refName</excludeField>
 						<excludeField>collectionspace_core:tenantId</excludeField>
-						<excludeField>collectionspace_core:createdAt</excludeField>
-						<excludeField>collectionspace_core:updatedAt</excludeField>
 						<excludeField>collectionspace_core:createdBy</excludeField>
 						<excludeField>collectionspace_core:updatedBy</excludeField>
 						<!-- exclude dublin core -->
