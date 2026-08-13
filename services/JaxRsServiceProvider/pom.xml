@@ -931,7 +931,7 @@
                         <manifestEntries>
                             <Vendor>CollectionSpace Services</Vendor>
                             <Package>${project.groupId}</Package>
-                            <Release>${project.version</Release>
+                            <Release>${project.version}</Release>
                         </manifestEntries>
                     </archive>
                 </configuration>
