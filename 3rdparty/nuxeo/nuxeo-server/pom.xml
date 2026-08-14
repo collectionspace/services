@@ -15,21 +15,21 @@
   <packaging>pom</packaging>
 
   <repositories>
-      <repository>
-        <id>cspace-nuxeo-public-releases</id>
-        <url>https://cspace-maven.collectionspace.org/nuxeo/public-releases</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-      </repository>
+    <repository>
+      <id>cspace-nuxeo-public-releases</id>
+      <url>https://cspace-maven.collectionspace.org/nuxeo/public-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
 
-      <repository>
-        <id>cspace-nuxeo-vendor-releases</id>
-        <url>https://cspace-maven.collectionspace.org/nuxeo/vendor-releases</url>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-      </repository>
+    <repository>
+      <id>cspace-nuxeo-vendor-releases</id>
+      <url>https://cspace-maven.collectionspace.org/nuxeo/vendor-releases</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <!-- These come from nuxeo-nxr-server as it seemed to match closest to our distribution. A number of dependencies
