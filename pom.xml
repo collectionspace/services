@@ -44,7 +44,7 @@
 
 		<!-- Spring -->
 		<spring.version>5.3.28</spring.version>
-		<spring.security.version>5.8.4</spring.security.version>
+		<spring.security.version>5.8.7</spring.security.version>
 		<spring.security.authorization.server.version>0.4.3</spring.security.authorization.server.version>
 		<net.ehcache.version>2.10.9.2</net.ehcache.version>
 	</properties>
