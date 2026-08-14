@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMove {
@@ -25,7 +25,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
             DocumentModel movementDocModel,
-            DocumentModel mostRecentMovementDocumentModel) throws ClientException {
+            DocumentModel mostRecentMovementDocumentModel) throws NuxeoException {
         boolean locationChanged = super.updateCollectionObjectLocation(collectionObjectDocModel, movementDocModel,
                                                                        mostRecentMovementDocumentModel);
         boolean crateChanged = updateComputedCrateValue(collectionObjectDocModel, mostRecentMovementDocumentModel);
@@ -34,7 +34,7 @@ public class UpdateObjectLocationAndCrateOnMove extends UpdateObjectLocationOnMo
     }
 
     private boolean updateComputedCrateValue(DocumentModel collectionObjectDocModel,
-                                             DocumentModel movementDocModel) throws ClientException {
+                                             DocumentModel movementDocModel) throws NuxeoException {
         boolean result = false;
 
         String crateRefName = null;

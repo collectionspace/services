@@ -41,7 +41,7 @@ import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.jaxb.BlobJAXBSchema;
 import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.slf4j.Logger;
@@ -49,7 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -96,7 +95,7 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 	}
 	
 	private void setCommonPartProperties(DocumentModel documentModel,
-			BlobsCommon blobsCommon) throws ClientException {
+			BlobsCommon blobsCommon) throws NuxeoException {
 		try {
 			String schemaName = getServiceContext().getCommonPartLabel();
 			PayloadOutputPart outputPart = new PayloadOutputPart(schemaName, blobsCommon);
@@ -104,7 +103,7 @@ extends NuxeoDocumentModelHandler<BlobsCommon> {
 			Map<String, Object> propertyMap = DocumentUtils.parseProperties(schemaName, element, getServiceContext());
 			documentModel.setProperties(schemaName, propertyMap);
 		} catch (Exception e) {
-			throw new ClientException(e);
+			throw new NuxeoException(e);
 		}		
 	}
 	

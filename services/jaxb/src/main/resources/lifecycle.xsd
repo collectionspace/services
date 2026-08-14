@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="2.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/lifecycle"
-  xmlns="http://collectionspace.org/services/lifecycle"
-  targetNamespace="http://collectionspace.org/services/lifecycle" version="2.0">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+           jaxb:version="3.0"
+           xmlns="http://collectionspace.org/services/lifecycle"
+           targetNamespace="http://collectionspace.org/services/lifecycle" version="2.0">
   
   <xs:element name="lifecycle">
     <xs:complexType>

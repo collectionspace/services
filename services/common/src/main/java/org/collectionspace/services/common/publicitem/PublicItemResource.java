@@ -77,11 +77,10 @@ public class PublicItemResource extends NuxeoBasedResource {
     }
 
 	@Override
-	public boolean allowAnonymousAccess(HttpRequest request,
-			Class<?> resourceClass) {
+	public boolean allowAnonymousAccess() {
 		return true;
 	}
-	
+
     @GET
     @Path("/{csid}/{tenantId}/" + PublicItemClient.PUBLICITEMS_CONTENT_SUFFIX) // "content"
     public Response getPublishedResource(

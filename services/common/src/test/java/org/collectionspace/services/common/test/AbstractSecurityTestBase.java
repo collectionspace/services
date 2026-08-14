@@ -2,7 +2,7 @@ package org.collectionspace.services.common.test;
 
 import java.io.ByteArrayInputStream;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;

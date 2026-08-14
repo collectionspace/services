@@ -23,6 +23,21 @@
  */
 package org.collectionspace.services.vocabulary;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
+
 import org.collectionspace.services.client.IClientQueryParams;
 import org.collectionspace.services.client.PayloadInputPart;
 import org.collectionspace.services.client.PoxPayload;
@@ -60,24 +75,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.DatatypeConverter;
-
 @Path("/" + VocabularyClient.SERVICE_PATH_COMPONENT)
 public class VocabularyResource extends
 	AuthorityResource<VocabulariesCommon, VocabularyItemDocumentModelHandler> {
@@ -86,12 +83,12 @@ public class VocabularyResource extends
         POST, PUT;
     }
 
-    private final static String vocabularyServiceName = VocabularyClient.SERVICE_PATH_COMPONENT;
+    private static final String vocabularyServiceName = VocabularyClient.SERVICE_PATH_COMPONENT;
 
-	private final static String VOCABULARIES_COMMON = "vocabularies_common";
+	private static final String VOCABULARIES_COMMON = "vocabularies_common";
 
-    private final static String vocabularyItemServiceName = "vocabularyitems";
-	private final static String VOCABULARYITEMS_COMMON = "vocabularyitems_common";
+    private static final String vocabularyItemServiceName = "vocabularyitems";
+	private static final String VOCABULARYITEMS_COMMON = "vocabularyitems_common";
 
     final Logger logger = LoggerFactory.getLogger(VocabularyResource.class);
 

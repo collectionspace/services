@@ -12,24 +12,25 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
+
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
-import com.sun.xml.bind.api.impl.NameConverter;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.io.SAXReader;
+import org.glassfish.jaxb.core.api.impl.NameConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -91,7 +92,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 			reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
 			reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
 		} catch (SAXException saxException) {
-			final String error = "Unable to disable Doctype features, aborting document read";
+			final var error = "Unable to disable Doctype features, aborting document read";
 			logger.error(error, saxException);
 			throw new DocumentException(error);
 		}
@@ -384,7 +385,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 
 				if (StringUtils.isNotEmpty(namespace.getURI())) {
 					String thePackage = getPackage(namespace);
-					JAXBContext jc = JAXBContext.newInstance(thePackage);
+					JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(thePackage);
 					Unmarshaller um = jc.createUnmarshaller();
 
 					XMLStreamReader xmlStream = xmlInputFactory.createXMLStreamReader(
@@ -392,7 +393,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
 					result = um.unmarshal(xmlStream);
 				}
 			} catch (Exception e) {
-				logger.error("Could not unmarshal XML element '{}' into a JAXB object.", elementInput.getName(), e);
+				logger.debug("Could not unmarshal XML element '{}' into a JAXB object.", elementInput.getName(), e);
 			}
 
 			return result;
@@ -414,7 +415,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     			JAXBElement jaxbElement = (JAXBElement)jaxbObject;
     			thePackage = jaxbElement.getValue().getClass().getPackage().getName();
     		}
-	    	JAXBContext jc = JAXBContext.newInstance(thePackage);
+	    	JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(thePackage);
 	    	//Create marshaller
 	    	Marshaller m = jc.createMarshaller();
 	    	m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -425,7 +426,7 @@ public abstract class PoxPayload<PT extends PayloadPart> {
     		Document doc = DocumentHelper.parseText(text);
     		result = doc.getRootElement(); //FIXME: REM - call .detach() to free the element
     	} catch (Exception e) {
-    		logger.error("Could not marshal JAXB object '{}' to an XML element.", jaxbObject, e);
+    		logger.debug("Could not marshal JAXB object '{}' to an XML element.", jaxbObject, e);
     	}
 
     	return result;

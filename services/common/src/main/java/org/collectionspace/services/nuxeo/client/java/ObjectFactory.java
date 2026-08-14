@@ -23,7 +23,7 @@
  */
 package org.collectionspace.services.nuxeo.client.java;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 /**
  * ObjectFactory for CommonList 

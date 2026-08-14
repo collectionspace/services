@@ -68,6 +68,7 @@ public class AuthZ {
     public static final String ACCOUNT_ROLES = "accounts/*/accountroles";
     public static final String STRUCTURED_DATE_REQUEST = "structureddate";
     public static final String PASSWORD_RESET = "accounts/requestpasswordreset";
+    public static final String PASSWORD_COMPLEXITY_REQS = "accounts/passwordrequirements";
     public static final String PROCESS_PASSWORD_RESET = "accounts/processpasswordreset";
 	public static final String REPORTS_INVOKE = "reports/*/invoke";
 	public static final String BATCH_INVOKE = "batch/*/invoke";
@@ -76,7 +77,7 @@ public class AuthZ {
      *
      * @return
      */
-    public final static AuthZ get() {
+    public static AuthZ get() {
         return self;
     }
 

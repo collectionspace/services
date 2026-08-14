@@ -97,7 +97,7 @@ public interface CollectionSpaceResource<IT, OT> {
      */
 //			<sec:filter-chain pattern="/publicitems/*/*/content"
 //                              filters="none"/>
-	public boolean allowAnonymousAccess(HttpRequest request, Class<?> resourceClass);
+	public boolean allowAnonymousAccess();
 	
     /**
      * Returns a UriRegistry entry: a map of tenant-qualified URI templates

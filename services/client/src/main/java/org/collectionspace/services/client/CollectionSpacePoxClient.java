@@ -3,7 +3,6 @@ package org.collectionspace.services.client;
 import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.jaxb.AbstractCommonList;
-//import org.jboss.resteasy.client.ClientResponse;
 
 /*
  * <LT> = List type

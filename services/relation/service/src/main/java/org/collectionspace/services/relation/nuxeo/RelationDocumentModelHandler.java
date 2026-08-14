@@ -58,10 +58,10 @@ import org.collectionspace.services.nuxeo.client.java.RemoteDocumentModelHandler
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.PropertyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -514,7 +514,7 @@ public class RelationDocumentModelHandler
             					RelationJAXBSchema.SUBJECT_REFNAME
             					:RelationJAXBSchema.OBJECT_REFNAME),
             				refname);
-        } catch (ClientException ce) {
+        } catch (NuxeoException ce) {
             throw new RuntimeException(
                     "populateSubjectOrObjectValues: Problem fetching field " + ce.getLocalizedMessage());
         }
@@ -523,7 +523,7 @@ public class RelationDocumentModelHandler
         // property values in the target document model.
         try {
         	relationDocModel.setProperties(ctx.getCommonPartLabel(), properties);
-        } catch (ClientException ce) {
+        } catch (NuxeoException ce) {
             throw new RuntimeException(
                     "populateSubjectValues: Problem setting fields " + ce.getLocalizedMessage());
         }

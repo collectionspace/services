@@ -104,7 +104,6 @@ import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.workflow.WorkflowCommon;
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.slf4j.Logger;
@@ -655,7 +654,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 repoClient.releaseRepositorySession(ctx, repoSession);
             }
 
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, specifier);
         }
@@ -719,7 +718,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
                 repoClient.releaseRepositorySession(ctx, repoSession);
             }
 
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, specifier);
         }
@@ -1624,7 +1623,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         try {
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = createServiceContext(getItemServiceName(), uriInfo);
             deleteAuthorityItem(ctx, parentIdentifier, itemIdentifier, AuthorityServiceUtils.UPDATE_REV);
-            result = Response.status(HttpResponseCodes.SC_OK).build();
+            result = Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED + "  itemcsid: " + itemIdentifier + " parentcsid:" + parentIdentifier);
         }

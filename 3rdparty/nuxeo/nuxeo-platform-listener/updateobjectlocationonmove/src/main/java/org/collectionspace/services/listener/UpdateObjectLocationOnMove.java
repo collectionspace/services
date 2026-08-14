@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.common.api.Tools;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValues {
@@ -16,7 +16,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
     @Override
     protected boolean updateCollectionObjectLocation(DocumentModel collectionObjectDocModel,
                                                      DocumentModel movementDocModel, //FIXME: Not needed?
-                                                     DocumentModel mostRecentMovementDocumentModel) throws ClientException {
+                                                     DocumentModel mostRecentMovementDocumentModel) throws NuxeoException {
         boolean result = false;
 
         //

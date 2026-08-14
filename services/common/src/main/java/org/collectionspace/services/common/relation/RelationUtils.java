@@ -17,7 +17,7 @@ import org.collectionspace.services.common.repository.RepositoryClient;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.client.java.NuxeoRepositoryClientImpl;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -118,7 +118,7 @@ public class RelationUtils {
                     try {
                         docModel.setProperty(IRelationsManager.SERVICE_COMMONPART_NAME, targetField, newRefName);
                         repoSession.saveDocument(docModel);
-                    } catch (ClientException e) {
+                    } catch (NuxeoException e) {
                         logger.error(String.format("Could not update field '%s' with updated refName '%s' for relations record CSID=%s",
                                 targetField, newRefName, docModel.getName()));
                     }
@@ -142,7 +142,7 @@ public class RelationUtils {
         //
         try {
             repoSession.save();
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             // TODO Auto-generated catch block
             logger.error("Could not flush results of relation-refName payload updates to Nuxeo repository");
         }

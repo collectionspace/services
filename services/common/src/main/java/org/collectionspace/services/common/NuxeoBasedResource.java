@@ -53,7 +53,6 @@ import org.collectionspace.services.nuxeo.client.java.DocumentModelHandler;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 
@@ -98,7 +97,7 @@ public abstract class NuxeoBasedResource
             @PathParam("csid") String csid,
             @PathParam("indexid") String indexid) {
     	uriInfo = new UriInfoWrapper(uriInfo);
-       	Response result = Response.status(Response.Status.OK).entity("Reindex complete.").type("text/plain").build();
+       	Response result = Response.ok().entity("Reindex complete.").type("text/plain").build();
        	boolean success = false;
        	
         ensureCSID(csid, READ);
@@ -308,7 +307,7 @@ public abstract class NuxeoBasedResource
             throws Exception {
     	DocumentHandler<PoxPayloadIn, PoxPayloadOut, DocumentModel, DocumentModelList> handler = createDocumentHandler(ctx);
         getRepositoryClient(ctx).delete(ctx, csid, handler);
-        return Response.status(HttpResponseCodes.SC_OK).build();
+        return Response.ok().build();
     }
     
     public Response deleteWithParentCtx(ServiceContext<PoxPayloadIn, PoxPayloadOut> parentCtx,

@@ -21,7 +21,6 @@ import org.collectionspace.services.place.PlaceauthoritiesCommon;
 import org.collectionspace.services.place.PlacesCommon;
 
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

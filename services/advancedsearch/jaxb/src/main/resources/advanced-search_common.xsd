@@ -10,8 +10,8 @@
 
 <xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="2.0"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+  jaxb:version="3.0"
   xmlns="http://collectionspace.org/services/advancedsearch"
   targetNamespace="http://collectionspace.org/services/advancedsearch"
   version="0.1"
@@ -37,6 +37,12 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="homeLocations">
+    <xs:sequence>
+      <xs:element name="homeLocation" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
   <xs:element name="advancedsearch-common-list">
     <xs:complexType>
       <xs:complexContent>
@@ -55,6 +61,7 @@
                   <xs:element name="objectNumber" type="xs:string" nillable="true"/>
                   <xs:element name="title" type="xs:string" nillable="true"/>
                   <xs:element name="computedCurrentLocation" type="xs:string" nillable="true"/>
+                  <xs:element name="homeLocations" type="homeLocations" nillable="true"/>
                   <xs:element name="responsibleDepartment" type="xs:string" nillable="true"/>
                   <xs:element name="briefDescription" type="xs:string" nillable="true"/>
 

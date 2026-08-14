@@ -29,6 +29,9 @@
 			<tenant:eventListenerConfig id="UpdateRelationsOnDelete">
 				<tenant:className>org.collectionspace.services.listener.UpdateRelationsOnDelete</tenant:className>
 			</tenant:eventListenerConfig>
+			<tenant:eventListenerConfig id="UpdateMediaPriorityOnDelete">
+				<tenant:className>org.collectionspace.services.listener.UpdateMediaPriorityOnDelete</tenant:className>
+			</tenant:eventListenerConfig>
 			<tenant:eventListenerConfig id="ReindexSupport">
 				<tenant:className>org.collectionspace.services.listener.ReindexSupport</tenant:className>
 			</tenant:eventListenerConfig>
@@ -78,6 +81,10 @@
 					<service:property>
 						<service:key>sqlScriptName</service:key>
 						<service:value>deurn_function.sql</service:value>
+					</service:property>
+					<service:property>
+						<service:key>sqlScriptName</service:key>
+						<service:value>fulltext_triggers.sql</service:value>
 					</service:property>
 				</service:params>
 			</service:initHandler>
@@ -1174,9 +1181,6 @@
 					// index as small as possible. We may want to turn this on in the future, to support arbitrary
 					// searches through Elasticsearch, e.g. NXQL queries for ad hoc reporting in the CSpace UI.
 					"dynamic": false,
-					"_all" : {
-						"enabled": false
-					},
 					"_source": {
 						"includes": [
 							"collectionobjects_common:briefDescriptions",
@@ -1204,6 +1208,7 @@
 							"collectionobjects_common:objectStatusList",
 							"collectionobjects_common:otherNumberList",
 							"collectionobjects_common:ownersContributionNote",
+							"collectionobjects_common:mediaPriorityList",
 							"collectionobjects_common:publishedRelatedLinkGroupList",
 							"collectionobjects_common:publishToList",
 							"collectionobjects_common:responsibleDepartments",
@@ -1419,6 +1424,35 @@
 						"collectionobjects_common:responsibleDepartments": {
 							"type": "keyword",
 							"copy_to": "all_field"
+						},
+						"collectionobjects_common:mediaPriorityList": {
+							"type": "keyword",
+							"copy_to": "all_field",
+							"fields": {
+								"displayName": {
+									"type": "keyword",
+									"normalizer": "refname_displayname_normalizer"
+								}
+							}
+						},
+						"collectionspace_denorm:mediaPriorityList": {
+							"type": "object",
+							"properties": {
+								"csid": {
+									"type": "keyword"
+								},
+								"blobCsid": {
+									"type": "keyword"
+								},
+								"title": {
+									"type": "text",
+									"copy_to": "all_field"
+								},
+								"altText": {
+									"type": "text",
+									"copy_to": "all_field"
+								}
+							}
 						},
 						"collectionobjects_common:contentConcepts": {
 							"type": "keyword",

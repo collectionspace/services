@@ -5,7 +5,6 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.apache.http.HttpStatus;
 
 import org.nuxeo.ecm.core.api.ConcurrentUpdateException;
-import org.nuxeo.ecm.core.api.WrappedException;
 
 public class NuxeoDocumentException extends DocumentException {
 
@@ -50,11 +49,8 @@ public class NuxeoDocumentException extends DocumentException {
 		
 		if (exception != null) {
 			result = exception.getClass().getCanonicalName();
-			if (exception instanceof WrappedException) {
-				result = ((WrappedException)exception).getClassName();  // Nuxeo wraps the original exception, so we need to get the name of it.
-			}
 		}
-		
+
 		return result;
 	}
 

@@ -139,13 +139,13 @@ public class NuxeoConnectorEmbedded {
 
 		try {
 			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
-			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
+			coreSession = CoreInstance.getCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
         } catch (Throwable t) {
 			logger.error(t.getMessage());
 			throw new RuntimeException("Could not start the Nuxeo EP Framework", t);
 		} finally {
 			if (coreSession != null) {
-				CoreInstance.closeCoreSession(coreSession);
+				coreSession.close();
 			}
 
 			if (transactionStarted) {

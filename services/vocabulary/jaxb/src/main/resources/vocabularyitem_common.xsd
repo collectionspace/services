@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-        jaxb:version="1.0" elementFormDefault="unqualified"
-        xmlns:ns="http://collectionspace.org/services/vocabulary"
-        xmlns="http://collectionspace.org/services/vocabulary"
-        targetNamespace="http://collectionspace.org/services/vocabulary"
-        version="0.1"
-        >
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+  xmlns="http://collectionspace.org/services/vocabulary"
+  targetNamespace="http://collectionspace.org/services/vocabulary"
+  version="0.1"
+>
 
 
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
@@ -35,4 +33,3 @@
         </xs:complexType>
     </xs:element>
 </xs:schema>
-

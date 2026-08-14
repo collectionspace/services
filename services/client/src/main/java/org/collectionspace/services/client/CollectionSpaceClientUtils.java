@@ -31,13 +31,14 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FileUtils;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartInput;
 import org.slf4j.Logger;
@@ -76,12 +77,12 @@ public class CollectionSpaceClientUtils {
      * @param res the res
      * @return the string
      */
-    static public String extractId(Response res) {
+    public static String extractId(Response res) {
         MultivaluedMap<String, Object> mvm = res.getMetadata();
         return extractIdFromResponseMetadata(mvm);
     }
  
-    static protected String extractIdFromResponseMetadata(MultivaluedMap<String, Object> mvm) {
+    protected static String extractIdFromResponseMetadata(MultivaluedMap<String, Object> mvm) {
     	// mvm may return a java.net.URI which complains about casting to String...
     	String uri = ((List<Object>) mvm.get("Location")).get(0).toString();
         if (logger.isDebugEnabled()) {
@@ -104,7 +105,7 @@ public class CollectionSpaceClientUtils {
      * @return the object
      * @throws Exception the exception
      */
-    static protected Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
+    protected static Object extractPart(PoxPayloadIn input, String label, Class<?> clazz)
             throws Exception {
     	Object result = null;
     	PayloadInputPart payloadInputPart = input.getPart(label);
@@ -127,7 +128,7 @@ public class CollectionSpaceClientUtils {
      * @throws Exception the exception
      */
     @Deprecated
-    static public Object extractPart(MultipartInput input, String label, Class<?> clazz)
+    public static Object extractPart(MultipartInput input, String label, Class<?> clazz)
             throws Exception {
         Object obj = null;
         String partLabel = "";
@@ -186,9 +187,9 @@ public class CollectionSpaceClientUtils {
      * @return the part object
      * @throws JAXBException the jAXB exception
      */
-    static public Object getPartObject(String partStr, Class<?> clazz)
+    public static Object getPartObject(String partStr, Class<?> clazz)
             throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(clazz);
+        JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
         ByteArrayInputStream bais = null;
         Object obj = null;
         try {
@@ -216,10 +217,10 @@ public class CollectionSpaceClientUtils {
      * @param clazz the clazz
      * @return the string
      */
-    static public String objectAsXmlString(Object o, Class<?> clazz) {
+    public static String objectAsXmlString(Object o, Class<?> clazz) {
         StringWriter sw = new StringWriter();
         try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
                     Boolean.TRUE);
@@ -237,7 +238,7 @@ public class CollectionSpaceClientUtils {
      * @return
      * @throws Exception
      */
-    static public Object getObjectFromFile(Class<?> jaxbClass, String fileName)
+    public static Object getObjectFromFile(Class<?> jaxbClass, String fileName)
             throws Exception {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         InputStream is = tccl.getResourceAsStream(fileName);
@@ -251,7 +252,7 @@ public class CollectionSpaceClientUtils {
      * @return the xml document
      * @throws Exception the exception
      */
-    static public Document getXmlDocument(String fileName) throws Exception {
+    public static Document getXmlDocument(String fileName) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         File f = new File(fileName);
         if (!f.exists()) {
@@ -268,7 +269,7 @@ public class CollectionSpaceClientUtils {
      * @return the xml document as string
      * @throws Exception the exception
      */
-    static public String getXmlDocumentAsString(String fileName) throws Exception {
+    public static String getXmlDocumentAsString(String fileName) throws Exception {
         byte[] b = FileUtils.readFileToByteArray(new File(fileName));
         return new String(b);
     }
@@ -280,8 +281,8 @@ public class CollectionSpaceClientUtils {
      * @return
      * @throws Exception
      */
-    static public Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
+    public static Object getObjectFromStream(Class<?> jaxbClass, InputStream is) throws Exception {
+        JAXBContext context = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         //note: setting schema to null will turn validator off
         unmarshaller.setSchema(null);

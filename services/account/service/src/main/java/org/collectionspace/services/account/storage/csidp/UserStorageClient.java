@@ -64,9 +64,9 @@ public class UserStorageClient {
         User user = new User();
         user.setUsername(userId);
         String salt = UUID.randomUUID().toString();
-        user.setPasswd(getEncPassword(userId, password, salt));
+        user.setPasswd(getEncPassword(password));
         user.setSalt(salt);
-        user.setCreatedAtItem(new Date());
+        user.setCreatedAt(new Date());
         return user;
     }
 
@@ -112,13 +112,13 @@ public class UserStorageClient {
      * @param password
      */
     public void update(JPATransactionContext jpaTransactionContext, String userId, byte[] password)
-            throws DocumentNotFoundException, Exception {
+        throws DocumentNotFoundException, BadRequestException {
         User userFound = get(jpaTransactionContext, userId);
         if (userFound != null) {
             String salt = UUID.randomUUID().toString();
-            userFound.setPasswd(getEncPassword(userId, password, salt));
+            userFound.setPasswd(getEncPassword(password));
             userFound.setSalt(salt);
-            userFound.setUpdatedAtItem(new Date());
+            userFound.setUpdatedAt(new Date());
             if (logger.isDebugEnabled()) {
                 logger.debug("updated user=" + JaxbUtils.toString(userFound, User.class));
             }
@@ -150,15 +150,7 @@ public class UserStorageClient {
         }
     }
 
-    private String getEncPassword(String userId, byte[] password, String salt) throws BadRequestException {
-        //jaxb unmarshaller already unmarshal xs:base64Binary, no need to b64 decode
-        //byte[] bpass = Base64.decodeBase64(accountReceived.getPassword());
-        try {
-            SecurityUtils.validatePassword(new String(password));
-        } catch (Exception e) {
-            throw new BadRequestException(e.getMessage());
-        }
-        String secEncPasswd = SecurityUtils.createPasswordHash(new String(password));
-        return secEncPasswd;
+    private String getEncPassword(byte[] password) {
+        return SecurityUtils.createPasswordHash(new String(password));
     }
 }

@@ -24,38 +24,33 @@
 package org.collectionspace.services.authorization.importer;
 
 import java.io.File;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 
-import org.collectionspace.services.client.TenantClient;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Marshaller;
 import org.collectionspace.authentication.AuthN;
-import org.collectionspace.authentication.AuthN;
-
-import org.collectionspace.services.authorization.perms.Permission;
 import org.collectionspace.services.authorization.PermissionRole;
 import org.collectionspace.services.authorization.PermissionValue;
-import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.authorization.PermissionsRolesList;
-
 import org.collectionspace.services.authorization.Role;
 import org.collectionspace.services.authorization.RoleValue;
 import org.collectionspace.services.authorization.RolesList;
 import org.collectionspace.services.authorization.SubjectType;
-
+import org.collectionspace.services.authorization.perms.Permission;
+import org.collectionspace.services.authorization.perms.PermissionsList;
+import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.common.authorization_mgt.AuthorizationCommon;
 import org.collectionspace.services.common.config.ServicesConfigReaderImpl;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.common.storage.jpa.JPATransactionContext;
-
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.tenant.TenantBindingType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * AuthorizationGen generates authorizations (permissions and roles)
@@ -478,13 +473,7 @@ public class AuthorizationGen {
     public void exportDefaultRoles(String fileName) {
         RolesList rList = new RolesList();
         rList.setRole(this.getDefaultRoles());
-        //
-        // Since it is missing the @XMLRootElement annotation, create a JAXBElement wrapper for the RoleList instance
-        // so we can have it marshalled it correctly.
-        //
-        org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
-        toFile(objectFactory.createRolesList(rList), RolesList.class,
-                fileName);
+        toFile(rList, RolesList.class, fileName);
         if (logger.isDebugEnabled()) {
             logger.debug("exported roles to " + fileName);
         }
@@ -493,11 +482,7 @@ public class AuthorizationGen {
     public void exportDefaultPermissions(String fileName) {
         PermissionsList pcList = new PermissionsList();
         pcList.setPermission(this.getDefaultPermissions());
-        org.collectionspace.services.authorization.ObjectFactory objectFactory =
-        	new org.collectionspace.services.authorization.ObjectFactory();
-        toFile(pcList, PermissionsList.class,
-//        toFile(objectFactory.createPermissionsList(pcList), PermissionsList.class,
-                fileName);
+        toFile(pcList, PermissionsList.class, fileName);
         if (logger.isDebugEnabled()) {
             logger.debug("exported permissions to " + fileName);
         }
@@ -506,8 +491,7 @@ public class AuthorizationGen {
     public void exportDefaultPermissionRoles(String fileName) {
         PermissionsRolesList psrsl = new PermissionsRolesList();
         psrsl.setPermissionRole(this.getDefaultAdminPermissionRoles());
-        toFile(psrsl, PermissionsRolesList.class,
-                fileName);
+        toFile(psrsl, PermissionsRolesList.class, fileName);
         if (logger.isDebugEnabled()) {
             logger.debug("exported permissions-roles to " + fileName);
         }
@@ -516,10 +500,9 @@ public class AuthorizationGen {
     private void toFile(Object o, Class jaxbClass, String fileName) {
         File f = new File(fileName);
         try {
-            JAXBContext jc = JAXBContext.newInstance(jaxbClass);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(jaxbClass);
             Marshaller m = jc.createMarshaller();
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,
-                    Boolean.TRUE);
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(o, f);
         } catch (Exception e) {
             e.printStackTrace();

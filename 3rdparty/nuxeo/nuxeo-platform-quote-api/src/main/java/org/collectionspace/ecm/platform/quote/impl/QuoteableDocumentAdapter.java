@@ -21,7 +21,7 @@ package org.collectionspace.ecm.platform.quote.impl;
 
 import java.util.List;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.collectionspace.ecm.platform.quote.api.QuoteManager;
 import org.collectionspace.ecm.platform.quote.api.QuoteableDocument;
@@ -50,37 +50,37 @@ public class QuoteableDocumentAdapter implements QuoteableDocument {
     }
 
     @Override
-    public DocumentModel addQuote(DocumentModel comment) throws ClientException {
+    public DocumentModel addQuote(DocumentModel comment) throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         return quoteManager.createQuote(docModel, comment);
     }
 
     @Deprecated
-    public DocumentModel addQuote(String comment) throws ClientException {
+    public DocumentModel addQuote(String comment) throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         return quoteManager.createQuote(docModel, comment);
     }
 
     @Override
-    public DocumentModel addQuote(DocumentModel parent, DocumentModel comment) throws ClientException {
+    public DocumentModel addQuote(DocumentModel parent, DocumentModel comment) throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         return quoteManager.createQuote(docModel, parent, comment);
     }
 
     @Override
-    public void removeQuote(DocumentModel comment) throws ClientException {
+    public void removeQuote(DocumentModel comment) throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         quoteManager.deleteQuote(docModel, comment);
     }
 
     @Override
-    public List<DocumentModel> getQuotes() throws ClientException {
+    public List<DocumentModel> getQuotes() throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         return quoteManager.getQuotes(docModel);
     }
 
     @Override
-    public List<DocumentModel> getQuotes(DocumentModel parent) throws ClientException {
+    public List<DocumentModel> getQuotes(DocumentModel parent) throws NuxeoException {
         QuoteManager quoteManager = getQuoteManager();
         return quoteManager.getQuotes(docModel, parent);
     }

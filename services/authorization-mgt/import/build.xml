@@ -110,7 +110,7 @@
 
     <target name="import" depends="import-unix,import-windows"
             description="import authorization" />
-    <target name="import-unix" if="osfamily-unix" depends="setup_hibernate.cfg">
+    <target name="import-unix" if="osfamily-unix" depends="setup_persistence_cfg">
         <exec executable="mvn" failonerror="true"> <!-- To debug, change command here mvn to 'mvnDebug' -->
             <arg value="exec:java" />
             <arg value="-f" />
@@ -121,7 +121,7 @@
             <!-- <arg value="-X" /> -->
         </exec>
     </target>
-    <target name="import-windows" if="osfamily-windows" depends="setup_hibernate.cfg">
+    <target name="import-windows" if="osfamily-windows" depends="setup_persistence_cfg">
         <exec executable="cmd" failonerror="true">
             <arg value="/c" />
             <arg value="mvn" /> <!-- To debug, change command here to be 'mvnDebug.bat' -->
@@ -133,12 +133,12 @@
         </exec>
     </target>
 
-    <target name="setup_hibernate.cfg" description="replace property keywords in hibernate.cfg.xml" depends="install">
-        <property name="src.hibernate.cfg" value="${basedir}/src/main/resources/hibernate.cfg.xml"/>
-        <property name="dest.hibernate.cfg" value="${basedir}/target/classes/hibernate.cfg.xml"/>
+    <target name="setup_persistence_cfg" description="replace property keywords in persistence xml files" depends="install">
+        <property name="src.persistence.xml" value="${basedir}/src/main/resources/META-INF/persistence.xml"/>
+        <property name="dest.persistence.xml" value="${basedir}/target/classes/META-INF/persistence.xml"/>
         <property name="src.appContext.cfg" value="${basedir}/src/main/resources/applicationContext-authorization-test.xml"/>
         <property name="dest.appContext.cfg" value="${basedir}/target/classes/applicationContext-authorization-test.xml"/>
-        <delete file="${dest.hibernate.cfg}" verbose="true" />
+        <delete file="${dest.persistence.xml}" verbose="true" />
         <delete file="${dest.appContext.cfg}" verbose="true" />
         <filter token="DB_CSPACE_URL" value="${db.jdbc.cspace.url.encoded}" />
         <filter token="DB_DRIVER_CLASS" value="${db.jdbc.driver.class}" />
@@ -147,7 +147,7 @@
         <filter token="DB_DIALECT" value="${db.dialect}" />
         <filter token="CLASS_ID_QUERY" value="${db.spring.acl.classIdentityQuery}" />
         <filter token="SID_ID_QUERY" value="${db.spring.acl.sidIdentityQuery}" />
-        <copy tofile="${dest.hibernate.cfg}" file="${src.hibernate.cfg}" filtering="true"/>
+        <copy tofile="${dest.persistence.xml}" file="${src.persistence.xml}" filtering="true"/>
         <copy tofile="${dest.appContext.cfg}" file="${src.appContext.cfg}" filtering="true"/>
     </target>
 

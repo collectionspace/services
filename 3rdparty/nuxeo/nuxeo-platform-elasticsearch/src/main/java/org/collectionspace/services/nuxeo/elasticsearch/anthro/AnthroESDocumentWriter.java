@@ -3,8 +3,8 @@ package org.collectionspace.services.nuxeo.elasticsearch.anthro;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.node.ObjectNode;
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.nuxeo.elasticsearch.DefaultESDocumentWriter;
 import org.nuxeo.ecm.core.api.DocumentModel;

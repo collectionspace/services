@@ -12,12 +12,10 @@
 -->
 
 <xs:schema
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="1.0" elementFormDefault="unqualified"
-    xmlns="http://collectionspace.org/services/relation"
-    xmlns:rel="http://collectionspace.org/services/relation"
-    targetNamespace="http://collectionspace.org/services/relation">
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+  xmlns="http://collectionspace.org/services/relation"
+  targetNamespace="http://collectionspace.org/services/relation">
 
     <!-- Relation -->
     <xs:element name="relations_common">

@@ -28,60 +28,24 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
-
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.ClientRequestContext;
 import javax.ws.rs.client.ClientRequestFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.DatatypeConverter;
 
+import jakarta.xml.bind.DatatypeConverter;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.collectionspace.services.common.api.Tools;
+import org.collectionspace.services.common.provider.JakartaJAXBProvider;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.engines.URLConnectionEngine;
-import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-// FIXME: Deprecated classes that need to be updated
-import org.jboss.resteasy.client.ProxyFactory;
-import org.apache.http.impl.client.DefaultHttpClient;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-
-import javax.net.ssl.X509TrustManager;
-
-/**
- * Private class for SSL support
- */
-class HttpsTrustManager implements X509TrustManager {
-
-	@Override
-	public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-			throws CertificateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-			throws CertificateException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public X509Certificate[] getAcceptedIssuers() {
-		return new X509Certificate[]{};
-	}
-
-}
 
 /**
  * Private class for JAX-RS authentication
@@ -112,7 +76,7 @@ class Authenticator implements ClientRequestFilter {
         } catch (UnsupportedEncodingException ex) {
             throw new IllegalStateException("Cannot encode with UTF-8", ex);
         }
-        
+
         return result;
     }
 }
@@ -195,9 +159,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
     		throw new RuntimeException(e.getMessage());
     	}
     	
-        ResteasyProviderFactory factory = ResteasyProviderFactory.getInstance();
-        RegisterBuiltin.register(factory);
-        setProxy();        
+        setProxy();
     }
 
     /**
@@ -524,43 +486,25 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
      * allow to reset proxy as per security needs
      */
     @Override
-	public void setProxy() throws Exception {
-    	ResteasyClient client = null;
+	public void setProxy() {
+    	Client client = null;
         String urlString = url.toString();
     	Class<P> proxyClass = this.getProxyClass();
-    	
-//    	if (useSSL()) {
-//    		SSLContext sslcontext = SSLContexts.custom().useSSL().build();
-//            sslcontext.init(null, new X509TrustManager[]{new HttpsTrustManager()}, new SecureRandom());
-//            client = (ResteasyClient)ClientBuilder.newBuilder().sslContext(sslcontext).build();
-//    	} else {
-//        	client = (ResteasyClient)ClientBuilder.newClient();
-//    	}
-    	
-    	client = new ResteasyClientBuilder().httpEngine(new URLConnectionEngine()).build();
-    	
+
+
         if (useAuth()) {
             String user = properties.getProperty(USER_PROPERTY);
             String password = properties.getProperty(PASSWORD_PROPERTY);
-        	client = client.register(new Authenticator(user, password));
-        }
-        
-        proxy = client.target(urlString).proxy(proxyClass);
-    }
-    
-    /**
-     * allow to reset proxy as per security needs
-     */
-    @Deprecated
-	public void _setProxy() {
-    	Class<P> proxyClass = this.getProxyClass();
-        if (useAuth()) {
-            proxy = ProxyFactory.create(proxyClass,
-                    getBaseURL(), new ApacheHttpClient4Executor(getHttpClient4()));
+            client = ClientBuilder.newBuilder()
+                                  .register(new Authenticator(user, password))
+                                  .register(new JakartaJAXBProvider<>())
+                                  .build();
         } else {
-        	proxy = ProxyFactory.create(proxyClass,
-                    getBaseURL());
+            client = ClientBuilder.newBuilder().register(new JakartaJAXBProvider<>()).build();
         }
+
+        ResteasyWebTarget target = (ResteasyWebTarget) client.target(urlString);
+        proxy = target.proxy(proxyClass);
     }
 
     @Override
@@ -586,6 +530,7 @@ public abstract class AbstractServiceClientImpl<CLT, REQUEST_PT, RESPONSE_PT, P 
         }
         
         try {
+            // TODO: Why does this get set twice?
 	        setupHttpClient();
 	        setupHttpClient(); // temp fix for CSPACE-6281
         } catch (Exception e) {

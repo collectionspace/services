@@ -11,14 +11,12 @@
     $LastChangedDate: 2010-06-16 14:47:45 -0700 (Wed, 16 Jun 2010) $
 -->
 
-<xs:schema 
-  xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/report"
-  xmlns="http://collectionspace.org/services/report"
-  targetNamespace="http://collectionspace.org/services/report"
-  version="0.1"
+<xs:schema
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+	xmlns="http://collectionspace.org/services/report"
+	targetNamespace="http://collectionspace.org/services/report"
+	version="0.1"
 >
 
 <!--

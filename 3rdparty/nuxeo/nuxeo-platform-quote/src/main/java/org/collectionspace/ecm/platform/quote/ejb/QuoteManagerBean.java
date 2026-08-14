@@ -28,7 +28,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.ClientRuntimeException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
@@ -62,22 +62,22 @@ public class QuoteManagerBean implements QuoteManager {
 
     @Override
     public DocumentModel createQuote(DocumentModel docModel,
-            String quote) throws ClientException {
+            String quote) throws NuxeoException {
         try {
             String author = context.getCallerPrincipal().getName();
             return quoteManager.createQuote(docModel, quote, author);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public DocumentModel createQuote(DocumentModel docModel,
-            String quote, String author) throws ClientException {
+            String quote, String author) throws NuxeoException {
         try {
             return quoteManager.createQuote(docModel, quote, author);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
@@ -85,14 +85,14 @@ public class QuoteManagerBean implements QuoteManager {
         String author;
         try {
             author = (String) docModel.getProperty("comment", "author");
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             author = null;
         }
         if (author == null) {
             author = context.getCallerPrincipal().getName();
             try {
                 docModel.setProperty("comment", "author", author);
-            } catch (ClientException e) {
+            } catch (NuxeoException e) {
                 throw new ClientRuntimeException(e);
             }
         }
@@ -101,73 +101,73 @@ public class QuoteManagerBean implements QuoteManager {
 
     @Override
     public DocumentModel createQuote(DocumentModel docModel,
-            DocumentModel quote) throws ClientException {
+            DocumentModel quote) throws NuxeoException {
         try {
             updateAuthor(quote);
             return quoteManager.createQuote(docModel, quote);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public void deleteQuote(DocumentModel docModel, DocumentModel quote)
-            throws ClientException {
+            throws NuxeoException {
         try {
             quoteManager.deleteQuote(docModel, quote);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public List<DocumentModel> getQuotes(DocumentModel docModel)
-            throws ClientException {
+            throws NuxeoException {
         try {
             return quoteManager.getQuotes(docModel);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public DocumentModel createQuote(DocumentModel docModel,
-            DocumentModel parent, DocumentModel child) throws ClientException {
+            DocumentModel parent, DocumentModel child) throws NuxeoException {
         try {
             updateAuthor(child);
             return quoteManager.createQuote(docModel, parent, child);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public List<DocumentModel> getQuotes(DocumentModel docModel,
-            DocumentModel parent) throws ClientException {
+            DocumentModel parent) throws NuxeoException {
         try {
             return quoteManager.getQuotes(docModel, parent);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public List<DocumentModel> getDocumentsForQuote(DocumentModel commentDoc)
-            throws ClientException{
+            throws NuxeoException{
         try {
             return quoteManager.getDocumentsForQuote(commentDoc);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 
     @Override
     public DocumentModel createLocatedQuote(DocumentModel docModel,
-            DocumentModel comment, String path) throws ClientException {
+            DocumentModel comment, String path) throws NuxeoException {
         try {
             return quoteManager.createLocatedQuote(docModel, comment, path);
         } catch (Throwable e) {
-            throw ClientException.wrap(e);
+            throw NuxeoException.wrap(e);
         }
     }
 

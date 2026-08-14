@@ -37,7 +37,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBElement;
 
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.services.authorization.AccountPermission;
@@ -91,7 +91,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.impl.DataModelImpl;
 import org.nuxeo.ecm.core.api.model.DocumentPart;
 import org.nuxeo.ecm.core.api.model.Property;
-import org.nuxeo.ecm.core.api.model.PropertyException;
+import org.nuxeo.ecm.core.api.PropertyException;
 import org.nuxeo.ecm.core.api.model.impl.ScalarProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,7 +251,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     public void completeUpdate(DocumentWrapper<DocumentModel> wrapDoc) throws Exception {
         DocumentModel docModel = wrapDoc.getWrappedObject();
         
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
@@ -353,7 +353,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
             throws Exception {
 
         DocumentModel docModel = wrapDoc.getWrappedObject();
-        String[] schemas = docModel.getDeclaredSchemas();
+        String[] schemas = docModel.getSchemas();
         Map<String, ObjectPartType> partsMetaMap = getServiceContext().getPartsMetadata();
         for (String schema : schemas) {
             ObjectPartType partMeta = partsMetaMap.get(schema);
@@ -404,7 +404,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
     private void addAccountPermissionsPart() throws Exception {
     	Profiler profiler = new Profiler("addAccountPermissionsPart():", 1);
     	profiler.start();
-    	
+
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         String currentServiceName = ctx.getServiceName();
         String workflowSubResource = "/";
@@ -417,12 +417,9 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         }
         AccountPermission accountPermission = JpaStorageUtils.getAccountPermissions(JpaStorageUtils.CS_CURRENT_USER,
         		currentServiceName, workflowSubResource);
-        org.collectionspace.services.authorization.ObjectFactory objectFactory =
-        	new org.collectionspace.services.authorization.ObjectFactory();
-        JAXBElement<AccountPermission> ap = objectFactory.createAccountPermission(accountPermission);
-        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", ap); // REM - "account_permission" should be using a constant and not a literal
+        PayloadOutputPart accountPermissionPart = new PayloadOutputPart("account_permission", accountPermission);
         ctx.addOutputPart(accountPermissionPart);
-        
+
         profiler.stop();
     }
 
@@ -768,9 +765,8 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
         return authRefList;
     }
 
-    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari, 
-    						List<AuthorityRefList.AuthorityRefItem> list)
-            throws Exception {
+    private boolean appendToAuthRefsList(RefNameServiceUtils.AuthRefInfo ari,
+                                         List<AuthorityRefList.AuthorityRefItem> list) {
     	String fieldName = ari.getQualifiedDisplayName();
     	try {
 	   		String refNameValue = (String)ari.getProperty().getValue();
@@ -780,12 +776,7 @@ public abstract class RemoteDocumentModelHandlerImpl<T, TL>
 	   			return true;
 	   		}
     	} catch(PropertyException pe) {
-    		String msg = "PropertyException on: "+ari.getProperty().getPath()+pe.getLocalizedMessage();
-    		if (logger.isDebugEnabled()) {
-    			logger.debug(msg, pe);
-    		} else {
-    			logger.error(msg);
-    		}
+            logger.error("PropertyException on: {} {}", ari.getProperty().getXPath(), pe.getLocalizedMessage(), pe);
     	}
     	return false;
     }

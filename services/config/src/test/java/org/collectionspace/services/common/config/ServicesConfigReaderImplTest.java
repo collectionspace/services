@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.collectionspace.services.config.AssertionAttributeProbeType;
 import org.collectionspace.services.config.SAMLRelyingPartyType;

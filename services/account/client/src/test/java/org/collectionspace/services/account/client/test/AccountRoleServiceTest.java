@@ -207,8 +207,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
             assertStatusCode(res, testName);
             AccountRole output = res.readEntity(AccountRole.class);
             if(logger.isDebugEnabled()) {
-            	org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
-            	String sOutput = objectAsXmlString(objectFactory.createAccountRole(output), AccountRole.class);
+            	String sOutput = objectAsXmlString(output, AccountRole.class);
                 logger.debug(testName + " received " + sOutput);
             }
         } finally {
@@ -453,8 +452,7 @@ public class AccountRoleServiceTest extends AbstractServiceTestImpl<AccountRole,
 
         if (logger.isDebugEnabled()) {
             logger.debug("to be created, accRole common");
-            org.collectionspace.services.authorization.ObjectFactory objectFactory = new org.collectionspace.services.authorization.ObjectFactory();
-            logger.debug(objectAsXmlString(objectFactory.createAccountRole(accRole), AccountRole.class));
+            logger.debug(objectAsXmlString(accRole, AccountRole.class));
         }
         return accRole;
     }

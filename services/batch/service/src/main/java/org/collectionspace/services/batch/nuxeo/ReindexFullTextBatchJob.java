@@ -37,15 +37,15 @@ import org.nuxeo.ecm.core.api.AbstractSession;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
 import org.nuxeo.ecm.core.api.NuxeoException;
+import org.nuxeo.ecm.core.api.repository.FulltextConfiguration;
 import org.nuxeo.ecm.core.event.EventService;
 import org.nuxeo.ecm.core.query.QueryFilter;
 import org.nuxeo.ecm.core.query.sql.NXQL;
-import org.nuxeo.ecm.core.storage.FulltextConfiguration;
+import org.nuxeo.ecm.core.storage.FulltextExtractorWork;
 import org.nuxeo.ecm.core.storage.sql.Model;
 import org.nuxeo.ecm.core.storage.sql.Node;
 import org.nuxeo.ecm.core.storage.sql.Session;
 import org.nuxeo.ecm.core.storage.sql.SimpleProperty;
-import org.nuxeo.ecm.core.storage.sql.coremodel.SQLFulltextExtractorWork;
 import org.nuxeo.ecm.core.storage.sql.coremodel.SQLSession;
 import org.nuxeo.ecm.core.work.api.Work;
 import org.nuxeo.ecm.core.work.api.WorkManager;
@@ -531,7 +531,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		runAsyncBatch(asyncIds);
 
 		// wait for async completion after transaction commit
-		Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+		Framework.getService(EventService.class).waitForAsyncCompletion();
 	}
 
 	private List<String> quoteList(List<String> values) {
@@ -642,7 +642,7 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 		runAsyncBatch(asyncIds);
 
 		// wait for async completion after transaction commit
-		Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+		Framework.getService(EventService.class).waitForAsyncCompletion();
 	}
 
 	/*
@@ -692,9 +692,9 @@ public class ReindexFullTextBatchJob extends AbstractBatchJob {
 			return;
 		}
 		String repositoryName = coreSession.getRepositoryName();
-		WorkManager workManager = Framework.getLocalService(WorkManager.class);
+		WorkManager workManager = Framework.getService(WorkManager.class);
 		for (String id : asyncIds) {
-			Work work = new SQLFulltextExtractorWork(repositoryName, id);
+			Work work = new FulltextExtractorWork(repositoryName, id, false, true, false);
 			// schedule immediately, we're outside a transaction
 			workManager.schedule(work, Scheduling.IF_NOT_SCHEDULED, false);
 		}

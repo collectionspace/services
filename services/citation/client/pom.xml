@@ -47,11 +47,7 @@
         <!-- RESTEasy -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
+            <artifactId>resteasy-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.resteasy</groupId>

@@ -14,8 +14,6 @@ import org.collectionspace.services.config.tenant.EventListenerConfig;
 import org.collectionspace.services.config.tenant.Param;
 import org.collectionspace.services.nuxeo.client.java.CoreSessionInterface;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
-import org.nuxeo.common.collections.ScopeType;
-import org.nuxeo.common.collections.ScopedMap;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.event.Event;
@@ -23,9 +21,9 @@ import org.nuxeo.ecm.core.event.EventContext;
 import org.nuxeo.ecm.core.event.impl.DocumentEventContext;
 
 public abstract class AbstractCSEventListenerImpl implements CSEventListener {
-	private static Map<String, List<String>> mapOfrepositoryNames = new HashMap<String, List<String>>(); // <className, repositoryName>
-	private static Map<String, Map<String, Map<String, String>>> eventListenerParamsMap = new HashMap<String, Map<String, Map<String, String>>>();  // <repositoryName, Map<EventListenerId, Map<key, value>>>
-	private static Map<String, String> nameMap = new HashMap<String, String>();
+	private static Map<String, List<String>> mapOfrepositoryNames = new HashMap<>(); // <className, repositoryName>
+	private static Map<String, Map<String, Map<String, String>>> eventListenerParamsMap = new HashMap<>();  // <repositoryName, Map<EventListenerId, Map<key, value>>>
+	private static Map<String, String> nameMap = new HashMap<>();
 
     // SQL clauses
     private final static String NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
@@ -34,7 +32,7 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
     protected final static String ACTIVE_DOCUMENT_WHERE_CLAUSE_FRAGMENT =
             "AND (ecm:currentLifeCycleState <> 'deleted') "
             + NONVERSIONED_NONPROXY_DOCUMENT_WHERE_CLAUSE_FRAGMENT;
-    static final String DOCMODEL_CONTEXT_PROPERTY_PREFIX = ScopeType.DEFAULT.getScopePrefix();
+    private static final String DOCMODEL_CONTEXT_PROPERTY_PREFIX = "default/";
 	private String currentRepositoryName;
 
 	public AbstractCSEventListenerImpl() {
@@ -228,8 +226,8 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	//
 	@Override
     public void setDocModelContextProperty(DocumentModel collectionObjectDocModel, String key, Serializable value) {
-    	ScopedMap contextData = collectionObjectDocModel.getContextData();
-    	contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);
+		Map<String, Serializable> contextData = collectionObjectDocModel.getContextData();
+		contextData.putIfAbsent(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key, value);
     }
 
     //
@@ -237,8 +235,8 @@ public abstract class AbstractCSEventListenerImpl implements CSEventListener {
 	//
 	@Override
 	public void clearDocModelContextProperty(DocumentModel docModel, String key) {
-    	ScopedMap contextData = docModel.getContextData();
-    	contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);
+		Map<String, Serializable> contextData = docModel.getContextData();
+		contextData.remove(DOCMODEL_CONTEXT_PROPERTY_PREFIX + key);
 	}
 
 	//

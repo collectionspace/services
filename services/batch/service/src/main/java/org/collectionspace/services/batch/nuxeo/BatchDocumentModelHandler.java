@@ -299,7 +299,7 @@ public class BatchDocumentModelHandler extends NuxeoDocumentModelHandler<BatchCo
 			if (resourceMap != null) {
 				batchInstance.setResourceMap(resourceMap);
 			} else {
-				resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+				resourceMap = ResteasyProviderFactory.getInstance().getContextData(ResourceMap.class);
 				if (resourceMap != null) {
 					batchInstance.setResourceMap(resourceMap);
 				} else {

@@ -22,7 +22,7 @@ package org.collectionspace.ecm.platform.quote.api;
 import java.io.Serializable;
 import java.util.List;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
@@ -36,38 +36,38 @@ public interface QuoteableDocument extends Serializable {
      *
      * @return the list of comments
      */
-    List<DocumentModel> getQuotes() throws ClientException;
+    List<DocumentModel> getQuotes() throws NuxeoException;
 
     /**
      * Returns the comments for this document that are replied to a parent comment.
      *
      * @param parent the parent comment
      * @return the comments for the parent comment
-     * @throws ClientException
+     * @throws NuxeoException
      */
-    List<DocumentModel> getQuotes(DocumentModel parent) throws ClientException;
+    List<DocumentModel> getQuotes(DocumentModel parent) throws NuxeoException;
 
     /**
      * Removes a comment from the document comment list.
      *
      * @param comment
      */
-    void removeQuote(DocumentModel comment) throws ClientException;
+    void removeQuote(DocumentModel comment) throws NuxeoException;
 
     /**
      * Creates a new comment.
      *
      * @param comment
      */
-    DocumentModel addQuote(DocumentModel comment) throws ClientException;
+    DocumentModel addQuote(DocumentModel comment) throws NuxeoException;
 
     /**
      * Creates a new comment as a reply to an existing comment.
      *
      * @param parent the parent comment, which must exist
      * @param comment the comment to be added
-     * @throws ClientException
+     * @throws NuxeoException
      */
-    DocumentModel addQuote(DocumentModel parent, DocumentModel comment) throws ClientException;
+    DocumentModel addQuote(DocumentModel parent, DocumentModel comment) throws NuxeoException;
 
 }

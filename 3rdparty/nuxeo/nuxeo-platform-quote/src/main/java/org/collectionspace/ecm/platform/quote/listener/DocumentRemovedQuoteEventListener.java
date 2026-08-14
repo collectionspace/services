@@ -25,7 +25,7 @@ package org.collectionspace.ecm.platform.quote.listener;
 
 import java.util.List;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.event.PostCommitEventListener;
@@ -53,7 +53,7 @@ public class DocumentRemovedQuoteEventListener extends
 
     private static void onDocumentRemoved(CoreSession coreSession,
             RelationManager relationManager, QuoteServiceConfig config,
-            DocumentModel docMessage) throws ClientException {
+            DocumentModel docMessage) throws NuxeoException {
 
         Resource documentRes = relationManager.getResource(
                 config.documentNamespace, docMessage, null);

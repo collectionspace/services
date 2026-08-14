@@ -1,7 +1,7 @@
 package org.collectionspace.services.advancedsearch;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
 
 import org.collectionspace.collectionspace_core.CollectionSpaceCore;
 import org.collectionspace.services.collectionobject.CollectionobjectsCommon;

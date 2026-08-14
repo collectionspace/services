@@ -95,7 +95,7 @@ public class SimpleListenerTest extends RepositoryOSGITestCase {
     }
 
     protected void waitForAsyncExec() {
-        Framework.getLocalService(EventService.class).waitForAsyncCompletion();
+        Framework.getService(EventService.class).waitForAsyncCompletion();
     }
 
     /*

@@ -36,7 +36,7 @@ public class ThumbnailConverter extends IMImageUtils implements Converter {
 		try {
 			// Make sure the toThumbnail command is available
 			CommandLineExecutorService cles = Framework
-					.getLocalService(CommandLineExecutorService.class);
+					.getService(CommandLineExecutorService.class);
 			CommandAvailability commandAvailability = cles
 					.getCommandAvailability("toThumbnail");
 			if (!commandAvailability.isAvailable()) {

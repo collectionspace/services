@@ -9,7 +9,13 @@
         <class>org.collectionspace.services.account.AccountTenant</class>
         <class>org.collectionspace.services.account.Status</class>
         <properties>
-            <property name="hibernate.ejb.cfgfile" value="hibernate.cfg.xml"/>
+            <!-- Until our JNDI issue with Nuxeo is resolved, we have to use these JDBC properties rather than a datasource -->
+            <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+            <property name="javax.persistence.jdbc.user" value="@DB_CSPACE_USER@"/>
+            <property name="javax.persistence.jdbc.password" value="@DB_CSPACE_PASSWORD@"/>
+            <property name="javax.persistence.jdbc.url" value="@DB_CSPACE_URL@"/>
+            <!-- Same as auth-mgt import - disable XML Mapping so that javax.xml.bind classes are not loaded -->
+            <property name="hibernate.xml_mapping_enabled" value="false" />
         </properties>
     </persistence-unit>
 </persistence>

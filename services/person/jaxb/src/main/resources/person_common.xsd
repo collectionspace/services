@@ -11,14 +11,12 @@
     $LastChangedDate: $
 -->
 
-<xs:schema 
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-    jaxb:version="1.0" elementFormDefault="unqualified"
-    xmlns:ns="http://collectionspace.org/services/person"
-    xmlns="http://collectionspace.org/services/person"
-    targetNamespace="http://collectionspace.org/services/person"
-    version="0.1"
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+  xmlns="http://collectionspace.org/services/person"
+  targetNamespace="http://collectionspace.org/services/person"
+  version="0.1"
 >
     
     <!-- avoid XmlRootElement nightnmare, see http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html-->
@@ -146,4 +144,3 @@
     </xs:complexType>
     
 </xs:schema>
-

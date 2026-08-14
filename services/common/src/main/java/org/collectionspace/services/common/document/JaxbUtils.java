@@ -27,17 +27,17 @@
  */
 package org.collectionspace.services.common.document;
 
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+
 import javax.xml.namespace.QName;
 
+import org.collectionspace.services.common.jaxb.JAXBContextCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +59,11 @@ public class JaxbUtils {
         StringWriter sw = new StringWriter();
         
         try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
             Marshaller m = jc.createMarshaller();
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             m.marshal(o, sw);
-        } catch (javax.xml.bind.MarshalException e) {
+        } catch (jakarta.xml.bind.MarshalException e) {
         	//
         	// If the JAX-B object we're trying to marshal doesn't have an @XmlRootElement, then we need another
         	// approach.
@@ -83,7 +83,7 @@ public class JaxbUtils {
         StringWriter sw = new StringWriter();
 
     	try {
-            JAXBContext jc = JAXBContext.newInstance(clazz);
+            JAXBContext jc = JAXBContextCache.getInstance().getCachedJAXBContext(clazz);
 	    	Marshaller marshaller = jc.createMarshaller();
 	    	marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 	    	marshaller.marshal(new JAXBElement(new QName("uri","local"), clazz, o), sw);
@@ -92,40 +92,6 @@ public class JaxbUtils {
     	}
     	
         return sw.toString();
-    }
-
-    /**
-     * fromFile retrieves object of given class from given file (in classpath)
-     * @param jaxbClass
-     * @param fileName of the file to read to construct the object
-     * @return
-     * @throws Exception
-     */
-    public static Object fromFile(Class jaxbClass, String fileName)
-            throws Exception {
-
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
-        ClassLoader tccl = Thread.currentThread().getContextClassLoader();
-        InputStream is = tccl.getResourceAsStream(fileName);
-        return fromStream(jaxbClass, is);
-    }
-
-    /**
-     * fromStream retrieves object of given class from given inputstream
-     * @param jaxbClass
-     * @param is stream to read to construct the object
-     * @return
-     * @throws Exception
-     */
-    public static Object fromStream(Class jaxbClass, InputStream is) throws Exception {
-        JAXBContext context = JAXBContext.newInstance(jaxbClass);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
-        //note: setting schema to null will turn validator off
-        unmarshaller.setSchema(null);
-        return jaxbClass.cast(unmarshaller.unmarshal(is));
     }
 
     /**

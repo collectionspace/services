@@ -154,9 +154,7 @@ public class RoleDocumentHandler
         }
 
         if (logger.isDebugEnabled()) {
-        	org.collectionspace.services.authorization.ObjectFactory objectFactory =
-        		new org.collectionspace.services.authorization.ObjectFactory();
-            logger.debug("Merged role on update=" + JaxbUtils.toString(objectFactory.createRole(to), Role.class));
+            logger.debug("Merged role on update= {}", JaxbUtils.toString(to, Role.class));
         }
         
         return to;
@@ -259,19 +257,19 @@ public class RoleDocumentHandler
 
         return roleList;
     }
-	
+
     @Override
     public RolesList extractCommonPartList(
             DocumentWrapper<List<Role>> wrapDoc) throws Exception {
 
-        RolesList rolesList = extractPagingInfoForRoles(new RolesList(), wrapDoc);        
+        RolesList rolesList = extractPagingInfoForRoles(new RolesList(), wrapDoc);
         List<Role> list = new ArrayList<Role>();
         rolesList.setRole(list);
         for (Role role : wrapDoc.getWrappedObject()) {
             sanitize(role);
             list.add(role);
         }
-        
+
         return rolesList;
     }
 
@@ -296,8 +294,7 @@ public class RoleDocumentHandler
     }
 
     @Override
-    public String getQProperty(
-            String prop) {
+    public String getQProperty(String prop) {
         return null;
     }
 

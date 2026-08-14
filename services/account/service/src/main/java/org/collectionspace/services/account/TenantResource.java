@@ -28,20 +28,16 @@ package org.collectionspace.services.account;
 import org.collectionspace.services.account.storage.TenantDocumentHandler;
 import org.collectionspace.services.account.storage.TenantStorageClient;
 import org.collectionspace.services.account.storage.TenantValidatorHandler;
-import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.TenantClient;
 import org.collectionspace.services.client.PayloadOutputPart;
 import org.collectionspace.services.common.SecurityResourceBase;
 import org.collectionspace.services.common.ServiceMessages;
-import org.collectionspace.services.common.config.ServiceConfigUtils;
 import org.collectionspace.services.common.context.RemoteServiceContextFactory;
 import org.collectionspace.services.common.context.ServiceContext;
 import org.collectionspace.services.common.context.ServiceContextFactory;
 import org.collectionspace.services.common.document.DocumentFilter;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.StorageClient;
-import org.collectionspace.services.common.storage.jpa.JpaStorageUtils;
-import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,10 +49,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 
@@ -139,7 +133,7 @@ public class TenantResource extends SecurityResourceBase {
             ServiceContext<Tenant, Tenant> ctx = createServiceContext((Tenant) null,
                     Tenant.class, uriInfo);
             getStorageClient(ctx).delete(ctx, csid);
-            return Response.status(HttpResponseCodes.SC_OK).build();
+            return Response.ok().build();
         } catch (Exception e) {
             throw bigReThrow(e, ServiceMessages.DELETE_FAILED, csid);
         }

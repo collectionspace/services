@@ -20,7 +20,6 @@ import org.collectionspace.services.taxonomy.TaxonTermGroup;
 import org.collectionspace.services.taxonomy.TaxonTermGroupList;
 import org.collectionspace.services.taxonomy.TaxonomyauthorityCommon;
 import org.dom4j.DocumentException;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

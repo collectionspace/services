@@ -27,6 +27,7 @@ import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.chronology.ChronologyAuthorityResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
+import org.collectionspace.services.common.provider.JakartaJAXBProvider;
 import org.collectionspace.services.consultation.ConsultationResource;
 import org.collectionspace.services.deaccession.DeaccessionResource;
 import org.collectionspace.services.dutyofcare.DutyofcareResource;
@@ -67,6 +68,7 @@ import org.collectionspace.services.advancedsearch.AdvancedSearch;
 import org.collectionspace.services.dimension.DimensionResource;
 import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.structureddate.StructuredDateResource;
+import org.collectionspace.services.systeminfo.HealthResource;
 import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.contact.ContactResource;
 import org.collectionspace.services.vocabulary.VocabularyResource;
@@ -109,8 +111,8 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  */
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
 
-    private Set<Object> singletons = new HashSet<Object>();
-    private Set<Class<?>> empty = new HashSet<Class<?>>();
+    private Set<Object> singletons = new HashSet<>();
+    private Set<Class<?>> empty = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
@@ -119,6 +121,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         // Instantiate all our JaxRS resources
         //
         singletons.add(new SecurityInterceptor());
+        singletons.add(new JakartaJAXBProvider<>());
 
         singletons.add(new AccountResource());
         singletons.add(new TenantResource());
@@ -129,6 +132,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         singletons.add(new ExportResource());
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
+        singletons.add(new HealthResource());
         singletons.add(new IndexResource());
         singletons.add(new LoginResource());
         singletons.add(new LogoutResource());

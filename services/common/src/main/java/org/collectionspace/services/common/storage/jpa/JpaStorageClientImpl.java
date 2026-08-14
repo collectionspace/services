@@ -117,7 +117,7 @@ public class JpaStorageClientImpl implements StorageClient {
             jpaConnectionContext.beginTransaction();
             try {
                 handler.handle(Action.CREATE, wrapDoc);
-                JaxbUtils.setValue(entity, "setCreatedAtItem", Date.class, new Date());
+                JaxbUtils.setValue(entity, "setCreatedAt", Date.class, new Date());
                 jpaConnectionContext.persist(entity);
             } catch (EntityExistsException ee) { // FIXME: No, don't allow duplicates
                 //
@@ -312,7 +312,7 @@ public class JpaStorageClientImpl implements StorageClient {
             Object entityFound = getEntity(ctx, id, entityReceived.getClass());
             DocumentWrapper<Object> wrapDoc = new DocumentWrapperImpl<Object>(entityFound);
             handler.handle(Action.UPDATE, wrapDoc);
-            JaxbUtils.setValue(entityFound, "setUpdatedAtItem", Date.class, new Date());
+            JaxbUtils.setValue(entityFound, "setUpdatedAt", Date.class, new Date());
             handler.complete(Action.UPDATE, wrapDoc);
             
             jpaConnectionContext.commitTransaction();

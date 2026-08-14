@@ -708,7 +708,7 @@
         </test>
         <test ID="SearchVocabularyItemsAdvancedSearch">
             <method>GET</method>
-            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items?as=(vocabularyitems_common:displayName+ILIKE+%22%ShowItemsItem2%25%22)</uri>
+            <uri>/cspace-services/vocabularies/${createShowItemsVocab.CSID}/items?as=(vocabularyitems_common:displayName+ILIKE+%22%25ShowItemsItem2%25%22)</uri>
             <response>
                 <vars>
                     <var ID="itemsInPage">1</var>

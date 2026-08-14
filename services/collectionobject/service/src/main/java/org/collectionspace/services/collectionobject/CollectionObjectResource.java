@@ -25,38 +25,22 @@
  */
 package org.collectionspace.services.collectionobject;
 
-import org.collectionspace.services.client.CollectionObjectClient;
-import org.collectionspace.services.client.IQueryManager;
-import org.collectionspace.services.client.Profiler;
-import org.collectionspace.services.common.NuxeoBasedResource;
-import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.collectionspace.services.relation.RelationsCommonList;
-import org.collectionspace.services.relation.RelationshipType;
-import org.jboss.resteasy.util.HttpResponseCodes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.collectionspace.services.client.CollectionObjectClient;
+import org.collectionspace.services.client.Profiler;
+import org.collectionspace.services.common.NuxeoBasedResource;
 
 
 @Path(CollectionObjectClient.SERVICE_PATH_COMPONENT)
 @Consumes("application/xml")
 @Produces("application/xml")
 public class CollectionObjectResource extends NuxeoBasedResource {
-    
-    final Logger logger = LoggerFactory.getLogger(CollectionObjectResource.class);
 
     @Override
     public String getVersionString() {
@@ -68,7 +52,7 @@ public class CollectionObjectResource extends NuxeoBasedResource {
     public String getServiceName() {
         return CollectionObjectClient.SERVICE_PATH_COMPONENT;
     }
-    
+
     @Override
     public Class<CollectionobjectsCommon> getCommonPartClass() {
     	return CollectionobjectsCommon.class;
@@ -89,12 +73,12 @@ public class CollectionObjectResource extends NuxeoBasedResource {
     public Response roundtrip(
     		@PathParam("ms") String ms) {
     	Response result = null;
-    	
+
     	Profiler profiler = new Profiler("roundtrip():", 1);
     	profiler.start();
-		result = Response.status(HttpResponseCodes.SC_OK).build();
+		result = Response.ok().build();
 		profiler.stop();
-		
+
 		return result;
     }
 

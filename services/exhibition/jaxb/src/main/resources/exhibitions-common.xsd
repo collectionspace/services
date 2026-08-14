@@ -8,11 +8,9 @@
     Used for: JAXB binding between XML and Java objects
 -->
 
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/exhibition"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
   xmlns="http://collectionspace.org/services/exhibition"
   targetNamespace="http://collectionspace.org/services/exhibition"
   version="0.1"

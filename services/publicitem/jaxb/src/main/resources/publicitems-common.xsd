@@ -4,10 +4,10 @@
 	binding between XML and Java objects $LastChangedRevision$ $LastChangedDate$ -->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="1.0"
-	elementFormDefault="unqualified" xmlns:ns="http://collectionspace.org/services/publicitem"
-	xmlns="http://collectionspace.org/services/publicitem" targetNamespace="http://collectionspace.org/services/publicitem"
-	version="0.1">
+					 xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
+					 xmlns="http://collectionspace.org/services/publicitem"
+					 targetNamespace="http://collectionspace.org/services/publicitem"
+					 version="0.1">
 
 	<!-- Avoid XmlRootElement nightmare: See http://weblogs.java.net/blog/kohsuke/archive/2006/03/why_does_jaxb_p.html -->
 	<xs:element name="publicitems_common">

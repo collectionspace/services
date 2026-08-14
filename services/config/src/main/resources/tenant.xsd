@@ -51,6 +51,7 @@
 			<xs:element name="properties" type="types:PropertyType" minOccurs="0" maxOccurs="unbounded"/>
 			<xs:element name="remoteClientConfigurations" type="RemoteClientConfigurations" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="emailConfig" type="EmailConfig" minOccurs="0" maxOccurs="1"/>
+			<xs:element ref="passwordRequirementConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="uiConfig" type="UIConfig" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchDocumentWriter" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="elasticSearchIndexConfig" type="ElasticSearchIndexConfig" minOccurs="0" maxOccurs="1"/>
@@ -249,5 +250,31 @@
 			<xs:element name="value" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
+
+	<!-- Force XmlRootElement w/ anonymous type -->
+	<xs:element name="passwordRequirementConfig">
+		<xs:complexType>
+			<!-- Example:
+				<tenant:passwordRequirementConfig>
+					<tenant:minLength>6</tenant:minLength>
+					<tenant:requireLowerCase/>
+					<tenant:requireUpperCase/>
+					<tenant:requireDigit/>
+					<tenant:requireSpecial/>
+				</tenant:passwordRequirementConfig>
+			-->
+			<xs:annotation>
+				<xs:documentation>Configuration for how password restriction in a tenant</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element name="enabled" type="xs:boolean"/>
+				<xs:element name="minLength" type="xs:int" minOccurs="0"/>
+				<xs:element name="requireLowerCase" type="xs:boolean"/>
+				<xs:element name="requireUpperCase" type="xs:boolean"/>
+				<xs:element name="requireDigit" type="xs:boolean"/>
+				<xs:element name="requireSpecial" type="xs:boolean"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 
 </xs:schema>

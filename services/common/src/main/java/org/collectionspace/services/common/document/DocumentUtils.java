@@ -753,7 +753,7 @@ public class DocumentUtils {
 	 */
 	public static Schema getSchemaFromName(String schemaName) {
 		SchemaManager schemaManager = Framework
-				.getLocalService(SchemaManager.class);
+				.getService(SchemaManager.class);
 		return schemaManager.getSchema(schemaName);
 	}
 

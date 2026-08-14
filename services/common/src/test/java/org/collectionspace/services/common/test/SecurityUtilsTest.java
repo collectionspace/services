@@ -2,7 +2,7 @@ package org.collectionspace.services.common.test;
 
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import org.collectionspace.services.common.security.SecurityUtils;
 import org.collectionspace.services.config.AssertionProbesType;

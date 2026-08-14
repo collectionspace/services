@@ -42,7 +42,7 @@
           </formats>
           <!-- define a language-specific format -->
           <java>
-            <palantirJavaFormat />
+            <palantirJavaFormat/>
           </java>
         </configuration>
       </plugin>

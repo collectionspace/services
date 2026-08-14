@@ -10,9 +10,7 @@
 
 <xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
-  jaxb:version="1.0" elementFormDefault="unqualified"
-  xmlns:ns="http://collectionspace.org/services/insurance"
+  xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb" jaxb:version="3.0"
   xmlns="http://collectionspace.org/services/insurance"
   targetNamespace="http://collectionspace.org/services/insurance"
   version="0.1"
@@ -27,6 +25,7 @@
     <xs:element name="insurances_common">
         <xs:complexType>
             <xs:sequence>
+                <xs:element name="insuranceIndemnityReferenceNumber" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

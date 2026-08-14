@@ -28,17 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
 import javax.sql.rowset.CachedRowSet;
 import javax.ws.rs.core.MultivaluedMap;
 
-//
-// CSPACE-5036 - How to make CMISQL queries from Nuxeo
-//
 import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.server.CallContext;
 import org.apache.chemistry.opencmis.server.impl.CallContextImpl;
-import org.apache.chemistry.opencmis.server.shared.ThresholdOutputStreamFactory;
+import org.apache.chemistry.opencmis.server.shared.TempStoreOutputStreamFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
@@ -75,12 +71,12 @@ import org.collectionspace.services.lifecycle.TransitionDef;
 import org.collectionspace.services.nuxeo.util.CSReindexFulltextRoot;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.nuxeo.common.utils.IdUtils;
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.IdRef;
 import org.nuxeo.ecm.core.api.IterableQueryResult;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.VersioningOption;
 import org.nuxeo.ecm.core.api.impl.DocumentModelListImpl;
@@ -104,12 +100,8 @@ import org.slf4j.LoggerFactory;
  */
 public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn, PoxPayloadOut> {
 
-    /**
-     * The logger.
-     */
     private final Logger logger = LoggerFactory.getLogger(NuxeoRepositoryClientImpl.class);
-//    private final Logger profilerLogger = LoggerFactory.getLogger("remperf");
-//    private String foo = Profiler.createLogger();
+
     public static final String NUXEO_CORE_TYPE_DOMAIN = "Domain";
     public static final String NUXEO_CORE_TYPE_WORKSPACEROOT = "WorkspaceRoot";
     // FIXME: Get this value from an existing constant, if available
@@ -129,7 +121,8 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         //Empty constructor
     }
 
-    public void assertWorkflowState(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws DocumentNotFoundException, ClientException {
+    public void assertWorkflowState(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentModel docModel) throws DocumentNotFoundException,
+        NuxeoException {
         MultivaluedMap<String, String> queryParams = ctx.getQueryParams();
         if (queryParams != null) {
             //
@@ -389,7 +382,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     @Override
     public boolean synchronize(ServiceContext ctx, Object specifier, DocumentHandler handler)
-            throws DocumentNotFoundException, TransactionException, DocumentException {
+            throws DocumentNotFoundException, DocumentException {
     	boolean result = false;
 
         if (handler == null) {
@@ -592,7 +585,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
     public DocumentWrapper<DocumentModel> getDoc(
     		CoreSessionInterface repoSession,
             ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
-            String csid) throws DocumentNotFoundException, DocumentException {
+            String csid) throws DocumentNotFoundException {
         DocumentWrapper<DocumentModel> wrapDoc = null;
 
         try {
@@ -600,15 +593,15 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             DocumentModel doc = null;
             try {
                 doc = repoSession.getDocument(docRef);
-            } catch (ClientException ce) {
+            } catch (NuxeoException ce) {
                 String msg = logException(ce, "Could not find document with CSID=" + csid);
                 throw new DocumentNotFoundException(msg, ce);
             }
             wrapDoc = new DocumentWrapperImpl<DocumentModel>(doc);
         } catch (IllegalArgumentException iae) {
             throw iae;
-        } catch (DocumentException de) {
-            throw de;
+        } catch (NuxeoException ne) {
+            throw ne;
         }
 
         return wrapDoc;
@@ -1185,11 +1178,11 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      * Returns a URI value for a document in the Nuxeo repository
      *
      * @param wrappedDoc a wrapped documentModel
-     * @throws ClientException
+     * @throws NuxeoException
      * @return a document URI
      */
     @Override
-    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws ClientException {
+    public String getDocURI(DocumentWrapper<DocumentModel> wrappedDoc) throws NuxeoException {
         DocumentModel docModel = wrappedDoc.getWrappedObject();
         String uri = (String) docModel.getProperty(CollectionSpaceClient.COLLECTIONSPACE_CORE_SCHEMA,
                 CollectionSpaceClient.COLLECTIONSPACE_CORE_URI);
@@ -1208,7 +1201,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             logger.debug(String.format("Performing a CMIS query on Nuxeo repository named %s",
             		repoSession.getRepositoryName()));
 
-            ThresholdOutputStreamFactory streamFactory = ThresholdOutputStreamFactory.newInstance(
+            TempStoreOutputStreamFactory streamFactory = TempStoreOutputStreamFactory.newInstance(
                     null, THRESHOLD, -1, false);
             CallContextImpl callContext = new CallContextImpl(
                     CallContext.BINDING_LOCAL,
@@ -1223,7 +1216,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
             NuxeoCmisService cmisService = new NuxeoCmisService(repoSession.getCoreSession());
             result = repoSession.queryAndFetch(query, "CMISQL", cmisService);
-        } catch (ClientException e) {
+        } catch (NuxeoException e) {
             // TODO Auto-generated catch block
             logger.error("Encounter trouble making the following CMIS query: " + query, e);
             throw new NuxeoDocumentException(e);
@@ -1300,7 +1293,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             throw de;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Caught exception ", e); // REM - 1/17/2014: Check for org.nuxeo.ecm.core.api.ClientException and re-attempt
+                logger.debug("Caught exception ", e); // REM - 1/17/2014: Check for org.nuxeo.ecm.core.api.NuxeoException and re-attempt
             }
             throw new NuxeoDocumentException(e);
         } finally {
@@ -1791,7 +1784,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      * @param docModel the document to save
      * @param fSaveSession if TRUE, will call CoreSessionInterface.save() to save
      * accumulated changes.
-     * @throws ClientException
+     * @throws NuxeoException
      * @throws DocumentException
      */
 	@Deprecated
@@ -1800,14 +1793,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             CoreSessionInterface repoSession,
             DocumentModel docModel,
             boolean fSaveSession)
-            throws ClientException, DocumentException {
+            throws NuxeoException, DocumentException {
 
         try {
             repoSession.saveDocument(docModel);
             if (fSaveSession) {
                 repoSession.save();
             }
-        } catch (ClientException ce) {
+        } catch (NuxeoException ce) {
             throw ce;
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -1825,7 +1818,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      * @param docModelList a list of document models
      * @param fSaveSession if TRUE, will call CoreSessionInterface.save() to save
      * accumulated changes.
-     * @throws ClientException
+     * @throws NuxeoException
      * @throws DocumentException
      */
     public void saveDocListWithoutHandlerProcessing(
@@ -1833,14 +1826,14 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
             CoreSessionInterface repoSession,
             DocumentModelList docList,
             boolean fSaveSession)
-            throws ClientException, DocumentException {
+            throws NuxeoException, DocumentException {
         try {
             DocumentModel[] docModelArray = new DocumentModel[docList.size()];
             repoSession.saveDocuments(docList.toArray(docModelArray));
             if (fSaveSession) {
                 repoSession.save();
             }
-        } catch (ClientException ce) {
+        } catch (NuxeoException ce) {
             throw ce;
         } catch (Exception e) {
             logger.error("Caught exception ", e);
@@ -2084,7 +2077,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         }
 
         if (result == null) {
-            throw new ClientException("Could not find workspace root directory in: "
+            throw new NuxeoException("Could not find workspace root directory in: "
                     + domainPath);
         }
 
@@ -2283,9 +2276,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
 
     @Override
     public void doWorkflowTransition(ServiceContext ctx, String id,
-            DocumentHandler handler, TransitionDef transitionDef)
-            throws BadRequestException, DocumentNotFoundException,
-            DocumentException {
+            DocumentHandler handler, TransitionDef transitionDef) {
         // This is a placeholder for when we change the StorageClient interface to treat workflow transitions as 1st class operations like 'get', 'create', 'update, 'delete', etc
     }
 
@@ -2399,7 +2390,7 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
      */
 	@Override
 	public boolean delete(ServiceContext ctx, Object entityFound, DocumentHandler handler)
-			throws DocumentNotFoundException, DocumentException {
+			throws DocumentException {
 		throw new UnsupportedOperationException();
 	}
 }

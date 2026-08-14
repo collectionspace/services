@@ -3,6 +3,7 @@
 	<!-- environment should be declared before reading build.properties -->
 	<property environment="env" />
 	<!-- set global properties for this build -->
+	<property name="services.trunk" value="." />
 	<property file="build.properties" />
 	<property name="mvn.opts" value="-V" />
 	<property name="src" location="src" />
@@ -14,14 +15,28 @@
 		<os family="windows" />
 	</condition>
 
-  <scriptdef name="urlencode" language="javascript">
-    <attribute name="property"/>
-    <![CDATA[
-      var value = self.project.getProperty(attributes.get("property"));
-      var encoded = encodeURIComponent(value);
-      self.project.setProperty(attributes.get("property") + ".encoded", encoded)
-    ]]>
-  </scriptdef>
+  <target name="prepare-ant-libs">
+    <ant antfile="3rdparty/ant/build.xml" target="prepare-ant-libs" inheritAll="false" />
+  </target>
+
+  <target name="encode-jdbc-options" depends="prepare-ant-libs">
+    <path id="javax.classpath">
+      <fileset dir="${services.trunk}/3rdparty/ant/target/dependency">
+        <include name="*.jar" />
+      </fileset>
+    </path>
+
+    <scriptdef name="encode" language="javascript" manager="javax" classpathref="javax.classpath">
+      <attribute name="property"/>
+      <![CDATA[
+        var value = self.project.getProperty(attributes.get("property"));
+        var encoded = encodeURIComponent(value);
+        self.project.setProperty(attributes.get("property") + ".encoded", encoded)
+      ]]>
+    </scriptdef>
+
+    <encode property="db.jdbc.urloptions" />
+  </target>
 
 	<target name="init">
 		<!-- Create the time stamp -->
@@ -226,8 +241,7 @@
 	<!--
 		This target calls the 'create_nuxeo_db' and 'create_cspace_db' targets and creates some database utility functions
 	-->
-	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows">
-		<urlencode property="db.jdbc.urloptions" />
+	<target name="-create_db" depends="-validate_create_db_unix, -validate_create_db_windows, encode-jdbc-options">
 		<antcall target="create_nuxeo_db" />
 		<antcall target="create_cspace_db" />
 		<antcall target="create_update_userid_db_function" />
@@ -311,19 +325,22 @@
 		<ant antfile="services/build.xml" target="create_cspace_db" inheritAll="false" />
 	</target>
 
-	<target name="import" description="import default configuration">
-		<urlencode property="db.jdbc.urloptions" />
-		<ant antfile="services/build.xml" target="import" inheritAll="false" />
+	<target name="import" depends="encode-jdbc-options" description="import default configuration">
+		<ant antfile="services/build.xml" target="import" inheritAll="false">
+			<property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+		</ant>
 	</target>
 
-	<target name="deploy" depends="install, setup_initdb.sql" description="deploy services in ${jee.server.cspace}">
+	<target name="deploy" depends="install, setup_initdb.sql, encode-jdbc-options" description="deploy services in ${jee.server.cspace}">
 		<!-- copy db scripts, etc. -->
 		<copy todir="${jee.server.cspace}/cspace/services/scripts">
 			<fileset dir="${src}/main/resources/scripts/" />
 		</copy>
 		<ant antfile="3rdparty/build.xml" target="deploy" inheritAll="false" />
 		<ant antfile="common-lib/build.xml" target="deploy" inheritAll="false" />
-		<ant antfile="services/build.xml" target="deploy" inheritAll="false" />
+		<ant antfile="services/build.xml" target="deploy" inheritAll="false">
+			<property name="db.jdbc.urloptions.encoded" value="${db.jdbc.urloptions.encoded}" />
+		</ant>
 		<ant antfile="cspace-ui/build.xml" target="deploy" inheritAll="false" />
 	</target>
 

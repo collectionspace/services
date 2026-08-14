@@ -7,7 +7,6 @@ import javax.ws.rs.core.Response;
 
 import org.collectionspace.services.client.workflow.WorkflowClient;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-import org.jboss.resteasy.client.ClientResponse;
 
 public interface CollectionSpaceCommonListPoxProxy extends CollectionSpacePoxProxy<AbstractCommonList> {
     @GET

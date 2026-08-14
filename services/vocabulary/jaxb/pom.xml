@@ -13,25 +13,23 @@
     <name>services.vocabulary.jaxb</name>
 
     <dependencies>
-        <!-- CollectionSpace dependencies -->
         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.common</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
-        <!-- External dependencies -->
+
         <dependency>
-            <groupId>org.collectionspace.services</groupId>
-            <artifactId>org.collectionspace.services.jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>        
+            <groupId>org.jvnet.jaxb</groupId>
+            <artifactId>jaxb-plugins-runtime</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <finalName>collectionspace-services-vocabulary-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.jvnet.jaxb2.maven2</groupId>
-                <artifactId>maven-jaxb2-plugin</artifactId>                
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>jaxb-maven-plugin</artifactId>                
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

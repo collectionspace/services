@@ -14,7 +14,7 @@
 
 	<properties>
 		<annox.version>0.5.0</annox.version>
-		<maven-jaxb2-plugin.version>0.13.3</maven-jaxb2-plugin.version>
+		<maven-jaxb2-plugin.version>2.0.14</maven-jaxb2-plugin.version>
 		<!-- The default life cycle policy for Nuxeo document types -->
 		<Lifecycle>cs_default</Lifecycle>
 		<jaxb.codegen.phase>generate-sources</jaxb.codegen.phase>
@@ -29,6 +29,7 @@
     -->
 	<modules>
 		<module>config</module>
+		<module>common-http</module>
 		<module>common-api</module>
 		<module>authentication</module>
 		<module>authorization-common</module>
@@ -183,33 +184,9 @@
 					</configuration>
 				</plugin>
 				<plugin>
-					<groupId>org.jvnet.hyperjaxb3</groupId>
-					<artifactId>maven-hyperjaxb3-plugin</artifactId>
-					<version>0.6.0</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>generate</goal>
-							</goals>
-						</execution>
-					</executions>
-					<configuration>
-						<bindingIncludes>
-							<include>bindings.xjb</include>
-						</bindingIncludes>
-						<args>
-							<arg>-Xannotate</arg>
-						</args>
-						<extension>true</extension>
-						<jdk5>true</jdk5>
-						<ejb3>false</ejb3>
-						<persistenceUnitName>garbage</persistenceUnitName>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.jvnet.jaxb2.maven2</groupId>
-					<artifactId>maven-jaxb2-plugin</artifactId>
-					<version>${maven-jaxb2-plugin.version}</version>
+					<groupId>org.jvnet.jaxb</groupId>
+					<artifactId>jaxb-maven-plugin</artifactId>
+					<version>${jvnet.jaxb.version}</version>
 					<executions>
 						<execution>
 							<id>jaxb-codegen</id>
@@ -218,57 +195,27 @@
 								<goal>generate</goal>
 							</goals>
 							<configuration>
-								<extension>true</extension>
-								<schemaDirectory>src/main/resources</schemaDirectory>
-								<schemaIncludes>
-									<include>*.xsd</include>
-								</schemaIncludes>
-								<bindingDirectory>src/main/resources</bindingDirectory>
-								<bindingIncludes>
-									<include>bindings.xml</include>
-								</bindingIncludes>
 								<args>
-									<arg>-extension</arg>
-									<arg>-Xnamespace-prefix</arg>
-									<arg>-Xannotate</arg>
-									<arg>-verbose</arg>
-									<!-- <arg>-XtoString</arg> -->
+									<arg>-XtoString</arg>
 									<arg>-Xequals</arg>
 									<arg>-XhashCode</arg>
-									<!-- <arg>-Xcopyable</arg> -->
+									<arg>-Xnamespace-prefix</arg>
 								</args>
 								<plugins>
 									<plugin>
-										<groupId>javax.xml.bind</groupId>
-										<artifactId>jaxb-api</artifactId>
-										<version>${jaxb.version}</version>
-									</plugin>
-									<plugin>
-										<groupId>org.jvnet.jaxb2_commons</groupId>
-										<artifactId>jaxb2-basics-annotate</artifactId>
-										<version>${jaxb2-basics.version}</version>
-									</plugin>
-									<plugin>
-										<groupId>org.jvnet.jaxb2_commons</groupId>
-										<artifactId>jaxb2-basics</artifactId>
-										<version>${jaxb2-basics.version}</version>
+										<groupId>org.jvnet.jaxb</groupId>
+										<artifactId>jaxb-plugins</artifactId>
+										<version>${jvnet.jaxb.version}</version>
 									</plugin>
 								</plugins>
 							</configuration>
 						</execution>
 					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>org.jvnet.jaxb2_commons</groupId>
-							<artifactId>jaxb2-namespace-prefix</artifactId>							<!-- Used to force a specific namespace prefix specified in src/main/resource/bindings.xml -->
-							<version>1.4-SNAPSHOT</version>
-						</dependency>
-					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.1</version>
+					<version>3.6.3</version>
 					<configuration>
 						<systemProperties>
 							<systemProperty>
@@ -301,39 +248,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<!--show>public</show-->
-				</configuration>
 			</plugin>
-			<!--plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>taglist-maven-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <tags>
-                        <tag>@FIXME</tag>
-                        <tag>@fixme</tag>
-                        <tag>FIXME</tag>
-                        <tag>fixme</tag>
-                        <tag>@TODO</tag>
-                        <tag>@todo</tag>
-                        <tag>TODO</tag>
-                        <tag>todo</tag>
-                    </tags>
-                     <onlyAnalyze>org.collectionspace.*</onlyAnalyze>
-                </configuration>
-            </plugin-->
-			<!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <onlyAnalyze>org.collectionspace.*</onlyAnalyze>
-                    <findbugsXmlOutput>true</findbugsXmlOutput>
-                    <findbugsXmlOutputDirectory>target/site</findbugsXmlOutputDirectory>
-                </configuration>
-            </plugin>-->
-
 		</plugins>
 	</reporting>
 
@@ -358,7 +273,6 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
-
 		</dependencies>
 	</dependencyManagement>
 </project>

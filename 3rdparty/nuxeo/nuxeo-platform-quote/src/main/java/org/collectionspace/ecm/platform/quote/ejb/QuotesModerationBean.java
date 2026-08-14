@@ -25,7 +25,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.nuxeo.ecm.core.api.NuxeoException;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.runtime.api.Framework;
@@ -39,30 +39,30 @@ public class QuotesModerationBean implements QuotesModerationService {
 
 
     protected QuotesModerationService getQuotesModerationService() {
-        return Framework.getLocalService(QuotesModerationService.class);
+        return Framework.getService(QuotesModerationService.class);
     }
 
 
     public void approveQuote(CoreSession session, DocumentModel document,
-            String commentID) throws ClientException {
+            String commentID) throws NuxeoException {
         getQuotesModerationService().approveQuote(session, document, commentID);
     }
 
     public void publishQuote(CoreSession session, DocumentModel comment)
-            throws ClientException {
+            throws NuxeoException {
         getQuotesModerationService().publishQuote(session, comment);
 
     }
 
     public void rejectQuote(CoreSession session, DocumentModel document,
-            String commentID) throws ClientException {
+            String commentID) throws NuxeoException {
         getQuotesModerationService().rejectQuote(session, document, commentID);
 
     }
 
     public void startModeration(CoreSession session, DocumentModel document,
             String commentID, ArrayList<String> moderators)
-            throws ClientException {
+            throws NuxeoException {
         getQuotesModerationService().startModeration(session, document, commentID, moderators);
 
     }

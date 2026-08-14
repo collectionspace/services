@@ -23,12 +23,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-core</artifactId>
+			<groupId>jakarta.xml.bind</groupId>
+			<artifactId>jakarta.xml.bind-api</artifactId>
 		</dependency>
+
 		<dependency>
-			<groupId>org.jvnet.jaxb2_commons</groupId>
-			<artifactId>jaxb2-basics</artifactId>
+			<groupId>org.jvnet.jaxb</groupId>
+			<artifactId>jaxb-plugins-runtime</artifactId>
 		</dependency>
 	</dependencies>
 
@@ -37,8 +38,8 @@
 		<defaultGoal>install</defaultGoal>
 		<plugins>
 			<plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
+				<groupId>org.jvnet.jaxb</groupId>
+				<artifactId>jaxb-maven-plugin</artifactId>
 			</plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

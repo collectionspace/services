@@ -56,7 +56,7 @@ public class CollectionSpaceServiceContextListener implements ServletContextList
         ServiceMain instance = null;
 
         try {
-        	ServiceMain.getInstance();
+        	instance = ServiceMain.getInstance();
         } catch (Throwable t) {
         	// Do nothing.  Error already logged by the Services layer
         } finally {

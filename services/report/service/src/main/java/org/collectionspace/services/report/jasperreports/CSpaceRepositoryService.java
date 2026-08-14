@@ -59,7 +59,7 @@ public class CSpaceRepositoryService implements RepositoryService {
 
 	private InputStreamResource getMediaContentResource(String mediaCsid, String derivative) {
 		if (StringUtils.isNotEmpty(mediaCsid) && StringUtils.isNotEmpty(derivative)) {
-			ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
+			ResourceMap resourceMap = ResteasyProviderFactory.getInstance().getContextData(ResourceMap.class);
 			MediaResource mediaResource = (MediaResource) resourceMap.get(MediaClient.SERVICE_NAME);
 
 			InputStream contentStream = null;

@@ -10,87 +10,31 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.collectionspace.services.authorization.jaxb</artifactId>
     <name>services.authorization.jaxb</name>
-    <properties>
-    </properties>
+
     <dependencies>
         <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.jaxb2-commons</groupId>
-            <artifactId>property-listener-injector</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
+            <artifactId>javax.persistence-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>
-        <!-- Needed by hibernate-entitymanager, since we excluded dom4j:dom4j in order to upgrade to org.dom4j:dom4j -->
-        <dependency>
-            <groupId>org.dom4j</groupId>
-            <artifactId>dom4j</artifactId>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-c3p0</artifactId>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.jvnet.hyperjaxb3</groupId>
-            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.jaxb</artifactId>
+            <version>${project.version}</version>
         </dependency>
-        <dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
-			<version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-<!--
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jvnet.hyperjaxb3</groupId>
-            <artifactId>hyperjaxb3-ejb-runtime</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-        </dependency>
-        <dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.hyperjaxb</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jaxb-impl</artifactId>
-					<groupId>com.sun.xml.bind</groupId>
-				</exclusion>
-			</exclusions>
-        </dependency>
--->
     </dependencies>
 
     <build>
         <finalName>collectionspace-services-authorization-jaxb</finalName>
         <defaultGoal>install</defaultGoal>
-        <plugins>
-            <plugin>
-                <groupId>org.jvnet.hyperjaxb3</groupId>
-                <artifactId>maven-hyperjaxb3-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+     </build>
 
 </project>

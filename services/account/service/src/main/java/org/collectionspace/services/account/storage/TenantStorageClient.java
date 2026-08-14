@@ -73,7 +73,7 @@ public class TenantStorageClient extends JpaStorageClientImpl {
                     new DocumentWrapperImpl<Tenant>(tenant);
             handler.handle(Action.CREATE, wrapDoc);
             jpaConnectionContext.beginTransaction();
-            tenant.setCreatedAtItem(new Date());
+            tenant.setCreatedAt(new Date());
             jpaConnectionContext.persist(tenant);
             handler.complete(Action.CREATE, wrapDoc);
             jpaConnectionContext.commitTransaction();

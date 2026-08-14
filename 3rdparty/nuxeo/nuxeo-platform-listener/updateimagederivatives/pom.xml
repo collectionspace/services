@@ -15,7 +15,7 @@
     <name>org.collectionspace.services.listener.updateimagederivatives</name>
     <url>http://maven.apache.org</url>
 
-	 
+
    <dependencies>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
@@ -32,8 +32,12 @@
             <artifactId>org.collectionspace.services.client</artifactId>
             <version>${project.version}</version>
         </dependency>
+       <dependency>
+           <groupId>org.nuxeo.ecm.platform</groupId>
+           <artifactId>nuxeo-platform-imaging-core</artifactId>
+       </dependency>
     </dependencies>
-	
+
     <build>
         <resources>
             <resource>

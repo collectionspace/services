@@ -2,19 +2,16 @@ package org.collectionspace.services.nuxeo.elasticsearch.materials;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.lang3.StringUtils;
-
-import org.codehaus.jackson.JsonNode;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.node.ObjectNode;
-import org.codehaus.jackson.node.TextNode;
-
 import org.collectionspace.services.common.api.RefNameUtils;
 import org.collectionspace.services.nuxeo.elasticsearch.DefaultESDocumentWriter;
 import org.nuxeo.ecm.core.api.CoreSession;
@@ -71,12 +68,12 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 			// Combine term creator organizations and term editor organizations into a holding
 			// institutions field.
 
-			Set<String> holdingInstitutions = new LinkedHashSet<String>();
+			Set<String> holdingInstitutions = new LinkedHashSet<>();
 
 			holdingInstitutions.addAll(getTermAttributionContributors(doc));
 			holdingInstitutions.addAll(getTermAttributionEditors(doc));
 
-			if (holdingInstitutions.size() > 0) {
+			if (!holdingInstitutions.isEmpty()) {
 				denormValues.putArray("holdingInstitutions").addAll(jsonNodes(holdingInstitutions));
 			}
 		}
@@ -151,29 +148,25 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 		String escapedRefName = refName.replace("'", "\\'");
 		String mediaQuery = String.format("SELECT * FROM Media WHERE media_common:coverage = '%s' AND ecm:currentLifeCycleState = 'project' AND collectionspace_core:tenantId = '%s' ORDER BY media_common:identificationNumber", escapedRefName, tenantId);
 		DocumentModelList mediaDocs = session.query(mediaQuery);
-		List<JsonNode> mediaCsids = new ArrayList<JsonNode>();
-		List<JsonNode> mediaAltTexts = new ArrayList<JsonNode>();
+		List<JsonNode> mediaCsids = new ArrayList<>();
+		List<JsonNode> mediaAltTexts = new ArrayList<>();
 
 		if (mediaDocs.size() > 0) {
-			Iterator<DocumentModel> iterator = mediaDocs.iterator();
+            for (DocumentModel mediaDoc : mediaDocs) {
+                if (isMediaPublished(mediaDoc)) {
+                    String mediaCsid = mediaDoc.getName();
 
-			while (iterator.hasNext()) {
-				DocumentModel mediaDoc = iterator.next();
+                    mediaCsids.add(new TextNode(mediaCsid));
 
-				if (isMediaPublished(mediaDoc)) {
-					String mediaCsid = (String) mediaDoc.getName();
+                    String altText = (String) mediaDoc.getProperty("media_common", "altText");
 
-					mediaCsids.add(new TextNode(mediaCsid));
+                    if (altText == null) {
+                        altText = "";
+                    }
 
-					String altText = (String) mediaDoc.getProperty("media_common", "altText");
-
-					if (altText == null) {
-						altText = "";
-					}
-
-					mediaAltTexts.add(new TextNode(altText));
-				}
-			}
+                    mediaAltTexts.add(new TextNode(altText));
+                }
+            }
 		}
 
 		denormValues.putArray("mediaCsid").addAll(mediaCsids);
@@ -194,7 +187,7 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 	}
 
 	private List<String> findTermDisplayNamesWithFlag(List<Map<String, Object>> termGroups, String flagShortId) {
-		List<String> termDisplayNames = new ArrayList<String>();
+		List<String> termDisplayNames = new ArrayList<>();
 
 		for (Map<String, Object> termGroup : termGroups) {
 			String termFlag = (String) termGroup.get("termFlag");
@@ -212,7 +205,7 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 	}
 
 	private Set<String> getTermAttributionContributors(DocumentModel doc) {
-		Set orgs = new LinkedHashSet<String>();
+		Set<String> orgs = new LinkedHashSet<>();
 
 		List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionContributingGroupList");
 
@@ -228,7 +221,7 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 	}
 
 	private Set<String> getTermAttributionEditors(DocumentModel doc) {
-		Set orgs = new LinkedHashSet<String>();
+		Set<String> orgs = new LinkedHashSet<>();
 
 		List<Map<String, Object>> groups = (List<Map<String, Object>>) doc.getProperty("materials_common", "materialTermAttributionEditingGroupList");
 
@@ -248,29 +241,25 @@ public class MaterialsESDocumentWriter extends DefaultESDocumentWriter {
 		boolean isPublished = false;
 
 		if (publishToValues != null) {
-			for (int i=0; i<publishToValues.size(); i++) {
-				String value = publishToValues.get(i);
-				String shortId = RefNameUtils.getItemShortId(value);
+            for (String value : publishToValues) {
+                String shortId = RefNameUtils.getItemShortId(value);
 
-				if (shortId.equals("all") || shortId.equals("materialorder")) {
-					isPublished = true;
-					break;
-				}
-			}
+                if (shortId.equals("all") || shortId.equals("materialorder")) {
+                    isPublished = true;
+                    break;
+                }
+            }
 		}
 
 		return isPublished;
 	}
 
 	private List<JsonNode> jsonNodes(Collection<String> values) {
-		List<JsonNode> nodes = new ArrayList<JsonNode>();
-		Iterator<String> iterator = values.iterator();
+		List<JsonNode> nodes = new ArrayList<>();
 
-		while (iterator.hasNext()) {
-			String value = iterator.next();
-
-			nodes.add(new TextNode(value));
-		}
+        for (String value : values) {
+            nodes.add(new TextNode(value));
+        }
 
 		return nodes;
 	}
