@@ -519,6 +519,14 @@
 				<scope>import</scope>
 			</dependency>
 
+			<dependency>
+				<groupId>io.micrometer</groupId>
+				<artifactId>micrometer-bom</artifactId>
+				<version>1.16.7</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
 			<!-- Provided dependencies (for common-lib/cspace-service.war deployments) -->
 			<!-- Logging dependencies (slf4j, log4j) -->
 			<dependency>

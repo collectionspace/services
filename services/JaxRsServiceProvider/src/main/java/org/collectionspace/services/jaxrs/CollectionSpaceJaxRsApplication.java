@@ -22,85 +22,92 @@
  */
 package org.collectionspace.services.jaxrs;
 
-import org.collectionspace.services.account.AccountResource;
-import org.collectionspace.services.account.TenantResource;
-import org.collectionspace.services.blob.BlobResource;
-import org.collectionspace.services.chronology.ChronologyAuthorityResource;
-import org.collectionspace.services.collectionobject.CollectionObjectResource;
-import org.collectionspace.services.common.provider.JakartaJAXBProvider;
-import org.collectionspace.services.consultation.ConsultationResource;
-import org.collectionspace.services.deaccession.DeaccessionResource;
-import org.collectionspace.services.dutyofcare.DutyofcareResource;
-import org.collectionspace.services.exit.ExitResource;
-import org.collectionspace.services.heldintrust.HeldInTrustResource;
-import org.collectionspace.services.id.IDResource;
-import org.collectionspace.services.insurance.InsuranceResource;
-import org.collectionspace.services.iterationreport.IterationreportResource;
-import org.collectionspace.services.media.MediaResource;
-import org.collectionspace.services.group.GroupResource;
-import org.collectionspace.services.intake.IntakeResource;
-import org.collectionspace.services.index.IndexResource;
-import org.collectionspace.services.loanin.LoaninResource;
-import org.collectionspace.services.loanout.LoanoutResource;
-import org.collectionspace.services.repatriationrequest.RepatriationRequestResource;
-import org.collectionspace.services.nagprainventory.NagpraInventoryResource;
-import org.collectionspace.services.restrictedmedia.RestrictedMediaResource;
-import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
-import org.collectionspace.services.transport.TransportResource;
-import org.collectionspace.services.uoc.UocResource;
-import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
-import org.collectionspace.services.objectexit.ObjectExitResource;
-import org.collectionspace.services.batch.BatchResource;
-import org.collectionspace.services.imports.ImportsResource;
-import org.collectionspace.services.export.ExportResource;
-import org.collectionspace.services.location.LocationAuthorityResource;
-import org.collectionspace.services.place.PlaceAuthorityResource;
-import org.collectionspace.services.work.WorkAuthorityResource;
-import org.collectionspace.services.material.MaterialAuthorityResource;
-import org.collectionspace.services.concept.ConceptAuthorityResource;
-import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
-import org.collectionspace.services.movement.MovementResource;
-import org.collectionspace.services.propagation.PropagationResource;
-import org.collectionspace.services.pottag.PottagResource;
-import org.collectionspace.services.report.ReportResource;
-import org.collectionspace.services.acquisition.AcquisitionResource;
-import org.collectionspace.services.advancedsearch.AdvancedSearch;
-import org.collectionspace.services.dimension.DimensionResource;
-import org.collectionspace.services.servicegroup.ServiceGroupResource;
-import org.collectionspace.services.structureddate.StructuredDateResource;
-import org.collectionspace.services.systeminfo.HealthResource;
-import org.collectionspace.services.systeminfo.SystemInfoResource;
-import org.collectionspace.services.contact.ContactResource;
-import org.collectionspace.services.vocabulary.VocabularyResource;
-import org.collectionspace.services.organization.OrgAuthorityResource;
-import org.collectionspace.services.person.PersonAuthorityResource;
-import org.collectionspace.services.citation.CitationAuthorityResource;
-import org.collectionspace.services.claim.ClaimResource;
-import org.collectionspace.services.exhibition.ExhibitionResource;
-import org.collectionspace.services.osteology.OsteologyResource;
-import org.collectionspace.services.conditioncheck.ConditioncheckResource;
-import org.collectionspace.services.conservation.ConservationResource;
-import org.collectionspace.services.authorization.PermissionResource;
-import org.collectionspace.services.login.LoginResource;
-import org.collectionspace.services.logout.LogoutResource;
-
+import java.util.HashSet;
+import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import java.util.HashSet;
-import java.util.Set;
-
-
-
+import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
+import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
+import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.micrometer.core.instrument.binder.system.UptimeMetrics;
+import io.micrometer.prometheusmetrics.PrometheusConfig;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import org.collectionspace.services.account.AccountResource;
+import org.collectionspace.services.account.TenantResource;
+import org.collectionspace.services.acquisition.AcquisitionResource;
+import org.collectionspace.services.advancedsearch.AdvancedSearch;
+import org.collectionspace.services.authorization.PermissionResource;
 import org.collectionspace.services.authorization.RoleResource;
+import org.collectionspace.services.batch.BatchResource;
+import org.collectionspace.services.blob.BlobResource;
+import org.collectionspace.services.chronology.ChronologyAuthorityResource;
+import org.collectionspace.services.citation.CitationAuthorityResource;
+import org.collectionspace.services.claim.ClaimResource;
+import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.ResourceMapHolder;
 import org.collectionspace.services.common.ResourceMapImpl;
+import org.collectionspace.services.common.provider.JakartaJAXBProvider;
 import org.collectionspace.services.common.publicitem.PublicItemResource;
 import org.collectionspace.services.common.relation.RelationResource;
 import org.collectionspace.services.common.security.SecurityInterceptor;
+import org.collectionspace.services.concept.ConceptAuthorityResource;
+import org.collectionspace.services.conditioncheck.ConditioncheckResource;
+import org.collectionspace.services.conservation.ConservationResource;
+import org.collectionspace.services.consultation.ConsultationResource;
+import org.collectionspace.services.contact.ContactResource;
+import org.collectionspace.services.deaccession.DeaccessionResource;
+import org.collectionspace.services.dimension.DimensionResource;
+import org.collectionspace.services.dutyofcare.DutyofcareResource;
+import org.collectionspace.services.exhibition.ExhibitionResource;
+import org.collectionspace.services.exit.ExitResource;
+import org.collectionspace.services.export.ExportResource;
+import org.collectionspace.services.group.GroupResource;
+import org.collectionspace.services.heldintrust.HeldInTrustResource;
+import org.collectionspace.services.id.IDResource;
+import org.collectionspace.services.imports.ImportsResource;
+import org.collectionspace.services.index.IndexResource;
+import org.collectionspace.services.insurance.InsuranceResource;
+import org.collectionspace.services.intake.IntakeResource;
+import org.collectionspace.services.iterationreport.IterationreportResource;
+import org.collectionspace.services.loanin.LoaninResource;
+import org.collectionspace.services.loanout.LoanoutResource;
+import org.collectionspace.services.location.LocationAuthorityResource;
+import org.collectionspace.services.login.LoginResource;
+import org.collectionspace.services.logout.LogoutResource;
+import org.collectionspace.services.material.MaterialAuthorityResource;
+import org.collectionspace.services.media.MediaResource;
+import org.collectionspace.services.movement.MovementResource;
+import org.collectionspace.services.nagprainventory.NagpraInventoryResource;
+import org.collectionspace.services.objectexit.ObjectExitResource;
+import org.collectionspace.services.organization.OrgAuthorityResource;
+import org.collectionspace.services.osteology.OsteologyResource;
+import org.collectionspace.services.person.PersonAuthorityResource;
+import org.collectionspace.services.place.PlaceAuthorityResource;
+import org.collectionspace.services.pottag.PottagResource;
+import org.collectionspace.services.propagation.PropagationResource;
+import org.collectionspace.services.repatriationrequest.RepatriationRequestResource;
+import org.collectionspace.services.report.ReportResource;
+import org.collectionspace.services.restrictedmedia.RestrictedMediaResource;
+import org.collectionspace.services.servicegroup.ServiceGroupResource;
+import org.collectionspace.services.structureddate.StructuredDateResource;
+import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
+import org.collectionspace.services.systeminfo.HealthResource;
+import org.collectionspace.services.systeminfo.MetricsResource;
+import org.collectionspace.services.systeminfo.SystemInfoResource;
+import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
+import org.collectionspace.services.transport.TransportResource;
+import org.collectionspace.services.uoc.UocResource;
+import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
+import org.collectionspace.services.vocabulary.VocabularyResource;
+import org.collectionspace.services.work.WorkAuthorityResource;
 
 /**
  * CollectionSpaceJaxRsApplication, the root application
@@ -112,6 +119,8 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  */
 @ApplicationPath("/")
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
+
+    private static final String CSPACE_METRICS_ENABLED_OPT = "cspace.metrics.enabled";
 
     private Set<Object> singletons = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
@@ -138,6 +147,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         singletons.add(new LoginResource());
         singletons.add(new LogoutResource());
         singletons.add(new AdvancedSearch());
+        registerMetrics();
 
         addResourceToMapAndSingletons(new VocabularyResource());
         addResourceToMapAndSingletons(new PersonAuthorityResource());
@@ -189,12 +199,23 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
         addResourceToMapAndSingletons(new RestrictedMediaResource());
 
         singletons.add(new IDResource());
+    }
 
-        /*
-        singletons.add(new WorkflowResource());
-        */
-//        singletons.add(new DomainIdentifierResource());
-//        singletons.add(new PingResource());
+    private void registerMetrics() {
+        boolean metricsEnabled = Boolean.parseBoolean(System.getProperty(CSPACE_METRICS_ENABLED_OPT));
+        if (metricsEnabled) {
+            var registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT,
+                                                       PrometheusRegistry.defaultRegistry,
+                                                       Clock.SYSTEM);
+            new JvmThreadMetrics().bindTo(registry);
+            new JvmGcMetrics().bindTo(registry);
+            new JvmMemoryMetrics().bindTo(registry);
+            new ProcessorMetrics().bindTo(registry);
+            new UptimeMetrics().bindTo(registry);
+            Metrics.addRegistry(registry);
+
+            singletons.add(new MetricsResource(registry));
+        }
     }
 
     private void addResourceToMapAndSingletons(NuxeoBasedResource resource) {
