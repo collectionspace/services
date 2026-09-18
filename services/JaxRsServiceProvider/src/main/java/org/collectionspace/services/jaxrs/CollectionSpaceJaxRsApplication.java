@@ -28,16 +28,8 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
-import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Metrics;
-import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
-import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
-import io.micrometer.core.instrument.binder.system.UptimeMetrics;
-import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
-import io.prometheus.metrics.model.registry.PrometheusRegistry;
 import org.collectionspace.services.account.AccountResource;
 import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.acquisition.AcquisitionResource;
@@ -100,6 +92,7 @@ import org.collectionspace.services.servicegroup.ServiceGroupResource;
 import org.collectionspace.services.structureddate.StructuredDateResource;
 import org.collectionspace.services.summarydocumentation.SummaryDocumentationResource;
 import org.collectionspace.services.systeminfo.HealthResource;
+import org.collectionspace.services.systeminfo.MeterRegistryProvider;
 import org.collectionspace.services.systeminfo.MetricsResource;
 import org.collectionspace.services.systeminfo.SystemInfoResource;
 import org.collectionspace.services.taxonomy.TaxonomyAuthorityResource;
@@ -120,7 +113,7 @@ import org.collectionspace.services.work.WorkAuthorityResource;
 @ApplicationPath("/")
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
 
-    private static final String CSPACE_METRICS_ENABLED_OPT = "cspace.metrics.enabled";
+    public static final String CSPACE_METRICS_ENABLED_OPT = "cspace.metrics.enabled";
 
     private Set<Object> singletons = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
@@ -204,16 +197,8 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
     private void registerMetrics() {
         boolean metricsEnabled = Boolean.parseBoolean(System.getProperty(CSPACE_METRICS_ENABLED_OPT));
         if (metricsEnabled) {
-            var registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT,
-                                                       PrometheusRegistry.defaultRegistry,
-                                                       Clock.SYSTEM);
-            new JvmThreadMetrics().bindTo(registry);
-            new JvmGcMetrics().bindTo(registry);
-            new JvmMemoryMetrics().bindTo(registry);
-            new ProcessorMetrics().bindTo(registry);
-            new UptimeMetrics().bindTo(registry);
+            PrometheusMeterRegistry registry = MeterRegistryProvider.getInstance().getRegistry();
             Metrics.addRegistry(registry);
-
             singletons.add(new MetricsResource(registry));
         }
     }
