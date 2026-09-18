@@ -33,6 +33,16 @@
         </param-value>
     </context-param>
 
+    <!-- HTTP Response Time Metrics -->
+    <filter>
+        <filter-name>ResponseTimeFilter</filter-name>
+        <filter-class>org.collectionspace.services.common.filter.ResponseTimeFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ResponseTimeFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
     <!--
     	Spring Security Filter
     -->
