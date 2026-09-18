@@ -14,12 +14,15 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import org.apache.commons.io.IOUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
@@ -55,6 +58,7 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.report.ReportResource;
+import org.collectionspace.services.systeminfo.MeterRegistryProvider;
 import org.jboss.resteasy.core.ResteasyContext;
 import org.jboss.resteasy.specimpl.PathSegmentImpl;
 import org.jboss.resteasy.spi.Dispatcher;
@@ -81,6 +85,9 @@ public class CSpaceResteasyBootstrap implements Feature {
 	private static final String REPORT_PROPERTY = "report";
 	private static final String BATCH_PROPERTY = "batch";
 
+	@Context
+	private ServletContext servletContext;
+
 	@Override
 	public boolean configure(FeatureContext featureContext) {
 		try {
@@ -89,6 +96,12 @@ public class CSpaceResteasyBootstrap implements Feature {
 			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
+
+			String metricsEnabled = System.getProperty(CollectionSpaceJaxRsApplication.CSPACE_METRICS_ENABLED_OPT);
+			if (Boolean.parseBoolean(metricsEnabled)) {
+				PrometheusMeterRegistry registry = MeterRegistryProvider.getInstance().getRegistry();
+				servletContext.setAttribute("cspace.metrics.registry", registry);
+			}
 
 			// Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
 			String quickBoot = System.getProperty(QUICK_BOOT_PROPERTY, Boolean.FALSE.toString());
