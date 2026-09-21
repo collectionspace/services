@@ -87,7 +87,6 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 	private static final String LOGOUT = LogoutClient.SERVICE_NAME;
 	private static final String SYSTEM_INFO = SystemInfoClient.SERVICE_NAME;
 	private static final String HEALTH = "health";
-	private static final String METRICS = "metrics";
 	private static final String NUXEO_ADMIN = null;
 
 	private static final Set<String> ANONYMOUS_RESOURCES = Set.of(
@@ -95,7 +94,7 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 		AuthZ.PROCESS_PASSWORD_RESET,
 		AuthZ.PASSWORD_COMPLEXITY_REQS,
 		LOGIN, LOGOUT,
-		SYSTEM_INFO, HEALTH, METRICS);
+		SYSTEM_INFO, HEALTH);
 
     //
     // Use this thread specific member instance to hold our login context with Nuxeo
@@ -121,15 +120,16 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 
 		Class<?> resourceClass = resourceInfo.getResourceClass();
 		try {
-			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
-			result = resourceInstance.allowAnonymousAccess();
-		} catch (InstantiationException e) {
-			logger.error("isAnonymousRequest: ", e);
-		} catch (IllegalAccessException e) {
+			if (CollectionSpaceResource.class.isAssignableFrom(resourceClass)) {
+				CollectionSpaceResource resourceInstance =
+					(CollectionSpaceResource) resourceClass.getDeclaredConstructor().newInstance();
+				result = resourceInstance.allowAnonymousAccess();
+			}
+		} catch (ReflectiveOperationException e) {
 			logger.error("isAnonymousRequest: ", e);
 		}
 
-    	return result;
+        return result;
     }
 
 	/*

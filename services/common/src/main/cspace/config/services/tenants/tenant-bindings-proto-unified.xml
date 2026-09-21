@@ -215,7 +215,13 @@
 	        version="0.01">
 	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
 	    </tenant:serviceBindings>
-	    <!-- end systeminfo service meta-data -->
+	    <!-- end advancedsearch service meta-data -->
+
+	    <!-- metrics server meta-data -->
+	    <tenant:serviceBindings id="metrics" merge:matcher="id" name="metrics" requiresDocumentHandler="false" type="utility"
+	        version="0.01">
+	        <service:repositoryDomain xmlns:service="http://collectionspace.org/services/config/service">default-domain</service:repositoryDomain>
+	    </tenant:serviceBindings>
 
 		<!-- begin blob service meta-data -->
 		<!-- This should likely be type="object" -->
