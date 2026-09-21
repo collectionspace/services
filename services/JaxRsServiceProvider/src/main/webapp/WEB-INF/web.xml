@@ -149,7 +149,12 @@
         <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
     </listener-->
 
-	<!-- A general listener for the CollectionSpace services.  In particular, this listener starts the embedded Nuxeo EP server instance. -->
+    <!-- listener to shut down any meter registry which was created -->
+    <listener>
+        <listener-class>org.collectionspace.services.systeminfo.listener.MeterRegistryContextListener</listener-class>
+    </listener>
+
+    <!-- A general listener for the CollectionSpace services.  In particular, this listener starts the embedded Nuxeo EP server instance. -->
     <listener>
         <listener-class>
             org.collectionspace.services.common.CollectionSpaceServiceContextListener
