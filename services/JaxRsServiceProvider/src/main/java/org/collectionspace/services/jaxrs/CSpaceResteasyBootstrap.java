@@ -97,8 +97,7 @@ public class CSpaceResteasyBootstrap implements Feature {
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 
-			String metricsEnabled = System.getProperty(CollectionSpaceJaxRsApplication.CSPACE_METRICS_ENABLED_OPT);
-			if (Boolean.parseBoolean(metricsEnabled)) {
+			if (MeterRegistryProvider.isEnabled()) {
 				PrometheusMeterRegistry registry = MeterRegistryProvider.getInstance().getRegistry();
 				servletContext.setAttribute("cspace.metrics.registry", registry);
 			}

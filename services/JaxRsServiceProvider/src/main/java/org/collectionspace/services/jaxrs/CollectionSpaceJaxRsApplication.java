@@ -113,8 +113,6 @@ import org.collectionspace.services.work.WorkAuthorityResource;
 @ApplicationPath("/")
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
 
-    public static final String CSPACE_METRICS_ENABLED_OPT = "cspace.metrics.enabled";
-
     private Set<Object> singletons = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
@@ -195,11 +193,8 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
     }
 
     private void registerMetrics() {
-        boolean metricsEnabled = Boolean.parseBoolean(System.getProperty(CSPACE_METRICS_ENABLED_OPT));
-        if (metricsEnabled) {
-            PrometheusMeterRegistry registry = MeterRegistryProvider.getInstance().getRegistry();
-            Metrics.addRegistry(registry);
-            singletons.add(new MetricsResource(registry));
+        if (MeterRegistryProvider.isEnabled()) {
+            singletons.add(new MetricsResource());
         }
     }
 

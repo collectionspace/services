@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
@@ -62,6 +63,8 @@ public class MeterRegistryProvider {
         // store the jvm gv metrics so we can close it later
         jvmGcMetrics = new JvmGcMetrics();
         jvmGcMetrics.bindTo(registry);
+
+        Metrics.addRegistry(registry);
     }
 
     public static MeterRegistryProvider getInstance() {
