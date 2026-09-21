@@ -1,19 +1,21 @@
 package org.collectionspace.services.systeminfo;
 
+import java.util.Collections;
+
 import io.micrometer.core.instrument.Clock;
 import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.binder.jvm.JvmGcMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmThreadMetrics;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
 import io.micrometer.core.instrument.binder.system.UptimeMetrics;
+import io.micrometer.core.instrument.binder.tomcat.TomcatMetrics;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.prometheusmetrics.PrometheusConfig;
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import org.apache.catalina.Manager;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,6 +31,7 @@ public class MeterRegistryProvider {
 
     private final PrometheusMeterRegistry registry;
     private final JvmGcMetrics jvmGcMetrics;
+    private TomcatMetrics tomcatMetrics;
 
     private MeterRegistryProvider() {
         this.registry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT,
@@ -69,7 +72,20 @@ public class MeterRegistryProvider {
         return registry;
     }
 
+    public static boolean isEnabled() {
+        return Boolean.parseBoolean(System.getProperty("cspace.metrics.enabled"));
+    }
+
+    public void registerTomcatMetrics(Manager tomcatManager) {
+        this.tomcatMetrics = new TomcatMetrics(tomcatManager, Collections.emptyList());
+        tomcatMetrics.bindTo(MeterRegistryProviderInstance.INSTANCE.getRegistry());
+    }
+
     public void close() {
+        if (tomcatMetrics != null) {
+            tomcatMetrics.close();
+        }
+
         jvmGcMetrics.close();
         registry.close();
     }
