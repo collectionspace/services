@@ -35,7 +35,8 @@ public class ResponseTimeFilter implements Filter {
 
         // skip if metrics aren't enabled OR we're on the /metrics path (maybe include /health?)
         boolean enabled = Boolean.parseBoolean(System.getProperty("cspace.metrics.enabled"));
-        if (!enabled || request.getRequestURI().startsWith("/metrics")) {
+        String requestPath = request.getRequestURI().substring(request.getContextPath().length());
+        if (!enabled || requestPath.startsWith("/metrics")) {
             chain.doFilter(request, response);
             return;
         }
@@ -50,7 +51,7 @@ public class ResponseTimeFilter implements Filter {
                 timer.stop(Timer.builder("http.server.requests")
                                 .description("")
                                 .tag("method", request.getMethod())
-                                .tag("uri", normalizeUri(request.getRequestURI()))
+                                .tag("uri", normalizeUri(requestPath))
                                 .tag("status", getResponseStatus(response))
                                 .register(registry)
                           );

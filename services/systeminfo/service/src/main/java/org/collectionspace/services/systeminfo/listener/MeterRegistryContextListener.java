@@ -59,8 +59,10 @@ public class MeterRegistryContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        Metrics.removeRegistry(MeterRegistryProvider.getInstance().getRegistry());
-        MeterRegistryProvider.getInstance().close();
+        if (MeterRegistryProvider.isEnabled()) {
+            Metrics.removeRegistry(MeterRegistryProvider.getInstance().getRegistry());
+            MeterRegistryProvider.getInstance().close();
+        }
     }
 
 }
