@@ -84,10 +84,6 @@ public class CSpaceResteasyBootstrap implements Feature {
 	@Override
 	public boolean configure(FeatureContext featureContext) {
 		try {
-			//
-			// This call to super instantiates and initializes our JAX-RS application class.
-		 	// The application class is org.collectionspace.services.jaxrs.CollectionSpaceJaxRsApplication.
-			//
 			logger.info("Starting up the CollectionSpace Services JAX-RS application.");
 			ResteasyDeployment deployment = ResteasyContext.getContextData(ResteasyDeployment.class);
 			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();

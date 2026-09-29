@@ -146,10 +146,4 @@
         </listener-class>
     </listener>
 
-    <servlet>
-        <servlet-name>Resteasy</servlet-name>
-        <servlet-class>
-            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
-        </servlet-class>
-    </servlet>
 </web-app>
