@@ -228,14 +228,20 @@ public class AuthorizationGen {
      */
     public List<Permission> createDefaultReaderPermissions(String tenantId, boolean isEntityProxy) {
         ArrayList<Permission> apcList = new ArrayList<Permission>();
-        
+
         TenantBindingType tbinding = tenantBindings.get(tenantId);
         for (ServiceBindingType sbinding : tbinding.getServiceBindings()) {
             //add permissions for the main path
         	String resourceName = sbinding.getName().toLowerCase().trim();
+
+            if (resourceName.equals("metrics")) {
+                logger.debug("Skipping /metrics reader permissions");
+                continue;
+            }
+
         	if (isEntityProxy == true) {
         		resourceName = SecurityUtils.getResourceEntity(resourceName);
-        	}        	
+        	}
             Permission perm = buildReaderPermission(tbinding.getId(), resourceName);
             apcList.add(perm);
 
@@ -248,7 +254,7 @@ public class AuthorizationGen {
 	            }
             }
         }
-        
+
         return apcList;
     }
 
