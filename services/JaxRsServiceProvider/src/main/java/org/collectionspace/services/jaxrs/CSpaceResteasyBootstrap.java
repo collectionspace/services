@@ -2,13 +2,24 @@ package org.collectionspace.services.jaxrs;
 
 import static org.nuxeo.elasticsearch.ElasticSearchConstants.ES_ENABLED_PROPERTY;
 
-import javax.servlet.ServletContextEvent;
+import java.io.File;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Set;
+import javax.ws.rs.core.Feature;
+import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap;
-import org.jboss.resteasy.specimpl.PathSegmentImpl;
 import org.apache.commons.io.IOUtils;
 import org.collectionspace.authentication.AuthN;
 import org.collectionspace.authentication.CSpaceTenant;
@@ -32,7 +43,6 @@ import org.collectionspace.services.common.config.ConfigUtils;
 import org.collectionspace.services.common.config.TenantBindingConfigReaderImpl;
 import org.collectionspace.services.common.query.UriInfoImpl;
 import org.collectionspace.services.common.vocabulary.AuthorityResource;
-
 import org.collectionspace.services.config.service.AuthorityInstanceType;
 import org.collectionspace.services.config.service.ServiceBindingType;
 import org.collectionspace.services.config.service.ServiceBindingType.AuthorityInstanceList;
@@ -45,27 +55,22 @@ import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.jaxb.AbstractCommonList.ListItem;
 import org.collectionspace.services.nuxeo.util.NuxeoUtils;
 import org.collectionspace.services.report.ReportResource;
+import org.jboss.resteasy.core.ResteasyContext;
+import org.jboss.resteasy.specimpl.PathSegmentImpl;
 import org.jboss.resteasy.spi.Dispatcher;
+import org.jboss.resteasy.spi.ResteasyDeployment;
 import org.nuxeo.elasticsearch.ElasticSearchComponent;
 import org.nuxeo.elasticsearch.api.ElasticSearchService;
 import org.nuxeo.runtime.api.Framework;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-
-public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
+/**
+ * Note: this isn't really a proper {@link Feature}, but is just being used as a way to do work once the
+ * RESTEasyDeployment is available. Previously, this extended ResteasyBootstrap which was causing multiple instances of
+ * our JaxRsApplication to be created.
+ */
+public class CSpaceResteasyBootstrap implements Feature {
 	private static final Logger logger = LoggerFactory.getLogger(CSpaceResteasyBootstrap.class);
 
 	private static final String RESET_AUTHORITIES_PROPERTY = "org.collectionspace.services.authorities.reset";
@@ -77,40 +82,36 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 	private static final String BATCH_PROPERTY = "batch";
 
 	@Override
-	public void contextInitialized(ServletContextEvent event) {
+	public boolean configure(FeatureContext featureContext) {
 		try {
-			//
-			// This call to super instantiates and initializes our JAX-RS application class.
-		 	// The application class is org.collectionspace.services.jaxrs.CollectionSpaceJaxRsApplication.
-			//
 			logger.info("Starting up the CollectionSpace Services JAX-RS application.");
-			super.contextInitialized(event);
-			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication)deployment.getApplication();
+			ResteasyDeployment deployment = ResteasyContext.getContextData(ResteasyDeployment.class);
+			CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();
 			Dispatcher disp = deployment.getDispatcher();
 			disp.getDefaultContextObjects().put(ResourceMap.class, app.getResourceMap());
 
 			// Property can be set in the tomcat/bin/setenv.sh (or setenv.bat) file
 			String quickBoot = System.getProperty(QUICK_BOOT_PROPERTY, Boolean.FALSE.toString());
 
-			if (Boolean.valueOf(quickBoot) == false) {
+			if (!Boolean.parseBoolean(quickBoot)) {
 				// The below properties can be set in the tomcat/bin/setenv.sh (or setenv.bat) file.
 				String resetAuthsString = System.getProperty(RESET_AUTHORITIES_PROPERTY, Boolean.FALSE.toString());
 				String resetElasticsearchIndexString = System.getProperty(RESET_ELASTICSEARCH_INDEX_PROPERTY, Boolean.FALSE.toString());
 				String resetBatchJobsString = System.getProperty(RESET_BATCH_JOBS_PROPERTY, Boolean.TRUE.toString());
 				String resetReportsString = System.getProperty(RESET_REPORTS_PROPERTY, Boolean.TRUE.toString());
 
-				initializeAuthorities(app.getResourceMap(), Boolean.valueOf(resetAuthsString));
+				initializeAuthorities(app.getResourceMap(), Boolean.parseBoolean(resetAuthsString));
 
-				if (Boolean.valueOf(resetElasticsearchIndexString) == true) {
+				if (Boolean.parseBoolean(resetElasticsearchIndexString)) {
 					resetElasticSearchIndex();
 				}
 
-				if (Boolean.valueOf(resetReportsString) == true) {
-					resetReports();
+				if (Boolean.parseBoolean(resetReportsString)) {
+					resetReports(app);
 				}
 
-				if (Boolean.valueOf(resetBatchJobsString) == true) {
-					resetBatchJobs();
+				if (Boolean.parseBoolean(resetBatchJobsString)) {
+					resetBatchJobs(app);
 				}
 			}
 
@@ -119,17 +120,11 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
+
+		return true;
 	}
 
-
-	@Override
-	public void contextDestroyed(ServletContextEvent event) {
-		logger.info("Shutting down the CollectionSpace Services JAX-RS application.");
-		//Do something if needed.
-		logger.info("CollectionSpace Services JAX-RS application stopped.");
-	}
-
-	public void resetReports() throws Exception {
+	public void resetReports(CollectionSpaceJaxRsApplication app) throws Exception {
 		logger.info("Resetting reports");
 
 		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -161,17 +156,17 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			if (reportNames.size() > 0) {
 				CSpaceTenant tenant = new CSpaceTenant(tenantBinding.getId(), tenantBinding.getName());
 
-				resetTenantReports(tenant, reportNames);
+				resetTenantReports(tenant, reportNames, app);
 			}
 		}
 	}
 
-	private void resetTenantReports(CSpaceTenant tenant, Set<String> reportNames) throws Exception {
+	private void resetTenantReports(CSpaceTenant tenant, Set<String> reportNames, CollectionSpaceJaxRsApplication app)
+		throws Exception {
 		logger.info("Resetting reports for tenant {}", tenant.getId());
 
 		AuthZ.get().login(tenant);
 
-		CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();
 		ResourceMap resourceMap = app.getResourceMap();
 		ReportResource reportResource = (ReportResource) resourceMap.get(ReportClient.SERVICE_NAME);
 
@@ -245,7 +240,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		}
 	}
 
-	public void resetBatchJobs() throws Exception {
+	public void resetBatchJobs(CollectionSpaceJaxRsApplication app) throws Exception {
 		logger.info("Resetting batch jobs");
 
 		TenantBindingConfigReaderImpl tenantBindingConfigReader = ServiceMain.getInstance().getTenantBindingConfigReader();
@@ -277,17 +272,17 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 			if (batchNames.size() > 0) {
 				CSpaceTenant tenant = new CSpaceTenant(tenantBinding.getId(), tenantBinding.getName());
 
-				resetTenantBatchJobs(tenant, batchNames);
+				resetTenantBatchJobs(tenant, batchNames, app);
 			}
 		}
 	}
 
-	private void resetTenantBatchJobs(CSpaceTenant tenant, Set<String> batchNames) throws Exception {
+	private void resetTenantBatchJobs(CSpaceTenant tenant, Set<String> batchNames, CollectionSpaceJaxRsApplication app)
+		throws Exception {
 		logger.info("Resetting batch jobs for tenant {}", tenant.getId());
 
 		AuthZ.get().login(tenant);
 
-		CollectionSpaceJaxRsApplication app = (CollectionSpaceJaxRsApplication) deployment.getApplication();
 		ResourceMap resourceMap = app.getResourceMap();
 		BatchResource batchResource = (BatchResource) resourceMap.get(BatchClient.SERVICE_NAME);
 
@@ -388,7 +383,8 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 				Boolean isElasticsearchIndexed = serviceBinding.isElasticsearchIndexed();
 				String servicesRepoDomainName = serviceBinding.getRepositoryDomain();
 
-				if (isElasticsearchIndexed && servicesRepoDomainName != null && servicesRepoDomainName.trim().isEmpty() == false) {
+				if (isElasticsearchIndexed && servicesRepoDomainName != null && !servicesRepoDomainName.trim()
+                                                                                                       .isEmpty()) {
 					String repositoryName = ConfigUtils.getRepositoryName(tenantBinding, servicesRepoDomainName);
 					String docType = NuxeoUtils.getTenantQualifiedDocType(tenantBinding.getId(), serviceBinding.getObject().getName());
 
@@ -410,7 +406,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
     	Hashtable<String, TenantBindingType> tenantBindingsTable = tenantBindingConfigReader.getTenantBindings(false);
     	for (TenantBindingType tenantBindings : tenantBindingsTable.values()) {
 			CSpaceTenant tenant = new CSpaceTenant(tenantBindings.getId(), tenantBindings.getName());
-			if (shouldInitializeAuthorities(tenant, reset) == true) {
+			if (shouldInitializeAuthorities(tenant, reset)) {
 				logger.info("Initializing vocabularies and authorities of tenant '{}'.", tenant.getId());
 	    		for (ServiceBindingType serviceBinding : tenantBindings.getServiceBindings()) {
 	    			AuthorityInstanceList element = serviceBinding.getAuthorityInstanceList();
@@ -453,7 +449,7 @@ public class CSpaceResteasyBootstrap extends ResteasyBootstrap {
 		// we're not being asked to reset them, we'll return 'false'
 		// making any changes
 		//
-		return tenantState.isAuthoritiesInitialized() == false || reset == true;
+		return !tenantState.isAuthoritiesInitialized() || reset;
     }
 
     private void setAuthoritiesInitialized(CSpaceTenant cspaceTenant, boolean initState) {

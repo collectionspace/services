@@ -85,6 +85,7 @@ import org.collectionspace.services.login.LoginResource;
 import org.collectionspace.services.logout.LogoutResource;
 
 import javax.servlet.ServletContext;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
 import java.util.HashSet;
@@ -109,10 +110,10 @@ import org.collectionspace.services.common.security.SecurityInterceptor;
  * $LastChangedRevision$
  * $LastChangedDate$
  */
+@ApplicationPath("/")
 public class CollectionSpaceJaxRsApplication extends Application implements ResourceMapHolder {
 
     private Set<Object> singletons = new HashSet<>();
-    private Set<Class<?>> empty = new HashSet<>();
     private ResourceMap resourceMap = new ResourceMapImpl();
     private ServletContext servletContext = null;
 
@@ -203,7 +204,7 @@ public class CollectionSpaceJaxRsApplication extends Application implements Reso
 
     @Override
     public Set<Class<?>> getClasses() {
-        return empty;
+        return Set.of(CSpaceResteasyBootstrap.class);
     }
 
     @Override

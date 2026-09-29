@@ -18,11 +18,6 @@
     </env-entry>
 
     <context-param>
-        <param-name>javax.ws.rs.Application</param-name>
-        <param-value>org.collectionspace.services.jaxrs.CollectionSpaceJaxRsApplication</param-value>
-    </context-param>
-
-    <context-param>
         <param-name>resteasy.servlet.mapping.prefix</param-name>
         <param-value>/</param-value>
     </context-param>
@@ -150,23 +145,5 @@
             org.collectionspace.services.common.CollectionSpaceServiceContextListener
         </listener-class>
     </listener>
-
-	<!-- The CollectionSpace listener that starts up the RESTEasy/JAX-RS service framework. -->
-    <listener>
-        <listener-class>
-            org.collectionspace.services.jaxrs.CSpaceResteasyBootstrap
-        </listener-class>
-    </listener>
-    
-    <servlet>
-        <servlet-name>Resteasy</servlet-name>
-        <servlet-class>
-            org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
-        </servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>Resteasy</servlet-name>
-        <url-pattern>/*</url-pattern>
-    </servlet-mapping>
 
 </web-app>
