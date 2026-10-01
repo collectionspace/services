@@ -120,15 +120,16 @@ public class SecurityInterceptor implements ContainerRequestFilter, ContainerRes
 
 		Class<?> resourceClass = resourceInfo.getResourceClass();
 		try {
-			CollectionSpaceResource resourceInstance = (CollectionSpaceResource)resourceClass.newInstance();
-			result = resourceInstance.allowAnonymousAccess();
-		} catch (InstantiationException e) {
-			logger.error("isAnonymousRequest: ", e);
-		} catch (IllegalAccessException e) {
+			if (CollectionSpaceResource.class.isAssignableFrom(resourceClass)) {
+				CollectionSpaceResource resourceInstance =
+					(CollectionSpaceResource) resourceClass.getDeclaredConstructor().newInstance();
+				result = resourceInstance.allowAnonymousAccess();
+			}
+		} catch (ReflectiveOperationException e) {
 			logger.error("isAnonymousRequest: ", e);
 		}
 
-    	return result;
+        return result;
     }
 
 	/*
