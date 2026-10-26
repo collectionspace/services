@@ -1,5 +1,12 @@
 # CollectionSpace Services Changelog
 
+## 9.0.1
+
+* Bound DBCP2 JDBC pools with maxWithMillis
+* Set validationQuery and testOnBorrow for nuxeo pool
+* Raise Nuxeo VCS session pool size
+* Use WorkManager to schedule derivative generation
+
 ## 9.0.0
 
 * Add home location to collectionobject schema and advanced search

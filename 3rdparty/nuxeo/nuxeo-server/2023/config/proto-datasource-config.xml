@@ -4,7 +4,7 @@
   <extension target="org.nuxeo.runtime.datasource" point="datasources">
     <datasource name="jdbc/place_holder" driverClassName="org.postgresql.Driver"
       maxPoolSize="100" minPoolSize="5" blockingTimeoutMillis="10000"
-      url="jdbc:postgresql://localhost:5432/place_holder" validationQuery=""
+      url="jdbc:postgresql://localhost:5432/place_holder" validationQuery="SELECT 1" testOnBorrow="true"
       username="place_holder" password="place_holder"
       accessToUnderlyingConnectionAllowed="true" >
     </datasource>
