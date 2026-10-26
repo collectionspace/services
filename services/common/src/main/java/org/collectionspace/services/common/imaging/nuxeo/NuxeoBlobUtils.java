@@ -29,12 +29,9 @@ package org.collectionspace.services.common.imaging.nuxeo;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -82,6 +79,7 @@ import org.nuxeo.ecm.core.api.impl.blob.FileBlob;
 import org.nuxeo.ecm.core.api.model.Property;
 import org.nuxeo.ecm.core.blob.BlobManager;
 import org.nuxeo.ecm.core.blob.BlobProvider;
+import org.nuxeo.ecm.core.work.api.WorkManager;
 import org.nuxeo.ecm.platform.filemanager.api.FileImporterContext;
 import org.nuxeo.ecm.platform.filemanager.api.FileManager;
 import org.nuxeo.ecm.platform.filemanager.service.FileManagerService;
@@ -89,6 +87,7 @@ import org.nuxeo.ecm.platform.filemanager.service.extension.FileImporter;
 import org.nuxeo.ecm.platform.filemanager.utils.FileManagerUtils;
 import org.nuxeo.ecm.platform.mimetype.MimetypeDetectionException;
 import org.nuxeo.ecm.platform.mimetype.interfaces.MimetypeRegistry;
+import org.nuxeo.ecm.platform.picture.PictureViewsGenerationWork;
 import org.nuxeo.ecm.platform.picture.api.ImageInfo;
 import org.nuxeo.ecm.platform.picture.api.ImagingDocumentConstants;
 import org.nuxeo.ecm.platform.picture.api.ImagingService;
@@ -674,47 +673,17 @@ public class NuxeoBlobUtils {
 											   .build();
 		result = getFileManager().createOrUpdateDocument(context);
 
-		// Compute the views now instead of relying on Nuxeo to populate them
+		// Schedule a job to compute the derivatives. Pass true to the work manager so that jobs run after the current
+		// transaction completes
 		if (result != null && isBlobAnImage(inputStreamBlob) && useNuxeoAdaptors) {
-			computeViews(result, inputStreamBlob);
+			WorkManager workManager = Framework.getService(WorkManager.class);
+			if (workManager != null) {
+				workManager.schedule(new PictureViewsGenerationWork(repoSession.getRepositoryName(),
+																result.getId(), "file:content"), true);
+			}
 		}
 
 		return result;
-	}
-
-	/**
-	 * Compute the derivative views and add them to our document. This assumes the view list is not populated and in the
-	 * future we might need to clear existing views before setting the value.
-	 *
-	 * @param doc The Blob's document
-	 * @param blob The Blob
-	 */
-	private static void computeViews(DocumentModel doc, Blob blob) {
-		final var convert = true;
-		final var imagingService = Framework.getService(ImagingService.class);
-		if (imagingService == null) {
-			logger.warn("Unable to compute views for {}, ImagingService not found", blob.getFilename());
-			return;
-		}
-
-		final var views = new ArrayList<Map<String, Serializable>>();
-		final var imageInfo = imagingService.getImageInfo(blob);
-		if (imageInfo == null) {
-			logger.warn("Unable to generate imageInfo for {}, skipping derivative generation", blob.getFilename());
-			return;
-		}
-
-        try {
-			final var computedViews = imagingService.computeViewsFor(doc, blob, imageInfo, convert);
-			for (var view : computedViews) {
-				views.add(view.asMap());
-			}
-			doc.setPropertyValue(VIEWS_PROPERTY, views);
-		} catch (PropertyException e) {
-			logger.error("Unable to set view property for document {}", blob.getFilename(), e);
-		} catch (IOException e) {
-			logger.error("Unable to compute views for document {}", blob.getFilename(), e);
-		}
 	}
 
 	public static BlobsCommon createBlobInRepository(
