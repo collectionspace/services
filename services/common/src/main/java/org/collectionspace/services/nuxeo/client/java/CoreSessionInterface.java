@@ -15,12 +15,12 @@ import org.nuxeo.ecm.core.api.impl.LifeCycleFilter;
 
 public interface CoreSessionInterface {
 
-	public CoreSession getCoreSession();
-	
-    public void setTransactionRollbackOnly();
-    
-    public boolean isTransactionMarkedForRollbackOnly();
-	
+    CoreSession getCoreSession();
+
+    void setTransactionRollbackOnly();
+
+    boolean isTransactionMarkedForRollbackOnly();
+
     /**
      * Gets the root document of this repository.
      *
@@ -28,8 +28,8 @@ public interface CoreSessionInterface {
      * @throws NuxeoException
      * @throws SecurityException
      */
-    public DocumentModel getRootDocument() throws NuxeoException;
-    
+    DocumentModel getRootDocument() throws NuxeoException;
+
     /**
      * Gets the current session id.
      * <p>
@@ -37,58 +37,57 @@ public interface CoreSessionInterface {
      *
      * @return the session id or null if not connected
      */
-    public String getSessionId();
+    String getSessionId();
 
     /**
-     * 
      * @throws Exception
      */
-    public void close() throws Exception;
-    
+    void close() throws Exception;
+
     /**
      * Returns the repository name against which this core session is bound.
      *
      * @return the repository name used currently used as an identifier
      */
-    public String getRepositoryName();
-    
+    String getRepositoryName();
+
     /**
      * Gets the principal that created the client session.
      *
      * @return the principal
      */
-    public Principal getPrincipal();
+    Principal getPrincipal();
 
-    public IterableQueryResult queryAndFetch(String query, String queryType,
-            Object... params) throws NuxeoException, DocumentException;
+    IterableQueryResult queryAndFetch(String query, String queryType, Object... params)
+        throws NuxeoException, DocumentException;
 
-    public DocumentModelList query(String query, Filter filter, long limit,
-            long offset, boolean countTotal) throws NuxeoException, DocumentException;
+    DocumentModelList query(String query, Filter filter, long limit, long offset, boolean countTotal)
+        throws NuxeoException, DocumentException;
 
-    public DocumentModelList query(String query) throws NuxeoException, DocumentException;
+    DocumentModelList query(String query) throws NuxeoException, DocumentException;
 
     /**
      * Executes the given NXQL query an returns the result.
      *
      * @param query the query to execute
-     * @param max number of document to retrieve
+     * @param max   number of document to retrieve
      * @return the query result
      * @throws NuxeoException
-     * @throws DocumentException 
+     * @throws DocumentException
      */
-    public DocumentModelList query(String query, int max) throws NuxeoException, DocumentException;
-    
+    DocumentModelList query(String query, int max) throws NuxeoException, DocumentException;
+
     /**
      * Executes the given NXQL query and returns the result that matches the
      * filter.
      *
-     * @param query the query to execute
+     * @param query  the query to execute
      * @param filter the filter to apply to result
      * @return the query result
-     * @throws DocumentException 
+     * @throws DocumentException
      * @throws NuxeoException
      */
-    public DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) throws DocumentException;
+    DocumentModelList query(String query, LifeCycleFilter workflowStateFilter) throws DocumentException;
 
     /**
      * Gets a document model given its reference.
@@ -104,11 +103,11 @@ public interface CoreSessionInterface {
      * @throws NuxeoException
      * @throws SecurityException
      */
-    public DocumentModel getDocument(DocumentRef docRef) throws NuxeoException;
+    DocumentModel getDocument(DocumentRef docRef) throws NuxeoException;
 
-    public DocumentModel saveDocument(DocumentModel docModel) throws NuxeoException;
+    DocumentModel saveDocument(DocumentModel docModel) throws NuxeoException;
 
-    public void save() throws NuxeoException;
+    void save() throws NuxeoException;
 
     /**
      * Bulk document saving.
@@ -116,7 +115,7 @@ public interface CoreSessionInterface {
      * @param docModels the document models that needs to be saved
      * @throws NuxeoException
      */
-    public void saveDocuments(DocumentModel[] docModels) throws NuxeoException;
+    void saveDocuments(DocumentModel[] docModels) throws NuxeoException;
 
     /**
      * Removes this document and all its children, if any.
@@ -124,7 +123,7 @@ public interface CoreSessionInterface {
      * @param docRef the reference to the document to remove
      * @throws NuxeoException
      */
-    public void removeDocument(DocumentRef docRef) throws NuxeoException;
+    void removeDocument(DocumentRef docRef) throws NuxeoException;
 
     /**
      * Creates a document model using required information.
@@ -141,9 +140,8 @@ public interface CoreSessionInterface {
      * @return the initial document model
      * @throws NuxeoException
      */
-    public DocumentModel createDocumentModel(String parentPath, String id,
-            String typeName) throws NuxeoException;
-    
+    DocumentModel createDocumentModel(String parentPath, String id, String typeName) throws NuxeoException;
+
     /**
      * Creates a document using given document model for initialization.
      * <p>
@@ -155,17 +153,21 @@ public interface CoreSessionInterface {
      * @return the created document
      * @throws NuxeoException
      */
-    public DocumentModel createDocument(DocumentModel model) throws NuxeoException;
-    
+    DocumentModel createDocument(DocumentModel model) throws NuxeoException;
+
     /**
      * Gets the children of the given parent.
      *
      * @param parent the parent reference
      * @return the children if any, an empty list if no children or null if the
-     *         specified parent document is not a folder
+     * specified parent document is not a folder
      * @throws NuxeoException
      */
-    public DocumentModelList getChildren(DocumentRef parent) throws NuxeoException;
+    DocumentModelList getChildren(DocumentRef parent) throws NuxeoException;
 
-    
+    /**
+     * @return The time this session was acquired, using System.nanoTime
+     */
+    long getAcquisitionTime();
+
 }

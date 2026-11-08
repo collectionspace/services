@@ -31,6 +31,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
 	private CoreSession repoSession;
 	private boolean transactionSetForRollback = false;
+	private final long acquisitionTime;
 
     /** The logger. */
     private static Logger logger = LoggerFactory.getLogger(CoreSessionWrapper.class);
@@ -51,6 +52,7 @@ public class CoreSessionWrapper implements CoreSessionInterface {
 
 	public CoreSessionWrapper(CoreSession repoSession) {
 		this.repoSession = repoSession;
+		this.acquisitionTime = System.nanoTime();
 	}
 
 	/*
@@ -340,6 +342,8 @@ public class CoreSessionWrapper implements CoreSessionInterface {
     	return repoSession.getChildren(parent);
     }
 
-
-
+	@Override
+    public long getAcquisitionTime() {
+        return acquisitionTime;
+    }
 }
