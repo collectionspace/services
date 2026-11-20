@@ -2,47 +2,38 @@ package org.collectionspace.services.common.blob;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
 
+import org.collectionspace.services.common.HttpDownloadUtility;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
+import org.collectionspace.services.nuxeo.client.java.CommonList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.collectionspace.services.nuxeo.client.java.CommonList;
-import org.collectionspace.services.common.Download;
-import org.collectionspace.services.common.HttpDownloadUtility;
-import org.collectionspace.services.common.ServiceMain;
-import org.collectionspace.services.common.document.DocumentException;
-import org.collectionspace.services.common.imaging.nuxeo.NuxeoBlobUtils;
-
-import org.apache.commons.io.FileUtils;
-
 public class BlobInput {
 	private final Logger logger = LoggerFactory.getLogger(BlobInput.class);
-	private final static String FILE_ACCESS_ERROR = "The following file is either missing or cannot be read: ";
-	private final static String URL_DOWNLOAD_FAILED = "Could not download file from the following URL: ";
-	
+	private static final String URL_DOWNLOAD_FAILED = "Could not download file from the following URL: ";
+
 	private boolean isTemporaryFile = false;
 	private String blobCsid = null;
 	private File blobFile = null;
 	private String blobUri = null;
 	private String blobMimeType = null;
 	private String originalFileName = null;
-	
+
 	private String derivativeTerm;
 	private boolean derivativeListRequested = false;
 	private CommonList derivativeList;
-	
+
 	private boolean contentRequested = false;
 	private InputStream contentStream;
-	
+
 	private boolean schemaRequested = false;
-	
+
 	public static final String URI_CONTENT_PATH = "content";
 	public static final String URI_DERIVATIVES_PATH = "derivatives";
 
@@ -52,28 +43,28 @@ public class BlobInput {
 	public BlobInput() {
 		/* Empty constructor */
 	}
-		
+
 	public BlobInput(File blobFile, String blobUri) {
 		this.blobFile = blobFile;
 		this.blobUri = blobUri;
 	}
-	
+
 	/*
 	 * Save the original file name in case we rename it because of illegal Nuxeo file name characters
 	 */
 	private void setBlobFileName(String fileName) throws Exception {
 		String sanitizedResult = NuxeoBlobUtils.getSanizitedFilename(fileName);
-		if (fileName.equals(sanitizedResult) == true) {
-			originalFileName = null; //
+		if (fileName.equals(sanitizedResult)) {
+			originalFileName = null;
 		} else {
 			originalFileName = fileName;
 		}
 	}
-	
+
 	public String getBlobFilename() throws Exception {
 		String result = null;
-		
-		if (originalFileName != null && originalFileName.trim().isEmpty() == false) {
+
+		if (originalFileName != null && !originalFileName.trim().isEmpty()) {
 			result = originalFileName;
 		} else {
 			File theBlobFile = this.getBlobFile();
@@ -81,19 +72,18 @@ public class BlobInput {
 				result = theBlobFile.getName();
 			}
 		}
-		
+
 		//
 		// Add a log warning if the blob file name fails Nuxeo's file name restrictions.
 		//
 		String sanitizedResult = NuxeoBlobUtils.getSanizitedFilename(result);
-		if (result.equals(sanitizedResult) == false) {
-			logger.warn(String.format("The file name '%s' contains characters that Nuxeo deems illegal.",
-					result));
-		}		
-		
+		if (!Objects.equals(result, sanitizedResult)) {
+            logger.warn("The file name '{}' contains characters that Nuxeo deems illegal.", result);
+		}
+
 		return result;
 	}
-	
+
 	/*
 	 * Getters and Setters
 	 */
@@ -175,7 +165,7 @@ public class BlobInput {
 	/*
 	 * End of setters and getters
 	 */
-	
+
 	//
 	// FIXME: REM - The callers of this method are sending us a multipart form-data post, so why
 	// are we also receiving the blobUri?
@@ -186,51 +176,22 @@ public class BlobInput {
     	this.setBlobFile(tmpFile);
     	this.setBlobUri(blobUri);
 	}
-	
-	private boolean isProtocolHttp(URL url) {
-		boolean result = false;
-		
-		if (url.getProtocol().equalsIgnoreCase("http") ||
-				url.getProtocol().equalsIgnoreCase("https")) {
-			result = true;
-		}
-		
-		return result;
-	}
-		
-	public void createBlobFile(String theBlobUri) throws MalformedURLException, Exception {		
-		URL blobUrl = new URL(theBlobUri);
-    	File theBlobFile = null;
 
-    	if (isProtocolHttp(blobUrl) == true) {
-    		theBlobFile = HttpDownloadUtility.downloadFile(theBlobUri);
-			if (theBlobFile != null) {
-				setIsTemporaryFile(true); // setting to true ensures the file will get cleanup (removed) when we're done with it
-			} else {
-				String msg = URL_DOWNLOAD_FAILED + theBlobUri;
-				logger.error(msg);
-				throw new DocumentException(msg);
-			}
-		} else if (blobUrl.getProtocol().equalsIgnoreCase("file")) {
-			if (blobUrl.getPath().startsWith("/")) {
-				// full path
-				theBlobFile = FileUtils.toFile(blobUrl);			
-			} else {
-				// relative to JEE container (e.g. Apache Tomcat) path
-				Path theBlobFilePath = Paths.get(ServiceMain.getJeeContainPath(), blobUrl.getPath());
-				theBlobFile = new File(theBlobFilePath.toAbsolutePath().toString());
-			}
-			if (theBlobFile.exists() == false || theBlobFile.canRead() == false) {
-				String msg = FILE_ACCESS_ERROR + theBlobFile.getAbsolutePath();
-				logger.error(msg);
-				throw new DocumentException(msg);
-			}
+
+	public void createBlobFile(String theBlobUri) throws Exception {
+		File theBlobFile;
+
+		theBlobFile = HttpDownloadUtility.downloadFile(theBlobUri);
+		if (theBlobFile != null) {
+			setIsTemporaryFile(true); // setting to true ensures the file will get cleanup (removed) when we're done with it
 		} else {
-			throw new MalformedURLException("Could not create a blob file from: " + blobUrl);
+			String msg = URL_DOWNLOAD_FAILED + theBlobUri;
+			logger.error(msg);
+			throw new DocumentException(msg);
 		}
-		
-    	this.setBlobFile(theBlobFile);
-    	this.setBlobUri(blobUri);
+
+		this.setBlobFile(theBlobFile);
+		this.setBlobUri(blobUri);
 	}
 
 	public String getMimeType() {
@@ -240,14 +201,13 @@ public class BlobInput {
 	public void setMimeType(String mimeType) {
 		this.blobMimeType = mimeType;
 	}
-	
+
 	public void setIsTemporaryFile(boolean flag) {
 		this.isTemporaryFile = flag;
 	}
-	
+
 	public boolean isTemporaryFile() {
 		return this.isTemporaryFile;
 	}
-	
-}
 
+}

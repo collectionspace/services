@@ -95,11 +95,6 @@ public class BlobResource extends NuxeoBasedResource {
         return (CommonList) getList(csidList);
     }
 
-//    @Deprecated
-//    protected CommonList search(MultivaluedMap<String,String> queryParams,String keywords) {
-//         return (CommonList) super.search(queryParams, keywords);
-//    }
-
     private CommonList getDerivativeList(ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
     		String csid) throws Exception {
     	CommonList result = null;
@@ -212,7 +207,7 @@ public class BlobResource extends NuxeoBasedResource {
     @Path("{csid}/prototype")
     @Consumes("multipart/form-data")
     @Produces(MediaType.TEXT_PLAIN)
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public Response prototype(@PathParam("csid") String csid,
     		@Context HttpServletRequest req,
     		@QueryParam(BlobClient.BLOB_URI_PARAM) String blobUri,

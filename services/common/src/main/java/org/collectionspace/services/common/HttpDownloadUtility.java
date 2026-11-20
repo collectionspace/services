@@ -1,23 +1,34 @@
 package org.collectionspace.services.common;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
+import javax.ws.rs.core.HttpHeaders;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.http.Header;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ContentDisposition;
 
 public class HttpDownloadUtility {
     private static final Logger logger = LoggerFactory.getLogger(HttpDownloadUtility.class);
 
-	private static final int BUFFER_SIZE = 4096;
-
     private static String getDestDir(String destDir) {
-        if (destDir.endsWith(File.separator) != true) {
+        if (!destDir.endsWith(File.separator)) {
         	destDir = destDir + File.separator;
         }
         //
@@ -26,7 +37,7 @@ public class HttpDownloadUtility {
         File destDirFile = new File(destDir);
         boolean destDirExists = destDirFile.exists();
         boolean triedToCreateDir = false;
-        if (destDirExists == false) {
+        if (!destDirExists) {
         	triedToCreateDir = true;
         	destDirExists = destDirFile.mkdir();
         } else {
@@ -35,10 +46,10 @@ public class HttpDownloadUtility {
         //
         // If we couldn't create the directory or if it is already a file then fail.
         //
-        if (destDirExists == false) {
+        if (!destDirExists) {
         	if (triedToCreateDir) {
-        		logger.error(String.format("Tried and failed to create a temp directory '%s' for storing a downloaded file.",
-        				destDir));
+        		logger.error("Tried and failed to create a temp directory '{}' for storing a downloaded file.",
+							 destDir);
         	}
         	return null;
         }
@@ -46,96 +57,120 @@ public class HttpDownloadUtility {
         return destDir;
     }
 
-	public static File downloadFile(String fileURL) throws IOException {
-		File result = null;
+	private static boolean isProtocolHttp(URL url) {
+		return url.getProtocol().equalsIgnoreCase("http") || url.getProtocol().equalsIgnoreCase("https");
+	}
 
-    	try {
+	public static File downloadFile(String url) throws MalformedURLException {
+		URI uri = URI.create(url);
+		if (!isProtocolHttp(uri.toURL())) {
+			throw new MalformedURLException("Could not create a blob file from: " + url);
+		}
+
+		File result = null;
+		try {
         	String tmpdir = System.getProperty("java.io.tmpdir");
-        	if (tmpdir.endsWith(File.separator) == false) {
+        	if (!tmpdir.endsWith(File.separator)) {
         		tmpdir = tmpdir + File.separator;
         	}
 
         	String destDir = getDestDir(tmpdir + UUID.randomUUID() + File.separator);
-        	String filePath = downloadFile(fileURL, destDir);
+        	String filePath = downloadFile(uri, destDir);
         	result = new File(filePath);
     	} catch (Exception e) {
-    		String msg = String.format("Could not download file use this URL: %s", fileURL);
-    		logger.error(msg, e);
+    		logger.error("Could not download file use this URL: {}", url, e);
     	}
 
     	return result;
 	}
 
 	/**
-	 * Downloads a file from a URL
+	 * Get and validate a URI for a given url string. Checks that a URI is not a link local or site local.
 	 *
-	 * @param fileURL HTTP URL of the file to be downloaded
-	 * @param saveDir path of the directory to save the file
-	 * @throws IOException
+	 * @param uri the uri
+	 * @return InetAddress of the uri
+	 * @throws IllegalArgumentException if the URI is for an unknown host, link local, site local, or loopback address
 	 */
-	private static String downloadFile(String fileURL, String saveDir) throws IOException {
-		URL url = new URL(fileURL);
-		HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-		int httpResponseCode = 0;
-		String result = null;
-
-		try {
-			httpResponseCode = httpConn.getResponseCode();
-
-			// always check HTTP response code first
-			if (httpResponseCode == HttpURLConnection.HTTP_OK) {
-				String fileName = "";
-				String disposition = httpConn.getHeaderField("Content-Disposition");
-
-				if (disposition != null) {
-					// extracts file name from header field
-					int index = disposition.indexOf("filename=");
-					if (index > 0) {
-						fileName = disposition.substring(index + 9, disposition.length());
-					}
-				} else {
-					// extracts file name from URL
-					fileName = fileURL.substring(fileURL.lastIndexOf("/") + 1, fileURL.length());
-					// Remove query parameters from filename
-					int qIndex = fileName.indexOf("?");
-					if (qIndex > -1) {
-						fileName = fileName.substring(0, qIndex);
-					}
-				}
-
-				if (logger.isDebugEnabled()) {
-					String contentType = httpConn.getContentType();
-					int contentLength = httpConn.getContentLength();
-					logger.debug("File name is:" + fileName);
-					logger.debug("Disposition is:" + disposition != null ? disposition : "<empty>");
-					logger.debug("Content type is:" + contentType != null ? contentType : "<empty>");
-					logger.debug("Content length is:" + contentLength);
-				}
-
-				// opens input stream from the HTTP connection
-				InputStream inputStream = httpConn.getInputStream();
-				String saveFilePath = saveDir + File.separator + fileName; //FIXME: File.separator NOT needed
-
-				// opens an output stream to save into file
-				FileOutputStream outputStream = new FileOutputStream(saveFilePath);
-
-				try {
-					int bytesRead = -1;
-					byte[] buffer = new byte[BUFFER_SIZE];
-					while ((bytesRead = inputStream.read(buffer)) != -1) {
-						outputStream.write(buffer, 0, bytesRead);
-					}
-				} finally {
-					outputStream.close();
-					inputStream.close();
-				}
-
-				result = saveFilePath;
+	@VisibleForTesting
+	protected static InetAddress addressFor(URI uri) {
+        InetAddress address;
+        try {
+            address = InetAddress.getByName(uri.getHost());
+			if (address.isLinkLocalAddress()
+				|| address.isMulticastAddress()
+				|| address.isSiteLocalAddress()
+				|| address.isAnyLocalAddress()
+				|| address.isLoopbackAddress()) {
+				throw new IllegalArgumentException("Invalid hostname");
 			}
-		} finally {
-			httpConn.disconnect();
+        } catch (UnknownHostException e) {
+			logger.warn("Invalid host {} for download", uri, e);
+            throw new IllegalArgumentException(e);
+        }
+
+		return address;
+	}
+
+
+	/**
+	 * Extract the filename from an HttpResponse. In order of precedence:
+	 * * Use the Content-Disposition header
+	 * * Use the final path part of the URI
+	 * * Use a UUID
+	 * @param uri The uri of the request
+	 * @param response The HttpResponse
+	 * @return The extracted filename
+	 */
+	private static String getFilename(URI uri, CloseableHttpResponse response) {
+		if (response.containsHeader(HttpHeaders.CONTENT_DISPOSITION)) {
+			Header header = response.getFirstHeader(HttpHeaders.CONTENT_DISPOSITION);
+			String headerValue = header.getValue();
+			ContentDisposition contentDisposition = ContentDisposition.parse(headerValue);
+			if (contentDisposition.getFilename() != null) {
+				return contentDisposition.getFilename();
+			}
 		}
 
-		return result;
+		String path = uri.getPath();
+		if (path != null) {
+			int lastSlashIndex = path.lastIndexOf("/");
+			String pathPart = lastSlashIndex == -1 ? path : path.substring(lastSlashIndex + 1);
+			if (!pathPart.isEmpty()) {
+				return pathPart;
+			}
+		}
+
+		return UUID.randomUUID().toString();
+	}
+
+	/**
+	 * Downloads a file from a URL. Exceptions propagate up to the downloadFile above which handles them.
+	 *
+	 * @param uri The URI of the file to be downloaded
+	 * @param saveDir path of the directory to save the file
+	 * @throws IOException if there's an error with the http request or with the file writing
+	 */
+	private static String downloadFile(URI uri, String saveDir) throws IOException {
+		final InetAddress address = addressFor(uri);
+
+		// we already resolved the InetAddress when validating the address is not a local address, so we can use a
+		// custom resolver to forward that to the http client
+		try (CloseableHttpClient client = HttpClients.custom()
+				.disableRedirectHandling()
+				.setDnsResolver(s -> new InetAddress[] {address})
+				.build()) {
+			HttpGet get = new HttpGet(uri);
+			Path savePath;
+			try (CloseableHttpResponse response = client.execute(get)) {
+				String file = getFilename(uri, response);
+				savePath = Path.of(saveDir, file);
+				try (OutputStream outputStream = Files.newOutputStream(savePath);
+					 InputStream inputStream = response.getEntity().getContent()) {
+					inputStream.transferTo(outputStream);
+				}
+			}
+
+			return savePath.toString();
+		}
 	}
 }
