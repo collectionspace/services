@@ -15,7 +15,6 @@
 	<property name="services.trunk" value=".." />
 	<property name="build.dir.name" value="build" />
 	<property name="build.dir" value="./${build.dir.name}" />
-	<!-- Files to deploy to the shared cspace-ui webapp. This is not a tenant directory. -->
 	<property name="shared.dir.name" value="shared" />
 	<property name="source.dir" value="${build.dir}/source" />
 	<property name="staging.dir" value="${build.dir}/staging" />
