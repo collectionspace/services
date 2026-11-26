@@ -15,6 +15,7 @@
 	<property name="services.trunk" value=".." />
 	<property name="build.dir.name" value="build" />
 	<property name="build.dir" value="./${build.dir.name}" />
+	<property name="shared.dir.name" value="shared" />
 	<property name="source.dir" value="${build.dir}/source" />
 	<property name="staging.dir" value="${build.dir}/staging" />
 
@@ -125,11 +126,29 @@
 		</pathconvert>
 
 		<copy file="${staging.dir}/${cspace.public.browser.install.filename}" todir="${jee.deploy.cspace.ui.shared}" />
+
+		<!--
+			The target of the stable public browser script URL (/cspace-ui/cspacePublicBrowser.js).
+			When the public browser is downloaded, redirect to the CDN. When it is built from source
+			redirect to the locally deployed build.
+		-->
+		<condition property="cspace.public.browser.stable.url"
+			value="/cspace-ui/${cspace.public.browser.install.filename}"
+			else="https://cdn.jsdelivr.net/npm/${cspace.public.browser.package.name}@${cspace.public.browser.version}/dist/${cspace.public.browser.library.name}.min.js">
+			<istrue value="${cspace.public.browser.build}" />
+		</condition>
+
+		<copy todir="${jee.deploy.cspace.ui.shared}" overwrite="true">
+			<fileset dir="${shared.dir.name}" />
+			<filterset>
+				<filter token="PUBLIC_BROWSER_STABLE_URL" value="${cspace.public.browser.stable.url}" />
+			</filterset>
+		</copy>
 	</target>
 
 	<target name="deploy_tenants" depends="deploy_cspace_ui_js,deploy_cspace_public_browser_js">
 		<subant target="deploy_tenant" genericantfile="${ant.file}" inheritall="true">
-			<dirset dir="." includes="*" excludes="${build.dir.name}" />
+			<dirset dir="." includes="*" excludes="${build.dir.name},${shared.dir.name}" />
 		</subant>
 	</target>
 
@@ -270,7 +289,7 @@
 
 	<target name="undeploy_tenants">
 		<subant target="undeploy_tenant" genericantfile="${ant.file}" inheritall="true">
-			<dirset dir="." includes="*" />
+			<dirset dir="." includes="*" excludes="${shared.dir.name}" />
 		</subant>
 	</target>
 

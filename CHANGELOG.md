@@ -1,5 +1,9 @@
 # CollectionSpace Services Changelog
 
+## 9.1.0
+
+* Add stable URL for the public browser script (/cspace-ui/cspacePublicBrowser.js) for external embedders
+
 ## 9.0.1
 
 * Bound DBCP2 JDBC pools with maxWithMillis
