@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="3.0" metadata-complete="true">
+        <!--
+                Stable, unversioned URL for the public browser script
+        -->
+        <servlet>
+                <servlet-name>PublicBrowserScript</servlet-name>
+                <jsp-file>/WEB-INF/publicBrowserScript.jsp</jsp-file>
+        </servlet>
+        <servlet-mapping>
+                <servlet-name>PublicBrowserScript</servlet-name>
+                <url-pattern>/cspacePublicBrowser.js</url-pattern>
+        </servlet-mapping>
+</web-app>
